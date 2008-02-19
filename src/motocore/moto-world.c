@@ -19,6 +19,8 @@ struct _MotoWorldPriv
     MotoTimeNode *time;
 };
 
+Бла-бла!
+
 static void
 moto_world_dispose(GObject *obj)
 {
