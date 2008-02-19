@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
 
     moto_library_new_slot(lib, "test", MOTO_TYPE_NODE);
 
-    moto_library_new_entry(lib, "test", "test", lib);
+    g_print("%s\n", g_type_name(MOTO_TYPE_LIBRARY));
 
+    // g_assert(moto_library_new_entry(lib, "test", "test", lib));
 
     g_print("OK\n");
 

@@ -126,7 +126,12 @@ gboolean moto_library_new_entry(MotoLibrary *self,
     if( ! slot_check_entry(slot, entry))
     {
         /* Warning! */
-        g_print("Checking failed!\n");
+        return FALSE;
+    }
+
+    if(slot_get_entry(slot, entry_name))
+    {
+        /* Warning! */
         return FALSE;
     }
 

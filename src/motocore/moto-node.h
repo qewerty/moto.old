@@ -28,6 +28,11 @@ typedef struct _MotoNode MotoNode;
 typedef struct _MotoNodeClass MotoNodeClass;
 typedef struct _MotoNodePriv MotoNodePriv;
 
+typedef struct _MotoNodeFactory MotoNodeFactory;
+typedef struct _MotoNodeFactoryClass MotoNodeFactoryClass;
+typedef struct _MotoNodeFactoryPriv MotoNodeFactoryPriv;
+typedef MotoNode *(*MotoNodeFactoryCreateNodeMethod)(MotoNodeFactory *self, const gchar *name);
+
 typedef struct _MotoVariation MotoVariation;
 typedef struct _MotoVariationClass MotoVariationClass;
 typedef struct _MotoVariationPriv MotoVariationPriv;
@@ -108,6 +113,40 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag);
 /* Get dump for saving. */
 gconstpointer moto_node_get_binary_dump(MotoNode *self, glong *numbytes);
 const gchar *moto_node_get_xml_dump(MotoNode *self, glong *numbytes);
+
+/* class MotoNodeFactory */
+
+struct _MotoNodeFactory
+{
+    GObject parent;
+
+    MotoNodeFactoryPriv *priv;
+};
+
+struct _MotoNodeFactoryClass
+{
+    GObjectClass parent;
+
+    MotoNodeFactoryCreateNodeMethod create_node;
+
+    /* signal */
+    guint create_node_signal_id;
+    guint node_created_signal_id;
+};
+
+GType moto_node_factory_get_type(void);
+
+#define MOTO_TYPE_NODE_FACTORY (moto_node_factory_get_type())
+#define MOTO_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_NODE_FACTORY, MotoNodeFactory))
+#define MOTO_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_NODE_FACTORY, MotoNodeFactoryClass))
+#define MOTO_IS_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_NODE_FACTORY))
+#define MOTO_IS_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NODE_FACTORY))
+#define MOTO_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NODE_FACTORY, MotoNodeFactoryClass))
+
+MotoNodeFactory *moto_node_factory_new();
+
+MotoNode *
+moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name);
 
 /* class MotoVariation */
 

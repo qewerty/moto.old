@@ -172,6 +172,102 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag)
     return FALSE;
 }
 
+/* class NodeFactory */
+
+static GObjectClass *node_factory_parent_class = NULL;
+
+struct _MotoNodeFactoryPriv
+{
+    GType node_type;
+};
+
+static void
+moto_node_factory_dispose(GObject *obj)
+{
+    /* MotoNodeFactory *self = (MotoNodeFactory *)obj; */
+    node_factory_parent_class->dispose(obj);
+}
+
+static void
+moto_node_factory_finalize(GObject *obj)
+{
+    node_factory_parent_class->finalize(obj);
+}
+
+static void
+moto_node_factory_init(MotoNodeFactory *self)
+{
+    self->priv = (MotoNodeFactoryPriv *)g_slice_new(MotoNodeFactoryPriv);
+
+    self->priv->node_type = G_TYPE_INVALID;
+}
+
+static void
+moto_node_factory_class_init(MotoNodeFactoryClass *klass)
+{
+    node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    node_factory_parent_class->dispose = moto_node_factory_dispose;
+    node_factory_parent_class->finalize = moto_node_factory_finalize;
+
+    klass->create_node = NULL;
+
+    klass->create_node_signal_id = g_signal_newv ("create-node",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
+
+    klass->node_created_signal_id = g_signal_newv ("node-created",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
+
+}
+
+G_DEFINE_TYPE(MotoNodeFactory, moto_node_factory, G_TYPE_OBJECT);
+
+MotoNodeFactory *moto_node_factory_new()
+{
+    MotoNodeFactory *self = (MotoNodeFactory *)g_object_new(MOTO_TYPE_NODE_FACTORY, NULL);
+
+    return self;
+}
+
+MotoNode *
+moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
+{
+    MotoNodeFactoryClass *klass = MOTO_NODE_FACTORY_GET_CLASS(self);
+
+    g_signal_emit(self, klass->create_node_signal_id, 0, NULL);
+
+    if(G_TYPE_IS_ABSTRACT(self->priv->node_type))
+    {
+        /* TODO: Warning! */
+        return NULL;
+    }
+
+    MotoNode *node = NULL;
+
+    if(klass->create_node)
+        node = klass->create_node(self, name);
+
+    g_signal_emit(self, klass->node_created_signal_id, 0, NULL);
+
+    return node;
+}
+
 /* class Param */
 
 static GObjectClass *param_parent_class = NULL;
