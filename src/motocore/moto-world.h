@@ -23,6 +23,7 @@
 #define MOTO_WORLD_H
 
 #include "moto-node.h"
+#include "moto-library.h"
 
 typedef struct _MotoWorld MotoWorld;
 typedef struct _MotoWorldClass MotoWorldClass;
@@ -51,7 +52,7 @@ GType moto_world_get_type(void);
 #define MOTO_IS_WORLD_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_WORLD))
 #define MOTO_WORLD_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_WORLD, MotoWorldClass))
 
-MotoWorld *moto_world_new(const gchar *name);
+MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib);
 
 MotoWorld *moto_world_new_from_dump(const gchar *filename);
 /* MotoWorld *moto_world_new_from_binary_dump(const gchar *filename);

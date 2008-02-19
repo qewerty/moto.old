@@ -51,13 +51,13 @@ GType moto_library_get_type(void);
 #define MOTO_IS_LIBRARY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_LIBRARY))
 #define MOTO_LIBRARY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_LIBRARY, MotoLibraryClass))
 
-MotoLibrary *moto_library_new(const gchar *name);
+MotoLibrary *moto_library_new();
 
 void moto_library_new_slot(MotoLibrary *self, const gchar *slot_name, GType type);
 /* void moto_library_delete_slot(MotoLibrary *self, const gchar *slot_name); */
 
 /* Library check type of entry for given slot and returns FALSE if entry is not added. */
-gboolen moto_library_new_entry(MotoLibrary *self,
+gboolean moto_library_new_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name, gpointer entry);
 gpointer moto_library_get_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name);

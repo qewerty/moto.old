@@ -2,8 +2,6 @@
 #include "moto-object-node.h"
 #include "moto-time-node.h"
 
-ХУЙ
-
 /* class World */
 
 static GObjectClass *world_parent_class = NULL;
@@ -19,9 +17,9 @@ struct _MotoWorldPriv
 
     MotoObjectNode *root;
     MotoTimeNode *time;
-};
 
-Бла-бла!
+    MotoLibrary *library;
+};
 
 static void
 moto_world_dispose(GObject *obj)
@@ -62,9 +60,11 @@ G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);
 
 /* methods of class World */
 
-MotoWorld *moto_world_new(const gchar *name)
+MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
 {
     MotoWorld *self = (MotoWorld *)g_object_new(MOTO_TYPE_WORLD, NULL);
+
+    self->priv->library = lib;
 
     return self;
 }
