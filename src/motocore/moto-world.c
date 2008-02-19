@@ -2,6 +2,8 @@
 #include "moto-object-node.h"
 #include "moto-time-node.h"
 
+ХУЙ
+
 /* class World */
 
 static GObjectClass *world_parent_class = NULL;
