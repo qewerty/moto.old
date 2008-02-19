@@ -1,5 +1,6 @@
 #include "moto-world.h"
 #include "moto-object-node.h"
+#include "moto-time-node.h"
 
 /* class World */
 
@@ -15,6 +16,7 @@ struct _MotoWorldPriv
     MotoNode *current_node;
 
     MotoObjectNode *root;
+    MotoTimeNode *time;
 };
 
 static void
