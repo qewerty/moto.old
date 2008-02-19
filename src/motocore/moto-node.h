@@ -50,9 +50,28 @@ typedef enum
     MOTO_PARAM_MODE_INOUT
 } MotoParamMode;
 
-typedef struct _MotoParam MotoParam;
-typedef struct _MotoParamClass MotoParamClass;
-typedef struct _MotoParamPriv MotoParamPriv;
+/* class MotoNode */
+
+struct _MotoNode
+{
+    GObject parent;
+
+    MotoNodePriv *priv;
+};
+
+struct _MotoNodeClass
+{
+    GObjectClass parent;
+};
+
+GType moto_node_get_type(void);
+
+#define MOTO_TYPE_NODE (moto_node_get_type())
+#define MOTO_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_NODE, MotoNode))
+#define MOTO_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_NODE, MotoNodeClass))
+#define MOTO_IS_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_NODE))
+#define MOTO_IS_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NODE))
+#define MOTO_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NODE, MotoNodeClass))
 
 const gchar *moto_node_get_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
