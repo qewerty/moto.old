@@ -81,7 +81,23 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
 
-    fac = moto_mesh_file_factory_new();
+    fac = moto_mesh_file_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_curve_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_revolve_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_extrude_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_bevel_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
 

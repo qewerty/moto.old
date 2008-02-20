@@ -16,7 +16,6 @@ struct _MotoWorldPriv
     MotoNode *current_node;
 
     MotoObjectNode *root;
-    MotoObjectNode *camera;
     MotoTimeNode *time;
 
     MotoLibrary *library;

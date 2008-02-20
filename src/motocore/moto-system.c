@@ -115,7 +115,7 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
 
     mesh_loader = moto_rib_mesh_loader_new(); /* RenderMan Interface Bytestream (*.rib) */
     moto_library_new_entry(lib, "mesh-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);`
+            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
 
     return NULL;
 }
