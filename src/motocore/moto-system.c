@@ -57,5 +57,65 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
     moto_library_new_slot(lib, "node", MOTO_TYPE_NODE_FACTORY);
     moto_library_new_slot(lib, "mesh-loader", MOTO_TYPE_MESH_LOADER);
 
+    /* built-in node types */
+
+    MotoNodeFactory *fac;
+
+    fac = moto_object_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_view_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_nurbs_view_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_cube_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_sphere_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_file_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_curve_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_revolve_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_extrude_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_mesh_bevel_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    /* built-in mesh loaders */
+
+    MotoMeshLoader *mesh_loader;
+
+    mesh_loader = moto_mbm_mesh_loader_new(); /* Moto Binary Mesh (*.mbm) */
+    moto_library_new_entry(lib, "mesh-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
+
+    mesh_loader = moto_wobj_mesh_loader_new(); /* Wavefront Object (*.obj) */
+    moto_library_new_entry(lib, "mesh-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
+
+    mesh_loader = moto_rib_mesh_loader_new(); /* RenderMan Interface Bytestream (*.rib) */
+    moto_library_new_entry(lib, "mesh-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);`
+
     return NULL;
 }
