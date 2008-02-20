@@ -39,7 +39,8 @@ typedef enum
 typedef enum
 {
     MOTO_IMAGE_MODE_RGB,
-    MOTO_IMAGE_MODE_RGBA
+    MOTO_IMAGE_MODE_RGBA,
+    MOTO_IMAGE_MODE_GRAYSCALE
 } MotoImageMode;
 
 struct _MotoImage
@@ -75,8 +76,8 @@ GType moto_image_get_type(void);
 #define MOTO_IS_IMAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_IMAGE))
 #define MOTO_IMAGE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_IMAGE, MotoImageClass))
 
-MotoImage *moto_image_new(MotoImagePrecision precision, MotoImageMode mode,
-        guchar chnum, guint width, guint height);
+MotoImage *moto_image_new(MotoImagePrecision precision,
+        MotoImageMode mode, guint width, guint height);
 
 #endif /* MOTO_IMAGE_H */
 

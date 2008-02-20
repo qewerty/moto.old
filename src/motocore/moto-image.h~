@@ -39,7 +39,8 @@ typedef enum
 typedef enum
 {
     MOTO_IMAGE_MODE_RGB,
-    MOTO_IMAGE_MODE_RGBA
+    MOTO_IMAGE_MODE_RGBA,
+    MOTO_IMAGE_MODE_GRAYSCALE
 } MotoImageMode;
 
 struct _MotoImage
@@ -51,12 +52,14 @@ struct _MotoImage
     guchar chnum;
     guint width, height;
 
+    gboolean valid;
+
     union
     {
         guint8  *uint8_data;
         guint16 *uint16_data;
         gfloat  *float_data;
-    }
+    };
 };
 
 struct _MotoImageClass

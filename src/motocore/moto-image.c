@@ -9,8 +9,7 @@ moto_image_dispose(GObject *obj)
 {
     MotoImage *self = (MotoImage *)obj;
 
-    g_string_free(self->priv->filename, TRUE);
-    g_slice_free(MotoImagePriv, self->priv);
+    g_free(self->uint8_data);
 
     G_OBJECT_CLASS(image_parent_class)->dispose(obj);
 }
@@ -40,28 +39,40 @@ G_DEFINE_TYPE(MotoImage, moto_image, G_TYPE_OBJECT);
 
 /* methods of class Image */
 
-MotoImage *moto_image_new(MotoImagePrecision precision, MotoImageMode mode,
-        guchar chnum, guint width, guint height)
+MotoImage *moto_image_new(MotoImagePrecision precision,
+        MotoImageMode mode, guint width, guint height)
 {
     MotoImage *self = (MotoImage *)g_object_new(MOTO_TYPE_IMAGE, NULL);
 
     self->precision = precision;
     self->mode = mode;
-    self->chnum = chnum;
     self->width = width;
     self->height = height;
+
+    switch(mode)
+    {
+        case MOTO_IMAGE_MODE_RGB:
+            self->chnum = 3;
+        break;
+        case MOTO_IMAGE_MODE_RGBA:
+            self->chnum = 4;
+        break;
+        case MOTO_IMAGE_MODE_GRAYSCALE:
+            self->chnum = 1;
+        break;
+    }
 
     guint pixel_size;
     switch(precision)
     {
         case MOTO_IMAGE_PRECISION_UINT8:
-            pixel_size = 8*chnum;
+            pixel_size = 8 * self->chnum;
         break;
         case MOTO_IMAGE_PRECISION_UINT16:
-            pixel_size = 16*chnum;
+            pixel_size = 16 * self->chnum;
         break;
         case MOTO_IMAGE_PRECISION_FLOAT32:
-            pixel_size = 32*chnum;
+            pixel_size = 32 * self->chnum;
         break;
     }
 
