@@ -371,6 +371,16 @@ void moto_param_set_from_string(MotoParam *self,
 
 void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
+    if(src->priv->mode == MOTO_PARAM_MODE_IN)
+    {
+        GString *msg = g_string_new("You are trying to connect source that has no output (\"");
+        g_string_append(moto_param_get_name(self));
+        g_string_append("\"). I won't connect it.");
+        moto_warning(msg);
+        g_string_free(msg, TRUE);
+        return;
+    }
+
     if(self->priv->mode == MOTO_PARAM_MODE_OUT)
     {
         GString *msg = g_string_new("You are trying to connect source to output parameter (\"");

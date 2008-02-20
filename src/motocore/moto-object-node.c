@@ -16,6 +16,9 @@ struct _MotoObjectNodePriv
     gfloat rotate[3];
     gfloat scale[3];
 
+    MotoTransformOrder  transform_order;
+    MotoRotateOrder     rotate_order;
+
     gfloat matrix[16];
     gfloat inverse_matrix[16];
     gfloat parent_inverse_matrix[16];
@@ -77,51 +80,220 @@ G_DEFINE_TYPE(MotoObjectNode, moto_object_node, MOTO_TYPE_NODE);
 
 /* methods class ObjectNode */
 
-MotoObject *moto_object_node_new()
+static gpointer get_parent(MotoNode *node, MotoParam *param)
+{
+    return node->priv->parent;
+}
+
+static void set_parent(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_parent(node, (MotoObjectNode *)p);
+}
+
+static gpointer get_tx(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->translate[0];
+}
+
+static void set_tx(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_translate_x(node, *((gfloat *)p));
+}
+
+static gpointer get_ty(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->translate[1];
+}
+
+static void set_ty(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_translate_y(node, *((gfloat *)p));
+}
+
+static gpointer get_tz(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->translate[2];
+}
+
+static void set_tz(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_translate_z(node, *((gfloat *)p));
+}
+
+static gpointer get_rx(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->rotate[0];
+}
+
+static void set_rx(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_rotate_x(node, *((gfloat *)p));
+}
+
+static gpointer get_ry(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->rotate[1];
+}
+
+static void set_ry(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_rotate_y(node, *((gfloat *)p));
+}
+
+static gpointer get_rz(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->rotate[2];
+}
+
+static void set_rz(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_rotate_z(node, *((gfloat *)p));
+}
+
+static gpointer get_sx(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->scale[0];
+}
+
+static void set_sx(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_scale_x(node, *((gfloat *)p));
+}
+
+static gpointer get_sy(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->scale[1];
+}
+
+static void set_sy(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_scale_y(node, *((gfloat *)p));
+}
+
+static gpointer get_sz(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->scale[2];
+}
+
+static void set_sz(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_scale_z(node, *((gfloat *)p));
+}
+
+static gpointer get_to(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->transform_order;
+}
+
+static void set_to(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_transform_order(node, *((MotoTransformOrder *)p));
+}
+
+static gpointer get_ro(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->rotate_order;
+}
+
+static void set_ro(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_rotate_order(node, *((MotoRotateOrder *)p));
+}
+
+static gpointer get_kt(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->keep_transform;
+}
+
+static void set_kt(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_keep_transform(node, *((gboolean *)p));
+}
+
+static gpointer get_visible(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->visible;
+}
+
+static void set_visible(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_visible(node, *((gboolean *)p));
+}
+
+static gpointer get_view(MotoNode *node, MotoParam *param)
+{
+    return node->priv->view;
+}
+
+static void set_show_view(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_view(node, (MotoGeometryViewNode *)p);
+}
+
+static gpointer get_show_view(MotoNode *node, MotoParam *param)
+{
+    return & node->priv->visible;
+}
+
+static void set_show_view(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_show_view(node, *((gboolean *)p));
+}
+
+MotoObjectNode *moto_object_node_new()
 {
     MotoObjectNode *self = \
         (MotoObjectNode *)g_object_new(MOTO_TYPE_OBJECT_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     /* params */
+    /* WARNING: Implementation of *_param_data_* may be changed in future!  */
+
     MotoParamBlock *pb;
 
+    /* main block */
     pb = moto_param_block_new("main", "Main", self);
     moto_node_add_param_block(node, pb);
+    moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
+            moto_object_param_data_new(get_parent, set_parent, NULL));
+
     moto_param_new("tx", "Translate X", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->translate[0]));
+            moto_float_param_data_new(get_tx, set_tx, 0));
     moto_param_new("ty", "Translate Y", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->translate[1]));
+            moto_float_param_data_new(get_ty, set_ty, 0));
     moto_param_new("tz", "Translate Z", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->translate[2]));
+            moto_float_param_data_new(get_tz, set_tz, 0));
     moto_param_new("rx", "Rotate X",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->rotate[0]));
+            moto_float_param_data_new(get_rx, set_rx, 0));
     moto_param_new("ry", "Rotate Y",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->rotate[1]));
+            moto_float_param_data_new(get_ry, set_ry, 0));
     moto_param_new("rz", "Rotate Z",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->rotate[2]));
+            moto_float_param_data_new(get_rz, set_rz, 0));
     moto_param_new("sx", "Scale X",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->scale[0]));
+            moto_float_param_data_new(get_sx, set_sx, 1));
     moto_param_new("sy", "Scale Y",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->scale[1]));
+            moto_float_param_data_new(get_sy, set_sy, 1));
     moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(& self->priv->scale[2]));
+            moto_float_param_data_new(get_sz, set_sz, 1));
 
     moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
-            moto_transform_order_param_data_new(& self->priv->transform_order));
+            moto_transform_order_param_data_new(get_to, set_to, MOTO_TRANSFORM_ORDER_TRS));
     moto_param_new("ro", "Rotate Order",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_rotate_order_param_data_new(& self->priv->rotate_order));
+            moto_rotate_order_param_data_new(get_ro, set_ro, MOTO_ROTATE_ORDER_XYZ));
 
-    moto_param_new("keep_transform", "Keep Transform", MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(& self->priv->keep_transform));
+    moto_param_new("kt", "Keep Transform", MOTO_PARAM_MODE_INOUT, pb,
+            moto_bool_param_data_new(get_kt, set_kt, TRUE));
+
+    /* view block */
+    pb = moto_param_block_new("view", "View", self);
 
     moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(& self->priv->visible));
-    moto_param_new("visible_geometry", "Visible Geometry",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(& self->priv->visible_geometry));
+            moto_bool_param_data_new(get_visible, set_visible, TRUE));
 
-    moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
-            moto_object_param_data_new(& self->priv->parent));
+    moto_param_new("view", "View", MOTO_PARAM_MODE_IN, pb,
+            moto_geometry_view_param_data_new(get_view, set_view, NULL));
+    moto_param_new("show_view", "Show View", MOTO_PARAM_MODE_INOUT, pb,
+            moto_bool_param_data_new(get_show_view, set_show_view, TRUE));
 
     return self;
 }
