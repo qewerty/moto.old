@@ -28,7 +28,7 @@ typedef struct _MotoMeshLoader MotoMeshLoader;
 typedef struct _MotoMeshLoaderClass MotoMeshLoaderClass;
 typedef struct _MotoMeshLoaderPriv MotoMeshLoaderPriv;
 
-typedef MotoMesh *(*MotoMeshLoaderLoadMethod)(MotoMeshLoader *self, const gchar *name);
+typedef MotoMesh *(*MotoMeshLoaderLoadMethod)(MotoMeshLoader *self, const gchar *filename);
 
 /* class MotoMeshLoader */
 

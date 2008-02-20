@@ -1,6 +1,19 @@
 #include "moto-system.h"
+
+/* nodes */
 #include "moto-object-node.h"
 #include "moto-time-node.h"
+
+/* image loaders */
+#include "moto-png-image-loader.h"
+#include "moto-tif-image-loader.h"
+#include "moto-jpg-image-loader.h"
+#include "moto-exr-image-loader.h"
+
+/* mesh loaders*/
+#include "moto-mbm-mesh-loader.h"
+#include "moto-wobj-mesh-loader.h"
+#include "moto-rib-mesh-loader.h"
 
 /* class System */
 
