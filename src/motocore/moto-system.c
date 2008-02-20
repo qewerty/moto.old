@@ -55,6 +55,7 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
     MotoLibrary *lib = self->priv->library = moto_library_new();
 
     moto_library_new_slot(lib, "node", MOTO_TYPE_NODE_FACTORY);
+    moto_library_new_slot(lib, "image-loader", MOTO_TYPE_IMAGE_LOADER);
     moto_library_new_slot(lib, "mesh-loader", MOTO_TYPE_MESH_LOADER);
 
     /* built-in node types */
@@ -100,6 +101,26 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
     fac = moto_mesh_bevel_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    /* built-in image loaders */
+
+    MotoImageLoader *image_loader;
+
+    image_loader = moto_png_image_loader_new(); /* Portable Network Graphics (*.png) */
+    moto_library_new_entry(lib, "image-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+
+    image_loader = moto_jpg_image_loader_new(); /* JPEG (*.jpg|*.jpeg) */
+    moto_library_new_entry(lib, "image-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+
+    image_loader = moto_tif_image_loader_new(); /* TIFF (*.tif|*.tiff) */
+    moto_library_new_entry(lib, "image-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+
+    image_loader = moto_exr_image_loader_new(); /* ILM OpenEXR HDR Format (*.exr) */
+    moto_library_new_entry(lib, "image-loader",
+            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
 
     /* built-in mesh loaders */
 

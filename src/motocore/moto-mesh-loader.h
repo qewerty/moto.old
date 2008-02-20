@@ -43,7 +43,7 @@ struct _MotoMeshLoaderClass
 {
     GObjectClass parent;
 
-    MotoMeshLoaderLoadMeshMethod load;
+    MotoMeshLoaderLoadMethod load;
 };
 
 GType moto_mesh_loader_get_type(void);
