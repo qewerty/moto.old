@@ -76,22 +76,8 @@ GType moto_object_node_get_type(void);
 
 MotoObject *moto_object_node_new();
 
-MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self);
-void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent, gboolean keep_trasform);
-
 const MotoBound *moto_object_node_get_bound(MotoObjectNode *self);
 void moto_object_node_draw(MotoObjectNode *self);
-
-MotoTrasformOrder moto_object_node_get_transform_order(MotoObjectNode *self);
-void moto_object_node_set_transform_order(MotoObjectNode *self, MotoTrasformOrder order);
-MotoRotateOrder moto_object_node_get_rotate_order(MotoObjectNode *self);
-void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order);
-
-MotoTransformStrategy moto_object_node_get_trasform_strategy(MotoObjectNode *self);
-void moto_object_node_get_trasform_strategy(MotoObjectNode *self, MotoTransformStrategy ts);
-
-MotoManipulator*
-moto_object_node_get_manipulator_for_current_node(MotoObjectNode *self);
 
 #endif /* MOTO_OBJECT_NODE_H */
 

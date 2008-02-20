@@ -1,3 +1,6 @@
+#include "gl.h"
+#include "glu.h"
+
 #include "moto-object-node.h"
 #include "common/matrix.h"
 
@@ -29,7 +32,7 @@ struct _MotoObjectNodePriv
     gboolean keep_transform;
 
     gboolean visible;
-    gboolean draw_children;
+    gboolean geometry_visible;
 
     MotoObjectNode *parent;
     GSList *children;
@@ -78,8 +81,47 @@ MotoObject *moto_object_node_new()
 {
     MotoObjectNode *self = \
         (MotoObjectNode *)g_object_new(MOTO_TYPE_OBJECT_NODE, NULL);
+    MotoNode *node = (MotoNode *)self;
 
     /* params */
+    MotoParamBlock *pb;
+
+    pb = moto_param_block_new("main", "Main", self);
+    moto_node_add_param_block(node, pb);
+    moto_param_new("tx", "Translate X", MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->translate[0]));
+    moto_param_new("ty", "Translate Y", MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->translate[1]));
+    moto_param_new("tz", "Translate Z", MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->translate[2]));
+    moto_param_new("rx", "Rotate X",    MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->rotate[0]));
+    moto_param_new("ry", "Rotate Y",    MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->rotate[1]));
+    moto_param_new("rz", "Rotate Z",    MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->rotate[2]));
+    moto_param_new("sx", "Scale X",     MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->scale[0]));
+    moto_param_new("sy", "Scale Y",     MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->scale[1]));
+    moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
+            moto_float_param_data_new(& self->priv->scale[2]));
+
+    moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
+            moto_transform_order_param_data_new(& self->priv->transform_order));
+    moto_param_new("ro", "Rotate Order",    MOTO_PARAM_MODE_INOUT, pb,
+            moto_rotate_order_param_data_new(& self->priv->rotate_order));
+
+    moto_param_new("keep_transform", "Keep Transform", MOTO_PARAM_MODE_INOUT, pb,
+            moto_bool_param_data_new(& self->priv->keep_transform));
+
+    moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
+            moto_bool_param_data_new(& self->priv->visible));
+    moto_param_new("visible_geometry", "Visible Geometry",    MOTO_PARAM_MODE_INOUT, pb,
+            moto_bool_param_data_new(& self->priv->visible_geometry));
+
+    moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
+            moto_object_param_data_new(& self->priv->parent));
 
     return self;
 }
@@ -230,6 +272,23 @@ void moto_object_node_set_scale_z(MotoObjectNode *self, gfloat z)
 
 /*  */
 
+void moto_object_node_clear_parent_inverse(MotoObjectNode *self)
+{
+    matrix44_identity(self->priv->parent_inverse_matrix);
+}
+
+void moto_object_node_update_parent_inverse(MotoObjectNode *self)
+{
+    if(self->priv->parent == NULL)
+    {
+        moto_object_node_clear_parent_inverse(self);
+        return;
+    }
+
+    matrix44_copy(self->priv->parent_inverse_matrix,
+                  self->priv->parent->priv->inverse_matrix);
+}
+
 MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self)
 {
     return self->priv->parent;
@@ -266,7 +325,7 @@ const MotoBound *moto_object_node_get_bound(MotoObjectNode *self)
 
 void moto_object_node_draw(MotoObjectNode *self)
 {
-    if( ! moto_object_node_is_visible(self))
+    if( ! self->priv->visible)
         return;
 
     GSList *child = g_slist_first(self->priv->children);
@@ -275,7 +334,7 @@ void moto_object_node_draw(MotoObjectNode *self)
         moto_object_node_draw((MotoObjectNode *)child->data);
     }
 
-    if(moto_object_node_is_geomety_visible(self))
+    if(self->priv->geomety_visible)
         moto_geometry_view_draw(self->priv->view);
 }
 
