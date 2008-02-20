@@ -9,7 +9,27 @@ struct _MotoObjectNodePriv
 {
     MotoGeometryView *view;
 
-    gfloat transform[16];
+    gfloat translate[3];
+    gfloat rotate[3];
+    gfloat scale[3];
+
+    gfloat matrix[16];
+    gfloat inverse_matrix[16];
+    gfloat parent_inverse_matrix[16];
+    gfloat translate_matrix[16];
+    gfloat rotate_matrix[16];
+    gfloat scale_matrix[16];
+
+    gboolean translate_calculated,
+             rotate_calculated,
+             scale_calculated,
+             transform_calculated,
+             inverse_calculated;
+
+    gboolean keep_transform;
+
+    gboolean visible;
+    gboolean draw_children;
 
     MotoObjectNode *parent;
     GSList *children;
@@ -63,6 +83,152 @@ MotoObject *moto_object_node_new()
 
     return self;
 }
+
+/* translate */
+
+void moto_object_node_set_translate(MotoObjectNode *self,
+        gfloat x, gfloat y, gfloat z)
+{
+    self->priv->translate[0] = x;
+    self->priv->translate[1] = y;
+    self->priv->translate[2] = z;
+
+    self->priv->translate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_translate_array(MotoObjectNode *self,
+        gfloat xyz[3])
+{
+    self->priv->translate[0] = xyz[0];
+    self->priv->translate[1] = xyz[1];
+    self->priv->translate[2] = xyz[2];
+
+    self->priv->translate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_translate_x(MotoObjectNode *self, gfloat x)
+{
+    self->priv->translate[0] = x;
+
+    self->priv->translate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_translate_y(MotoObjectNode *self, gfloat y)
+{
+    self->priv->translate[1] = y;
+
+    self->priv->translate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_translate_z(MotoObjectNode *self, gfloat z)
+{
+    self->priv->translate[2] = z;
+
+    self->priv->translate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+/* rotate */
+
+void moto_object_node_set_rotate(MotoObjectNode *self,
+        gfloat x, gfloat y, gfloat z)
+{
+    self->priv->rotate[0] = x;
+    self->priv->rotate[1] = y;
+    self->priv->rotate[2] = z;
+
+    self->priv->rotate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_rotate_array(MotoObjectNode *self,
+        gfloat xyz[3])
+{
+    self->priv->rotate[0] = xyz[0];
+    self->priv->rotate[1] = xyz[1];
+    self->priv->rotate[2] = xyz[2];
+
+    self->priv->rotate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_rotate_x(MotoObjectNode *self, gfloat x)
+{
+    self->priv->rotate[0] = x;
+
+    self->priv->rotate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_rotate_y(MotoObjectNode *self, gfloat y)
+{
+    self->priv->rotate[1] = y;
+
+    self->priv->rotate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_rotate_z(MotoObjectNode *self, gfloat z)
+{
+    self->priv->rotate[2] = z;
+
+    self->priv->rotate_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+/* scale */
+
+void moto_object_node_set_scale(MotoObjectNode *self,
+        gfloat x, gfloat y, gfloat z)
+{
+    self->priv->scale[0] = x;
+    self->priv->scale[1] = y;
+    self->priv->scale[2] = z;
+
+    self->priv->scale_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_scale_array(MotoObjectNode *self,
+        gfloat xyz[3])
+{
+    self->priv->scale[0] = xyz[0];
+    self->priv->scale[1] = xyz[1];
+    self->priv->scale[2] = xyz[2];
+
+    self->priv->scale_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_scale_x(MotoObjectNode *self, gfloat x)
+{
+    self->priv->scale[0] = x;
+
+    self->priv->scale_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_scale_y(MotoObjectNode *self, gfloat y)
+{
+    self->priv->scale[1] = y;
+
+    self->priv->scale_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+void moto_object_node_set_scale_z(MotoObjectNode *self, gfloat z)
+{
+    self->priv->scale[2] = z;
+
+    self->priv->scale_calculated = FALSE;
+    self->priv->transform_calculated = FALSE;
+}
+
+/*  */
 
 MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self)
 {
