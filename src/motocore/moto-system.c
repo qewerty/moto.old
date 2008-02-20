@@ -40,7 +40,7 @@ moto_system_init(MotoSystem *self)
 static void
 moto_system_class_init(MotoSystemClass *klass)
 {
-    system_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    system_parent_class = g_type_class_peek_parent(klass);
 
     system_parent_class->dispose = moto_system_dispose;
     system_parent_class->finalize = moto_system_finalize;

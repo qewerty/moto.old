@@ -118,7 +118,7 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
 
-    image_loader = moto_exr_image_loader_new(); /* ILM OpenEXR HDRI Format (*.exr) */
+    image_loader = moto_exr_image_loader_new(); /* ILM OpenEXR HDR Format (*.exr) */
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
 
