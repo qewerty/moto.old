@@ -1,5 +1,6 @@
 #include "moto-node.h"
 #include "moto-param-types.h"
+#include "moto-messager.h"
 
 /* utils */
 
@@ -254,7 +255,11 @@ moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
 
     if(G_TYPE_IS_ABSTRACT(self->priv->node_type))
     {
-        /* TODO: Warning! */
+        GString *msg = g_string_new("You are trying to create instance of abstract node type (\"");
+        g_string_append(g_type_name(self->priv->node_type));
+        g_string_append("\"). I won't create it.");
+        moto_warning(msg);
+        g_string_free(msg, TRUE);
         return NULL;
     }
 
@@ -368,7 +373,11 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
     if(self->priv->mode == MOTO_PARAM_MODE_OUT)
     {
-        /* Warning! */
+        GString *msg = g_string_new("You are trying to connect source to output parameter (\"");
+        g_string_append(moto_param_get_name(self));
+        g_string_append("\"). I won't connect it.");
+        moto_warning(msg);
+        g_string_free(msg, TRUE);
         return;
     }
 
@@ -397,7 +406,11 @@ void moto_param_clear_dests(MotoParam *self)
 {
     if(self->priv->mode == MOTO_PARAM_MODE_IN)
     {
-        /* Warning! */
+        GString *msg = g_string_new("You are trying to clear destinations of input parameter (\"");
+        g_string_append(moto_param_get_name(self));
+        g_string_append("\"). Inputs have no destinations.");
+        moto_warning(msg);
+        g_string_free(msg, TRUE);
         return;
     }
 

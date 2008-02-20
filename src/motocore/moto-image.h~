@@ -47,18 +47,18 @@ struct _MotoImage
 {
     GObject parent;
 
-    MotoImagePrecision precision;
-    MotoImageMode mode;
-    guchar chnum;
-    guint width, height;
-
-    gboolean valid;
+    MotoImagePrecision  precision;
+    MotoImageMode       mode;
+    guchar              chnum;
+    guint               width,
+                        height;
+    gboolean            valid;
 
     union
     {
-        guint8  *uint8_data;
-        guint16 *uint16_data;
-        gfloat  *float_data;
+        guint8      *uint8_data;
+        guint16     *uint16_data;
+        gfloat      *float_data;
     };
 };
 
@@ -76,8 +76,8 @@ GType moto_image_get_type(void);
 #define MOTO_IS_IMAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_IMAGE))
 #define MOTO_IMAGE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_IMAGE, MotoImageClass))
 
-MotoImage *moto_image_new(MotoImagePrecision precision, MotoImageMode mode,
-        guchar chnum, guint width, guint height);
+MotoImage *moto_image_new(MotoImagePrecision precision,
+        MotoImageMode mode, guint width, guint height);
 
 #endif /* MOTO_IMAGE_H */
 

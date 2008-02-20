@@ -47,18 +47,19 @@ struct _MotoImage
 {
     GObject parent;
 
-    MotoImagePrecision precision;
-    MotoImageMode mode;
-    guchar chnum;
-    guint width, height;
+    MotoImagePrecision  precision;
+    MotoImageMode       mode;
+    guchar              chnum;
+    guint               width,
+                        height;
 
-    gboolean valid;
+    gboolean            valid;
 
     union
     {
-        guint8  *uint8_data;
-        guint16 *uint16_data;
-        gfloat  *float_data;
+        guint8      *uint8_data;
+        guint16     *uint16_data;
+        gfloat      *float_data;
     };
 };
 
