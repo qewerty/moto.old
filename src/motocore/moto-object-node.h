@@ -24,6 +24,7 @@
 
 #include "moto-node.h"
 #include "moto-bound.h"
+#include "moto-geometry-view-node.h"
 
 typedef struct _MotoObjectNode MotoObjectNode;
 typedef struct _MotoObjectNodeClass MotoObjectNodeClass;
@@ -74,7 +75,7 @@ GType moto_object_node_get_type(void);
 #define MOTO_IS_OBJECT_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_OBJECT_NODE))
 #define MOTO_OBJECT_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OBJECT_NODE, MotoObjectNodeClass))
 
-MotoObject *moto_object_node_new();
+MotoObjectNode *moto_object_node_new();
 
 const MotoBound *moto_object_node_get_bound(MotoObjectNode *self);
 void moto_object_node_draw(MotoObjectNode *self);

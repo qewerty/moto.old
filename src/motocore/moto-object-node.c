@@ -1,8 +1,61 @@
-#include "gl.h"
-#include "glu.h"
+#include "GL/gl.h"
+#include "GL/glu.h"
 
 #include "moto-object-node.h"
 #include "common/matrix.h"
+
+/* forward */
+
+MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self);
+void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent);
+
+gfloat moto_object_node_get_translate_x(MotoObjectNode *self);
+void moto_object_node_set_translate_x(MotoObjectNode *self, gfloat x);
+
+gfloat moto_object_node_get_translate_y(MotoObjectNode *self);
+void moto_object_node_set_translate_y(MotoObjectNode *self, gfloat y);
+
+gfloat moto_object_node_get_translate_z(MotoObjectNode *self);
+void moto_object_node_set_translate_z(MotoObjectNode *self, gfloat z);
+
+gfloat moto_object_node_get_rotate_x(MotoObjectNode *self);
+void moto_object_node_set_rotate_x(MotoObjectNode *self, gfloat x);
+
+gfloat moto_object_node_get_rotate_y(MotoObjectNode *self);
+void moto_object_node_set_rotate_y(MotoObjectNode *self, gfloat y);
+
+gfloat moto_object_node_get_rotate_z(MotoObjectNode *self);
+void moto_object_node_set_rotate_z(MotoObjectNode *self, gfloat z);
+
+gfloat moto_object_node_get_scale_x(MotoObjectNode *self);
+void moto_object_node_set_scale_x(MotoObjectNode *self, gfloat x);
+
+gfloat moto_object_node_get_scale_y(MotoObjectNode *self);
+void moto_object_node_set_scale_y(MotoObjectNode *self, gfloat y);
+
+gfloat moto_object_node_get_scale_z(MotoObjectNode *self);
+void moto_object_node_set_scale_z(MotoObjectNode *self, gfloat z);
+
+MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self);
+void moto_object_node_set_view(MotoObjectNode *self, MotoGeometryViewNode *view);
+
+MotoTransformStrategy moto_object_node_get_transform_strategy(MotoObjectNode *self);
+void moto_object_node_set_transform_strategy(MotoObjectNode *self, MotoTransformStrategy ts);
+
+MotoTransformOrder moto_object_node_get_transform_order(MotoObjectNode *self);
+void moto_object_node_set_transform_order(MotoObjectNode *self, MotoTransformOrder ts);
+
+MotoRotateOrder moto_object_node_get_rotate_order(MotoObjectNode *self);
+void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder ts);
+
+gboolean moto_object_node_get_keep_transform(MotoObjectNode *self);
+void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt);
+
+gboolean moto_object_node_get_visible(MotoObjectNode *self);
+void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible);
+
+gboolean moto_object_node_get_show_view(MotoObjectNode *self);
+void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view);
 
 /* class ObjectNode */
 
@@ -10,14 +63,15 @@ static GObjectClass *object_node_parent_class = NULL;
 
 struct _MotoObjectNodePriv
 {
-    MotoGeometryView *view;
+    MotoGeometryViewNode *view;
 
     gfloat translate[3];
     gfloat rotate[3];
     gfloat scale[3];
 
-    MotoTransformOrder  transform_order;
-    MotoRotateOrder     rotate_order;
+    MotoTransformStrategy   transform_strategy;
+    MotoTransformOrder      transform_order;
+    MotoRotateOrder         rotate_order;
 
     gfloat matrix[16];
     gfloat inverse_matrix[16];
@@ -40,22 +94,22 @@ struct _MotoObjectNodePriv
     MotoObjectNode *parent;
     GSList *children;
 
-    MotoManipulatorStorage *manip_storage;
+    /* MotoManipulatorStorage *manip_storage; */
 };
 
 static void
-moto_object_node_dispose(GObject *instance)
+moto_object_node_dispose(GObject *obj)
 {
-    MotoObjectNode *self = (MotoObjectNode *)instance;
+    MotoObjectNode *self = (MotoObjectNode *)obj;
 
     g_slice_free(MotoObjectNodePriv, self->priv);
     G_OBJECT_CLASS(object_node_parent_class)->dispose(G_OBJECT(self));
 }
 
 static void
-moto_object_node_finalize(MotoObjectNode *self)
+moto_object_node_finalize(GObject *obj)
 {
-    G_OBJECT_CLASS(object_node_parent_class)->finalize(G_OBJECT(self));
+    object_node_parent_class->finalize(obj);
 }
 
 static void
@@ -82,162 +136,172 @@ G_DEFINE_TYPE(MotoObjectNode, moto_object_node, MOTO_TYPE_NODE);
 
 static gpointer get_parent(MotoNode *node, MotoParam *param)
 {
-    return node->priv->parent;
+    return ((MotoObjectNode *)node)->priv->parent;
 }
 
 static void set_parent(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_parent(node, (MotoObjectNode *)p);
+    moto_object_node_set_parent((MotoObjectNode *)node, (MotoObjectNode *)p);
 }
 
 static gpointer get_tx(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->translate[0];
+    return & ((MotoObjectNode *)node)->priv->translate[0];
 }
 
 static void set_tx(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_translate_x(node, *((gfloat *)p));
+    moto_object_node_set_translate_x((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_ty(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->translate[1];
+    return & ((MotoObjectNode *)node)->priv->translate[1];
 }
 
 static void set_ty(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_translate_y(node, *((gfloat *)p));
+    moto_object_node_set_translate_y((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_tz(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->translate[2];
+    return & ((MotoObjectNode *)node)->priv->translate[2];
 }
 
 static void set_tz(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_translate_z(node, *((gfloat *)p));
+    moto_object_node_set_translate_z((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_rx(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->rotate[0];
+    return & ((MotoObjectNode *)node)->priv->rotate[0];
 }
 
 static void set_rx(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_rotate_x(node, *((gfloat *)p));
+    moto_object_node_set_rotate_x((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_ry(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->rotate[1];
+    return & ((MotoObjectNode *)node)->priv->rotate[1];
 }
 
 static void set_ry(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_rotate_y(node, *((gfloat *)p));
+    moto_object_node_set_rotate_y((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_rz(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->rotate[2];
+    return & ((MotoObjectNode *)node)->priv->rotate[2];
 }
 
 static void set_rz(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_rotate_z(node, *((gfloat *)p));
+    moto_object_node_set_rotate_z((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_sx(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->scale[0];
+    return & ((MotoObjectNode *)node)->priv->scale[0];
 }
 
 static void set_sx(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_scale_x(node, *((gfloat *)p));
+    moto_object_node_set_scale_x((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_sy(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->scale[1];
+    return & ((MotoObjectNode *)node)->priv->scale[1];
 }
 
 static void set_sy(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_scale_y(node, *((gfloat *)p));
+    moto_object_node_set_scale_y((MotoObjectNode *)node, *((gfloat *)p));
 }
 
 static gpointer get_sz(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->scale[2];
+    return & ((MotoObjectNode *)node)->priv->scale[2];
 }
 
 static void set_sz(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_scale_z(node, *((gfloat *)p));
+    moto_object_node_set_scale_z((MotoObjectNode *)node, *((gfloat *)p));
+}
+
+static gpointer get_ts(MotoNode *node, MotoParam *param)
+{
+    return & ((MotoObjectNode *)node)->priv->transform_strategy;
+}
+
+static void set_ts(MotoNode *node, MotoParam *param, gpointer p)
+{
+    moto_object_node_set_transform_strategy((MotoObjectNode *)node, *((MotoTransformStrategy *)p));
 }
 
 static gpointer get_to(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->transform_order;
+    return & ((MotoObjectNode *)node)->priv->transform_order;
 }
 
 static void set_to(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_transform_order(node, *((MotoTransformOrder *)p));
+    moto_object_node_set_transform_order((MotoObjectNode *)node, *((MotoTransformOrder *)p));
 }
 
 static gpointer get_ro(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->rotate_order;
+    return & ((MotoObjectNode *)node)->priv->rotate_order;
 }
 
 static void set_ro(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_rotate_order(node, *((MotoRotateOrder *)p));
+    moto_object_node_set_rotate_order((MotoObjectNode *)node, *((MotoRotateOrder *)p));
 }
 
 static gpointer get_kt(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->keep_transform;
+    return & ((MotoObjectNode *)node)->priv->keep_transform;
 }
 
 static void set_kt(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_keep_transform(node, *((gboolean *)p));
+    moto_object_node_set_keep_transform((MotoObjectNode *)node, *((gboolean *)p));
 }
 
 static gpointer get_visible(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->visible;
+    return & ((MotoObjectNode *)node)->priv->visible;
 }
 
 static void set_visible(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_visible(node, *((gboolean *)p));
+    moto_object_node_set_visible((MotoObjectNode *)node, *((gboolean *)p));
 }
 
 static gpointer get_view(MotoNode *node, MotoParam *param)
 {
-    return node->priv->view;
+    return ((MotoObjectNode *)node)->priv->view;
 }
 
-static void set_show_view(MotoNode *node, MotoParam *param, gpointer p)
+static void set_view(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_view(node, (MotoGeometryViewNode *)p);
+    moto_object_node_set_view((MotoObjectNode *)node, (MotoGeometryViewNode *)p);
 }
 
 static gpointer get_show_view(MotoNode *node, MotoParam *param)
 {
-    return & node->priv->visible;
+    return & ((MotoObjectNode *)node)->priv->visible;
 }
 
 static void set_show_view(MotoNode *node, MotoParam *param, gpointer p)
 {
-    moto_object_node_set_show_view(node, *((gboolean *)p));
+    moto_object_node_set_show_view((MotoObjectNode *)node, *((gboolean *)p));
 }
 
 MotoObjectNode *moto_object_node_new()
@@ -252,7 +316,7 @@ MotoObjectNode *moto_object_node_new()
     MotoParamBlock *pb;
 
     /* main block */
-    pb = moto_param_block_new("main", "Main", self);
+    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
     moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
             moto_object_param_data_new(get_parent, set_parent, NULL));
@@ -275,7 +339,9 @@ MotoObjectNode *moto_object_node_new()
             moto_float_param_data_new(get_sy, set_sy, 1));
     moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
             moto_float_param_data_new(get_sz, set_sz, 1));
-
+    
+    moto_param_new("ts", "Transform Strategy", MOTO_PARAM_MODE_INOUT, pb,
+            moto_transform_strategy_param_data_new(get_ts, set_ts, MOTO_TRANSFORM_STRATEGY_SOFTWARE));
     moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
             moto_transform_order_param_data_new(get_to, set_to, MOTO_TRANSFORM_ORDER_TRS));
     moto_param_new("ro", "Rotate Order",    MOTO_PARAM_MODE_INOUT, pb,
@@ -285,7 +351,7 @@ MotoObjectNode *moto_object_node_new()
             moto_bool_param_data_new(get_kt, set_kt, TRUE));
 
     /* view block */
-    pb = moto_param_block_new("view", "View", self);
+    pb = moto_param_block_new("view", "View", (MotoNode *)self);
 
     moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
             moto_bool_param_data_new(get_visible, set_visible, TRUE));
