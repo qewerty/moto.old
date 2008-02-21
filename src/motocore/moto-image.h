@@ -22,7 +22,7 @@
 #ifndef MOTO_IMAGE_H
 #define MOTO_IMAGE_H
 
-#include "moto-image.h"
+#include "glib-object.h"
 
 typedef struct _MotoImage MotoImage;
 typedef struct _MotoImageClass MotoImageClass;

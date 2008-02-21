@@ -23,12 +23,14 @@
 #ifndef MOTO_MESH_H
 #define MOTO_MESH_H
 
-#include "moto-mesh.h"
+#include "glib-object.h"
 
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
 
 typedef struct _MotoMeshVertex MotoMeshVertex;
+typedef struct _MotoMeshEdge MotoMeshEdge;
+typedef struct _MotoMeshFace MotoMeshFace;
 typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
 
 /* class MotoMesh */
@@ -37,6 +39,17 @@ struct _MotoMeshVertex
 {
     gfloat xyz[3];
     gfloat no[3];
+};
+
+struct _MotoMeshEdge
+{
+    guint a, b;
+};
+
+struct _MotoMeshFace
+{
+    guint verts_num;
+    guint *indecies;
 };
 
 struct _MotoMeshVertexAttr
@@ -52,6 +65,9 @@ struct _MotoMesh
 
     guint verts_num;
     MotoMeshVertex *verts;
+
+    MotoMeshEdge *edges;
+    MotoMeshFace *faces;
 
     GSList *verts_attrs;
 };

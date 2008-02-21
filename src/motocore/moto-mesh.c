@@ -6,9 +6,22 @@
 static GObjectClass *mesh_parent_class = NULL;
 
 static void
+free_attr(gpointer data, gpointer user_data)
+{
+    MotoMeshVertexAttr *attr = (MotoMeshVertexAttr *)data;
+
+    g_string_free(attr->name, TRUE);
+    g_free(attr->data);
+    g_slice_free(MotoMeshVertexAttr, attr);
+}
+
+static void
 moto_mesh_dispose(GObject *obj)
 {
     MotoMesh *self = (MotoMesh *)obj;
+
+    g_slist_foreach(self->verts_attrs, free_attr, NULL);
+    g_slist_free(self->verts_attrs);
 
     g_free(self->verts);
 
@@ -59,7 +72,7 @@ void moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum)
         GString *msg = g_string_new("Mesh already has attribute with name \"");
         g_string_append(msg, attr_name);
         g_string_append(msg, "\". I won't create it.");
-        moto_warning(msg);
+        moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return;
     }
