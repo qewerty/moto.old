@@ -296,12 +296,17 @@ static void set_view(MotoNode *node, MotoParam *param, gpointer p)
 
 static gpointer get_show_view(MotoNode *node, MotoParam *param)
 {
-    return & ((MotoObjectNode *)node)->priv->visible;
+    return & ((MotoObjectNode *)node)->priv->show_view;
 }
 
 static void set_show_view(MotoNode *node, MotoParam *param, gpointer p)
 {
     moto_object_node_set_show_view((MotoObjectNode *)node, *((gboolean *)p));
+}
+
+static gpointer get_transform(MotoNode *node, MotoParam *param)
+{
+    return node;
 }
 
 MotoObjectNode *moto_object_node_new()
@@ -320,6 +325,8 @@ MotoObjectNode *moto_object_node_new()
     moto_node_add_param_block(node, pb);
     moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
             moto_object_param_data_new(get_parent, set_parent, NULL));
+    moto_param_new("transform", "Transform", MOTO_PARAM_MODE_OUT, pb,
+            moto_object_param_data_new(get_transform, NULL, NULL));
 
     moto_param_new("tx", "Translate X", MOTO_PARAM_MODE_INOUT, pb,
             moto_float_param_data_new(get_tx, set_tx, 0));
@@ -339,7 +346,7 @@ MotoObjectNode *moto_object_node_new()
             moto_float_param_data_new(get_sy, set_sy, 1));
     moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
             moto_float_param_data_new(get_sz, set_sz, 1));
-    
+
     moto_param_new("ts", "Transform Strategy", MOTO_PARAM_MODE_INOUT, pb,
             moto_transform_strategy_param_data_new(get_ts, set_ts, MOTO_TRANSFORM_STRATEGY_SOFTWARE));
     moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
