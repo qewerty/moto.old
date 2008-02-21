@@ -1,6 +1,4 @@
-#include "moto-param_data.h"
-#include "moto-object-node.h"
-#include "moto-time-node.h"
+#include "moto-param-data.h"
 
 /* class ParamData */
 
@@ -42,7 +40,7 @@ G_DEFINE_ABSTRACT_TYPE(MotoParamData, moto_param_data, G_TYPE_OBJECT);
 gpointer moto_param_data_get_ptr(MotoParamData *self)
 {
     if(self->get)
-        return self->priv->get(self->param);
+        return self->get(self->param);
 }
 
 void moto_param_data_set_ptr(MotoParamData *self, gpointer p)

@@ -27,8 +27,8 @@
 typedef struct _MotoParamData MotoParamData;
 typedef struct _MotoParamDataClass MotoParamDataClass;
 
-typedef gpointer (*MotoPataDataGetFunc)(MotoNode *node, MotoParam *param);
-typedef void (*MotoPataDataSetFunc)(MotoNode *node, MotoParam *param, gpointer p);
+typedef gpointer (*MotoParamDataGetFunc)(MotoParam *param);
+typedef void (*MotoParamDataSetFunc)(MotoParam *param, gpointer p);
 /* class MotoParamData */
 
 struct _MotoParamData
@@ -36,8 +36,8 @@ struct _MotoParamData
     GObject parent;
 
     MotoParam *param;
-    MotoPataDataGetFunc get;
-    MotoPataDataSetFunc set;
+    MotoParamDataGetFunc get;
+    MotoParamDataSetFunc set;
 };
 
 struct _MotoParamDataClass
