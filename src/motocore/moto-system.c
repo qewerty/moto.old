@@ -2,6 +2,15 @@
 
 /* nodes */
 #include "moto-object-node.h"
+#include "moto-mesh-view-node.h"
+#include "moto-nurbs-view-node.h"
+#include "moto-cube-node.h"
+#include "moto-sphere-node.h"
+#include "moto-curve-node.h"
+#include "moto-mesh-file-node.h"
+#include "moto-revolve-node.h"
+#include "moto-extrude-node.h"
+#include "moto-bevel-node.h"
 #include "moto-time-node.h"
 
 /* image loaders */
