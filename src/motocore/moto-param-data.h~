@@ -36,6 +36,7 @@ struct _MotoParamData
 {
     GObject parent;
 
+    MotoParam *param;
     MotoPataDataGetFunc get;
     MotoPataDataSetFunc set;
 
