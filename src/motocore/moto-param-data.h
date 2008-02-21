@@ -24,9 +24,6 @@
 
 #include "moto-node.h"
 
-typedef struct _MotoParamData MotoParamData;
-typedef struct _MotoParamDataClass MotoParamDataClass;
-
 typedef gpointer (*MotoParamDataGetFunc)(MotoParam *param);
 typedef void (*MotoParamDataSetFunc)(MotoParam *param, gpointer p);
 /* class MotoParamData */

@@ -41,6 +41,9 @@ typedef struct _MotoParam MotoParam;
 typedef struct _MotoParamClass MotoParamClass;
 typedef struct _MotoParamPriv MotoParamPriv;
 
+typedef struct _MotoParamData MotoParamData;
+typedef struct _MotoParamDataClass MotoParamDataClass;
+
 typedef struct _MotoParamBlock MotoParamBlock;
 typedef struct _MotoParamBlockClass MotoParamBlockClass;
 typedef struct _MotoParamBlockPriv MotoParamBlockPriv;
@@ -201,7 +204,8 @@ GType moto_param_get_type(void);
 #define MOTO_PARAM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM, MotoParamClass))
 
 MotoParam *moto_param_new(const gchar *name,
-        const gchar *title, MotoParamMode mode, MotoParamBlock *pb);
+        const gchar *title, MotoParamMode mode, MotoParamBlock *pb,
+        MotoParamData *data);
 void moto_param_set_from_string(MotoParam *self, const gchar *string);
 
 gpointer moto_param_get_pointer(MotoParam *self);
@@ -217,6 +221,8 @@ void moto_param_clear_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */
 gboolean moto_param_is_valid(MotoParam *self);
+
+MotoNode *moto_param_get_node(MotoParam *self);
 
 /* class MotoParamBlock */
 
