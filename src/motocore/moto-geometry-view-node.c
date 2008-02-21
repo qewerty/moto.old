@@ -1,4 +1,3 @@
-
 #include <GL/gl.h>
 
 #include "moto-geometry-view-node.h"
@@ -13,16 +12,19 @@ struct _MotoGeometryViewNodePriv
 };
 
 static void
-moto_geometry_view_node_dispose(MotoGeometryViewNode *self)
+moto_geometry_view_node_dispose(GObject *obj)
 {
-    G_OBJECT_CLASS(geometry_view_node_parent_class)->dispose(G_OBJECT(self));
+    MotoGeometryView *self = (MotoGeometryView *)obj;
+
     g_slice_free(MotoGeometryViewNodePriv, self->priv);
+
+    geometry_view_node_parent_class->dispose(obj);
 }
 
 static void
-moto_geometry_view_node_finalize(MotoGeometryViewNode *self)
+moto_geometry_view_node_finalize(GObject *obj)
 {
-    G_OBJECT_CLASS(geometry_view_node_parent_class)->finalize(G_OBJECT(self));
+    geometry_view_node_parent_class->finalize(obj);
 }
 
 static void

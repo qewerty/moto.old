@@ -51,6 +51,6 @@ GType moto_mesh_file_node_get_type(void);
 #define MOTO_IS_MESH_FILE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESH_FILE_NODE))
 #define MOTO_MESH_FILE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH_FILE_NODE, MotoMeshFileNodeClass))
 
-MotoObject *moto_mesh_file_node_new();
+MotoMeshFileNode *moto_mesh_file_node_new();
 
 #endif /* MOTO_MESH_FILE_NODE_H */
