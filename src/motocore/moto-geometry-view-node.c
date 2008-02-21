@@ -88,7 +88,7 @@ moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
                  NULL  /* param_types */);
 }
 
-G_DEFINE_ABSTRACT_TYPE(MotoGeometryViewNode, moto_geometry_view_node, G_TYPE_OBJECT);
+G_DEFINE_ABSTRACT_TYPE(MotoGeometryViewNode, moto_geometry_view_node, MOTO_TYPE_NODE);
 
 /* methods of class GeometryViewNode */
 
