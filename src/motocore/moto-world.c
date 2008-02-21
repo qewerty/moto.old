@@ -50,10 +50,12 @@ moto_world_init(MotoWorld *self)
 static void
 moto_world_class_init(MotoWorldClass *klass)
 {
+    GObejctClass *goclass = G_OBJECT_CLASS(klass);
+
     world_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    world_parent_class->dispose = moto_world_dispose;
-    world_parent_class->finalize = moto_world_finalize;
+    goclass->dispose    = moto_world_dispose;
+    goclass->finalize   = moto_world_finalize;
 }
 
 G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);

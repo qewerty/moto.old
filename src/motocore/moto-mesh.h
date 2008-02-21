@@ -66,7 +66,10 @@ struct _MotoMesh
     guint verts_num;
     MotoMeshVertex *verts;
 
+    guint edges_num;
     MotoMeshEdge *edges;
+
+    guint faces_num;
     MotoMeshFace *faces;
 
     GSList *verts_attrs;

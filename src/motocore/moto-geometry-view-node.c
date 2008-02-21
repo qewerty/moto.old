@@ -8,7 +8,7 @@ static GObjectClass *geometry_view_node_parent_class = NULL;
 
 struct _MotoGeometryViewNodePriv
 {
-    gboolean prepared;
+    gint dummy; /* TEMP */
 };
 
 static void
@@ -31,8 +31,6 @@ static void
 moto_geometry_view_node_init(MotoGeometryViewNode *self)
 {
     self->priv = g_slice_new(MotoGeometryViewNodePriv);
-
-    self->priv->prepared = FALSE;
 }
 
 static void
