@@ -132,7 +132,7 @@ moto_object_node_class_init(MotoObjectNodeClass *klass)
 
 G_DEFINE_TYPE(MotoObjectNode, moto_object_node, MOTO_TYPE_NODE);
 
-/* methods class ObjectNode */
+/* methods of class ObjectNode */
 
 static gpointer get_parent(MotoNode *node, MotoParam *param)
 {
