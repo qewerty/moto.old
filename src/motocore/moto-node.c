@@ -1,5 +1,4 @@
 #include "moto-node.h"
-#include "moto-param-types.h"
 #include "moto-messager.h"
 
 /* utils */
@@ -17,7 +16,7 @@ static GObjectClass *node_parent_class = NULL;
 struct _MotoNodePriv
 {
     GString *name;
-    GList *param_blocks;
+    GSList *param_blocks;
 
     gboolean hidden;
 
@@ -34,8 +33,8 @@ moto_node_dispose(GObject *obj)
     MotoNode *self = (MotoNode *)obj;
 
     g_string_free(self->priv->name, TRUE);
-    g_list_foreach(self->priv->param_blocks, unref_gobject, NULL);
-    g_list_free(self->priv->param_blocks);
+    g_slist_foreach(self->priv->param_blocks, unref_gobject, NULL);
+    g_slist_free(self->priv->param_blocks);
     g_slice_free(MotoNodePriv, self->priv);
 
     node_parent_class->dispose(obj);
@@ -85,8 +84,8 @@ void moto_node_set_name(MotoNode *self, const gchar *name)
 
 MotoParamBlock *moto_node_get_param_block(MotoNode *self, const gchar *name)
 {
-    GList *pb = g_list_first(self->priv->param_blocks);
-    for(; pb; pb = g_list_next(pb))
+    GSList *pb = self->priv->param_blocks;
+    for(; pb; pb = g_slist_next(pb))
     {
         if(g_utf8_collate(moto_param_block_get_name(MOTO_PARAM_BLOCK(pb->data)), name))
         {
@@ -256,9 +255,9 @@ moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
     if(G_TYPE_IS_ABSTRACT(self->priv->node_type))
     {
         GString *msg = g_string_new("You are trying to create instance of abstract node type (\"");
-        g_string_append(g_type_name(self->priv->node_type));
-        g_string_append("\"). I won't create it.");
-        moto_warning(msg);
+        g_string_append(msg, g_type_name(self->priv->node_type));
+        g_string_append(msg, "\"). I won't create it.");
+        moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return NULL;
     }
@@ -281,6 +280,7 @@ struct _MotoParamPriv
 {
     GValue value;
     MotoParamMode mode;
+    MotoParamData *data;
 
     MotoParam *source;
     GSList *dests;
@@ -320,6 +320,8 @@ moto_param_init(MotoParam *self)
 {
     self->priv = (MotoParamPriv *)g_slice_new(MotoParamPriv);
 
+    self->priv->data = NULL;
+
     self->priv->source = NULL;
     self->priv->dests = NULL;
 
@@ -347,10 +349,12 @@ G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
 
 /* methods of class Param */
 
-MotoParam *moto_param_new(const gchar *name, MotoParamMode mode,
-        const gchar *title, MotoParamBlock *pb)
+MotoParam *moto_param_new(const gchar *name, const gchar *title,
+        MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data)
 {
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
+
+    self->priv->data = data;
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);
@@ -369,14 +373,24 @@ void moto_param_set_from_string(MotoParam *self,
 
 }
 
+const gchar *moto_param_get_name(MotoParam *self)
+{
+    return self->priv->name->str;
+}
+
+const gchar *moto_param_get_title(MotoParam *self)
+{
+    return self->priv->title->str;
+}
+
 void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
     if(src->priv->mode == MOTO_PARAM_MODE_IN)
     {
         GString *msg = g_string_new("You are trying to connect source that has no output (\"");
-        g_string_append(moto_param_get_name(self));
-        g_string_append("\"). I won't connect it.");
-        moto_warning(msg);
+        g_string_append(msg, moto_param_get_name(self));
+        g_string_append(msg, "\"). I won't connect it.");
+        moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return;
     }
@@ -384,9 +398,9 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
     if(self->priv->mode == MOTO_PARAM_MODE_OUT)
     {
         GString *msg = g_string_new("You are trying to connect source to output parameter (\"");
-        g_string_append(moto_param_get_name(self));
-        g_string_append("\"). I won't connect it.");
-        moto_warning(msg);
+        g_string_append(msg, moto_param_get_name(self));
+        g_string_append(msg, "\"). I won't connect it.");
+        moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return;
     }
@@ -417,9 +431,9 @@ void moto_param_clear_dests(MotoParam *self)
     if(self->priv->mode == MOTO_PARAM_MODE_IN)
     {
         GString *msg = g_string_new("You are trying to clear destinations of input parameter (\"");
-        g_string_append(moto_param_get_name(self));
-        g_string_append("\"). Inputs have no destinations.");
-        moto_warning(msg);
+        g_string_append(msg, moto_param_get_name(self));
+        g_string_append(msg, "\"). Inputs have no destinations.");
+        moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return;
     }
@@ -445,7 +459,7 @@ struct _MotoParamBlockPriv
     GString *title;
     gboolean hidden;
 
-    GList *params;
+    GSList *params;
 
     MotoNode *node;
 };
@@ -458,8 +472,8 @@ moto_param_block_dispose(GObject *obj)
     G_OBJECT_CLASS(param_block_parent_class)->dispose(obj);
 
     g_string_free(self->priv->name, TRUE);
-    g_list_foreach(self->priv->params, unref_gobject, NULL);
-    g_list_free(self->priv->params);
+    g_slist_foreach(self->priv->params, unref_gobject, NULL);
+    g_slist_free(self->priv->params);
     g_slice_free(MotoParamBlockPriv, self->priv);
 }
 
@@ -533,4 +547,21 @@ void moto_param_block_set_title(MotoParamBlock *self, const gchar *title)
 const MotoNode *moto_param_block_get_node(MotoParamBlock *self)
 {
     return self->priv->node;
+}
+
+static void
+update_param(gpointer data, gpointer user_data)
+{
+    moto_node_update(moto_param_get_node((MotoParam *)data));
+}
+
+static void
+update_param_block(gpointer data, gpointer user_data)
+{
+    g_slist_foreach(((MotoParamBlock *)data)->priv->params, update_param, NULL);
+}
+
+void moto_node_update(MotoNode *self)
+{
+    g_slist_foreach(self->priv->param_blocks, update_param_block, NULL);
 }

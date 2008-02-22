@@ -203,10 +203,12 @@ GType moto_param_get_type(void);
 #define MOTO_IS_PARAM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM))
 #define MOTO_PARAM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM, MotoParamClass))
 
-MotoParam *moto_param_new(const gchar *name,
-        const gchar *title, MotoParamMode mode, MotoParamBlock *pb,
-        MotoParamData *data);
+MotoParam *moto_param_new(const gchar *name, const gchar *title,
+        MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data);
 void moto_param_set_from_string(MotoParam *self, const gchar *string);
+
+const gchar *moto_param_get_name(MotoParam *self);
+const gchar *moto_param_get_title(MotoParam *self);
 
 gpointer moto_param_get_pointer(MotoParam *self);
 
@@ -256,5 +258,7 @@ const gchar *moto_param_block_get_title(MotoParamBlock *self);
 void moto_param_block_set_title(MotoParamBlock *self, const gchar *title);
 
 const MotoNode *moto_param_block_get_node(MotoParamBlock *self);
+
+void moto_node_update(MotoNode *self);
 
 #endif /* MOTO_NODE_H */
