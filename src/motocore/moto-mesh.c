@@ -74,15 +74,47 @@ MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num)
     self->verts = (MotoMeshVertex *)g_try_malloc(sizeof(MotoMeshVertex) * verts_num);
 
     self->edges_num = edges_num;
-    self->edges = (MotoMeshEdge *)g_try_malloc(sizeof(MetoMeshEdge) * edges_num);
+    self->edges = (MotoMeshEdge *)g_try_malloc(sizeof(MotoMeshEdge) * edges_num);
 
     self->faces_num = faces_num;
-    self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MetoMeshFace) * faces_num);
+    self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MotoMeshFace) * faces_num);
 
     return self;
 }
 
-void moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum)
+MotoMesh *moto_mesh_copy(MotoMesh *other)
+{
+    MotoMesh *self = moto_mesh_new(other->verts_num, other->edges_num, other->faces_num);
+
+    guint i, j;
+
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = other->verts[i];
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = other->edges[i];
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = other->faces[i];
+
+    GSList *attr = other->verts_attrs;
+    for(; attr; attr = g_slist_next(attr))
+    {
+        MotoMeshVertexAttr *va  = (MotoMeshVertexAttr *)attr->data;
+        MotoMeshVertexAttr *va2 = moto_mesh_add_attr(self, va->name->str, va->chnum);
+
+        for(i = 0; i < self->verts_num; i++)
+        {
+            for(j = 0; j < va->chnum; j++)
+            {
+                guint index = i*va->chnum + j;
+                va2->data[index] = va->data[index];
+            }
+        }
+    }
+
+    return self;
+}
+
+MotoMeshVertexAttr *moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum)
 {
     if(moto_mesh_get_attr(self, attr_name))
     {

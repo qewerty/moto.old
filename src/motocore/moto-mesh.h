@@ -90,8 +90,9 @@ GType moto_mesh_get_type(void);
 #define MOTO_MESH_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH, MotoMeshClass))
 
 MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num);
+MotoMesh *moto_mesh_copy(MotoMesh *other);
 
-void moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
+MotoMeshVertexAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
 MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
 #endif /* MOTO_MESH_H */
