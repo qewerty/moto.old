@@ -24,6 +24,8 @@ moto_mesh_dispose(GObject *obj)
     g_slist_free(self->verts_attrs);
 
     g_free(self->verts);
+    g_free(self->edges);
+    g_free(self->faces);
 
     G_OBJECT_CLASS(mesh_parent_class)->dispose(obj);
 }
@@ -39,28 +41,43 @@ moto_mesh_init(MotoMesh *self)
 {
     self->verts_num = 0;
     self->verts = NULL;
+
+    self->edges_num = 0;
+    self->edges = NULL;
+
+    self->faces_num = 0;
+    self->faces = NULL;
+
     self->verts_attrs = NULL;
 }
 
 static void
 moto_mesh_class_init(MotoMeshClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     mesh_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    mesh_parent_class->dispose = moto_mesh_dispose;
-    mesh_parent_class->finalize = moto_mesh_finalize;
+    goclass->dispose    = moto_mesh_dispose;
+    goclass->finalize   = moto_mesh_finalize;
 }
 
 G_DEFINE_TYPE(MotoMesh, moto_mesh, G_TYPE_OBJECT);
 
 /* methods of class Mesh */
 
-MotoMesh *moto_mesh_new(guint verts_num)
+MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num)
 {
     MotoMesh *self = (MotoMesh *)g_object_new(MOTO_TYPE_MESH, NULL);
 
     self->verts_num = verts_num;
-    self->verts = (MotoMeshVertex *)g_try_malloc(verts_num*sizeof(MotoMeshVertex));
+    self->verts = (MotoMeshVertex *)g_try_malloc(sizeof(MotoMeshVertex) * verts_num);
+
+    self->edges_num = edges_num;
+    self->edges = (MotoMeshEdge *)g_try_malloc(sizeof(MetoMeshEdge) * edges_num);
+
+    self->faces_num = faces_num;
+    self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MetoMeshFace) * faces_num);
 
     return self;
 }
@@ -91,7 +108,7 @@ MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
     GSList *attr = self->verts_attrs;
     for(; attr; attr = g_slist_next(attr))
     {
-        if(g_utf8_collate(attr_name, ((MotoMeshVertexAttr *)attr->data)->name->str))
+        if(g_utf8_collate(attr_name, ((MotoMeshVertexAttr *)attr->data)->name->str) == 0)
         {
             return (MotoMeshVertexAttr *)attr->data;
         }

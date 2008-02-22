@@ -333,7 +333,13 @@ MotoObjectNode *moto_object_node_new()
 
     /* main block */
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
+    if( ! moto_node_add_param_block(node, pb))
+    {
+        /* Error! =\ */
+        g_object_unref((GObject *)pb);
+        return self;
+    }
+
     moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
             moto_object_param_data_new(get_parent, set_parent, NULL));
     moto_param_new("transform", "Transform", MOTO_PARAM_MODE_OUT, pb,
@@ -370,6 +376,12 @@ MotoObjectNode *moto_object_node_new()
 
     /* view block */
     pb = moto_param_block_new("view", "View", (MotoNode *)self);
+    if( ! moto_node_add_param_block(node, pb))
+    {
+        /* Error! =\ */
+        g_object_unref((GObject *)pb);
+        return self;
+    }
 
     moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
             moto_bool_param_data_new(get_visible, set_visible, TRUE));

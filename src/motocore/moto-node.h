@@ -146,8 +146,6 @@ GType moto_node_factory_get_type(void);
 #define MOTO_IS_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NODE_FACTORY))
 #define MOTO_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NODE_FACTORY, MotoNodeFactoryClass))
 
-MotoNodeFactory *moto_node_factory_new();
-
 MotoNode *
 moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name);
 
