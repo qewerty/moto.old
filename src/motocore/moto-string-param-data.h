@@ -52,8 +52,9 @@ GType moto_string_param_data_get_type(void);
 #define MOTO_STRING_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_STRING_PARAM_DATA, MotoStringParamDataClass))
 
 MotoParamData *
-moto_string_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, const gchar *default_value);
+moto_string_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        const gchar *default_value);
 
 #endif /* MOTO_STRING_PARAM_DATA_H */
 

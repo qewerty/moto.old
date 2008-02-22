@@ -53,8 +53,9 @@ GType moto_rotate_order_param_data_get_type(void);
 #define MOTO_ROTATE_ORDER_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_ROTATE_ORDER_PARAM_DATA, MotoRotateOrderParamDataClass))
 
 MotoParamData *
-moto_rotate_order_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, MotoRotateOrder default_value);
+moto_rotate_order_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set, 
+        MotoRotateOrder default_value);
 
 #endif /* MOTO_ROTATE_ORDER_PARAM_DATA_H */
 

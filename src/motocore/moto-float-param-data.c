@@ -36,15 +36,17 @@ G_DEFINE_TYPE(MotoFloatParamData, moto_float_param_data, MOTO_TYPE_PARAM_DATA);
 /* methods of class FloatParamData */
 
 MotoParamData *
-moto_float_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, gfloat default_value)
+moto_float_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        gfloat default_value)
 {
     MotoFloatParamData *self = \
         (MotoFloatParamData *)g_object_new(MOTO_TYPE_FLOAT_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
 
-    data->get = get;
-    data->set = set;
+    data->update    = update;
+    data->get       = get;
+    data->set       = set;
 
     self->value = self->default_value = default_value;
 

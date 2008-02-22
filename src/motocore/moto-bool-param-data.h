@@ -52,8 +52,9 @@ GType moto_bool_param_data_get_type(void);
 #define MOTO_BOOL_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_BOOL_PARAM_DATA, MotoBoolParamDataClass))
 
 MotoParamData *
-moto_bool_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, gboolean default_value);
+moto_bool_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        gboolean default_value);
 
 #endif /* MOTO_BOOL_PARAM_DATA_H */
 

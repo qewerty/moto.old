@@ -36,15 +36,17 @@ G_DEFINE_TYPE(MotoBoolParamData, moto_bool_param_data, MOTO_TYPE_PARAM_DATA);
 /* methods of class BoolParamData */
 
 MotoParamData *
-moto_bool_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, gboolean default_value)
+moto_bool_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        gboolean default_value)
 {
     MotoBoolParamData *self = \
         (MotoBoolParamData *)g_object_new(MOTO_TYPE_BOOL_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
 
-    data->get = get;
-    data->set = set;
+    data->update    = update;
+    data->get       = get;
+    data->set       = set;
 
     self->value = self->default_value = default_value;
 

@@ -36,15 +36,17 @@ G_DEFINE_TYPE(MotoGeometryViewParamData, moto_geometry_view_param_data, MOTO_TYP
 /* methods of class GeometryViewParamData */
 
 MotoParamData *
-moto_geometry_view_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, MotoGeometryViewNode *default_value)
+moto_geometry_view_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        MotoGeometryViewNode *default_value)
 {
     MotoGeometryViewParamData *self = \
         (MotoGeometryViewParamData *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
 
-    data->get = get;
-    data->set = set;
+    data->update    = update;
+    data->get       = get;
+    data->set       = set;
 
     self->value = self->default_value = default_value;
 

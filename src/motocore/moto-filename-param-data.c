@@ -35,16 +35,18 @@ G_DEFINE_TYPE(MotoFilenameParamData, moto_filename_param_data, MOTO_TYPE_STRING_
 /* methods of class FilenameParamData */
 
 MotoParamData *
-moto_filename_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, const gchar *default_value)
+moto_filename_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        const gchar *default_value)
 {
     MotoFilenameParamData *self = \
         (MotoFilenameParamData *)g_object_new(MOTO_TYPE_FILENAME_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
     MotoStringParamData *string_param_data = (MotoStringParamData *)self;
 
-    data->get = get;
-    data->set = set;
+    data->update    = update;
+    data->get       = get;
+    data->set       = set;
 
     string_param_data->value = g_string_new(default_value);
     string_param_data->default_value = g_string_new(default_value);

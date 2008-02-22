@@ -53,8 +53,9 @@ GType moto_mesh_param_data_get_type(void);
 #define MOTO_MESH_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH_PARAM_DATA, MotoMeshParamDataClass))
 
 MotoParamData *
-moto_mesh_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, MotoMesh *default_value);
+moto_mesh_param_data_new(MotoParamDataUpdateFunc update, 
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        MotoMesh *default_value);
 
 #endif /* MOTO_MESH_PARAM_DATA_H */
 

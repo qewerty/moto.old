@@ -52,8 +52,9 @@ GType moto_float_param_data_get_type(void);
 #define MOTO_FLOAT_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_FLOAT_PARAM_DATA, MotoFloatParamDataClass))
 
 MotoParamData *
-moto_float_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, gfloat default_value);
+moto_float_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        gfloat default_value);
 
 #endif /* MOTO_FLOAT_PARAM_DATA_H */
 

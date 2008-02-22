@@ -36,15 +36,17 @@ G_DEFINE_TYPE(MotoTransformOrderParamData, moto_transform_order_param_data, MOTO
 /* methods of class TransformOrderParamData */
 
 MotoParamData *
-moto_transform_order_param_data_new(MotoParamDataGetFunc get,
-        MotoParamDataSetFunc set, MotoTransformOrder default_value)
+moto_transform_order_param_data_new(MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
+        MotoTransformOrder default_value)
 {
     MotoTransformOrderParamData *self = \
         (MotoTransformOrderParamData *)g_object_new(MOTO_TYPE_TRANSFORM_ORDER_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
 
-    data->get = get;
-    data->set = set;
+    data->update    = update;
+    data->get       = get;
+    data->set       = set;
 
     self->value = self->default_value = default_value;
 
