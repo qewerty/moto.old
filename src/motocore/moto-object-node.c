@@ -15,6 +15,9 @@
 
 /* forward */
 
+static void moto_object_node_calc_transform(MotoObjectNode *self);
+static void moto_object_node_calc_inverse_transform(MotoObjectNode *self);
+
 MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self);
 void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent);
 
@@ -707,6 +710,29 @@ void moto_object_node_set_scale_z(MotoObjectNode *self, gfloat z)
 
 /*  */
 
+static void moto_object_node_calc_inverse_transform(MotoObjectNode *self)
+{
+    moto_object_node_calc_transform(self);
+
+    if(self->priv->inverse_calculated)
+        return;
+
+    gfloat ambuf[16], detbuf;
+    matrix44_inverse(self->priv->inverse_matrix, self->priv->matrix, ambuf, detbuf);
+    if(!detbuf)
+    {
+        // Exception?
+    }
+
+    self->priv->inverse_calculated = TRUE;
+}
+
+gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self)
+{
+    moto_object_node_calc_inverse_transform(self);
+    return self->priv->inverse_matrix;
+}
+
 void moto_object_node_clear_parent_inverse(MotoObjectNode *self)
 {
     matrix44_identity(self->priv->parent_inverse_matrix);
@@ -721,7 +747,7 @@ void moto_object_node_update_parent_inverse(MotoObjectNode *self)
     }
 
     matrix44_copy(self->priv->parent_inverse_matrix,
-                  self->priv->parent->priv->inverse_matrix);
+                  moto_object_node_get_inverse_matrix(self->priv->parent));
 }
 
 MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self)
@@ -744,6 +770,8 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
 
     if(parent && ! g_slist_find(parent->priv->children, self))
         parent->priv->children = g_slist_append(parent->priv->children, self);
+
+    moto_object_node_update_parent_inverse(self);
 }
 
 static void calc_bound(MotoObjectNode *self)
