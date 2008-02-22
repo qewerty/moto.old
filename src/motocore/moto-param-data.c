@@ -19,9 +19,10 @@ moto_param_data_finalize(GObject *obj)
 static void
 moto_param_data_init(MotoParamData *self)
 {
-    self->param = NULL;
-    self->get   = NULL;
-    self->set   = NULL;
+    self->param     = NULL;
+    self->get       = NULL;
+    self->set       = NULL;
+    self->update    = NULL;
 }
 
 static void
@@ -37,14 +38,20 @@ G_DEFINE_ABSTRACT_TYPE(MotoParamData, moto_param_data, G_TYPE_OBJECT);
 
 /* methods of class ParamData */
 
-gpointer moto_param_data_get_ptr(MotoParamData *self)
+gpointer moto_param_data_get(MotoParamData *self)
 {
     if(self->get)
         return self->get(self->param);
 }
 
-void moto_param_data_set_ptr(MotoParamData *self, gpointer p)
+void moto_param_data_set(MotoParamData *self, gpointer p)
 {
     if(self->set)
         self->set(self->param, p);
+}
+
+void moto_param_data_update(MotoParamData *self)
+{
+    if(self->update)
+        self->update(self->param);
 }

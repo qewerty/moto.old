@@ -26,6 +26,7 @@
 
 typedef gpointer (*MotoParamDataGetFunc)(MotoParam *param);
 typedef void (*MotoParamDataSetFunc)(MotoParam *param, gpointer p);
+typedef void (*MotoParamDataUpdateFunc)(MotoParam *param);
 /* class MotoParamData */
 
 struct _MotoParamData
@@ -35,6 +36,7 @@ struct _MotoParamData
     MotoParam *param;
     MotoParamDataGetFunc get;
     MotoParamDataSetFunc set;
+    MotoParamDataUpdateFunc update;
 };
 
 struct _MotoParamDataClass
@@ -51,8 +53,9 @@ GType moto_param_data_get_type(void);
 #define MOTO_IS_PARAM_DATA_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_DATA))
 #define MOTO_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_DATA, MotoParamDataClass))
 
-gpointer moto_param_data_get_ptr(MotoParamData *self);
-void moto_param_data_set_ptr(MotoParamData *self, gpointer p);
+gpointer moto_param_data_get(MotoParamData *self);
+void moto_param_data_set(MotoParamData *self, gpointer p);
+void moto_param_data_update(MotoParamData *self);
 
 #endif /* MOTO_PARAM_DATA_H */
 

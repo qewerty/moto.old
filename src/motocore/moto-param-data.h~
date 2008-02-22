@@ -24,11 +24,9 @@
 
 #include "moto-node.h"
 
-typedef struct _MotoParamData MotoParamData;
-typedef struct _MotoParamDataClass MotoParamDataClass;
-
 typedef gpointer (*MotoParamDataGetFunc)(MotoParam *param);
 typedef void (*MotoParamDataSetFunc)(MotoParam *param, gpointer p);
+typedef void (*MotoParamDataUpdateFunc)(MotoParam *param);
 /* class MotoParamData */
 
 struct _MotoParamData
@@ -38,6 +36,7 @@ struct _MotoParamData
     MotoParam *param;
     MotoParamDataGetFunc get;
     MotoParamDataSetFunc set;
+    MotoParamDataUpdateFunc update;
 };
 
 struct _MotoParamDataClass
@@ -56,6 +55,7 @@ GType moto_param_data_get_type(void);
 
 gpointer moto_param_data_get_ptr(MotoParamData *self);
 void moto_param_data_set_ptr(MotoParamData *self, gpointer p);
+void moto_param_data_update(MotoParamData *self);
 
 #endif /* MOTO_PARAM_DATA_H */
 

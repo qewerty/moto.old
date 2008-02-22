@@ -1,4 +1,3 @@
-
 /* ##################################################################################
 #
 #  Moto Animation System (http://motoanim.sf.net)
@@ -48,6 +47,7 @@ struct _MotoMeshEdge
 
 struct _MotoMeshFace
 {
+    gfloat normal[3];
     guint verts_num;
     guint *indecies;
 };

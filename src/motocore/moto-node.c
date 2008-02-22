@@ -106,6 +106,8 @@ moto_node_class_init(MotoNodeClass *klass)
 
     goclass->dispose    = moto_node_dispose;
     goclass->finalize   = moto_node_finalize;
+
+    klass->update = NULL;
 }
 
 G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_OBJECT);
@@ -383,6 +385,7 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
 
     g_assert(data);
     self->priv->data = data;
+    data->param = self;
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);
@@ -410,6 +413,12 @@ const gchar *moto_param_get_title(MotoParam *self)
     return self->priv->title->str;
 }
 
+static void param_setup_ptr(MotoParam *self, MotoParam *src)
+{
+    /* FIXME: This is wrong! */
+    moto_param_data_set(self->priv->data, moto_param_data_get_ptr(src->priv->data));
+}
+
 void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
     if(src->priv->mode == MOTO_PARAM_MODE_IN)
@@ -432,11 +441,15 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
         return;
     }
 
+    /* TODO: Type checking! */
+
     if(src == self->priv->source)
         return;
 
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
+
+    param_setup_ptr(self, src);
 }
 
 void moto_param_clear_source(MotoParam *self)
@@ -573,19 +586,10 @@ const MotoNode *moto_param_block_get_node(MotoParamBlock *self)
     return self->priv->node;
 }
 
-static void
-update_param(gpointer data, gpointer user_data)
-{
-    moto_node_update(moto_param_get_node((MotoParam *)data));
-}
-
-static void
-update_param_block(gpointer data, gpointer user_data)
-{
-    g_slist_foreach(((MotoParamBlock *)data)->priv->params, update_param, NULL);
-}
-
 void moto_node_update(MotoNode *self)
 {
-    g_slist_foreach(self->priv->param_blocks, update_param_block, NULL);
+    MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
+
+    if(klass->update)
+        klass->update(self);
 }

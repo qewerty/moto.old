@@ -27,6 +27,7 @@
 typedef struct _MotoNode MotoNode;
 typedef struct _MotoNodeClass MotoNodeClass;
 typedef struct _MotoNodePriv MotoNodePriv;
+typedef void (*MotoNodeUpdateMethod)(MotoNode *self);
 
 typedef struct _MotoNodeFactory MotoNodeFactory;
 typedef struct _MotoNodeFactoryClass MotoNodeFactoryClass;
@@ -70,6 +71,8 @@ struct _MotoNode
 struct _MotoNodeClass
 {
     GObjectClass parent;
+
+    MotoNodeUpdateMethod update;
 };
 
 GType moto_node_get_type(void);
@@ -116,6 +119,9 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag);
 /* Get dump for saving. */
 gconstpointer moto_node_get_binary_dump(MotoNode *self, glong *numbytes);
 const gchar *moto_node_get_xml_dump(MotoNode *self, glong *numbytes);
+
+/* Update node internals. This must not affect and other node. */
+void moto_node_update(MotoNode *self);
 
 /* class MotoNodeFactory */
 
@@ -203,14 +209,15 @@ GType moto_param_get_type(void);
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data);
-void moto_param_set_from_string(MotoParam *self, const gchar *string);
 
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
-
-gpointer moto_param_get_pointer(MotoParam *self);
-
 MotoParamMode moto_param_get_mode(MotoParam *mode);
+MotoParamBlock *moto_param_get_block(MotoParam *self);
+MotoNode *moto_param_get_node(MotoParam *self);
+
+gpointer moto_param_get(MotoParam *self);
+void moto_param_set(MotoParam *self, gpointer ptr);
 
 /* Valid only if mode is IN or INOUT and does nothing if else. */
 void moto_param_set_source(MotoParam *self, MotoParam *src);
@@ -221,8 +228,6 @@ void moto_param_clear_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */
 gboolean moto_param_is_valid(MotoParam *self);
-
-MotoNode *moto_param_get_node(MotoParam *self);
 
 /* class MotoParamBlock */
 
@@ -256,7 +261,5 @@ const gchar *moto_param_block_get_title(MotoParamBlock *self);
 void moto_param_block_set_title(MotoParamBlock *self, const gchar *title);
 
 const MotoNode *moto_param_block_get_node(MotoParamBlock *self);
-
-void moto_node_update(MotoNode *self);
 
 #endif /* MOTO_NODE_H */
