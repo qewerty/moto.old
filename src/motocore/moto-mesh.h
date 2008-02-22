@@ -38,7 +38,7 @@ typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
 struct _MotoMeshVertex
 {
     gfloat xyz[3];
-    gfloat no[3];
+    gfloat normal[3];
 };
 
 struct _MotoMeshEdge
