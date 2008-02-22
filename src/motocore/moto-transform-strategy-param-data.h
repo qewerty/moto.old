@@ -53,9 +53,7 @@ GType moto_transform_strategy_param_data_get_type(void);
 #define MOTO_TRANSFORM_STRATEGY_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TRANSFORM_STRATEGY_PARAM_DATA, MotoTransformStrategyParamDataClass))
 
 MotoParamData *
-moto_transform_strategy_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get,MotoParamDataSetFunc set,
-        MotoTransformStrategy default_value);
+moto_transform_strategy_param_data_new(MotoTransformStrategy default_value);
 
 #endif /* MOTO_TRANSFORM_STRATEGY_PARAM_DATA_H */
 

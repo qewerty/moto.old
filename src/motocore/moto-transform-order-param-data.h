@@ -53,9 +53,7 @@ GType moto_transform_order_param_data_get_type(void);
 #define MOTO_TRANSFORM_ORDER_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TRANSFORM_ORDER_PARAM_DATA, MotoTransformOrderParamDataClass))
 
 MotoParamData *
-moto_transform_order_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
-        MotoTransformOrder default_value);
+moto_transform_order_param_data_new(MotoTransformOrder default_value);
 
 #endif /* MOTO_TRANSFORM_ORDER_PARAM_DATA_H */
 

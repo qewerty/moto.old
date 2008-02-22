@@ -1,4 +1,5 @@
 #include "moto-node.h"
+#include "moto-param-data.h"
 #include "moto-messager.h"
 
 /* utils */
@@ -416,7 +417,7 @@ const gchar *moto_param_get_title(MotoParam *self)
 static void param_setup_ptr(MotoParam *self, MotoParam *src)
 {
     /* FIXME: This is wrong! */
-    moto_param_data_set(self->priv->data, moto_param_data_get_ptr(src->priv->data));
+    moto_param_data_point(self->priv->data, moto_param_data_get(src->priv->data));
 }
 
 void moto_param_set_source(MotoParam *self, MotoParam *src)
@@ -495,6 +496,26 @@ MotoNode *moto_param_get_node(MotoParam *self)
         return NULL;
 
     return moto_param_block_get_node(self->priv->pb);
+}
+
+void moto_param_update(MotoParam *self)
+{
+    if(self->priv->data)
+        moto_param_data_update(self->priv->data);
+}
+
+void moto_param_update_dests(MotoParam *self)
+{
+    if(self->priv->mode == MOTO_PARAM_MODE_IN)
+        return;
+
+    GSList *dest = self->priv->dests;
+    for(; dest; dest = g_slist_next(dest))
+    {
+        MotoParam *param = (MotoParam *)dest->data;
+        moto_param_data_update(param);
+    }
+
 }
 
 /* class ParamBlock */

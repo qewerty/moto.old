@@ -36,17 +36,11 @@ G_DEFINE_TYPE(MotoRotateOrderParamData, moto_rotate_order_param_data, MOTO_TYPE_
 /* methods of class RotateOrderParamData */
 
 MotoParamData *
-moto_rotate_order_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set, 
-        MotoRotateOrder default_value)
+moto_rotate_order_param_data_new(MotoRotateOrder default_value)
 {
     MotoRotateOrderParamData *self = \
         (MotoRotateOrderParamData *)g_object_new(MOTO_TYPE_ROTATE_ORDER_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
-
-    data->update    = update;
-    data->get       = get;
-    data->set       = set;
 
     self->value = self->default_value = default_value;
 

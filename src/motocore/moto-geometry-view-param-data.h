@@ -53,9 +53,7 @@ GType moto_geometry_view_param_data_get_type(void);
 #define MOTO_GEOMETRY_VIEW_PARAM_DATA_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_PARAM_DATA, MotoGeometryViewParamDataClass))
 
 MotoParamData *
-moto_geometry_view_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
-        MotoGeometryViewNode *default_value);
+moto_geometry_view_param_data_new(MotoGeometryViewNode *default_value);
 
 #endif /* MOTO_GEOMETRY_VIEW_PARAM_DATA_H */
 

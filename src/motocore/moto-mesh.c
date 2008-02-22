@@ -116,17 +116,19 @@ MotoMesh *moto_mesh_copy(MotoMesh *other)
 
 MotoMeshVertexAttr *moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum)
 {
-    if(moto_mesh_get_attr(self, attr_name))
+    MotoMeshVertexAttr *attr = moto_mesh_get_attr(self, attr_name);
+
+    if(attr)
     {
         GString *msg = g_string_new("Mesh already has attribute with name \"");
         g_string_append(msg, attr_name);
         g_string_append(msg, "\". I won't create it.");
         moto_warning(msg->str);
         g_string_free(msg, TRUE);
-        return;
+        return attr;
     }
 
-    MotoMeshVertexAttr *attr = g_slice_new(MotoMeshVertexAttr);
+    attr = g_slice_new(MotoMeshVertexAttr);
 
     attr->name = g_string_new(attr_name);
     attr->chnum = chnum;

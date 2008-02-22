@@ -36,17 +36,11 @@ G_DEFINE_TYPE(MotoTransformStrategyParamData, moto_transform_strategy_param_data
 /* methods of class TransformStrategyParamData */
 
 MotoParamData *
-moto_transform_strategy_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
-        MotoTransformStrategy default_value)
+moto_transform_strategy_param_data_new(MotoTransformStrategy default_value)
 {
     MotoTransformStrategyParamData *self = \
         (MotoTransformStrategyParamData *)g_object_new(MOTO_TYPE_TRANSFORM_STRATEGY_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
-
-    data->update    = update;
-    data->get       = get;
-    data->set       = set;
 
     self->value = self->default_value = default_value;
 

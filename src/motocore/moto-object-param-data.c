@@ -36,17 +36,11 @@ G_DEFINE_TYPE(MotoObjectParamData, moto_object_param_data, MOTO_TYPE_PARAM_DATA)
 /* methods of class ObjectParamData */
 
 MotoParamData *
-moto_object_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
-        MotoObjectNode *default_value)
+moto_object_param_data_new(MotoObjectNode *default_value)
 {
     MotoObjectParamData *self = \
         (MotoObjectParamData *)g_object_new(MOTO_TYPE_OBJECT_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
-
-    data->update    = update;
-    data->get       = get;
-    data->set       = set;
 
     self->value = self->default_value = default_value;
 

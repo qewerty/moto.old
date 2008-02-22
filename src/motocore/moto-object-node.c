@@ -217,6 +217,12 @@ static void update_parent(MotoParam *param)
 {
 }
 
+static void point_parent(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->parent = (MotoObjectNode *)p;
+}
+
 static gpointer get_tx(MotoParam *param)
 {
     return ((MotoObjectNode *)moto_param_get_node(param))->priv->tx_ptr;
@@ -235,6 +241,12 @@ static void update_tx(MotoParam *param)
     obj->priv->transform_calculated = FALSE;
 
     moto_node_update((MotoNode *)obj);
+}
+
+static void point_tx(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->tx_ptr = (gfloat *)p;
 }
 
 static gpointer get_ty(MotoParam *param)
@@ -257,6 +269,12 @@ static void update_ty(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_ty(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->ty_ptr = (gfloat *)p;
+}
+
 static gpointer get_tz(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->tz;
@@ -275,6 +293,12 @@ static void update_tz(MotoParam *param)
     obj->priv->transform_calculated = FALSE;
 
     moto_node_update((MotoNode *)obj);
+}
+
+static void point_tz(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->tz_ptr = (gfloat *)p;
 }
 
 static gpointer get_rx(MotoParam *param)
@@ -297,6 +321,12 @@ static void update_rx(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_rx(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->rx_ptr = (gfloat *)p;
+}
+
 static gpointer get_ry(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->ry;
@@ -315,6 +345,12 @@ static void update_ry(MotoParam *param)
     obj->priv->transform_calculated = FALSE;
 
     moto_node_update((MotoNode *)obj);
+}
+
+static void point_ry(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->ry_ptr = (gfloat *)p;
 }
 
 static gpointer get_rz(MotoParam *param)
@@ -337,6 +373,12 @@ static void update_rz(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_rz(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->rz_ptr = (gfloat *)p;
+}
+
 static gpointer get_sx(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->sx;
@@ -355,6 +397,12 @@ static void update_sx(MotoParam *param)
     obj->priv->transform_calculated = FALSE;
 
     moto_node_update((MotoNode *)obj);
+}
+
+static void point_sx(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->sx_ptr = (gfloat *)p;
 }
 
 static gpointer get_sy(MotoParam *param)
@@ -377,6 +425,12 @@ static void update_sy(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_sy(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->sy_ptr = (gfloat *)p;
+}
+
 static gpointer get_sz(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->sz;
@@ -397,6 +451,12 @@ static void update_sz(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_sz(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->sz_ptr = (gfloat *)p;
+}
+
 static gpointer get_ts(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->transform_strategy;
@@ -405,6 +465,12 @@ static gpointer get_ts(MotoParam *param)
 static void set_ts(MotoParam *param, gpointer p)
 {
     moto_object_node_set_transform_strategy((MotoObjectNode *)moto_param_get_node(param), *((MotoTransformStrategy *)p));
+}
+
+static void point_ts(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->transform_strategy_ptr = (MotoTransformStrategy *)p;
 }
 
 static gpointer get_to(MotoParam *param)
@@ -424,6 +490,12 @@ static void update_to(MotoParam *param)
     obj->priv->transform_calculated = FALSE;
 
     moto_node_update((MotoNode *)obj);
+}
+
+static void point_to(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->transform_order_ptr = (MotoTransformOrder *)p;
 }
 
 static gpointer get_ro(MotoParam *param)
@@ -446,6 +518,12 @@ static void update_ro(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_ro(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->rotate_order_ptr = (MotoRotateOrder *)p;
+}
+
 static gpointer get_kt(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->keep_transform;
@@ -465,6 +543,12 @@ static void update_kt(MotoParam *param)
     moto_node_update((MotoNode *)obj);
 }
 
+static void point_kt(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->keep_transform_ptr = (gboolean *)p;
+}
+
 static gpointer get_visible(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->visible;
@@ -473,6 +557,12 @@ static gpointer get_visible(MotoParam *param)
 static void set_visible(MotoParam *param, gpointer p)
 {
     moto_object_node_set_visible((MotoObjectNode *)moto_param_get_node(param), *((gboolean *)p));
+}
+
+static void point_visible(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->visible_ptr = (gboolean *)p;
 }
 
 static gpointer get_view(MotoParam *param)
@@ -485,6 +575,12 @@ static void set_view(MotoParam *param, gpointer p)
     moto_object_node_set_view((MotoObjectNode *)moto_param_get_node(param), (MotoGeometryViewNode *)p);
 }
 
+static void point_view(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->view = (MotoGeometryViewNode *)p;
+}
+
 static gpointer get_show_view(MotoParam *param)
 {
     return & ((MotoObjectNode *)moto_param_get_node(param))->priv->show_view;
@@ -493,6 +589,12 @@ static gpointer get_show_view(MotoParam *param)
 static void set_show_view(MotoParam *param, gpointer p)
 {
     moto_object_node_set_show_view((MotoObjectNode *)moto_param_get_node(param), *((gboolean *)p));
+}
+
+static void point_show_view(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->show_view_ptr = (gboolean *)p;
 }
 
 static gpointer get_transform(MotoParam *param)
@@ -510,56 +612,87 @@ MotoObjectNode *moto_object_node_new()
     /* WARNING: Implementation of *_param_data_* may be changed in future!  */
 
     MotoParamBlock *pb;
+    MotoParamData *pdata;
 
     /* main block */
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
     moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
-            moto_object_param_data_new(update_parent, NULL, set_parent, NULL));
+            pdata = moto_object_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, point_parent, update_parent, get_parent, set_parent);
+
     moto_param_new("transform", "Transform", MOTO_PARAM_MODE_OUT, pb,
-            moto_object_param_data_new(NULL, get_transform, NULL, NULL));
+            pdata = moto_object_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, NULL, NULL, get_transform, NULL);
 
     moto_param_new("tx", "Translate X", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_tx, get_tx, set_tx, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_tx, update_tx, get_tx, set_tx);
+
     moto_param_new("ty", "Translate Y", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_ty, get_ty, set_ty, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_ty, update_ty, get_ty, set_ty);
+
     moto_param_new("tz", "Translate Z", MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_tz, get_tz, set_tz, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_tz, update_tz, get_tz, set_tz);
+
     moto_param_new("rx", "Rotate X",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_rx, get_rx, set_rx, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_rx, update_rx, get_rx, set_rx);
+
     moto_param_new("ry", "Rotate Y",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_ry, get_ry, set_ry, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_ry, update_ry, get_ry, set_ry);
+
     moto_param_new("rz", "Rotate Z",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_rz, get_rz, set_rz, 0));
+            pdata = moto_float_param_data_new(0));
+    moto_param_data_set_cbs(pdata, point_rz, update_rz, get_rz, set_rz);
+
     moto_param_new("sx", "Scale X",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_sx, get_sx, set_sx, 1));
+            pdata = moto_float_param_data_new(1));
+    moto_param_data_set_cbs(pdata, point_sx, update_sx, get_sx, set_sx);
+
     moto_param_new("sy", "Scale Y",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_sy, get_sy, set_sy, 1));
+            pdata = moto_float_param_data_new(1));
+    moto_param_data_set_cbs(pdata, point_sy, update_sy, get_sy, set_sy);
+
     moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
-            moto_float_param_data_new(update_sz, get_sz, set_sz, 1));
+            pdata = moto_float_param_data_new(1));
+    moto_param_data_set_cbs(pdata, point_sz, update_sz, get_sz, set_sz);
 
     moto_param_new("ts", "Transform Strategy", MOTO_PARAM_MODE_INOUT, pb,
-            moto_transform_strategy_param_data_new(NULL, get_ts, set_ts, MOTO_TRANSFORM_STRATEGY_SOFTWARE));
+            pdata = moto_transform_strategy_param_data_new(MOTO_TRANSFORM_STRATEGY_SOFTWARE));
+    moto_param_data_set_cbs(pdata, point_ts, NULL, get_ts, set_ts);
+
     moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
-            moto_transform_order_param_data_new(update_to, get_to, set_to, MOTO_TRANSFORM_ORDER_TRS));
+            pdata = moto_transform_order_param_data_new(MOTO_TRANSFORM_ORDER_TRS));
+    moto_param_data_set_cbs(pdata, point_to, update_to, get_to, set_to);
+
     moto_param_new("ro", "Rotate Order",    MOTO_PARAM_MODE_INOUT, pb,
-            moto_rotate_order_param_data_new(update_ro, get_ro, set_ro, MOTO_ROTATE_ORDER_XYZ));
+            pdata = moto_rotate_order_param_data_new(MOTO_ROTATE_ORDER_XYZ));
+    moto_param_data_set_cbs(pdata, point_ro, update_ro, get_ro, set_ro);
 
     moto_param_new("kt", "Keep Transform", MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(NULL, get_kt, set_kt, TRUE));
+            pdata = moto_bool_param_data_new(TRUE));
+    moto_param_data_set_cbs(pdata, point_kt, update_kt, get_kt, set_kt);
 
     /* view block */
     pb = moto_param_block_new("view", "View", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
     moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(NULL, get_visible, set_visible, TRUE));
+            pdata = moto_bool_param_data_new(TRUE));
+    moto_param_data_set_cbs(pdata, point_visible, NULL, get_visible, set_visible);
 
     moto_param_new("view", "View", MOTO_PARAM_MODE_IN, pb,
-            moto_geometry_view_param_data_new(NULL, get_view, set_view, NULL));
+            pdata = moto_geometry_view_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, point_view, NULL, get_view, set_view);
+
     moto_param_new("show_view", "Show View", MOTO_PARAM_MODE_INOUT, pb,
-            moto_bool_param_data_new(NULL, get_show_view, set_show_view, TRUE));
+            pdata = moto_bool_param_data_new(TRUE));
+    moto_param_data_set_cbs(pdata, point_show_view, NULL, get_show_view, set_show_view);
 
     return self;
 }
@@ -826,7 +959,7 @@ void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt)
     if(kt != self->priv->transform_strategy)
     {
         self->priv->transform_calculated = FALSE;
-        self->priv->keep_transform;
+        self->priv->keep_transform = kt;
     }
 }
 
@@ -1042,7 +1175,7 @@ static void apply_transform(MotoObjectNode *self)
             apply_hardware_transform(self);
         break;
         case MOTO_TRANSFORM_STRATEGY_SOFTWARE:
-            glMultMatrix(moto_object_node_get_matrix(self));
+            glMultMatrixf(moto_object_node_get_matrix(self));
         break;
     }
 }
@@ -1063,7 +1196,7 @@ void moto_object_node_draw(MotoObjectNode *self)
     }
 
     if(*(self->priv->show_view_ptr))
-        moto_geometry_view_draw(self->priv->view);
+        moto_geometry_view_node_draw(self->priv->view);
 
     glPopMatrix();
 }

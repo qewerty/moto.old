@@ -216,8 +216,8 @@ MotoParamMode moto_param_get_mode(MotoParam *mode);
 MotoParamBlock *moto_param_get_block(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 
-gpointer moto_param_get(MotoParam *self);
-void moto_param_set(MotoParam *self, gpointer ptr);
+void moto_param_update(MotoParam *self);
+void moto_param_update_dests(MotoParam *self);
 
 /* Valid only if mode is IN or INOUT and does nothing if else. */
 void moto_param_set_source(MotoParam *self, MotoParam *src);

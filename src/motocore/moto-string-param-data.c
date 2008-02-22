@@ -41,17 +41,11 @@ G_DEFINE_TYPE(MotoStringParamData, moto_string_param_data, MOTO_TYPE_PARAM_DATA)
 /* methods of class StringParamData */
 
 MotoParamData *
-moto_string_param_data_new(MotoParamDataUpdateFunc update,
-        MotoParamDataGetFunc get, MotoParamDataSetFunc set,
-        const gchar *default_value)
+moto_string_param_data_new(const gchar *default_value)
 {
     MotoStringParamData *self = \
         (MotoStringParamData *)g_object_new(MOTO_TYPE_STRING_PARAM_DATA, NULL);
     MotoParamData *data = (MotoParamData *)self;
-
-    data->update    = update;
-    data->get       = get;
-    data->set       = set;
 
     self->value = g_string_new(default_value);
     self->default_value = g_string_new(default_value);
