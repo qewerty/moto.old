@@ -1,0 +1,6 @@
+#! /bin/sh
+
+mkdir -p ./build/linux_debug
+make CFLAGS="-O0 -g" \
+     --directory=./build/linux_debug \
+     --makefile=../../project/Makefile
