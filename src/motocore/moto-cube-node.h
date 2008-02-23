@@ -54,4 +54,27 @@ GType moto_cube_node_get_type(void);
 
 MotoCubeNode *moto_cube_node_new();
 
+/* class MotoNodeFactory */
+
+struct _MotoCubeNodeFactory
+{
+    MotoNodeFactory parent;
+};
+
+struct _MotoNodeFactoryClass
+{
+    MotoNodeFactoryClass parent;
+};
+
+GType moto_node_factory_get_type(void);
+
+#define MOTO_TYPE_CUBE_NODE_FACTORY (moto_node_factory_get_type())
+#define MOTO_CUBE_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_CUBE_NODE_FACTORY, MotoNodeFactory))
+#define MOTO_CUBE_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_CUBE_NODE_FACTORY, MotoNodeFactoryClass))
+#define MOTO_IS_CUBE_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_CUBE_NODE_FACTORY))
+#define MOTO_IS_CUBE_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_CUBE_NODE_FACTORY))
+#define MOTO_CUBE_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_CUBE_NODE_FACTORY, MotoNodeFactoryClass))
+
+MotoNodeFactory *moto_cube_node_factory_new();
+
 #endif /* MOTO_CUBE_NODE_H */

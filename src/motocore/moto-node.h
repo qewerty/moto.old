@@ -232,6 +232,8 @@ void moto_param_clear_source(MotoParam *self);
 /* Valid only if mode is OUT or INOUT and does nothing if else. */
 void moto_param_clear_dests(MotoParam *self);
 
+void moto_param_has_dests(MotoParam *self);
+
 /* May be FALSE if source is invalid or when limits are exceeded.  */
 gboolean moto_param_is_valid(MotoParam *self);
 

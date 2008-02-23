@@ -484,6 +484,11 @@ void moto_param_clear_dests(MotoParam *self)
     self->priv->dests = NULL;
 }
 
+void moto_param_has_dests(MotoParam *self)
+{
+    return (g_slist_length(self->priv->dests) > 0);
+}
+
 gboolean moto_param_is_valid(MotoParam *self)
 {
     return (MOTO_IS_PARAM_BLOCK(self->priv->pb) && \
