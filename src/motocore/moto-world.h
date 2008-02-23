@@ -72,4 +72,7 @@ MotoObjectNode *moto_world_get_root(MotoWorld *self);
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
 void moto_world_draw(MotoWorld *self);
 
+void moto_world_get_system(MotoWorld *self);
+void moto_world_get_library(MotoWorld *self);
+
 #endif /* MOTO_WORLD_H */

@@ -1,4 +1,5 @@
 #include "moto-world.h"
+#include "moto-system.h"
 #include "moto-object-node.h"
 #include "moto-time-node.h"
 
@@ -8,6 +9,8 @@ static GObjectClass *world_parent_class = NULL;
 
 struct _MotoWorldPriv
 {
+    MotoSystem *system;
+
     GString *filename;
     gboolean changed;
 
@@ -42,6 +45,8 @@ static void
 moto_world_init(MotoWorld *self)
 {
     self->priv = g_slice_new(MotoWorldPriv);
+
+    self->priv->system = NULL;
 
     self->priv->filename = g_string_new("");
     self->priv->changed = FALSE;
@@ -105,5 +110,34 @@ void moto_world_xml_dump_selected(MotoWorld *self,
 void moto_world_merge(MotoWorld *self, const gchar *filename)
 {
 
+}
+
+MotoObjectNode *moto_world_get_root(MotoWorld *self)
+{
+    return self->priv->root;
+}
+
+void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
+{
+    /* TODO: Check that new root is a node in this world! */
+    self->priv->root = root;
+}
+
+void moto_world_draw(MotoWorld *self)
+{
+    if(self->priv->root)
+        moto_object_draw(self->priv->root);
+}
+
+void moto_world_get_system(MotoWorld *self)
+{
+    return self->priv->system;
+}
+
+void moto_world_get_library(MotoWorld *self)
+{
+    if(self->priv->system)
+        return moto_system_get_library(self->priv->system);
+    return NULL;
 }
 

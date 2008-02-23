@@ -51,7 +51,11 @@ GType moto_system_get_type(void);
 #define MOTO_IS_SYSTEM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SYSTEM))
 #define MOTO_SYSTEM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SYSTEM, MotoSystemClass))
 
-MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib);
+MotoSystem *moto_system_new();
+
+MotoWorld *moto_system_get_current_world(MotoSystem *self);
+void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current);
+void moto_system_set_world_current(MotoSystem *self, MotoWorld *world);
 
 #endif /* MOTO_SYSTEM_H */
 
