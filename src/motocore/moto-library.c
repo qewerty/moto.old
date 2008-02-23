@@ -116,6 +116,8 @@ void moto_library_new_slot(MotoLibrary *self, const gchar *slot_name, GType type
 gboolean moto_library_new_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name, gpointer entry)
 {
+    g_print("moto_library_new_entry: BEGIN");
+
     Slot *slot = g_datalist_get_data(self->priv->slots, slot_name);
     if( ! slot)
     {
@@ -123,11 +125,15 @@ gboolean moto_library_new_entry(MotoLibrary *self,
         return FALSE;
     }
 
+    g_print("BEFORE CHECK\n");
+
     if( ! slot_check_entry(slot, entry))
     {
         /* Warning! */
         return FALSE;
     }
+
+    g_print("AFTER CHECK\n");
 
     if(slot_get_entry(slot, entry_name))
     {

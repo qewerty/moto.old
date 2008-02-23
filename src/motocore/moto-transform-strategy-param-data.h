@@ -32,7 +32,7 @@ typedef struct _MotoTransformStrategyParamDataClass MotoTransformStrategyParamDa
 
 struct _MotoTransformStrategyParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     MotoTransformStrategy value;
     MotoTransformStrategy default_value;
@@ -40,7 +40,7 @@ struct _MotoTransformStrategyParamData
 
 struct _MotoTransformStrategyParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_transform_strategy_param_data_get_type(void);

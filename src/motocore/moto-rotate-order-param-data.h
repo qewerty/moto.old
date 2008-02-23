@@ -32,7 +32,7 @@ typedef struct _MotoRotateOrderParamDataClass MotoRotateOrderParamDataClass;
 
 struct _MotoRotateOrderParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     MotoRotateOrder value;
     MotoRotateOrder default_value;
@@ -40,7 +40,7 @@ struct _MotoRotateOrderParamData
 
 struct _MotoRotateOrderParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_rotate_order_param_data_get_type(void);

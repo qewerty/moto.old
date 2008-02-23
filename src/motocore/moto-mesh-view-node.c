@@ -177,7 +177,7 @@ static MotoNodeFactory *mesh_view_node_factory = NULL;
 
 MotoNodeFactory *moto_mesh_view_node_factory_new()
 {
-    if(mesh_view_node_factory = NULL)
+    if( ! mesh_view_node_factory)
         mesh_view_node_factory = \
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_MESH_VIEW_NODE_FACTORY, NULL);
 

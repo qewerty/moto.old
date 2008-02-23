@@ -1205,7 +1205,7 @@ void moto_object_node_draw(MotoObjectNode *self)
 
 MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self)
 {
-    return self->priv->show_view;
+    return self->priv->view;
 }
 
 void moto_object_node_set_view(MotoObjectNode *self, MotoGeometryViewNode *view)
@@ -1215,7 +1215,7 @@ void moto_object_node_set_view(MotoObjectNode *self, MotoGeometryViewNode *view)
 
 gboolean moto_object_node_get_show_view(MotoObjectNode *self)
 {
-    return self->priv->view;
+    return self->priv->show_view;
 }
 
 void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view)
@@ -1239,6 +1239,8 @@ MotoNode *
 moto_object_node_factory_create_node(MotoNodeFactory *self,
         const gchar *name);
 
+static GType moto_object_node_factory_get_node_type(MotoNodeFactory *self);
+
 static GObjectClass *object_node_factory_parent_class = NULL;
 
 static void
@@ -1255,7 +1257,9 @@ moto_object_node_factory_finalize(GObject *obj)
 
 static void
 moto_object_node_factory_init(MotoObjectNodeFactory *self)
-{}
+{
+    
+}
 
 static void
 moto_object_node_factory_class_init(MotoObjectNodeFactoryClass *klass)
@@ -1263,12 +1267,13 @@ moto_object_node_factory_class_init(MotoObjectNodeFactoryClass *klass)
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
 
-    object_node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    object_node_factory_parent_class = g_type_class_peek_parent(klass);
 
     goclass->dispose    = moto_object_node_factory_dispose;
     goclass->finalize   = moto_object_node_factory_finalize;
 
-    nfclass->create_node = moto_object_node_factory_create_node;
+    nfclass->get_node_type  = moto_object_node_factory_get_node_type;
+    nfclass->create_node    = moto_object_node_factory_create_node;
 }
 
 G_DEFINE_TYPE(MotoObjectNodeFactory, moto_object_node_factory, MOTO_TYPE_NODE_FACTORY);
@@ -1279,7 +1284,7 @@ static MotoNodeFactory *object_node_factory = NULL;
 
 MotoNodeFactory *moto_object_node_factory_new()
 {
-    if(object_node_factory = NULL)
+    if( ! object_node_factory)
         object_node_factory = \
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_OBJECT_NODE_FACTORY, NULL);
 
@@ -1292,3 +1297,7 @@ MotoNode *moto_object_node_factory_create_node(MotoNodeFactory *self,
     return (MotoNode *)moto_object_node_new(name);
 }
 
+static GType moto_object_node_factory_get_node_type(MotoNodeFactory *self)
+{
+    return MOTO_TYPE_OBJECT_NODE;
+}

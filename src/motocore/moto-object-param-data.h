@@ -32,7 +32,7 @@ typedef struct _MotoObjectParamDataClass MotoObjectParamDataClass;
 
 struct _MotoObjectParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     MotoObjectNode *value;
     MotoObjectNode *default_value;
@@ -40,7 +40,7 @@ struct _MotoObjectParamData
 
 struct _MotoObjectParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_object_param_data_get_type(void);

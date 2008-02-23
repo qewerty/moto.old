@@ -26,6 +26,8 @@
 
 #include "moto-forward.h"
 
+typedef GType (*MotoNodeFactoryGetNodeTypeMethod)(MotoNodeFactory *self);
+
 typedef enum
 {
     MOTO_PARAM_MODE_IN,
@@ -116,7 +118,8 @@ struct _MotoNodeFactoryClass
 {
     GObjectClass parent;
 
-    MotoNodeFactoryCreateNodeMethod create_node;
+    MotoNodeFactoryGetNodeTypeMethod    get_node_type;
+    MotoNodeFactoryCreateNodeMethod     create_node;
 
     /* signal */
     guint create_node_signal_id;

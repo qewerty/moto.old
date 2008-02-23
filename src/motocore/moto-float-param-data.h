@@ -31,7 +31,7 @@ typedef struct _MotoFloatParamDataClass MotoFloatParamDataClass;
 
 struct _MotoFloatParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     gfloat value;
     gfloat default_value;
@@ -39,7 +39,7 @@ struct _MotoFloatParamData
 
 struct _MotoFloatParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_float_param_data_get_type(void);

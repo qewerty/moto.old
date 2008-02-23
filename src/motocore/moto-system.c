@@ -89,14 +89,24 @@ MotoSystem *moto_system_new()
     /* built-in node types */
 
     MotoNodeFactory *fac;
+    
+    g_print("1\n");
 
     fac = moto_object_node_factory_new();
+    // MotoNode *node = moto_node_factory_create_node(fac, "123");
+
+    g_print("2\n");
+
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
+    
+    g_print("3\n");
 
     fac = moto_mesh_view_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    g_print("4\n");
 
     /*
     fac = moto_nurbs_view_factory_new();

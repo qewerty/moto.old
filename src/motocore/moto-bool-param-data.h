@@ -31,7 +31,7 @@ typedef struct _MotoBoolParamDataClass MotoBoolParamDataClass;
 
 struct _MotoBoolParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     gboolean value;
     gboolean default_value;
@@ -39,7 +39,7 @@ struct _MotoBoolParamData
 
 struct _MotoBoolParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_bool_param_data_get_type(void);

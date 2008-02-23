@@ -10,6 +10,10 @@ unref_gobject(gpointer data, gpointer user_data)
     g_object_unref(data);
 }
 
+/* forwards */
+
+static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self);
+
 /* privates */
 
 struct _MotoNodePriv
@@ -274,7 +278,8 @@ moto_node_factory_class_init(MotoNodeFactoryClass *klass)
     goclass->dispose    = moto_node_factory_dispose;
     goclass->finalize   = moto_node_factory_finalize;
 
-    klass->create_node = NULL;
+    klass->get_node_type    = moto_node_factory_get_node_type_virtual;
+    klass->create_node      = NULL;
 
     klass->create_node_signal_id = g_signal_newv ("create-node",
                  G_TYPE_FROM_CLASS (klass),
@@ -331,7 +336,15 @@ moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
 
 GType moto_node_factory_get_node_type(MotoNodeFactory *self)
 {
-    return self->priv->node_type;
+    MotoNodeFactoryClass *klass = MOTO_NODE_FACTORY_GET_CLASS(self);
+
+    if(klass->get_node_type)
+        klass->get_node_type(self);
+}
+
+static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self)
+{
+    return MOTO_TYPE_NODE;
 }
 
 /* class Param */

@@ -32,7 +32,7 @@ typedef struct _MotoGeometryViewParamDataClass MotoGeometryViewParamDataClass;
 
 struct _MotoGeometryViewParamData
 {
-    GObject parent;
+    MotoParamData parent;
 
     MotoGeometryViewNode *value;
     MotoGeometryViewNode *default_value;
@@ -40,7 +40,7 @@ struct _MotoGeometryViewParamData
 
 struct _MotoGeometryViewParamDataClass
 {
-    GObjectClass parent;
+    MotoParamDataClass parent;
 };
 
 GType moto_geometry_view_param_data_get_type(void);

@@ -262,7 +262,7 @@ static MotoNodeFactory *cube_node_factory = NULL;
 
 MotoNodeFactory *moto_cube_node_factory_new()
 {
-    if(cube_node_factory = NULL)
+    if( ! cube_node_factory)
         cube_node_factory = \
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_CUBE_NODE_FACTORY, NULL);
 

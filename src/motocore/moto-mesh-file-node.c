@@ -199,7 +199,7 @@ static MotoNodeFactory *mesh_file_node_factory = NULL;
 
 MotoNodeFactory *moto_mesh_file_node_factory_new()
 {
-    if(mesh_file_node_factory = NULL)
+    if( ! mesh_file_node_factory)
         mesh_file_node_factory = \
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_MESH_FILE_NODE_FACTORY, NULL);
 
