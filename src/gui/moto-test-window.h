@@ -23,7 +23,7 @@
 #ifndef MOTO_TEST_WINDOW_H
 #define MOTO_TEST_WINDOW_H
 
-#include <gtk.h>
+#include <gtk/gtk.h>
 
 typedef struct _MotoTestWindow MotoTestWindow;
 typedef struct _MotoTestWindowClass MotoTestWindowClass;
@@ -33,14 +33,14 @@ typedef struct _MotoTestWindowPriv MotoTestWindowPriv;
 
 struct _MotoTestWindow
 {
-    GObject parent;
+    GtkWindow parent;
 
     MotoTestWindowPriv *priv;
 };
 
 struct _MotoTestWindowClass
 {
-    GObjectClass parent;
+    GtkWindowClass parent;
 };
 
 GType moto_test_window_get_type(void);
