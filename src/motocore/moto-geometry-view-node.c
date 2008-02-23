@@ -14,7 +14,7 @@ struct _MotoGeometryViewNodePriv
 static void
 moto_geometry_view_node_dispose(GObject *obj)
 {
-    MotoGeometryView *self = (MotoGeometryView *)obj;
+    MotoGeometryViewNode *self = (MotoGeometryViewNode *)obj;
 
     g_slice_free(MotoGeometryViewNodePriv, self->priv);
 

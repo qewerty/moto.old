@@ -57,9 +57,9 @@ GType moto_mesh_file_node_get_type(void);
 
 MotoMeshFileNode *moto_mesh_file_node_new();
 
-/* class MotoNodeFactory */
+/* class MotoMeshFileNodeFactory */
 
-struct _MotoMeshFileNodeFactoryFactory
+struct _MotoMeshFileNodeFactory
 {
     MotoNodeFactory parent;
 };
@@ -71,12 +71,12 @@ struct _MotoMeshFileNodeFactoryClass
 
 GType moto_mesh_file_node_factory_get_type(void);
 
-#define MOTO_TYPE_OBJECT_NODE_FACTORY (moto_mesh_file_node_factory_get_type())
-#define MOTO_OBJECT_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_OBJECT_NODE_FACTORY, MotoMeshFileNodeFactory))
-#define MOTO_OBJECT_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_OBJECT_NODE_FACTORY, MotoMeshFileNodeFactoryClass))
-#define MOTO_IS_OBJECT_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_OBJECT_NODE_FACTORY))
-#define MOTO_IS_OBJECT_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_OBJECT_NODE_FACTORY))
-#define MOTO_OBJECT_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OBJECT_NODE_FACTORY, MotoMeshFileNodeFactoryClass))
+#define MOTO_TYPE_MESH_FILE_NODE_FACTORY (moto_mesh_file_node_factory_get_type())
+#define MOTO_MESH_FILE_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_MESH_FILE_NODE_FACTORY, MotoMeshFileNodeFactory))
+#define MOTO_MESH_FILE_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_MESH_FILE_NODE_FACTORY, MotoMeshFileNodeFactoryClass))
+#define MOTO_IS_MESH_FILE_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_MESH_FILE_NODE_FACTORY))
+#define MOTO_IS_MESH_FILE_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESH_FILE_NODE_FACTORY))
+#define MOTO_MESH_FILE_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH_FILE_NODE_FACTORY, MotoMeshFileNodeFactoryClass))
 
 MotoNodeFactory *moto_mesh_file_node_factory_new();
 

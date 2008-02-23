@@ -18,6 +18,8 @@ struct _MotoMeshFileNodePriv
     GString *filename;
     GString **filename_ptr;
 
+    GString *loaded_filename;
+
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
 };
@@ -73,7 +75,7 @@ static void point_filename(MotoParam *param, gpointer p)
 {
     MotoMeshFileNode *node = (MotoMeshFileNode *)moto_param_get_node(param);
 
-    self->priv->filename_ptr = p;
+    node->priv->filename_ptr = (GString **)p;
 }
 
 static void update_filename(MotoParam *param)
@@ -182,7 +184,7 @@ moto_mesh_file_node_factory_class_init(MotoMeshFileNodeFactoryClass *klass)
     nfclass->create_node = moto_mesh_file_node_factory_create_node;
 }
 
-G_DEFINE_TYPE(MotoMeshFileNodeFactory, moto_mesh_file_node_factory, MOTO_TYPE_NODE_FACTORY_NODE);
+G_DEFINE_TYPE(MotoMeshFileNodeFactory, moto_mesh_file_node_factory, MOTO_TYPE_NODE_FACTORY);
 
 /* methods of class MeshFileNodeFactory */
 

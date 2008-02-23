@@ -31,6 +31,9 @@ static GObjectClass *system_parent_class = NULL;
 struct _MotoSystemPriv
 {
     MotoLibrary *library;
+
+    GSList *worlds;
+    MotoWorld *current_world;
 };
 
 static void
@@ -161,4 +164,51 @@ MotoSystem *moto_system_new(const gchar *name, MotoLibrary *lib)
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
 
     return NULL;
+}
+
+MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name)
+{
+    GSList *w = self->priv->worlds;
+    for(; w; w = g_slist_next(w))
+        if(g_utf8_collate(moto_world_get_name((MotoWorld *)w->data), name) == 0)
+            return (MotoWorld *)w->data;
+    return NULL;
+}
+
+MotoWorld *moto_system_get_current_world(MotoSystem *self)
+{
+    return self->priv->current_world;
+}
+
+void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current)
+{
+    if( ! moto_system_get_world(self, moto_world_get_name(world)))
+        self->priv->worlds = g_slist_append(self->priv->worlds, world);
+
+    if(set_current)
+        self->priv->current_world = world;
+}
+
+void moto_system_set_world_current(MotoSystem *self, MotoWorld *world)
+{
+    GSList *w = self->priv->worlds;
+    for(; w; w = g_slist_next(w))
+    {
+        if(w->data == world)
+        {
+            self->priv->current_world = world;
+            return;
+        }
+    }
+
+    GString *msg = g_string_new("World \"");
+    g_string_append(msg, moto_world_get_name(world));
+    g_string_append(msg, "\" is not within the system. I won't set it current.");
+    moto_warning(msg->str);
+    g_string_free(msg, TRUE);
+}
+
+MotoLibrary *moto_system_get_library(MotoSystem *self)
+{
+    return self->priv->library;
 }

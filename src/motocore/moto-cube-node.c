@@ -12,6 +12,14 @@ static GObjectClass *cube_node_parent_class = NULL;
 
 struct _MotoCubeNodePriv
 {
+    gfloat size_x;
+    gfloat size_y;
+    gfloat size_z;
+
+    gfloat *size_x_ptr;
+    gfloat *size_y_ptr;
+    gfloat *size_z_ptr;
+
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
 };
@@ -69,6 +77,10 @@ static gpointer get_mesh(MotoParam *param)
 MotoCubeNode *moto_cube_node_new(const gchar *name)
 {
     MotoCubeNode *self = (MotoCubeNode *)g_object_new(MOTO_TYPE_CUBE_NODE, NULL);
+    MotoNode *node = (MotoNode *)self;
+
+    MotoParamBlock *pb;
+    MotoParamData *pdata;
 
     /* params */
 
@@ -242,7 +254,7 @@ moto_cube_node_factory_class_init(MotoCubeNodeFactoryClass *klass)
     nfclass->create_node = moto_cube_node_factory_create_node;
 }
 
-G_DEFINE_TYPE(MotoCubeNodeFactory, moto_cube_node_factory, MOTO_TYPE_NODE_FACTORY_NODE);
+G_DEFINE_TYPE(MotoCubeNodeFactory, moto_cube_node_factory, MOTO_TYPE_NODE_FACTORY);
 
 /* methods of class CubeNodeFactory */
 

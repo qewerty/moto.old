@@ -48,7 +48,7 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv = g_slice_new(MotoTestWindowPriv);
 
     self->priv->system = moto_system_new();
-    self->priv->world = moto_world_new("My Test World");
+    self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();

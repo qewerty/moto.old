@@ -24,7 +24,11 @@
 
 #include <glib-object.h>
 
+#include "moto-forward.h"
+
 /* class MotoLibrary */
+
+typedef struct _MotoLibraryPriv MotoLibraryPriv;
 
 struct _MotoLibrary
 {

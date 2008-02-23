@@ -15,22 +15,22 @@ struct _MotoMessagerPriv
 static void info_inc()
 {
     MotoMessager *msger = moto_messager_singleton();
-    msger->msg_count++;
-    msger->info_count++;
+    msger->priv->msg_count++;
+    msger->priv->info_count++;
 }
 
 static void warning_inc()
 {
     MotoMessager *msger = moto_messager_singleton();
-    msger->msg_count++;
-    msger->warning_count++;
+    msger->priv->msg_count++;
+    msger->priv->warning_count++;
 }
 
 static void error_inc()
 {
     MotoMessager *msger = moto_messager_singleton();
-    msger->msg_count++;
-    msger->error_count++;
+    msger->priv->msg_count++;
+    msger->priv->error_count++;
 }
 
 static void
@@ -60,10 +60,12 @@ moto_messager_init(MotoMessager *self)
 static void
 moto_messager_class_init(MotoMessagerClass *klass)
 {
-    messager_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    GObjectClass *goclass = (GObjectClass *)klass;
 
-    messager_parent_class->dispose = moto_messager_dispose;
-    messager_parent_class->finalize = moto_messager_finalize;
+    messager_parent_class = g_type_class_peek_parent(klass);
+
+    goclass->dispose = moto_messager_dispose;
+    goclass->finalize = moto_messager_finalize;
 
     klass->info_message_signal_id = g_signal_newv ("info-message",
                  G_TYPE_FROM_CLASS (klass),
@@ -85,6 +87,7 @@ moto_messager_class_init(MotoMessagerClass *klass)
                  g_cclosure_marshal_VOID__VOID,
                  G_TYPE_NONE /* return_type */,
                  0     /* n_params */,
+                 NULL  /* param_types */);
 
     klass->error_message_signal_id = g_signal_newv ("error-message",
                  G_TYPE_FROM_CLASS (klass),
@@ -95,7 +98,6 @@ moto_messager_class_init(MotoMessagerClass *klass)
                  g_cclosure_marshal_VOID__VOID,
                  G_TYPE_NONE /* return_type */,
                  0     /* n_params */,
-                 NULL  /* param_types */);
                  NULL  /* param_types */);
 
 }

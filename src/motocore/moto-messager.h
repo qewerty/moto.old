@@ -22,7 +22,7 @@
 #ifndef MOTO_MESSAGER_H
 #define MOTO_MESSAGER_H
 
-#include "glib-object.h"
+#include <glib-object.h>
 
 typedef struct _MotoMessager MotoMessager;
 typedef struct _MotoMessagerClass MotoMessagerClass;

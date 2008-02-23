@@ -9,8 +9,9 @@ static GObjectClass *world_parent_class = NULL;
 
 struct _MotoWorldPriv
 {
-    MotoSystem *system;
+    MotoLibrary *library;
 
+    GString *name;
     GString *filename;
     gboolean changed;
 
@@ -46,8 +47,9 @@ moto_world_init(MotoWorld *self)
 {
     self->priv = g_slice_new(MotoWorldPriv);
 
-    self->priv->system = NULL;
+    self->priv->library = NULL;
 
+    self->priv->name = g_string_new("");
     self->priv->filename = g_string_new("");
     self->priv->changed = FALSE;
 }
@@ -71,14 +73,17 @@ MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
 {
     MotoWorld *self = (MotoWorld *)g_object_new(MOTO_TYPE_WORLD, NULL);
 
+    g_string_assign(self->priv->name, name);
     self->priv->library = lib;
 
     return self;
 }
 
-MotoWorld *moto_world_new_from_dump(const gchar *filename)
+MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib)
 {
-    MotoWorld *self = moto_world_new("");
+    MotoWorld *self = moto_world_new("", lib);
+
+    /* load world from dump */
 
     return self;
 }
@@ -129,15 +134,8 @@ void moto_world_draw(MotoWorld *self)
         moto_object_node_draw(self->priv->root);
 }
 
-void moto_world_get_system(MotoWorld *self)
-{
-    return self->priv->system;
-}
-
 void moto_world_get_library(MotoWorld *self)
 {
-    if(self->priv->system)
-        return moto_system_get_library(self->priv->system);
-    return NULL;
+    return self->priv->library;
 }
 

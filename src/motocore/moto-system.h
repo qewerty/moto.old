@@ -51,9 +51,12 @@ GType moto_system_get_type(void);
 
 MotoSystem *moto_system_new();
 
+MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name);
 MotoWorld *moto_system_get_current_world(MotoSystem *self);
 void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current);
 void moto_system_set_world_current(MotoSystem *self, MotoWorld *world);
+
+MotoLibrary *moto_system_get_library(MotoSystem *self);
 
 #endif /* MOTO_SYSTEM_H */
 

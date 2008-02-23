@@ -63,6 +63,5 @@ typedef struct _MotoManipulatorClass MotoManipulatorClass;
 
 typedef struct _MotoLibrary MotoLibrary;
 typedef struct _MotoLibraryClass MotoLibraryClass;
-typedef struct _MotoLibraryPriv MotoLibraryPriv;
 
 #endif /* MOTO_FORWARD_H */
