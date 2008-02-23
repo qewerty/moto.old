@@ -602,7 +602,7 @@ static gpointer get_transform(MotoParam *param)
     return moto_param_get_node(param);
 }
 
-MotoObjectNode *moto_object_node_new()
+MotoObjectNode *moto_object_node_new(const gchar *name)
 {
     MotoObjectNode *self = \
         (MotoObjectNode *)g_object_new(MOTO_TYPE_OBJECT_NODE, NULL);
@@ -610,6 +610,8 @@ MotoObjectNode *moto_object_node_new()
 
     /* params */
     /* WARNING: Implementation of *_param_data_* may be changed in future!  */
+
+    moto_node_set_name(node, name);
 
     MotoParamBlock *pb;
     MotoParamData *pdata;
@@ -1200,3 +1202,63 @@ void moto_object_node_draw(MotoObjectNode *self)
 
     glPopMatrix();
 }
+
+/* class ObjectNodeFactory */
+
+MotoNode *
+moto_object_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name);
+
+static GObjectClass *object_node_factory_parent_class = NULL;
+
+static void
+moto_object_node_factory_dispose(GObject *obj)
+{
+    G_OBJECT_CLASS(object_node_factory_parent_class)->dispose(obj);
+}
+
+static void
+moto_object_node_factory_finalize(GObject *obj)
+{
+    object_node_factory_parent_class->finalize(obj);
+}
+
+static void
+moto_object_node_factory_init(MotoObjectNodeFactory *self)
+{}
+
+static void
+moto_object_node_factory_class_init(MotoObjectNodeFactoryClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
+
+    object_node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_object_node_factory_dispose;
+    goclass->finalize   = moto_object_node_factory_finalize;
+
+    nfclass->create_node = moto_object_node_factory_create_node;
+}
+
+G_DEFINE_TYPE(MotoObjectNodeFactory, moto_object_node_factory, MOTO_TYPE_NODE_FACTORY_NODE);
+
+/* methods of class ObjectNodeFactory */
+
+static MotoNodeFactory *object_node_factory = NULL;
+
+MotoNodeFactory *moto_object_node_factory_new()
+{
+    if(object_node_factory = NULL)
+        object_node_factory = \
+            (MotoNodeFactory *)g_object_new(MOTO_TYPE_OBJECT_NODE_FACTORY, NULL);
+
+    return object_node_factory;
+}
+
+MotoNode *moto_object_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name)
+{
+    return (MotoNode *)moto_object_node_new(name);
+}
+

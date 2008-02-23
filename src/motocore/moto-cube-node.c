@@ -196,6 +196,7 @@ static void moto_cube_node_update(MotoNode *self)
     if(param && moto_param_has_dests(param))
         moto_cube_update_mesh(cube);
 
+    /* TODO: Implement NURBS objects =) */
     /*
     param = moto_node_get_param(self, "main", "nurbs");
     if(param && moto_param_has_dests(param))

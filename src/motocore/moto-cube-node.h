@@ -29,6 +29,10 @@ typedef struct _MotoCubeNode MotoCubeNode;
 typedef struct _MotoCubeNodeClass MotoCubeNodeClass;
 typedef struct _MotoCubeNodePriv MotoCubeNodePriv;
 
+typedef struct _MotoCubeNodeFactory MotoCubeNodeFactory;
+typedef struct _MotoCubeNodeFactoryClass MotoCubeNodeFactoryClass;
+typedef struct _MotoCubeNodeFactoryPriv MotoCubeNodeFactoryPriv;
+
 /* class MotoCubeNode */
 
 struct _MotoCubeNode
@@ -52,7 +56,7 @@ GType moto_cube_node_get_type(void);
 #define MOTO_IS_CUBE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_CUBE_NODE))
 #define MOTO_CUBE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_CUBE_NODE, MotoCubeNodeClass))
 
-MotoCubeNode *moto_cube_node_new();
+MotoCubeNode *moto_cube_node_new(const gchar *name);
 
 /* class MotoNodeFactory */
 
