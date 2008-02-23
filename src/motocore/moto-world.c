@@ -1,7 +1,7 @@
 #include "moto-world.h"
 #include "moto-system.h"
 #include "moto-object-node.h"
-#include "moto-time-node.h"
+// #include "moto-time-node.h"
 
 /* class World */
 
@@ -9,8 +9,6 @@ static GObjectClass *world_parent_class = NULL;
 
 struct _MotoWorldPriv
 {
-    MotoLibrary *library;
-
     GString *name;
     GString *filename;
     gboolean changed;
@@ -20,7 +18,7 @@ struct _MotoWorldPriv
     MotoNode *current_node;
 
     MotoObjectNode *root;
-    MotoTimeNode *time;
+    // MotoTimeNode *time;
 
     MotoLibrary *library;
 };
@@ -57,7 +55,7 @@ moto_world_init(MotoWorld *self)
 static void
 moto_world_class_init(MotoWorldClass *klass)
 {
-    GObejctClass *goclass = G_OBJECT_CLASS(klass);
+    GObjectClass *goclass = (GObjectClass*)klass;
 
     world_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -79,6 +77,11 @@ MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
     return self;
 }
 
+const gchar *moto_world_get_name(MotoWorld *self)
+{
+    return self->priv->name->str;
+}
+
 MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib)
 {
     MotoWorld *self = moto_world_new("", lib);
@@ -89,25 +92,25 @@ MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib)
 }
 
 void moto_world_binary_dump(MotoWorld *self,
-        const *gchar filename, gboolean change_filename)
+        const gchar *filename, gboolean change_filename)
 {
 
 }
 
 void moto_world_xml_dump(MotoWorld *self,
-        const *gchar filename, gboolean change_filename)
+        const gchar *filename, gboolean change_filename)
 {
 
 }
 
 void moto_world_binary_dump_selected(MotoWorld *self,
-        const *gchar filename, gboolean change_filename)
+        const gchar *filename, gboolean change_filename)
 {
 
 }
 
 void moto_world_xml_dump_selected(MotoWorld *self,
-        const *gchar filename, gboolean change_filename)
+        const gchar *filename, gboolean change_filename)
 {
 
 }

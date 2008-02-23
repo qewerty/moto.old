@@ -9,6 +9,8 @@ static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar
 
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
 
+static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename);
+
 /* class MeshFileNode */
 
 static GObjectClass *mesh_file_node_parent_class = NULL;
@@ -30,7 +32,7 @@ moto_mesh_file_node_dispose(GObject *obj)
     MotoMeshFileNode *self = (MotoMeshFileNode *)obj;
 
     g_string_free(self->priv->filename, TRUE);
-    moto_mesh_unref(self->priv->mesh);
+    g_object_unref((GObject *)self->priv->mesh);
     g_slice_free(MotoMeshFileNodePriv, self->priv);
 
     mesh_file_node_parent_class->dispose(obj);
@@ -144,6 +146,11 @@ static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self)
 {
     return self->priv->mesh;
+}
+
+static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
+{
+
 }
 
 /* class MeshFileNodeFactory */

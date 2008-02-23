@@ -36,9 +36,10 @@ struct _MotoParamData
     GObject parent;
 
     MotoParam *param;
+    MotoParamDataPointFunc point;
+    MotoParamDataUpdateFunc update;
     MotoParamDataGetFunc get;
     MotoParamDataSetFunc set;
-    MotoParamDataUpdateFunc update;
 };
 
 struct _MotoParamDataClass

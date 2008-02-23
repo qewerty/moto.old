@@ -1,6 +1,6 @@
 PROGRAM := moto
 
-source_dirs := ../../src/common ../../src/motocore ../../src/gui
+source_dirs := ../../src ../../src/common ../../src/motocore ../../src/gui
 
 override INCLUDES += `pkg-config --cflags gtkglext-1.0`
 override CFLAGS += -pipe $(INCLUDES)

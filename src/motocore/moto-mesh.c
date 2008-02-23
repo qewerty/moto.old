@@ -150,3 +150,7 @@ MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
     return NULL;
 }
 
+void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh)
+{
+
+}

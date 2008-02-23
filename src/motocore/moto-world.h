@@ -51,6 +51,8 @@ GType moto_world_get_type(void);
 
 MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib);
 
+const gchar *moto_world_get_name(MotoWorld *self);
+
 MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib);
 /* MotoWorld *moto_world_new_from_binary_dump(const gchar *filename);
 MotoWorld *moto_world_new_from_xml_dump(const gchar *filename); */

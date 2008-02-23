@@ -1203,6 +1203,36 @@ void moto_object_node_draw(MotoObjectNode *self)
     glPopMatrix();
 }
 
+MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self)
+{
+    return self->priv->show_view;
+}
+
+void moto_object_node_set_view(MotoObjectNode *self, MotoGeometryViewNode *view)
+{
+    self->priv->view = view;
+}
+
+gboolean moto_object_node_get_show_view(MotoObjectNode *self)
+{
+    return self->priv->view;
+}
+
+void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view)
+{
+    self->priv->show_view = show_view;
+}
+
+gboolean moto_object_node_get_visible(MotoObjectNode *self)
+{
+    return self->priv->visible;
+}
+
+void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
+{
+    self->priv->visible = visible;
+}
+
 /* class ObjectNodeFactory */
 
 MotoNode *
@@ -1241,7 +1271,7 @@ moto_object_node_factory_class_init(MotoObjectNodeFactoryClass *klass)
     nfclass->create_node = moto_object_node_factory_create_node;
 }
 
-G_DEFINE_TYPE(MotoObjectNodeFactory, moto_object_node_factory, MOTO_TYPE_NODE_FACTORY_NODE);
+G_DEFINE_TYPE(MotoObjectNodeFactory, moto_object_node_factory, MOTO_TYPE_NODE_FACTORY);
 
 /* methods of class ObjectNodeFactory */
 

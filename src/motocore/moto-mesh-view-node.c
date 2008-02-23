@@ -130,3 +130,64 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
 
     view->priv->prepared = TRUE;
 }
+
+/* class MeshViewNodeFactory */
+
+MotoNode *
+moto_mesh_view_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name);
+
+static GObjectClass *mesh_view_node_factory_parent_class = NULL;
+
+static void
+moto_mesh_view_node_factory_dispose(GObject *obj)
+{
+    G_OBJECT_CLASS(mesh_view_node_factory_parent_class)->dispose(obj);
+}
+
+static void
+moto_mesh_view_node_factory_finalize(GObject *obj)
+{
+    mesh_view_node_factory_parent_class->finalize(obj);
+}
+
+static void
+moto_mesh_view_node_factory_init(MotoMeshViewNodeFactory *self)
+{}
+
+static void
+moto_mesh_view_node_factory_class_init(MotoMeshViewNodeFactoryClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
+
+    mesh_view_node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_mesh_view_node_factory_dispose;
+    goclass->finalize   = moto_mesh_view_node_factory_finalize;
+
+    nfclass->create_node = moto_mesh_view_node_factory_create_node;
+}
+
+G_DEFINE_TYPE(MotoMeshViewNodeFactory, moto_mesh_view_node_factory, MOTO_TYPE_NODE_FACTORY);
+
+/* methods of class MeshViewNodeFactory */
+
+static MotoNodeFactory *mesh_view_node_factory = NULL;
+
+MotoNodeFactory *moto_mesh_view_node_factory_new()
+{
+    if(mesh_view_node_factory = NULL)
+        mesh_view_node_factory = \
+            (MotoNodeFactory *)g_object_new(MOTO_TYPE_MESH_VIEW_NODE_FACTORY, NULL);
+
+    return mesh_view_node_factory;
+}
+
+MotoNode *moto_mesh_view_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name)
+{
+    return (MotoNode *)moto_mesh_view_node_new(name);
+}
+
+

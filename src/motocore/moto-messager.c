@@ -38,7 +38,9 @@ moto_messager_dispose(GObject *obj)
 {
     MotoMessager *self = (MotoMessager *)obj;
 
-    G_OBJECT_CLASS(messager_parent_class)->dispose(obj);
+    g_slice_free(MotoMessagerPriv, self->priv);
+
+    messager_parent_class->dispose(obj);
 }
 
 static void
@@ -56,6 +58,7 @@ moto_messager_init(MotoMessager *self)
     self->priv->info_count      = 0;
     self->priv->warning_count   = 0;
     self->priv->error_count     = 0;
+}
 
 static void
 moto_messager_class_init(MotoMessagerClass *klass)
@@ -119,6 +122,7 @@ void moto_info(const gchar *msg)
     g_print("Info: %s\n", msg);
     info_inc();
 
+    MotoMessager *self = moto_messager_singleton();
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
     g_signal_emit(self, klass->info_message_signal_id, 0, NULL);
 }
@@ -128,6 +132,7 @@ void moto_warning(const gchar *msg)
     g_print("Warning: %s\n", msg);
     warning_inc();
 
+    MotoMessager *self = moto_messager_singleton();
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
     g_signal_emit(self, klass->warning_message_signal_id, 0, NULL);
 }
@@ -137,6 +142,7 @@ void moto_error(const gchar *msg)
     g_print("Error: %s\n", msg);
     error_inc();
 
+    MotoMessager *self = moto_messager_singleton();
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
     g_signal_emit(self, klass->error_message_signal_id, 0, NULL);
 }

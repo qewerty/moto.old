@@ -39,16 +39,16 @@ G_DEFINE_ABSTRACT_TYPE(MotoParamData, moto_param_data, G_TYPE_OBJECT);
 
 /* methods of class ParamData */
 
-void moto_param_data_update(MotoParamData *self)
-{
-    if(self->point)
-        self->point(self->param);
-}
-
 void moto_param_data_point(MotoParamData *self, gpointer p)
 {
+    if(self->point)
+        self->point(self->param, p);
+}
+
+void moto_param_data_update(MotoParamData *self)
+{
     if(self->update)
-        self->update(self->param, p);
+        self->update(self->param);
 }
 
 gpointer moto_param_data_get(MotoParamData *self)
@@ -63,3 +63,12 @@ void moto_param_data_set(MotoParamData *self, gpointer p)
         self->set(self->param, p);
 }
 
+void moto_param_data_set_cbs(MotoParamData *self,
+        MotoParamDataPointFunc point, MotoParamDataUpdateFunc update,
+        MotoParamDataGetFunc get, MotoParamDataSetFunc set)
+{
+    self->point     = point;
+    self->update    = update;
+    self->get       = get;
+    self->set       = set;
+}

@@ -163,6 +163,15 @@ void moto_node_del_param_block(MotoNode *self, MotoParamBlock *pb)
     moto_warning("Method \"moto_node_del_param_block\" is not implemented yet!");
 }
 
+MotoParam *moto_node_get_param(MotoNode *self,
+        const gchar *block_name, const gchar *param_name)
+{
+    MotoParamBlock *pb = moto_node_get_param_block(self, block_name);
+    if(pb == NULL)
+        return NULL;
+    return moto_param_block_get_param(pb, param_name);
+}
+
 gboolean moto_node_is_hidden(MotoNode *self)
 {
     return self->priv->hidden;
@@ -318,6 +327,11 @@ moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
     g_signal_emit(self, klass->node_created_signal_id, 0, NULL);
 
     return node;
+}
+
+GType moto_node_factory_get_node_type(MotoNodeFactory *self)
+{
+    return self->priv->node_type;
 }
 
 /* class Param */
@@ -484,7 +498,7 @@ void moto_param_clear_dests(MotoParam *self)
     self->priv->dests = NULL;
 }
 
-void moto_param_has_dests(MotoParam *self)
+gboolean moto_param_has_dests(MotoParam *self)
 {
     return (g_slist_length(self->priv->dests) > 0);
 }
@@ -518,7 +532,7 @@ void moto_param_update_dests(MotoParam *self)
     for(; dest; dest = g_slist_next(dest))
     {
         MotoParam *param = (MotoParam *)dest->data;
-        moto_param_data_update(param);
+        moto_param_update(param);
     }
 
 }
@@ -607,7 +621,20 @@ void moto_param_block_set_title(MotoParamBlock *self, const gchar *title)
     g_string_assign(self->priv->title, title);
 }
 
-const MotoNode *moto_param_block_get_node(MotoParamBlock *self)
+MotoParam *
+moto_param_block_get_param(MotoParamBlock *self,
+        const gchar *name)
+{
+    GSList *param = self->priv->params;
+    for(; param; param = g_slist_next(param))
+    {
+        if(g_utf8_collate(moto_param_get_name((MotoParam *)param->data), name) == 0)
+            return (MotoParam *)param->data;
+    }
+    return NULL;
+}
+
+MotoNode *moto_param_block_get_node(MotoParamBlock *self)
 {
     return self->priv->node;
 }
