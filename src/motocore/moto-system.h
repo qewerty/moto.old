@@ -22,11 +22,9 @@
 #ifndef MOTO_SYSTEM_H
 #define MOTO_SYSTEM_H
 
-#include "moto-library.h"
+#include <glib-object.h>
 
-typedef struct _MotoSystem MotoSystem;
-typedef struct _MotoSystemClass MotoSystemClass;
-typedef struct _MotoSystemPriv MotoSystemPriv;
+#include "moto-forward.h"
 
 /* class MotoSystem */
 

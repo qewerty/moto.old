@@ -22,11 +22,7 @@
 #ifndef MOTO_LIBRARY_H
 #define MOTO_LIBRARY_H
 
-#include "glib-object.h"
-
-typedef struct _MotoLibrary MotoLibrary;
-typedef struct _MotoLibraryClass MotoLibraryClass;
-typedef struct _MotoLibraryPriv MotoLibraryPriv;
+#include <glib-object.h>
 
 /* class MotoLibrary */
 

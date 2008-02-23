@@ -22,12 +22,9 @@
 #ifndef MOTO_WORLD_H
 #define MOTO_WORLD_H
 
-#include "moto-node.h"
-#include "moto-library.h"
+#include <glib-object.h>
 
-typedef struct _MotoWorld MotoWorld;
-typedef struct _MotoWorldClass MotoWorldClass;
-typedef struct _MotoWorldPriv MotoWorldPriv;
+#include "moto-forward.h"
 
 /* class MotoWorld */
 
@@ -52,19 +49,19 @@ GType moto_world_get_type(void);
 #define MOTO_IS_WORLD_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_WORLD))
 #define MOTO_WORLD_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_WORLD, MotoWorldClass))
 
-MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib);
+MotoWorld *moto_world_new(const gchar *name);
 
 MotoWorld *moto_world_new_from_dump(const gchar *filename);
 /* MotoWorld *moto_world_new_from_binary_dump(const gchar *filename);
 MotoWorld *moto_world_new_from_xml_dump(const gchar *filename); */
 
 /* Dump all nodes. */
-void moto_world_binary_dump(MotoWorld *self, const *gchar filename, gboolean change_filename);
-void moto_world_xml_dump(MotoWorld *self, const *gchar filename, gboolean change_filename);
+void moto_world_binary_dump(MotoWorld *self, const gchar *filename, gboolean change_filename);
+void moto_world_xml_dump(MotoWorld *self, const gchar *filename, gboolean change_filename);
 
 /* Dump selected nodes and all its dependecies as a new world. */
-void moto_world_binary_dump_selected(MotoWorld *self, const *gchar filename, gboolean change_filename);
-void moto_world_xml_dump_selected(MotoWorld *self, const *gchar filename, gboolean change_filename);
+void moto_world_binary_dump_selected(MotoWorld *self, const gchar *filename, gboolean change_filename);
+void moto_world_xml_dump_selected(MotoWorld *self, const gchar *filename, gboolean change_filename);
 
 void moto_world_merge(MotoWorld *self, const gchar *filename);
 

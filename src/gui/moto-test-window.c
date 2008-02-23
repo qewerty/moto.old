@@ -1,8 +1,9 @@
+#include <gtk/gtkgl.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <gtk/gtkgl.h>
 
-#include "moto-test_window.h"
+#include "moto-test-window.h"
+#include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 
 /* forwards */
@@ -30,7 +31,6 @@ moto_test_window_dispose(GObject *obj)
 {
     MotoTestWindow *self = (MotoTestWindow *)obj;
 
-    g_string_free(self->priv->filename, TRUE);
     g_slice_free(MotoTestWindowPriv, self->priv);
 
     G_OBJECT_CLASS(test_window_parent_class)->dispose(obj);
@@ -48,12 +48,13 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv = g_slice_new(MotoTestWindowPriv);
 
     self->priv->system = moto_system_new();
-    self->priv->world = moto_world_new();
+    self->priv->world = moto_world_new("My Test World");
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
 
     GtkWidget *area = (GtkWidget *)self->priv->area;
+    gtk_container_add(GTK_CONTAINER(self), area);
 
     g_signal_connect(G_OBJECT(self), "delete-event",
                 G_CALLBACK(gtk_main_quit), NULL);
@@ -69,7 +70,7 @@ moto_test_window_init(MotoTestWindow *self)
 static void
 moto_test_window_class_init(MotoTestWindowClass *klass)
 {
-    GObejctClass *goclass = G_OBJECT_CLASS(klass);
+    GObjectClass *goclass = G_OBJECT_CLASS(klass);
 
     test_window_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -84,7 +85,7 @@ G_DEFINE_TYPE(MotoTestWindow, moto_test_window, G_TYPE_OBJECT);
 GtkWindow *moto_test_window_new()
 {
     GtkWindow *self = (GtkWindow *)g_object_new(MOTO_TYPE_TEST_WINDOW, NULL);
-    MotoTestWindow *twin = (MotoTestWindow *)self;
+    // MotoTestWindow *twin = (MotoTestWindow *)self;
 
     return self;
 }
@@ -109,7 +110,7 @@ static void init_gl(GtkWidget *widget, gpointer data)
     glClearColor(0.2, 0.2, 0.2, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, width/float(height), 0.3, 150.);
+    gluPerspective(60, width/(float)height, 0.3, 150.);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glViewport(0, 0, width, height);
@@ -158,7 +159,7 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
     glClearColor(0.2, 0.2, 0.2, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, width/float(height), 0.3, 150.);
+    gluPerspective(60, width/(float)height, 0.3, 150.);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glViewport(0, 0, width, height);
@@ -166,5 +167,5 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 
     gdk_gl_drawable_gl_end(gl_drawable);
 
-    return false;
+    return FALSE;
 }

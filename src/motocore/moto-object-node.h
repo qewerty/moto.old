@@ -26,8 +26,6 @@
 #include "moto-bound.h"
 #include "moto-geometry-view-node.h"
 
-typedef struct _MotoObjectNode MotoObjectNode;
-typedef struct _MotoObjectNodeClass MotoObjectNodeClass;
 typedef struct _MotoObjectNodePriv MotoObjectNodePriv;
 
 typedef struct _MotoObjectNodeFactory MotoObjectNodeFactory;

@@ -24,33 +24,7 @@
 
 #include <glib-object.h>
 
-typedef struct _MotoNode MotoNode;
-typedef struct _MotoNodeClass MotoNodeClass;
-typedef struct _MotoNodePriv MotoNodePriv;
-typedef void (*MotoNodeUpdateMethod)(MotoNode *self);
-
-typedef struct _MotoNodeFactory MotoNodeFactory;
-typedef struct _MotoNodeFactoryClass MotoNodeFactoryClass;
-typedef struct _MotoNodeFactoryPriv MotoNodeFactoryPriv;
-typedef MotoNode *(*MotoNodeFactoryCreateNodeMethod)(MotoNodeFactory *self, const gchar *name);
-
-typedef struct _MotoVariation MotoVariation;
-typedef struct _MotoVariationClass MotoVariationClass;
-typedef struct _MotoVariationPriv MotoVariationPriv;
-
-typedef struct _MotoParam MotoParam;
-typedef struct _MotoParamClass MotoParamClass;
-typedef struct _MotoParamPriv MotoParamPriv;
-
-typedef struct _MotoParamData MotoParamData;
-typedef struct _MotoParamDataClass MotoParamDataClass;
-
-typedef struct _MotoParamBlock MotoParamBlock;
-typedef struct _MotoParamBlockClass MotoParamBlockClass;
-typedef struct _MotoParamBlockPriv MotoParamBlockPriv;
-
-typedef struct _MotoManipulator MotoManipulator;
-typedef struct _MotoManipulatorClass MotoManipulatorClass;
+#include "moto-forward.h"
 
 typedef enum
 {

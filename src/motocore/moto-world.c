@@ -126,7 +126,7 @@ void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
 void moto_world_draw(MotoWorld *self)
 {
     if(self->priv->root)
-        moto_object_draw(self->priv->root);
+        moto_object_node_draw(self->priv->root);
 }
 
 void moto_world_get_system(MotoWorld *self)
