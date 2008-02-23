@@ -143,3 +143,63 @@ static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self)
 {
     return self->priv->mesh;
 }
+
+/* class MeshFileNodeFactory */
+
+MotoNode *
+moto_mesh_file_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name);
+
+static GObjectClass *mesh_file_node_factory_parent_class = NULL;
+
+static void
+moto_mesh_file_node_factory_dispose(GObject *obj)
+{
+    G_OBJECT_CLASS(mesh_file_node_factory_parent_class)->dispose(obj);
+}
+
+static void
+moto_mesh_file_node_factory_finalize(GObject *obj)
+{
+    mesh_file_node_factory_parent_class->finalize(obj);
+}
+
+static void
+moto_mesh_file_node_factory_init(MotoMeshFileNodeFactory *self)
+{}
+
+static void
+moto_mesh_file_node_factory_class_init(MotoMeshFileNodeFactoryClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
+
+    mesh_file_node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_mesh_file_node_factory_dispose;
+    goclass->finalize   = moto_mesh_file_node_factory_finalize;
+
+    nfclass->create_node = moto_mesh_file_node_factory_create_node;
+}
+
+G_DEFINE_TYPE(MotoMeshFileNodeFactory, moto_mesh_file_node_factory, MOTO_TYPE_NODE_FACTORY_NODE);
+
+/* methods of class MeshFileNodeFactory */
+
+static MotoNodeFactory *mesh_file_node_factory = NULL;
+
+MotoNodeFactory *moto_mesh_file_node_factory_new()
+{
+    if(mesh_file_node_factory = NULL)
+        mesh_file_node_factory = \
+            (MotoNodeFactory *)g_object_new(MOTO_TYPE_MESH_FILE_NODE_FACTORY, NULL);
+
+    return mesh_file_node_factory;
+}
+
+MotoNode *moto_mesh_file_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name)
+{
+    return (MotoNode *)moto_mesh_file_node_new(name);
+}
+
