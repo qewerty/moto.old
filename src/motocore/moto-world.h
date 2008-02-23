@@ -68,4 +68,8 @@ void moto_world_xml_dump_selected(MotoWorld *self, const *gchar filename, gboole
 
 void moto_world_merge(MotoWorld *self, const gchar *filename);
 
+MotoObjectNode *moto_world_get_root(MotoWorld *self);
+void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
+void moto_world_draw(MotoWorld *self);
+
 #endif /* MOTO_WORLD_H */

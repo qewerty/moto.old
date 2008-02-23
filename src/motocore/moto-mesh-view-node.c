@@ -14,8 +14,10 @@ static GObjectClass *mesh_view_node_parent_class = NULL;
 
 struct _MotoMeshViewNodePriv
 {
-    gboolean prepared;
     MotoMesh *mesh;
+    MotoMesh **mesh_ptr;
+
+    gboolean prepared;
     GLuint dlist;
 };
 
@@ -40,8 +42,10 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
 {
     self->priv = g_slice_new(MotoMeshViewNodePriv);
 
-    self->priv->prepared = FALSE;
     self->priv->mesh = NULL;
+    self->priv->mesh_ptr = & self->priv->mesh;
+
+    self->priv->prepared = FALSE;
     self->priv->dlist = 0;
 }
 
@@ -90,13 +94,15 @@ static void moto_mesh_view_node_draw(MotoGeometryViewNode *self)
 static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
 {
     MotoMeshViewNode *view = (MotoMeshViewNode *)self;
+    MotoMesh *mesh = *(view->priv->mesh_ptr);
+
+    if(mesh == NULL)
+        return;
 
     if( ! glIsList(view->priv->dlist))
         view->priv->dlist = glGenLists(1);
 
     glNewList(view->priv->dlist, GL_COMPILE_AND_EXECUTE);
-
-    MotoMesh *mesh = view->priv->mesh;
 
     int i, j;
     for(i = 0; i < mesh->faces_num; i++)

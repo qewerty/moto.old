@@ -96,6 +96,9 @@ void moto_node_del_param_block(MotoNode *self, MotoParamBlock *pb);
 MotoParam *moto_node_get_param(MotoNode *self,
         const gchar *block_name, const gchar *param_name);
 
+void moto_node_update_param_dests(MotoNode *self,
+        const gchar *block_name, const gchar *param_name);
+
 gboolean moto_node_is_hidden(MotoNode *self);
 void moto_node_set_hidden(MotoNode *self, gboolean hidden);
 void moto_node_hide(MotoNode *self);
@@ -122,6 +125,9 @@ const gchar *moto_node_get_xml_dump(MotoNode *self, glong *numbytes);
 
 /* Update node internals. This must not affect and other node. */
 void moto_node_update(MotoNode *self);
+
+MotoWorld *moto_node_get_world(MotoNode *self);
+MotoLibrary *moto_node_get_library(MotoNode *self);
 
 /* class MotoNodeFactory */
 
