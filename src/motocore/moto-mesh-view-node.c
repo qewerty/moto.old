@@ -21,7 +21,6 @@ struct _MotoMeshViewNodePriv
     GLuint dlist;
 };
 
-
 static void
 moto_mesh_view_node_dispose(GObject *obj)
 {
