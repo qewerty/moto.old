@@ -30,6 +30,9 @@
 
 typedef struct _MotoLibraryPriv MotoLibraryPriv;
 
+/* Must return FALSE for proceed and TRUE for interrupt cycle.  */
+typedef gboolean (*MotoLibraryForeachFunc)(gpointer data, gpointer user_data);
+
 struct _MotoLibrary
 {
     GObject parent;
@@ -61,5 +64,7 @@ gboolean moto_library_new_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name, gpointer entry);
 gpointer moto_library_get_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name);
+
+void moto_library_foreach(MotoLibrary *self, MotoLibraryForeachFunc func, gpointer user_data);
 
 #endif /* MOTO_LIBRARY_H */

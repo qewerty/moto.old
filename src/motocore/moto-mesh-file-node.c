@@ -1,6 +1,8 @@
 #include "moto-mesh-file-node.h"
 #include "moto-mesh-param-data.h"
 #include "moto-filename-param-data.h"
+#include "moto-library.h"
+#include "moto-messager.h"
 
 /* forwards */
 
@@ -10,6 +12,8 @@ static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
 
 static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename);
+
+static void moto_mesh_file_node_update(MotoNode *self);
 
 /* class MeshFileNode */
 
@@ -62,11 +66,14 @@ static void
 moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeClass *nclass = (MotoNodeClass *)klass;
 
     mesh_file_node_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
 
     goclass->dispose = moto_mesh_file_node_dispose;
     goclass->finalize = moto_mesh_file_node_finalize;
+
+    nclass->update = moto_mesh_file_node_update;
 }
 
 G_DEFINE_TYPE(MotoMeshFileNode, moto_mesh_file_node, MOTO_TYPE_GEOMETRY_NODE);
@@ -148,12 +155,77 @@ static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self)
     return self->priv->mesh;
 }
 
+typedef struct _TryMeshLoaderData
+{
+    const gchar *filename;
+    MotoMesh *mesh;
+} TryMeshLoaderData;
+
+static gboolean try_mesh_loader(gpointer data, pointer user_data)
+{
+    MotoMeshLoader *loader  = (MotoMeshLoader *)data;
+    TryMeshLoaderData *tmld = (TryMeshLoaderData *)user_data;
+
+    if(moto_mesh_loader_can(loader, tmld->filename))
+    {
+        tmld->mesh = moto_mesh_loader_load(loader, tmld->filename);
+        if(tmld->mesh)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
 {
+    MotoLibrary *lib = moto_node_get_library(self);
+    if( ! lib)
+    {
+        GString *msg = g_string_new("I have no library and can't load meshes. :(");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+        return;
+    }
 
+    TryMeshLoaderData tmld;
+    tmld.filename = filename;
+    tmld.mesh = NULL;
+
+    moto_library_foreach(lib, "mesh-loader", try_mesh_loader, & tmld);
+
+    if(tmld->mesh)
+    {
+        g_string_assign(self->priv->loaded_filename, tmld.filename);
+
+        GString *msg = g_string_new("Mesh \"");
+        g_string_append(msg, tmld.filename);
+        g_string_append(msg, "\" successfully loaded.");
+        moto_info(msg->str);
+        g_string_free(msg, TRUE);
+    }
+    else
+    {
+        GString *msg = g_string_new("Error while loading mesh \"");
+        g_string_append(msg, tmld.filename);
+        g_string_append(msg, "\". I can't load it. ;(");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+    }
+}
+
+static void moto_mesh_file_node_update(MotoNode *self)
+{
+    MotoCubeNode *cube = (MotoCubeNode *)self;
+
+    MotoParam *param;
+
+    param = moto_node_get_param(self, "main", "mesh");
+    if(param && 1)//moto_param_has_dests(param)) /* FIXME */
+        moto_cube_node_update_mesh(cube);
 }
 
 /* class MeshFileNodeFactory */
+
+GType moto_mesh_file_node_factory_get_node_type(MotoNodeFactory *self);
 
 MotoNode *
 moto_mesh_file_node_factory_create_node(MotoNodeFactory *self,
@@ -188,7 +260,8 @@ moto_mesh_file_node_factory_class_init(MotoMeshFileNodeFactoryClass *klass)
     goclass->dispose    = moto_mesh_file_node_factory_dispose;
     goclass->finalize   = moto_mesh_file_node_factory_finalize;
 
-    nfclass->create_node = moto_mesh_file_node_factory_create_node;
+    nfclass->get_node_node  = moto_mesh_file_node_factory_get_node_type;
+    nfclass->create_node    = moto_mesh_file_node_factory_create_node;
 }
 
 G_DEFINE_TYPE(MotoMeshFileNodeFactory, moto_mesh_file_node_factory, MOTO_TYPE_NODE_FACTORY);
@@ -204,6 +277,11 @@ MotoNodeFactory *moto_mesh_file_node_factory_new()
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_MESH_FILE_NODE_FACTORY, NULL);
 
     return mesh_file_node_factory;
+}
+
+GType moto_mesh_file_node_factory_get_node_type(MotoNodeFactory *self)
+{
+    return MOTO_TYPE_MESH_FILE_NODE;
 }
 
 MotoNode *moto_mesh_file_node_factory_create_node(MotoNodeFactory *self,
