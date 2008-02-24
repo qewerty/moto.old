@@ -29,11 +29,18 @@
 */
 
 /* mesh loaders*/
-/*
+
+#ifdef WITH_MOTO_MBM_MESH_LOADER
 #include "moto-mbm-mesh-loader.h"
+#endif
+
+#ifdef WITH_MOTO_WOBJ_MESH_LOADER
 #include "moto-wobj-mesh-loader.h"
+#endif
+
+#ifdef WITH_MOTO_RIB_MESH_LOADER
 #include "moto-rib-mesh-loader.h"
-*/
+#endif
 
 /* utils */
 
@@ -101,8 +108,8 @@ MotoSystem *moto_system_new()
     MotoLibrary *lib = self->priv->library;
 
     moto_library_new_slot(lib, "node", MOTO_TYPE_NODE_FACTORY);
-    // moto_library_new_slot(lib, "image-loader", MOTO_TYPE_IMAGE_LOADER);
-    // moto_library_new_slot(lib, "mesh-loader", MOTO_TYPE_MESH_LOADER);
+    //moto_library_new_slot(lib, "image-loader", MOTO_TYPE_IMAGE_LOADER);
+    moto_library_new_slot(lib, "mesh-loader", MOTO_TYPE_MESH_LOADER);
 
     /* built-in node types */
 
@@ -166,41 +173,51 @@ MotoSystem *moto_system_new()
 
     // MotoImageLoader *image_loader;
 
-    /*
+#ifdef WITH_MOTO_PNG_IMAGE_LOADER
     image_loader = moto_png_image_loader_new(); // Portable Network Graphics (*.png)
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+#endif
 
+#ifdef WITH_MOTO_JPG_IMAGE_LOADER
     image_loader = moto_jpg_image_loader_new(); // JPEG (*.jpg|*.jpeg)
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+#endif
 
+#ifdef WITH_MOTO_TIF_IMAGE_LOADER
     image_loader = moto_tif_image_loader_new(); // TIFF (*.tif|*.tiff)
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
+#endif
 
+#ifdef WITH_MOTO_EXR_IMAGE_LOADER
     image_loader = moto_exr_image_loader_new(); // ILM OpenEXR HDR Format (*.exr)
     moto_library_new_entry(lib, "image-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
-    */
+#endif
 
     /* built-in mesh loaders */
 
-    // MotoMeshLoader *mesh_loader;
+    MotoMeshLoader *mesh_loader;
 
-    /*
+#ifdef WITH_MOTO_MBM_MESH_LOADER
     mesh_loader = moto_mbm_mesh_loader_new(); // Moto Binary Mesh (*.mbm)
     moto_library_new_entry(lib, "mesh-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
+#endif
 
+#ifdef WITH_MOTO_WOBJ_MESH_LOADER
     mesh_loader = moto_wobj_mesh_loader_new(); // Wavefront Object (*.obj)
     moto_library_new_entry(lib, "mesh-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
+#endif
 
+#ifdef WITH_MOTO_RIB_MESH_LOADER
     mesh_loader = moto_rib_mesh_loader_new(); // RenderMan Interface Bytestream (*.rib)
     moto_library_new_entry(lib, "mesh-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
-    */
+#endif
 
     return self;
 }

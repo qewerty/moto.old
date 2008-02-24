@@ -1,4 +1,5 @@
 #include "moto-node.h"
+#include "moto-world.h"
 #include "moto-param-data.h"
 #include "moto-messager.h"
 
@@ -241,6 +242,17 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag)
             return TRUE;
     }
     return FALSE;
+}
+
+MotoWorld *moto_node_get_world(MotoNode *self)
+{}
+
+MotoLibrary *moto_node_get_library(MotoNode *self)
+{
+    MotoWorld *w = moto_node_get_world(self);
+    if( ! w)
+        return NULL;
+    return moto_world_get_library(w);
 }
 
 /* class NodeFactory */

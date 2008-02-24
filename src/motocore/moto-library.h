@@ -65,6 +65,7 @@ gboolean moto_library_new_entry(MotoLibrary *self,
 gpointer moto_library_get_entry(MotoLibrary *self,
         const gchar *slot_name, const gchar *entry_name);
 
-void moto_library_foreach(MotoLibrary *self, MotoLibraryForeachFunc func, gpointer user_data);
+void moto_library_foreach(MotoLibrary *self, const gchar *slot_name,
+        MotoLibraryForeachFunc func, gpointer user_data);
 
 #endif /* MOTO_LIBRARY_H */

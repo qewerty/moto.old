@@ -157,23 +157,23 @@ gpointer moto_library_get_entry(MotoLibrary *self,
 static MotoLibraryForeachFunc lib_foreach_callback = NULL;
 
 static void
-lib_foreach(GQuark *key_id, gpointer data, gpointer user_data)
+lib_foreach(GQuark key_id, gpointer data, gpointer user_data)
 {
     if(lib_foreach_callback)
         if(lib_foreach_callback(data, user_data))
             lib_foreach_callback = NULL;
 }
 
-void moto_library_foreach(MotoLibrary *self,
+void moto_library_foreach(MotoLibrary *self, const gchar *slot_name,
         MotoLibraryForeachFunc func, gpointer user_data)
 {
     Slot *slot = g_datalist_get_data(& self->priv->slots, slot_name);
     if( ! slot)
     {
         /* Warning! */
-        return NULL;
+        return;
     }
 
-    lib_foreach_callbac = func;
-    g_datalist_foreach(& slot->dl, lib_foreach, data);
+    lib_foreach_callback = func;
+    g_datalist_foreach(& slot->dl, lib_foreach, user_data);
 }

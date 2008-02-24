@@ -3,13 +3,16 @@
 #include "moto-filename-param-data.h"
 #include "moto-library.h"
 #include "moto-messager.h"
+#include "moto-mesh-loader.h"
 
 /* forwards */
 
 static gchar *moto_mesh_file_node_get_filename(MotoMeshFileNode *self);
 static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar *filename);
 
+/*
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
+*/
 
 static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename);
 
@@ -150,10 +153,12 @@ static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar
     g_string_assign(self->priv->filename, filename);
 }
 
+/*
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self)
 {
     return self->priv->mesh;
 }
+*/
 
 typedef struct _TryMeshLoaderData
 {
@@ -161,7 +166,7 @@ typedef struct _TryMeshLoaderData
     MotoMesh *mesh;
 } TryMeshLoaderData;
 
-static gboolean try_mesh_loader(gpointer data, pointer user_data)
+static gboolean try_mesh_loader(gpointer data, gpointer user_data)
 {
     MotoMeshLoader *loader  = (MotoMeshLoader *)data;
     TryMeshLoaderData *tmld = (TryMeshLoaderData *)user_data;
@@ -177,7 +182,7 @@ static gboolean try_mesh_loader(gpointer data, pointer user_data)
 
 static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
 {
-    MotoLibrary *lib = moto_node_get_library(self);
+    MotoLibrary *lib = moto_node_get_library((MotoNode *)self);
     if( ! lib)
     {
         GString *msg = g_string_new("I have no library and can't load meshes. :(");
@@ -192,7 +197,7 @@ static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filena
 
     moto_library_foreach(lib, "mesh-loader", try_mesh_loader, & tmld);
 
-    if(tmld->mesh)
+    if(tmld.mesh)
     {
         g_string_assign(self->priv->loaded_filename, tmld.filename);
 
@@ -212,15 +217,20 @@ static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filena
     }
 }
 
+static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
+{
+
+}
+
 static void moto_mesh_file_node_update(MotoNode *self)
 {
-    MotoCubeNode *cube = (MotoCubeNode *)self;
+    MotoMeshFileNode *mesh_file = (MotoMeshFileNode *)self;
 
     MotoParam *param;
 
     param = moto_node_get_param(self, "main", "mesh");
     if(param && 1)//moto_param_has_dests(param)) /* FIXME */
-        moto_cube_node_update_mesh(cube);
+        moto_mesh_file_node_update_mesh(mesh_file);
 }
 
 /* class MeshFileNodeFactory */
@@ -260,7 +270,7 @@ moto_mesh_file_node_factory_class_init(MotoMeshFileNodeFactoryClass *klass)
     goclass->dispose    = moto_mesh_file_node_factory_dispose;
     goclass->finalize   = moto_mesh_file_node_factory_finalize;
 
-    nfclass->get_node_node  = moto_mesh_file_node_factory_get_node_type;
+    nfclass->get_node_type  = moto_mesh_file_node_factory_get_node_type;
     nfclass->create_node    = moto_mesh_file_node_factory_create_node;
 }
 
