@@ -50,12 +50,15 @@ GType moto_world_get_type(void);
 #define MOTO_WORLD_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_WORLD, MotoWorldClass))
 
 MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib);
-
-const gchar *moto_world_get_name(MotoWorld *self);
-
 MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib);
 /* MotoWorld *moto_world_new_from_binary_dump(const gchar *filename);
 MotoWorld *moto_world_new_from_xml_dump(const gchar *filename); */
+
+const gchar *moto_world_get_name(MotoWorld *self);
+
+void moto_world_add_node(MotoWorld *self, MotoNode *node);
+MotoNode *moto_world_create_node(MotoWorld *self,
+        const gchar *type_name, const gchar *node_name);
 
 /* Dump all nodes. */
 void moto_world_binary_dump(MotoWorld *self, const gchar *filename, gboolean change_filename);
@@ -71,6 +74,6 @@ MotoObjectNode *moto_world_get_root(MotoWorld *self);
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
 void moto_world_draw(MotoWorld *self);
 
-void moto_world_get_library(MotoWorld *self);
+MotoLibrary *moto_world_get_library(MotoWorld *self);
 
 #endif /* MOTO_WORLD_H */

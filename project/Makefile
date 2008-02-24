@@ -4,7 +4,7 @@ source_dirs := ../../src ../../src/common ../../src/motocore ../../src/gui
 
 override INCLUDES += `pkg-config --cflags gtkglext-1.0`
 override CFLAGS += -pipe $(INCLUDES)
-override LIBS   += `pkg-config --libs gtkglext-1.0`
+override LIBS   += `pkg-config --libs gtkglext-1.0` -lGL -lGLU
 
 CC = gcc
 

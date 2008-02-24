@@ -36,7 +36,12 @@ moto_geometry_view_node_init(MotoGeometryViewNode *self)
 static void
 moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     geometry_view_node_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
+
+    goclass->dispose    = moto_geometry_view_node_dispose;
+    goclass->finalize   = moto_geometry_view_node_finalize;
 
     klass->draw = NULL;
     klass->prepare_for_draw = NULL;

@@ -172,9 +172,9 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->ty_ptr = & self->priv->ty;
     self->priv->tz_ptr = & self->priv->tz;
     self->priv->rx_ptr = & self->priv->rx;
-    self->priv->rx_ptr = & self->priv->rx;
     self->priv->ry_ptr = & self->priv->ry;
-    self->priv->sz_ptr = & self->priv->sz;
+    self->priv->rz_ptr = & self->priv->rz;
+    self->priv->sx_ptr = & self->priv->sx;
     self->priv->sy_ptr = & self->priv->sy;
     self->priv->sz_ptr = & self->priv->sz;
 
@@ -1037,8 +1037,11 @@ static void moto_object_node_calc_scale(MotoObjectNode *self)
     if(self->priv->scale_calculated)
         return;
 
-    matrix44_scale(self->priv->scale_matrix,
-            *(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
+    gfloat sx = *(self->priv->sx_ptr);
+    gfloat sy = *(self->priv->sy_ptr);
+    gfloat sz = *(self->priv->sz_ptr);
+
+    matrix44_scale(self->priv->scale_matrix, sx, sy, sz);
 
     self->priv->scale_calculated = TRUE;
 }
@@ -1258,7 +1261,7 @@ moto_object_node_factory_finalize(GObject *obj)
 static void
 moto_object_node_factory_init(MotoObjectNodeFactory *self)
 {
-    
+
 }
 
 static void

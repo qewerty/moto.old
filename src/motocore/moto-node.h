@@ -247,6 +247,7 @@ const gchar *moto_param_block_get_title(MotoParamBlock *self);
 void moto_param_block_set_title(MotoParamBlock *self, const gchar *title);
 
 MotoParam *moto_param_block_get_param(MotoParamBlock *self, const gchar *name);
+void moto_param_block_add_param(MotoParamBlock *self, MotoParam *param);
 
 MotoNode *moto_param_block_get_node(MotoParamBlock *self);
 

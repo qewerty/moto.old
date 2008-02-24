@@ -52,6 +52,8 @@ struct _MotoMeshFace
     guint *indecies;
 };
 
+void moto_mesh_face_alloc(MotoMeshFace *self);
+void moto_mesh_face_free(MotoMeshFace *self);
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh);
 
 struct _MotoMeshVertexAttr

@@ -150,6 +150,16 @@ MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
     return NULL;
 }
 
+void moto_mesh_face_alloc(MotoMeshFace *self)
+{
+    self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);
+}
+
+void moto_mesh_face_free(MotoMeshFace *self)
+{
+    g_free(self->indecies);
+}
+
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh)
 {
 

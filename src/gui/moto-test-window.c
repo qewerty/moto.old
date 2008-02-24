@@ -1,3 +1,5 @@
+#include "stdlib.h"
+
 #include <gtk/gtkgl.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -5,6 +7,7 @@
 #include "moto-test-window.h"
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
+#include "motocore/moto-node.h"
 
 /* forwards */
 
@@ -31,6 +34,7 @@ moto_test_window_dispose(GObject *obj)
 {
     MotoTestWindow *self = (MotoTestWindow *)obj;
 
+    g_object_unref(self->priv->system);
     g_slice_free(MotoTestWindowPriv, self->priv);
 
     G_OBJECT_CLASS(test_window_parent_class)->dispose(obj);
@@ -52,9 +56,30 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
-    self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
+    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    moto_world_set_root(self->priv->world, (MotoObjectNode *)obj_node);
+    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "View");
+    MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube");
 
+    MotoParam *in = moto_node_get_param(obj_node, "view", "view");
+    MotoParam *out = moto_node_get_param(view_node, "main", "view");
+    moto_param_set_source(in, out);
+
+    in = moto_node_get_param(view_node, "main", "mesh");
+    out = moto_node_get_param(cube_node, "main", "mesh");
+    moto_param_set_source(in, out);
+
+    self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;
+    GdkGLConfig *gl_config =\
+                gdk_gl_config_new_by_mode((GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
+        if (gl_config == NULL) {
+                g_print("\nNUll: Error - Unable to initialize OpenGL!\n");
+                exit(1);
+        }
+    gtk_widget_set_gl_capability(area, gl_config,
+                NULL, TRUE, GDK_GL_RGBA_TYPE);
+
     gtk_container_add(GTK_CONTAINER(self), area);
 
     g_signal_connect(G_OBJECT(self), "delete-event",
@@ -86,7 +111,9 @@ G_DEFINE_TYPE(MotoTestWindow, moto_test_window, GTK_TYPE_WINDOW);
 GtkWindow *moto_test_window_new()
 {
     GtkWindow *self = (GtkWindow *)g_object_new(MOTO_TYPE_TEST_WINDOW, NULL);
-    // MotoTestWindow *twin = (MotoTestWindow *)self;
+    MotoTestWindow *twin = (MotoTestWindow *)self;
+
+    // MotoWorld *w = twin->priv->world;
 
     return self;
 }
@@ -131,7 +158,7 @@ draw(GtkWidget *widget,
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent_window(widget);
+    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

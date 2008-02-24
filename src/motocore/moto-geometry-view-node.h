@@ -54,7 +54,7 @@ struct _MotoGeometryViewNodeClass
     guint after_prepare_for_draw_signal_id;
 };
 
-GType moto_geometry_view_node_storage_get_type(void);
+GType moto_geometry_view_node_get_type(void);
 
 #define MOTO_TYPE_GEOMETRY_VIEW_NODE (moto_geometry_view_node_get_type())
 #define MOTO_GEOMETRY_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeometryViewNode))

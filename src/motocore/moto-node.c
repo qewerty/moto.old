@@ -171,7 +171,7 @@ MotoParam *moto_node_get_param(MotoNode *self,
         const gchar *block_name, const gchar *param_name)
 {
     MotoParamBlock *pb = moto_node_get_param_block(self, block_name);
-    if(pb == NULL)
+    if( ! pb)
         return NULL;
     return moto_param_block_get_param(pb, param_name);
 }
@@ -422,6 +422,8 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
     self->priv->mode = mode;
 
     self->priv->pb = pb;
+    if(pb)
+        moto_param_block_add_param(pb, self);
 
     return self;
 }
@@ -444,12 +446,19 @@ const gchar *moto_param_get_title(MotoParam *self)
 
 static void param_setup_ptr(MotoParam *self, MotoParam *src)
 {
-    /* FIXME: This is wrong! */
     moto_param_data_point(self->priv->data, moto_param_data_get(src->priv->data));
 }
 
 void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
+    if( ! src)
+    {
+        GString *msg = g_string_new("You are trying to connect nothing (None|NULL). I won't connect it.");
+        moto_warning(msg->str);
+        g_string_free(msg, TRUE);
+        return;
+    }
+
     if(src->priv->mode == MOTO_PARAM_MODE_IN)
     {
         GString *msg = g_string_new("You are trying to connect source that has no output (\"");
@@ -646,6 +655,33 @@ moto_param_block_get_param(MotoParamBlock *self,
             return (MotoParam *)param->data;
     }
     return NULL;
+}
+
+void moto_param_block_add_param(MotoParamBlock *self, MotoParam *param)
+{
+    if( ! param)
+    {
+        GString *msg = g_string_new("You are trying to add nothing (None|NULL) to parameter block \"");
+        g_string_append(msg, moto_param_block_get_name(self));
+        g_string_append(msg, "\" instead of Param instance. I won't add it.");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+        return;
+    }
+
+    if(g_slist_find(self->priv->params, param))
+    {
+        GString *msg = g_string_new("Parameter \"");
+        g_string_append(msg, moto_param_get_name(param));
+        g_string_append(msg, "\" already within the block \"");
+        g_string_append(msg, moto_param_block_get_name(self));
+        g_string_append(msg, "\". I won't add it again.");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+        return;
+    }
+
+    self->priv->params = g_slist_append(self->priv->params, param);
 }
 
 MotoNode *moto_param_block_get_node(MotoParamBlock *self)

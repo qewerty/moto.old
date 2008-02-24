@@ -7,7 +7,7 @@ static GObjectClass *param_data_parent_class = NULL;
 static void
 moto_param_data_dispose(GObject *obj)
 {
-    G_OBJECT_CLASS(param_data_parent_class)->dispose(obj);
+    param_data_parent_class->dispose(obj);
 }
 
 static void
@@ -29,10 +29,12 @@ moto_param_data_init(MotoParamData *self)
 static void
 moto_param_data_class_init(MotoParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    param_data_parent_class->dispose = moto_param_data_dispose;
-    param_data_parent_class->finalize = moto_param_data_finalize;
+    goclass->dispose    = moto_param_data_dispose;
+    goclass->finalize   = moto_param_data_finalize;
 }
 
 G_DEFINE_ABSTRACT_TYPE(MotoParamData, moto_param_data, G_TYPE_OBJECT);
@@ -55,6 +57,7 @@ gpointer moto_param_data_get(MotoParamData *self)
 {
     if(self->get)
         return self->get(self->param);
+    return NULL;
 }
 
 void moto_param_data_set(MotoParamData *self, gpointer p)

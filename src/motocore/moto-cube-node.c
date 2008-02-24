@@ -45,6 +45,14 @@ moto_cube_node_init(MotoCubeNode *self)
 {
     self->priv = g_slice_new(MotoCubeNodePriv);
 
+    self->priv->size_x = 1;
+    self->priv->size_y = 1;
+    self->priv->size_z = 1;
+
+    self->priv->size_x_ptr = & self->priv->size_x;
+    self->priv->size_y_ptr = & self->priv->size_y;
+    self->priv->size_z_ptr = & self->priv->size_z;
+
     self->priv->mesh = NULL;
     self->priv->mesh_ptr = & self->priv->mesh;
 }
@@ -91,6 +99,8 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
             pdata = moto_mesh_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, NULL, NULL, get_mesh, NULL);
 
+    moto_node_update((MotoNode *)self);
+
     return self;
 }
 
@@ -136,40 +146,46 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->verts[7].xyz[2]   =  hsz;
 
     mesh->faces[0].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[0]);
     mesh->faces[0].indecies[0] = 0;
-    mesh->faces[0].indecies[0] = 1;
-    mesh->faces[0].indecies[0] = 2;
-    mesh->faces[0].indecies[0] = 3;
+    mesh->faces[0].indecies[1] = 1;
+    mesh->faces[0].indecies[2] = 2;
+    mesh->faces[0].indecies[3] = 3;
     moto_mesh_face_calc_normal(& mesh->faces[0], mesh);
     mesh->faces[1].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[1]);
     mesh->faces[1].indecies[0] = 7;
-    mesh->faces[1].indecies[0] = 6;
-    mesh->faces[1].indecies[0] = 5;
-    mesh->faces[1].indecies[0] = 4;
+    mesh->faces[1].indecies[1] = 6;
+    mesh->faces[1].indecies[2] = 5;
+    mesh->faces[1].indecies[3] = 4;
     moto_mesh_face_calc_normal(& mesh->faces[1], mesh);
     mesh->faces[2].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[2]);
     mesh->faces[2].indecies[0] = 4;
-    mesh->faces[2].indecies[0] = 5;
-    mesh->faces[2].indecies[0] = 1;
-    mesh->faces[2].indecies[0] = 0;
+    mesh->faces[2].indecies[1] = 5;
+    mesh->faces[2].indecies[2] = 1;
+    mesh->faces[2].indecies[3] = 0;
     moto_mesh_face_calc_normal(& mesh->faces[2], mesh);
     mesh->faces[3].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[3]);
     mesh->faces[3].indecies[0] = 2;
-    mesh->faces[3].indecies[0] = 6;
-    mesh->faces[3].indecies[0] = 7;
-    mesh->faces[3].indecies[0] = 3;
+    mesh->faces[3].indecies[1] = 6;
+    mesh->faces[3].indecies[2] = 7;
+    mesh->faces[3].indecies[3] = 3;
     moto_mesh_face_calc_normal(& mesh->faces[3], mesh);
     mesh->faces[4].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[4]);
     mesh->faces[4].indecies[0] = 5;
-    mesh->faces[4].indecies[0] = 6;
-    mesh->faces[4].indecies[0] = 2;
-    mesh->faces[4].indecies[0] = 1;
+    mesh->faces[4].indecies[1] = 6;
+    mesh->faces[4].indecies[2] = 2;
+    mesh->faces[4].indecies[3] = 1;
     moto_mesh_face_calc_normal(& mesh->faces[4], mesh);
-    mesh->faces[4].verts_num = 4;
-    mesh->faces[4].indecies[0] = 7;
-    mesh->faces[4].indecies[0] = 4;
-    mesh->faces[4].indecies[0] = 0;
-    mesh->faces[1].indecies[0] = 3;
+    mesh->faces[5].verts_num = 4;
+    moto_mesh_face_alloc(& mesh->faces[5]);
+    mesh->faces[5].indecies[0] = 7;
+    mesh->faces[5].indecies[1] = 4;
+    mesh->faces[5].indecies[2] = 0;
+    mesh->faces[5].indecies[3] = 3;
     moto_mesh_face_calc_normal(& mesh->faces[5], mesh);
 
     mesh->edges[0].a    = 0;
@@ -205,7 +221,7 @@ static void moto_cube_node_update(MotoNode *self)
     MotoParam *param;
 
     param = moto_node_get_param(self, "main", "mesh");
-    if(param && moto_param_has_dests(param))
+    if(param && 1)//moto_param_has_dests(param))
         moto_cube_node_update_mesh(cube);
 
     /* TODO: Implement NURBS objects =) */
@@ -217,6 +233,8 @@ static void moto_cube_node_update(MotoNode *self)
 }
 
 /* class CubeNodeFactory */
+
+static GType moto_cube_node_factory_get_node_type(MotoNodeFactory *self);
 
 MotoNode *
 moto_cube_node_factory_create_node(MotoNodeFactory *self,
@@ -251,7 +269,9 @@ moto_cube_node_factory_class_init(MotoCubeNodeFactoryClass *klass)
     goclass->dispose    = moto_cube_node_factory_dispose;
     goclass->finalize   = moto_cube_node_factory_finalize;
 
-    nfclass->create_node = moto_cube_node_factory_create_node;
+
+    nfclass->get_node_type  = moto_cube_node_factory_get_node_type;
+    nfclass->create_node    = moto_cube_node_factory_create_node;
 }
 
 G_DEFINE_TYPE(MotoCubeNodeFactory, moto_cube_node_factory, MOTO_TYPE_NODE_FACTORY);
@@ -267,6 +287,11 @@ MotoNodeFactory *moto_cube_node_factory_new()
             (MotoNodeFactory *)g_object_new(MOTO_TYPE_CUBE_NODE_FACTORY, NULL);
 
     return cube_node_factory;
+}
+
+static GType moto_cube_node_factory_get_node_type(MotoNodeFactory *self)
+{
+    return MOTO_TYPE_CUBE_NODE;
 }
 
 MotoNode *moto_cube_node_factory_create_node(MotoNodeFactory *self,
