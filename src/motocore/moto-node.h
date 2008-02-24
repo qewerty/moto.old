@@ -137,6 +137,7 @@ GType moto_node_factory_get_type(void);
 
 MotoNode *
 moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name);
+GType moto_node_factory_get_node_type(MotoNodeFactory *self);
 
 /* class MotoVariation */
 

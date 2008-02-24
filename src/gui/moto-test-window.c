@@ -48,6 +48,7 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv = g_slice_new(MotoTestWindowPriv);
 
     self->priv->system = moto_system_new();
+    moto_system_get_library(self->priv->system);
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
@@ -78,7 +79,7 @@ moto_test_window_class_init(MotoTestWindowClass *klass)
     goclass->finalize   = moto_test_window_finalize;
 }
 
-G_DEFINE_TYPE(MotoTestWindow, moto_test_window, G_TYPE_OBJECT);
+G_DEFINE_TYPE(MotoTestWindow, moto_test_window, GTK_TYPE_WINDOW);
 
 /* methods of class TestWindow */
 
@@ -96,7 +97,6 @@ static void init_gl(GtkWidget *widget, gpointer data)
     GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
 
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return;
-
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return;
 
     gint width = widget->allocation.width;
@@ -126,14 +126,13 @@ draw(GtkWidget *widget,
 {
     if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
 
-    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent_window(widget);
-
     GdkGLContext *gl_context = gtk_widget_get_gl_context(widget);
     GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
-
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
+    if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    if (!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
+    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent_window(widget);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3f(1, 0, 0);
@@ -151,7 +150,8 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
     GdkGLContext *gl_context = gtk_widget_get_gl_context(widget);
     GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
 
-    if (!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
+    if( ! GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
+    if( ! gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
     gint width = widget->allocation.width;
     gint height = widget->allocation.height;

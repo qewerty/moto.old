@@ -1,10 +1,15 @@
 #include "moto.h"
+#include "gtk/gtk.h"
 
 int main(int argc, char *argv[])
 {
-    g_type_init();
+    gtk_init(& argc, & argv);
 
-    MotoSystem *system = moto_system_new();
+    GtkWindow *win = moto_test_window_new();
+
+    gtk_widget_show_all(win);
+
+    gtk_main();
 
     return 0;
 }

@@ -1,4 +1,8 @@
 #include "moto-system.h"
+#include "moto-world.h"
+#include "moto-library.h"
+#include "moto-node.h"
+#include "moto-messager.h"
 
 #include "moto-image-loader.h"
 #include "moto-mesh-loader.h"
@@ -31,6 +35,13 @@
 #include "moto-rib-mesh-loader.h"
 */
 
+/* utils */
+
+static void unref_gobject(gpointer data, gpointer user_data)
+{
+    g_object_unref(G_OBJECT(data));
+}
+
 /* class System */
 
 static GObjectClass *system_parent_class = NULL;
@@ -48,6 +59,9 @@ moto_system_dispose(GObject *obj)
 {
     MotoSystem *self = (MotoSystem *)obj;
 
+    g_slist_foreach(self->priv->worlds, unref_gobject, NULL);
+    g_slist_free(self->priv->worlds);
+    g_object_unref(self->priv->library);
     g_slice_free(MotoSystemPriv, self->priv);
 
     G_OBJECT_CLASS(system_parent_class)->dispose(obj);
@@ -63,15 +77,19 @@ static void
 moto_system_init(MotoSystem *self)
 {
     self->priv = g_slice_new(MotoSystemPriv);
+
+    self->priv->library = moto_library_new();
 }
 
 static void
 moto_system_class_init(MotoSystemClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     system_parent_class = g_type_class_peek_parent(klass);
 
-    system_parent_class->dispose = moto_system_dispose;
-    system_parent_class->finalize = moto_system_finalize;
+    goclass->dispose    = moto_system_dispose;
+    goclass->finalize   = moto_system_finalize;
 }
 
 G_DEFINE_TYPE(MotoSystem, moto_system, G_TYPE_OBJECT);
@@ -80,7 +98,7 @@ MotoSystem *moto_system_new()
 {
     MotoSystem *self = (MotoSystem *)g_object_new(MOTO_TYPE_SYSTEM, NULL);
 
-    MotoLibrary *lib = self->priv->library = moto_library_new();
+    MotoLibrary *lib = self->priv->library;
 
     moto_library_new_slot(lib, "node", MOTO_TYPE_NODE_FACTORY);
     // moto_library_new_slot(lib, "image-loader", MOTO_TYPE_IMAGE_LOADER);
@@ -89,24 +107,16 @@ MotoSystem *moto_system_new()
     /* built-in node types */
 
     MotoNodeFactory *fac;
-    
-    g_print("1\n");
 
     fac = moto_object_node_factory_new();
     // MotoNode *node = moto_node_factory_create_node(fac, "123");
 
-    g_print("2\n");
-
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    
-    g_print("3\n");
 
     fac = moto_mesh_view_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    g_print("4\n");
 
     /*
     fac = moto_nurbs_view_factory_new();
@@ -154,7 +164,7 @@ MotoSystem *moto_system_new()
 
     /* built-in image loaders */
 
-    MotoImageLoader *image_loader;
+    // MotoImageLoader *image_loader;
 
     /*
     image_loader = moto_png_image_loader_new(); // Portable Network Graphics (*.png)
@@ -176,7 +186,7 @@ MotoSystem *moto_system_new()
 
     /* built-in mesh loaders */
 
-    MotoMeshLoader *mesh_loader;
+    // MotoMeshLoader *mesh_loader;
 
     /*
     mesh_loader = moto_mbm_mesh_loader_new(); // Moto Binary Mesh (*.mbm)
@@ -192,7 +202,7 @@ MotoSystem *moto_system_new()
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
     */
 
-    return NULL;
+    return self;
 }
 
 MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name)

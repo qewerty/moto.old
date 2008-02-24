@@ -339,7 +339,8 @@ GType moto_node_factory_get_node_type(MotoNodeFactory *self)
     MotoNodeFactoryClass *klass = MOTO_NODE_FACTORY_GET_CLASS(self);
 
     if(klass->get_node_type)
-        klass->get_node_type(self);
+        return klass->get_node_type(self);
+    return G_TYPE_INVALID;
 }
 
 static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self)

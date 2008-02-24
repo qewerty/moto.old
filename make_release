@@ -1,6 +1,6 @@
 #! /bin/sh
 
 mkdir -p ./build/linux_release
-make CFLAGS="-O3 -funroll-loops -fomit-frame-pointer -ffast-math" \
+make CFLAGS="-Wall -O3 -funroll-loops -fomit-frame-pointer -ffast-math" \
      --directory=./build/linux_release \
      --makefile=../../project/Makefile
