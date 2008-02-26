@@ -27,6 +27,8 @@ struct _MotoTestWindowPriv
     MotoWorld *world;
 
     GtkDrawingArea *area;
+
+    gboolean disposed;
 };
 
 static void
@@ -34,15 +36,21 @@ moto_test_window_dispose(GObject *obj)
 {
     MotoTestWindow *self = (MotoTestWindow *)obj;
 
-    g_object_unref(self->priv->system);
-    g_slice_free(MotoTestWindowPriv, self->priv);
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
 
-    G_OBJECT_CLASS(test_window_parent_class)->dispose(obj);
+    g_object_unref(self->priv->system);
+
+    test_window_parent_class->dispose(obj);
 }
 
 static void
 moto_test_window_finalize(GObject *obj)
 {
+    MotoTestWindow *self = (MotoTestWindow *)obj;
+    g_slice_free(MotoTestWindowPriv, self->priv);
+
     test_window_parent_class->finalize(obj);
 }
 
@@ -50,6 +58,7 @@ static void
 moto_test_window_init(MotoTestWindow *self)
 {
     self->priv = g_slice_new(MotoTestWindowPriv);
+    self->priv->disposed = FALSE;
 
     self->priv->system = moto_system_new();
     moto_system_get_library(self->priv->system);
@@ -81,7 +90,6 @@ moto_test_window_init(MotoTestWindow *self)
                 NULL, TRUE, GDK_GL_RGBA_TYPE);
 
     gtk_container_add(GTK_CONTAINER(self), area);
-
     g_signal_connect(G_OBJECT(self), "delete-event",
                 G_CALLBACK(gtk_main_quit), NULL);
 
@@ -111,7 +119,7 @@ G_DEFINE_TYPE(MotoTestWindow, moto_test_window, GTK_TYPE_WINDOW);
 GtkWindow *moto_test_window_new()
 {
     GtkWindow *self = (GtkWindow *)g_object_new(MOTO_TYPE_TEST_WINDOW, NULL);
-    MotoTestWindow *twin = (MotoTestWindow *)self;
+    // MotoTestWindow *twin = (MotoTestWindow *)self;
 
     // MotoWorld *w = twin->priv->world;
 

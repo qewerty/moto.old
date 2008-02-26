@@ -22,6 +22,8 @@
 #ifndef MOTO_FORWARD_H
 #define MOTO_FORWARD_H
 
+#include <glib-object.h>
+
 typedef struct _MotoSystem MotoSystem;
 typedef struct _MotoSystemClass MotoSystemClass;
 typedef struct _MotoSystemPriv MotoSystemPriv;

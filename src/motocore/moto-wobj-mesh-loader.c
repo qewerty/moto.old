@@ -15,8 +15,19 @@ struct _MotoWobjMeshLoaderPriv
 };
 
 static void
+free_gstring(gpointer data, gpointer user_data)
+{
+    g_string_free((GString *)data, TRUE);
+}
+
+static void
 moto_wobj_mesh_loader_dispose(GObject *obj)
 {
+    MotoWobjMeshLoader *wobj = (MotoWobjMeshLoader *)obj;
+
+    g_slist_foreach(wobj->priv->extensions, free_gstring, NULL);
+    g_slist_free(wobj->priv->extensions);
+
     wobj_mesh_loader_parent_class->dispose(obj);
 }
 
@@ -32,6 +43,8 @@ moto_wobj_mesh_loader_init(MotoWobjMeshLoader *self)
     self->priv = g_slice_new(MotoWobjMeshLoaderPriv);
 
     self->priv->extensions = NULL;
+    self->priv->extensions = \
+        g_slist_append(self->priv->extensions, g_string_new(".obj"));
 }
 
 static void
@@ -57,10 +70,7 @@ G_DEFINE_TYPE(MotoWobjMeshLoader, moto_wobj_mesh_loader, MOTO_TYPE_MESH_LOADER);
 MotoMeshLoader *moto_wobj_mesh_loader_new()
 {
     MotoMeshLoader *self = (MotoMeshLoader *)g_object_new(MOTO_TYPE_WOBJ_MESH_LOADER, NULL);
-    MotoWobjMeshLoader *wobj = (MotoWobjMeshLoader *)self;
-
-    wobj->priv->extensions = \
-        g_slist_append(wobj->priv->extensions, g_string_new(".obj"));
+    // MotoWobjMeshLoader *wobj = (MotoWobjMeshLoader *)self;
 
     return self;
 }

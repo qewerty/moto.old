@@ -1,5 +1,6 @@
 #include "moto-world.h"
 #include "moto-system.h"
+#include "moto-library.h"
 #include "moto-object-node.h"
 #include "moto-messager.h"
 // #include "moto-time-node.h"

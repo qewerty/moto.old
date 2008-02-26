@@ -21,6 +21,7 @@ struct _MotoNodePriv
 {
     GString *name;
     GSList *param_blocks;
+    MotoWorld *world;
 
     gboolean hidden;
 
@@ -97,6 +98,8 @@ moto_node_init(MotoNode *self)
 
     self->priv->name = g_string_new("");
     self->priv->param_blocks = NULL;
+    self->priv->world = NULL;
+
     self->priv->hidden = FALSE;
     g_get_current_time(& self->priv->last_modified);
 
@@ -245,7 +248,9 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag)
 }
 
 MotoWorld *moto_node_get_world(MotoNode *self)
-{}
+{
+    return self->priv->world;
+}
 
 MotoLibrary *moto_node_get_library(MotoNode *self)
 {
@@ -612,10 +617,12 @@ moto_param_block_init(MotoParamBlock *self)
 static void
 moto_param_block_class_init(MotoParamBlockClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     param_block_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    param_block_parent_class->dispose = moto_param_block_dispose;
-    param_block_parent_class->finalize = moto_param_block_finalize;
+    goclass->dispose    = moto_param_block_dispose;
+    goclass->finalize   = moto_param_block_finalize;
 }
 
 G_DEFINE_TYPE(MotoParamBlock, moto_param_block, G_TYPE_OBJECT);

@@ -1,5 +1,6 @@
 #include "moto-mesh.h"
 #include "moto-messager.h"
+#include "common/matrix.h"
 
 /* class Mesh */
 
@@ -78,6 +79,9 @@ MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num)
 
     self->faces_num = faces_num;
     self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MotoMeshFace) * faces_num);
+    guint i;
+    for(i = 0; i < faces_num; i++)
+        self->faces[i].triangles = NULL;
 
     return self;
 }
@@ -135,6 +139,8 @@ MotoMeshVertexAttr *moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, g
     attr->data = (gfloat *)g_try_malloc(sizeof(gfloat)*self->verts_num);
 
     self->verts_attrs = g_slist_append(self->verts_attrs, attr);
+
+    return attr;
 }
 
 MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
@@ -162,5 +168,86 @@ void moto_mesh_face_free(MotoMeshFace *self)
 
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh)
 {
+    self->normal[0] = 0;
+    self->normal[1] = 0;
+    self->normal[2] = 0;
 
+    MotoMeshVertex *vert, *nvert;
+
+    guint i;
+    for(i = 0; i < (self->verts_num-1); i++)
+    {
+        vert  = & mesh->verts[self->indecies[i]];
+        nvert = & mesh->verts[self->indecies[i+1]];
+
+        self->normal[0] += (vert->xyz[1] - nvert->xyz[1])*(vert->xyz[2] + nvert->xyz[2]);
+        self->normal[1] += (vert->xyz[2] - nvert->xyz[2])*(vert->xyz[0] + nvert->xyz[0]);
+        self->normal[2] += (vert->xyz[0] - nvert->xyz[0])*(vert->xyz[1] + nvert->xyz[1]);
+    }
+
+    gfloat lenbuf;
+    vector3_normalize(self->normal, lenbuf);
+}
+
+typedef struct _Vector
+{
+    gfloat xyz[3];
+} Vector;
+
+#define index(i, vnum) ((i) % (vnum))
+
+static gboolean has_concaves(Vector *crosses, guint num, gfloat normal[3])
+{
+    if(num <= 3)
+        return FALSE;
+
+    guint i;
+    for(i = 0; i < num; i++)
+    {
+        if(vector3_dot(normal, crosses[i].xyz) < 0)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh)
+{
+    Vector crosses[self->verts_num];
+    Vector a, b;
+    gfloat lenbuf;
+    guint vnum = self->verts_num;
+
+    guint i;
+    for(i = 0; i < self->verts_num; i++)
+    {
+        vector3_dif(a.xyz,
+                    mesh->verts[self->indecies[index(i-1, vnum)]].xyz,
+                    mesh->verts[self->indecies[index(i, vnum)]].xyz);
+        vector3_dif(b.xyz,
+                    mesh->verts[self->indecies[index(i, vnum)]].xyz,
+                    mesh->verts[self->indecies[index(i+1, vnum)]].xyz);
+
+        vector3_cross(crosses[i].xyz, a.xyz, b.xyz);
+        vector3_normalize(crosses[i].xyz, lenbuf);
+    }
+
+    if(has_concaves(crosses, self->verts_num, self->normal))
+    {
+        /* Face is convex and may be drawn as is. */
+        return;
+    }
+}
+
+void moto_mesh_face_foreach_vertex(MotoMeshFace *self,
+        MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh)
+{
+    MotoMeshVertex *vert;
+
+    guint i;
+    for(i = 0; i < (self->verts_num-1); i++)
+    {
+        vert = & mesh->verts[self->indecies[i]];
+        func();
+    }
 }
