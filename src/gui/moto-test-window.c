@@ -65,14 +65,31 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
+    MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root");
+    moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
+
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
-    moto_world_set_root(self->priv->world, (MotoObjectNode *)obj_node);
+    MotoParam *in = moto_node_get_param(obj_node, "main", "parent");
+    MotoParam *out = moto_node_get_param(root_node, "main", "transform");
+    moto_param_set_source(in, out);
+
+    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "View");
+
+    in = moto_node_get_param(obj_node, "view", "view");
+    out = moto_node_get_param(grid_view_node, "main", "view");
+    moto_param_set_source(in, out);
+
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    in = moto_node_get_param(obj_node, "main", "parent");
+    out = moto_node_get_param(root_node, "main", "transform");
+    moto_param_set_source(in, out);
+
     MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "View");
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube");
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material");
 
-    MotoParam *in = moto_node_get_param(obj_node, "view", "view");
-    MotoParam *out = moto_node_get_param(view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view", "view");
+    out = moto_node_get_param(view_node, "main", "view");
     moto_param_set_source(in, out);
 
     in = moto_node_get_param(view_node, "main", "mesh");

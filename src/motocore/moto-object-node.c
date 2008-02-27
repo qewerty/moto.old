@@ -227,8 +227,9 @@ static void update_parent(MotoParam *param)
 
 static void point_parent(MotoParam *param, gpointer p)
 {
-    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
-    obj->priv->parent = (MotoObjectNode *)p;
+    //MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    //obj->priv->parent = (MotoObjectNode *)p;
+    moto_object_node_set_parent((MotoObjectNode *)moto_param_get_node(param), (MotoObjectNode *)p);
 }
 
 static gpointer get_tx(MotoParam *param)
@@ -927,7 +928,7 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
     if(parent == self->priv->parent)
         return;
 
-    if(!self->priv->parent)
+    if(self->priv->parent)
     {
         self->priv->parent->priv->children = \
             g_slist_remove(self->priv->parent->priv->children, self);
@@ -1235,7 +1236,7 @@ void moto_object_node_draw(MotoObjectNode *self)
         moto_object_node_draw((MotoObjectNode *)child->data);
     }
 
-    if(*(self->priv->show_view_ptr))
+    if(*(self->priv->show_view_ptr) && self->priv->view)
         moto_geometry_view_node_draw(self->priv->view);
 
     glPopMatrix();

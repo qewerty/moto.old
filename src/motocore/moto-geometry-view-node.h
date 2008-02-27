@@ -31,6 +31,10 @@ typedef struct _MotoGeometryViewNodePriv MotoGeometryViewNodePriv;
 typedef void (*MotoGeometryViewNodeDrawMethod)(MotoGeometryViewNode *self);
 typedef void (*MotoGeometryViewNodePrepareForDrawMethod)(MotoGeometryViewNode *self);
 
+typedef struct _MotoGeometryViewState MotoGeometryViewState;
+typedef struct _MotoGeometryViewStateClass MotoGeometryViewStateClass;
+typedef struct _MotoGeometryViewStatePriv MotoGeometryViewStatePriv;
+
 /* class MotoGeometryViewNode */
 
 struct _MotoGeometryViewNode
@@ -65,5 +69,37 @@ GType moto_geometry_view_node_get_type(void);
 
 void moto_geometry_view_node_draw(MotoGeometryViewNode *self);
 void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self);
+
+MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self);
+void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, MotoGeometryViewState *state);
+void moto_geometry_view_node_set_state_by_name(MotoGeometryViewNode *self, const gchar *state_name);
+
+/* class MotoGeometryViewState */
+
+struct _MotoGeometryViewState
+{
+    GObject parent;
+
+    MotoGeometryViewStatePriv *priv;
+};
+
+struct _MotoGeometryViewStateClass
+{
+    GObjectClass parent;
+};
+
+GType moto_geometry_view_state_get_type(void);
+
+#define MOTO_TYPE_GEOMETRY_VIEW_STATE (moto_geometry_view_state_get_type())
+#define MOTO_GEOMETRY_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewState))
+#define MOTO_GEOMETRY_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewStateClass))
+#define MOTO_IS_GEOMETRY_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE))
+#define MOTO_IS_GEOMETRY_VIEW_STATE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_VIEW_STATE))
+#define MOTO_GEOMETRY_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewStateClass))
+
+MotoGeometryViewState *
+moto_geometry_view_state_new(const gchar *name, const gchar *title,
+        MotoGeometryViewNodeDrawMethod draw,
+        MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw);
 
 #endif /* MOTO_GEOMETRY_VIEW_NODE_H */
