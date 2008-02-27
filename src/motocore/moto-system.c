@@ -50,6 +50,15 @@ static void unref_gobject(gpointer data, gpointer user_data)
     g_object_unref(G_OBJECT(data));
 }
 
+static gboolean print_node_factory(gpointer data, gpointer user_data)
+{
+    MotoNodeFactory *fac  = (MotoNodeFactory *)data;
+
+    g_print("%s\n", g_type_name(moto_node_factory_get_node_type(fac)));
+
+    return FALSE;
+}
+
 /* class System */
 
 static GObjectClass *system_parent_class = NULL;
@@ -221,6 +230,8 @@ MotoSystem *moto_system_new()
     moto_library_new_entry(lib, "mesh-loader",
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
 #endif
+
+    moto_library_foreach(lib, "node", print_node_factory, NULL);
 
     return self;
 }

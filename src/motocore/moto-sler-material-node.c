@@ -1,3 +1,5 @@
+#include "stdlib.h"
+
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 
@@ -9,15 +11,20 @@
 
 const GLcharARB *vs_source = "\
 uniform vec3 lightPosition;\
+uniform float Kd;\
+uniform float Ks;\
 varying float lightIntensity;\
 \
-int main()\
+void main()\
 {\
     vec3 position       = vec3(gl_ModelViewMatrix * gl_Vertex);\
+    vec3 viewVec        = normalize(-position);\
+    \
     vec3 normal         = normalize(gl_NormalMatrix * gl_Normal);\
+    /* normal              = faceforward(-normal, viewVec, normal); */\
+    \
     vec3 lightVec       = normalize(lightPosition - position);\
     vec3 reflectVec     = reflect(-lightVec, normal);\
-    vec3 viewVec        = normalize(-position);\
 \
     float diffuse       = max(dot(lightVec, normal), 0.0);\
 \
@@ -31,7 +38,7 @@ int main()\
 
 const GLcharARB *fs_source = "\
 varying float lightIntensity;\
-int main()\
+void main()\
 {\
     gl_FragColor = lightIntensity;\
 }";
@@ -133,6 +140,47 @@ MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name)
     return self;
 }
 
+GLint get_uni_loc(GLhandleARB prog, const GLcharARB *name)
+{
+    GLint loc = glGetUniformLocationARB(prog, name);
+    if(loc == -1)
+    {
+        GString *msg = g_string_new("Uniform variable with name \"");
+        g_string_append(msg, name);
+        g_string_append(msg, "\" is not exist");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+    }
+    return loc;
+}
+
+void print_log_info(GLhandleARB handle)
+{
+    int info_log_length = 0;
+    int chars_written = 0;
+    GLcharARB *info_log;
+
+    glGetObjectParameterivARB(handle,
+        GL_OBJECT_INFO_LOG_LENGTH_ARB, &info_log_length);
+
+    if(info_log_length > 0)
+    {
+        info_log = (GLcharARB*)g_try_malloc(sizeof(GLcharARB)*info_log_length);
+        if(info_log == NULL)
+        {
+            moto_error("Out of memory (InfoLog)");
+            exit(1);
+        }
+        glGetInfoLogARB(handle, info_log_length, &chars_written, info_log);
+        moto_info(info_log);
+        g_free(info_log);
+    }
+    else
+    {
+        moto_info("No info log :(");
+    }
+}
+
 static gboolean make_shader(MotoSlerMaterialNode *self)
 {
     GLint compile_status, link_status;
@@ -147,6 +195,7 @@ static gboolean make_shader(MotoSlerMaterialNode *self)
     if( ! compile_status)
     {
         moto_error("Compilation of vertex shader failed");
+        print_log_info(self->priv->vs);
         return FALSE;
     }
 
@@ -160,6 +209,7 @@ static gboolean make_shader(MotoSlerMaterialNode *self)
     if( ! compile_status)
     {
         moto_error("Compilation of fragment shader failed");
+        print_log_info(self->priv->fs);
         return FALSE;
     }
 
@@ -174,6 +224,7 @@ static gboolean make_shader(MotoSlerMaterialNode *self)
     if( ! link_status)
     {
         moto_error("Linking failed");
+        print_log_info(self->priv->prog);
         return FALSE;
     }
 
@@ -188,7 +239,13 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
         slernode->priv->shader_made = make_shader(slernode);
 
     if(slernode->priv->shader_made)
+    {
+        glUniform3fARB(get_uni_loc(slernode->priv->prog, "lightPosition"),
+                0.3, 0.15, 0.15);
+        glUniform1fARB(get_uni_loc(slernode->priv->prog, "Kd"), 1);
+        glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.3);
         glUseProgramObjectARB(slernode->priv->prog);
+    }
 }
 
 /* class SlerMaterialNodeFactory */

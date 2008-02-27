@@ -122,7 +122,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     mesh->verts[0].xyz[0]   =  hsx;
     mesh->verts[0].xyz[1]   = -hsy;
-    mesh->verts[0].xyz[0]   = -hsz;
+    mesh->verts[0].xyz[2]   = -hsz;
     mesh->verts[1].xyz[0]   = -hsx;
     mesh->verts[1].xyz[1]   = -hsy;
     mesh->verts[1].xyz[2]   = -hsz;
@@ -152,6 +152,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->faces[0].indecies[2] = 2;
     mesh->faces[0].indecies[3] = 3;
     moto_mesh_face_calc_normal(& mesh->faces[0], mesh);
+
     mesh->faces[1].verts_num = 4;
     moto_mesh_face_alloc(& mesh->faces[1]);
     mesh->faces[1].indecies[0] = 7;
@@ -159,6 +160,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->faces[1].indecies[2] = 5;
     mesh->faces[1].indecies[3] = 4;
     moto_mesh_face_calc_normal(& mesh->faces[1], mesh);
+
     mesh->faces[2].verts_num = 4;
     moto_mesh_face_alloc(& mesh->faces[2]);
     mesh->faces[2].indecies[0] = 4;
@@ -166,6 +168,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->faces[2].indecies[2] = 1;
     mesh->faces[2].indecies[3] = 0;
     moto_mesh_face_calc_normal(& mesh->faces[2], mesh);
+
     mesh->faces[3].verts_num = 4;
     moto_mesh_face_alloc(& mesh->faces[3]);
     mesh->faces[3].indecies[0] = 2;
@@ -173,6 +176,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->faces[3].indecies[2] = 7;
     mesh->faces[3].indecies[3] = 3;
     moto_mesh_face_calc_normal(& mesh->faces[3], mesh);
+
     mesh->faces[4].verts_num = 4;
     moto_mesh_face_alloc(& mesh->faces[4]);
     mesh->faces[4].indecies[0] = 5;
@@ -180,6 +184,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     mesh->faces[4].indecies[2] = 2;
     mesh->faces[4].indecies[3] = 1;
     moto_mesh_face_calc_normal(& mesh->faces[4], mesh);
+
     mesh->faces[5].verts_num = 4;
     moto_mesh_face_alloc(& mesh->faces[5]);
     mesh->faces[5].indecies[0] = 7;

@@ -1,3 +1,5 @@
+#include <GL/gl.h>
+
 #include "moto-world.h"
 #include "moto-system.h"
 #include "moto-library.h"
@@ -55,7 +57,7 @@ moto_world_init(MotoWorld *self)
 
     self->priv->nodes           = NULL;
     self->priv->selected_nodes  = NULL;
-    self->priv->current_node     = NULL;
+    self->priv->current_node    = NULL;
 
     self->priv->root = NULL;
 }
@@ -175,8 +177,14 @@ void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
 
 void moto_world_draw(MotoWorld *self)
 {
+    glPushMatrix();
+
+    // glScalef(1, 1, -1);
+
     if(self->priv->root)
         moto_object_node_draw(self->priv->root);
+
+    glPopMatrix();
 }
 
 MotoLibrary *moto_world_get_library(MotoWorld *self)
