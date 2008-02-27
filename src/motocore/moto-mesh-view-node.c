@@ -114,9 +114,14 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     return self;
 }
 
+static void process_vertex(MotoMeshFace *face, MotoMeshVertex *vert)
+{
+    glVertex3fv(vert->xyz);
+}
+
 static void draw_mesh(MotoMesh *mesh)
 {
-    int i, j;
+    int i;
     for(i = 0; i < mesh->faces_num; i++)
     {
         /* TODO: Temporary solution! =) */
@@ -128,15 +133,7 @@ static void draw_mesh(MotoMesh *mesh)
 
         glBegin(GL_POLYGON);
 
-        for(j = 0; j < face->verts_num; j++)
-        {
-            MotoMeshVertex *vert = & mesh->verts[face->indecies[j]];
-
-            /* TODO: attrs */
-
-            // glNormal3fv(vert->normal);
-            glVertex3fv(vert->xyz);
-        }
+        moto_mesh_face_foreach_vertex(face, process_vertex, mesh);
 
         glEnd();
     }

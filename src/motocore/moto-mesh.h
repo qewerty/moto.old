@@ -55,8 +55,8 @@ struct _MotoMeshFace
     guint verts_num;
     guint *indecies;
 
-    /* If triangles is NULL face is not tesselated and considered as convex. */
-    MotoMeshSubFace *triangles;
+    /* If convexes is NULL face is not tesselated and considered as convex. */
+    MotoMeshSubFace *convexes;
 };
 
 struct _MotoMeshSubFace
@@ -70,9 +70,9 @@ void moto_mesh_face_free(MotoMeshFace *self);
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh);
 /* Tesselation must be performed after normal is calculated.  */
 void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh);
-void moto_mesh_face_draw(MotoMeshFace *self);
+// void moto_mesh_face_draw(MotoMeshFace *self);
 
-void moto_mesh_face_foreach_vertex(MotoMeshFace *self,
+void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
         MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh);
 
 struct _MotoMeshVertexAttr

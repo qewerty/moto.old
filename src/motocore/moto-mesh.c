@@ -81,7 +81,7 @@ MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num)
     self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MotoMeshFace) * faces_num);
     guint i;
     for(i = 0; i < faces_num; i++)
-        self->faces[i].triangles = NULL;
+        self->faces[i].convexes = NULL;
 
     return self;
 }
@@ -166,6 +166,7 @@ void moto_mesh_face_free(MotoMeshFace *self)
     g_free(self->indecies);
 }
 
+/* Newell's method */
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh)
 {
     self->normal[0] = 0;
@@ -235,19 +236,20 @@ void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh)
     if(has_concaves(crosses, self->verts_num, self->normal))
     {
         /* Face is convex and may be drawn as is. */
+        self->convexes = NULL;
         return;
     }
 }
 
-void moto_mesh_face_foreach_vertex(MotoMeshFace *self,
+void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
         MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh)
 {
     MotoMeshVertex *vert;
 
     guint i;
-    for(i = 0; i < (self->verts_num-1); i++)
+    for(i = 0; i < face->verts_num; i++)
     {
-        vert = & mesh->verts[self->indecies[i]];
-        func();
+        vert = & mesh->verts[face->indecies[i]];
+        func(face, vert);
     }
 }
