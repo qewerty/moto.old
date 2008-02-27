@@ -95,6 +95,8 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     MotoMeshViewNode *self = (MotoMeshViewNode *)g_object_new(MOTO_TYPE_MESH_VIEW_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
+    moto_node_set_name(node, name);
+
     MotoParamBlock *pb;
     MotoParamData *pdata;
 

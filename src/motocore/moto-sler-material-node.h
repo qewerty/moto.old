@@ -28,6 +28,10 @@ typedef struct _MotoSlerMaterialNode MotoSlerMaterialNode;
 typedef struct _MotoSlerMaterialNodeClass MotoSlerMaterialNodeClass;
 typedef struct _MotoSlerMaterialNodePriv MotoSlerMaterialNodePriv;
 
+typedef struct _MotoSlerMaterialNodeFactory MotoSlerMaterialNodeFactory;
+typedef struct _MotoSlerMaterialNodeFactoryClass MotoSlerMaterialNodeFactoryClass;
+typedef struct _MotoSlerMaterialNodeFactoryPriv MotoSlerMaterialNodeFactoryPriv;
+
 /* class MotoSlerMaterialNode */
 
 struct _MotoSlerMaterialNode
@@ -55,6 +59,29 @@ GType moto_sler_material_node_get_type(void);
 #define MOTO_SLER_MATERIAL_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SLER_MATERIAL_NODE, MotoSlerMaterialNodeClass))
 
 /* Enables the sler_material in OpenGL viewport. */
-MotoSlerMaterialNode *moto_sler_material_node_new();
+MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name);
+
+/* class MotoNodeFactory */
+
+struct _MotoSlerMaterialNodeFactory
+{
+    MotoNodeFactory parent;
+};
+
+struct _MotoSlerMaterialNodeFactoryClass
+{
+    MotoNodeFactoryClass parent;
+};
+
+GType moto_sler_material_node_factory_get_type(void);
+
+#define MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY (moto_sler_material_node_factory_get_type())
+#define MOTO_SLER_MATERIAL_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY, MotoSlerMaterialNodeFactory))
+#define MOTO_SLER_MATERIAL_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY, MotoSlerMaterialNodeFactoryClass))
+#define MOTO_IS_SLER_MATERIAL_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY))
+#define MOTO_IS_SLER_MATERIAL_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY))
+#define MOTO_SLER_MATERIAL_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY, MotoSlerMaterialNodeFactoryClass))
+
+MotoNodeFactory *moto_sler_material_node_factory_new();
 
 #endif /* MOTO_SLER_MATERIAL_NODE_H */

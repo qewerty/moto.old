@@ -69,6 +69,7 @@ moto_test_window_init(MotoTestWindow *self)
     moto_world_set_root(self->priv->world, (MotoObjectNode *)obj_node);
     MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "View");
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube");
+    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material");
 
     MotoParam *in = moto_node_get_param(obj_node, "view", "view");
     MotoParam *out = moto_node_get_param(view_node, "main", "view");
@@ -76,6 +77,10 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(view_node, "main", "mesh");
     out = moto_node_get_param(cube_node, "main", "mesh");
+    moto_param_set_source(in, out);
+
+    in = moto_node_get_param(obj_node, "shading", "material");
+    out = moto_node_get_param(mat_node, "main", "material");
     moto_param_set_source(in, out);
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();

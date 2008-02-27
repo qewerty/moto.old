@@ -51,3 +51,4 @@ void moto_material_node_use(MotoMaterialNode *self)
     if(klass->use)
         klass->use(self);
 }
+

@@ -2,6 +2,7 @@
 #include "GL/glu.h"
 
 #include "moto-object-node.h"
+#include "moto-material-node.h"
 #include "moto-float-param-data.h"
 #include "moto-bool-param-data.h"
 #include "moto-geometry-view-param-data.h"
@@ -9,6 +10,7 @@
 #include "moto-transform-order-param-data.h"
 #include "moto-rotate-order-param-data.h"
 #include "moto-object-param-data.h"
+#include "moto-material-param-data.h"
 
 #include "common/matrix.h"
 #include "common/numdef.h"
@@ -75,6 +77,8 @@ void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible);
 gboolean moto_object_node_get_show_view(MotoObjectNode *self);
 void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view);
 
+void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *material);
+
 /* class ObjectNode */
 
 static GObjectClass *object_node_parent_class = NULL;
@@ -82,6 +86,7 @@ static GObjectClass *object_node_parent_class = NULL;
 struct _MotoObjectNodePriv
 {
     MotoGeometryViewNode *view;
+    MotoMaterialNode *material;
 
     gfloat tx, ty, tz;
     gfloat rx, ry, rz;
@@ -186,6 +191,9 @@ moto_object_node_init(MotoObjectNode *self)
 
     self->priv->visible_ptr = & self->priv->visible;
     self->priv->show_view_ptr = & self->priv->show_view;
+
+    self->priv->view = NULL;
+    self->priv->material = NULL;
 }
 
 static void
@@ -602,6 +610,22 @@ static gpointer get_transform(MotoParam *param)
     return moto_param_get_node(param);
 }
 
+static gpointer get_material(MotoParam *param)
+{
+    return ((MotoObjectNode *)moto_param_get_node(param))->priv->material;
+}
+
+static void set_material(MotoParam *param, gpointer p)
+{
+    moto_object_node_set_material((MotoObjectNode *)moto_param_get_node(param), (MotoMaterialNode *)p);
+}
+
+static void point_material(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->material = (MotoMaterialNode *)p;
+}
+
 MotoObjectNode *moto_object_node_new(const gchar *name)
 {
     MotoObjectNode *self = \
@@ -695,6 +719,14 @@ MotoObjectNode *moto_object_node_new(const gchar *name)
     moto_param_new("show_view", "Show View", MOTO_PARAM_MODE_INOUT, pb,
             pdata = moto_bool_param_data_new(TRUE));
     moto_param_data_set_cbs(pdata, point_show_view, NULL, get_show_view, set_show_view);
+
+    /* shading block */
+    pb = moto_param_block_new("shading", "Shading", (MotoNode *)self);
+    moto_node_add_param_block(node, pb);\
+
+    moto_param_new("material", "Material", MOTO_PARAM_MODE_IN, pb,
+            pdata = moto_material_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, point_material, NULL, get_material, set_material);
 
     return self;
 }
@@ -1194,6 +1226,9 @@ void moto_object_node_draw(MotoObjectNode *self)
 
     apply_transform(self);
 
+    if(self->priv->material)
+        moto_material_node_use(self->priv->material);
+
     GSList *child = self->priv->children;
     for(; child; child = g_slist_next(child))
     {
@@ -1234,6 +1269,11 @@ gboolean moto_object_node_get_visible(MotoObjectNode *self)
 void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
 {
     self->priv->visible = visible;
+}
+
+void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *material)
+{
+    self->priv->material = material;
 }
 
 /* class ObjectNodeFactory */

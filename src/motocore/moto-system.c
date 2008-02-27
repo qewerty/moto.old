@@ -9,6 +9,7 @@
 
 /* nodes */
 #include "moto-object-node.h"
+#include "moto-sler-material-node.h"
 #include "moto-mesh-view-node.h"
 // #include "moto-nurbs-view-node.h"
 #include "moto-cube-node.h"
@@ -116,8 +117,10 @@ MotoSystem *moto_system_new()
     MotoNodeFactory *fac;
 
     fac = moto_object_node_factory_new();
-    // MotoNode *node = moto_node_factory_create_node(fac, "123");
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
 
+    fac = moto_sler_material_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
 

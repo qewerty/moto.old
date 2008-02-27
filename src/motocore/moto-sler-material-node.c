@@ -1,6 +1,40 @@
+#define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 
 #include "moto-sler-material-node.h"
+#include "moto-material-param-data.h"
+#include "moto-messager.h"
+
+/* Temporary GLSL shader sources. */
+
+const GLcharARB *vs_source = "\
+uniform vec3 lightPosition;\
+varying float lightIntensity;\
+\
+int main()\
+{\
+    vec3 position       = vec3(gl_ModelViewMatrix * gl_Vertex);\
+    vec3 normal         = normalize(gl_NormalMatrix * gl_Normal);\
+    vec3 lightVec       = normalize(lightPosition - position);\
+    vec3 reflectVec     = reflect(-lightVec, normal);\
+    vec3 viewVec        = normalize(-position);\
+\
+    float diffuse       = max(dot(lightVec, normal), 0.0);\
+\
+    float spec = max(dot(reflectVec, viewVec), 0.0);\
+    spec = pow(spec, 16.0);\
+\
+    lightIntensity = Kd*diffuse + Ks*spec;\
+\
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+}";
+
+const GLcharARB *fs_source = "\
+varying float lightIntensity;\
+int main()\
+{\
+    gl_FragColor = lightIntensity;\
+}";
 
 /* forward */
 
@@ -14,6 +48,11 @@ struct _MotoSlerMaterialNodePriv
 {
     gboolean use_external;
     GString *external_sler_project_filename;
+
+    GLhandleARB prog;
+    GLhandleARB vs;
+    GLhandleARB fs;
+    gboolean shader_made;
 };
 
 static void
@@ -44,6 +83,8 @@ moto_sler_material_node_init(MotoSlerMaterialNode *self)
     // TODO: Temporary! When internal Sler editor is integrated 'use_external' default value will be FALSE.
     self->priv->use_external = TRUE;
     self->priv->external_sler_project_filename = g_string_new("");
+
+    self->priv->shader_made = FALSE;
 }
 
 static void
@@ -64,14 +105,157 @@ G_DEFINE_TYPE(MotoSlerMaterialNode, moto_sler_material_node, MOTO_TYPE_MATERIAL_
 
 /* methods of class SlerMaterialNode */
 
-MotoSlerMaterialNode *moto_sler_material_node()
+static gpointer get_material(MotoParam *param)
+{
+    return moto_param_get_node(param);
+}
+
+MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name)
 {
     MotoSlerMaterialNode *self = \
         (MotoSlerMaterialNode *)g_object_new(MOTO_TYPE_SLER_MATERIAL_NODE, NULL);
+    MotoNode *node = (MotoNode *)self;
+
+    moto_node_set_name((MotoNode *)self, name);
+
+    MotoParamBlock *pb;
+    MotoParamData *pdata;
+
+    /* params */
+
+    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
+    moto_node_add_param_block(node, pb);
+
+    moto_param_new("material", "Material", MOTO_PARAM_MODE_OUT, pb,
+            pdata = moto_material_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, NULL, NULL, get_material, NULL);
 
     return self;
 }
 
+static gboolean make_shader(MotoSlerMaterialNode *self)
+{
+    GLint compile_status, link_status;
+
+    /* vertex shader */
+    self->priv->vs = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    glShaderSourceARB(self->priv->vs, 1, & vs_source, NULL);
+    glCompileShaderARB(self->priv->vs);
+    glGetObjectParameterivARB(self->priv->vs,
+            GL_OBJECT_COMPILE_STATUS_ARB, & compile_status);
+
+    if( ! compile_status)
+    {
+        moto_error("Compilation of vertex shader failed");
+        return FALSE;
+    }
+
+    /* fragment shader */
+    self->priv->fs = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    glShaderSourceARB(self->priv->fs, 1, & fs_source, NULL);
+    glCompileShaderARB(self->priv->fs);
+    glGetObjectParameterivARB(self->priv->fs,
+            GL_OBJECT_COMPILE_STATUS_ARB, & compile_status);
+
+    if( ! compile_status)
+    {
+        moto_error("Compilation of fragment shader failed");
+        return FALSE;
+    }
+
+    /* program */
+    self->priv->prog = glCreateProgramObjectARB();
+    glAttachObjectARB(self->priv->prog, self->priv->vs);
+    glAttachObjectARB(self->priv->prog, self->priv->fs);
+    glLinkProgramARB(self->priv->prog);
+    glGetObjectParameterivARB(self->priv->prog,
+        GL_OBJECT_LINK_STATUS_ARB, & link_status);
+
+    if( ! link_status)
+    {
+        moto_error("Linking failed");
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 static void moto_sler_material_node_use(MotoMaterialNode *self)
 {
+    MotoSlerMaterialNode *slernode = (MotoSlerMaterialNode *)self;
+
+    if( ! slernode->priv->shader_made)
+        slernode->priv->shader_made = make_shader(slernode);
+
+    if(slernode->priv->shader_made)
+        glUseProgramObjectARB(slernode->priv->prog);
+}
+
+/* class SlerMaterialNodeFactory */
+
+MotoNode *
+moto_sler_material_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name);
+
+static GType moto_sler_material_node_factory_get_node_type(MotoNodeFactory *self);
+
+static GObjectClass *sler_material_node_factory_parent_class = NULL;
+
+static void
+moto_sler_material_node_factory_dispose(GObject *obj)
+{
+    sler_material_node_factory_parent_class->dispose(obj);
+}
+
+static void
+moto_sler_material_node_factory_finalize(GObject *obj)
+{
+    sler_material_node_factory_parent_class->finalize(obj);
+}
+
+static void
+moto_sler_material_node_factory_init(MotoSlerMaterialNodeFactory *self)
+{
+
+}
+
+static void
+moto_sler_material_node_factory_class_init(MotoSlerMaterialNodeFactoryClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
+
+    sler_material_node_factory_parent_class = g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_sler_material_node_factory_dispose;
+    goclass->finalize   = moto_sler_material_node_factory_finalize;
+
+    nfclass->get_node_type  = moto_sler_material_node_factory_get_node_type;
+    nfclass->create_node    = moto_sler_material_node_factory_create_node;
+}
+
+G_DEFINE_TYPE(MotoSlerMaterialNodeFactory, moto_sler_material_node_factory, MOTO_TYPE_NODE_FACTORY);
+
+/* methods of class SlerMaterialNodeFactory */
+
+static MotoNodeFactory *sler_material_node_factory = NULL;
+
+MotoNodeFactory *moto_sler_material_node_factory_new()
+{
+    if( ! sler_material_node_factory)
+        sler_material_node_factory = \
+            (MotoNodeFactory *)g_object_new(MOTO_TYPE_SLER_MATERIAL_NODE_FACTORY, NULL);
+
+    return sler_material_node_factory;
+}
+
+MotoNode *moto_sler_material_node_factory_create_node(MotoNodeFactory *self,
+        const gchar *name)
+{
+    return (MotoNode *)moto_sler_material_node_new(name);
+}
+
+static GType moto_sler_material_node_factory_get_node_type(MotoNodeFactory *self)
+{
+    return MOTO_TYPE_SLER_MATERIAL_NODE;
 }
