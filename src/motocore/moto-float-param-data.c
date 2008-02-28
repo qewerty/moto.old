@@ -46,3 +46,8 @@ moto_float_param_data_new(gfloat default_value)
 
     return data;
 }
+
+void moto_float_param_data_set(MotoFloatParamData *self, gfloat value)
+{
+    moto_param_data_set((MotoParamData*)self, &value);
+}

@@ -54,5 +54,7 @@ GType moto_float_param_data_get_type(void);
 MotoParamData *
 moto_float_param_data_new(gfloat default_value);
 
+void moto_float_param_data_set(MotoFloatParamData *self, gfloat value);
+
 #endif /* MOTO_FLOAT_PARAM_DATA_H */
 

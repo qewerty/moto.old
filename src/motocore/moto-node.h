@@ -103,6 +103,8 @@ const gchar *moto_node_get_xml_dump(MotoNode *self, glong *numbytes);
 void moto_node_update(MotoNode *self);
 
 MotoWorld *moto_node_get_world(MotoNode *self);
+void moto_node_set_world(MotoNode *self, MotoWorld *world);
+
 MotoLibrary *moto_node_get_library(MotoNode *self);
 
 /* class MotoNodeFactory */
@@ -194,6 +196,7 @@ GType moto_param_get_type(void);
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data);
 
+MotoParamData *moto_param_get_data(MotoParam *self);
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
 MotoParamMode moto_param_get_mode(MotoParam *mode);

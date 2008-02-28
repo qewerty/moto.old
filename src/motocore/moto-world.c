@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 
 #include "moto-world.h"
+#include "moto-node.h"
 #include "moto-system.h"
 #include "moto-library.h"
 #include "moto-object-node.h"
@@ -106,6 +107,7 @@ const gchar *moto_world_get_name(MotoWorld *self)
 
 void moto_world_add_node(MotoWorld *self, MotoNode *node)
 {
+    moto_node_set_world(node, self);
     self->priv->nodes = g_slist_append(self->priv->nodes, node);
 }
 
@@ -176,6 +178,11 @@ void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
 {
     /* TODO: Check that new root is a node in this world! */
     self->priv->root = root;
+}
+
+void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera)
+{
+    self->priv->camera = camera;
 }
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)

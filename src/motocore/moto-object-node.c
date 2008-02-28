@@ -129,6 +129,7 @@ struct _MotoObjectNodePriv
 
     gfloat matrix[16];
     gfloat inverse_matrix[16];
+    gfloat global_inverse_matrix[16];
     gfloat parent_inverse_matrix[16];
     gfloat translate_matrix[16];
     gfloat rotate_matrix[16];
@@ -930,7 +931,16 @@ gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean globa
 
     if(global)
     {
-        return self->priv->inverse_matrix;
+        if( ! self->priv->parent)
+            return self->priv->inverse_matrix;
+
+        gfloat *parent_inverse = \
+            moto_object_node_get_inverse_matrix(self->priv->parent, TRUE);
+
+        matrix44_mult(self->priv->global_inverse_matrix,
+                parent_inverse, self->priv->inverse_matrix);
+
+        return self->priv->global_inverse_matrix;
     }
 
     return self->priv->inverse_matrix;
@@ -1303,8 +1313,8 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    /*
-    glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE)); */
+    glViewport(0, 0, width, height);
+    glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
 }
 
 MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self)

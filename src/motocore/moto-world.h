@@ -72,6 +72,7 @@ void moto_world_merge(MotoWorld *self, const gchar *filename);
 
 MotoObjectNode *moto_world_get_root(MotoWorld *self);
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
+void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera);
 void moto_world_draw(MotoWorld *self, gint width, gint height);
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
 

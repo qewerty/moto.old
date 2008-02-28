@@ -8,6 +8,8 @@
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
+#include "motocore/moto-param-data.h"
+#include "motocore/moto-float-param-data.h"
 
 /* forwards */
 
@@ -99,6 +101,21 @@ moto_test_window_init(MotoTestWindow *self)
     in = moto_node_get_param(obj_node, "shading", "material");
     out = moto_node_get_param(mat_node, "main", "material");
     moto_param_set_source(in, out);
+
+    /* camera */
+    MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject");
+    // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
+    moto_world_set_camera(self->priv->world, cam_obj);
+    MotoParam *param = moto_node_get_param(cam_obj, "main", "tx");
+    MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "ty");
+    MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "tz");
+    MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
+
+    moto_float_param_data_set(tx, 1);
+    moto_float_param_data_set(ty, -2);
+    moto_float_param_data_set(tz, 8);
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;

@@ -252,6 +252,11 @@ MotoWorld *moto_node_get_world(MotoNode *self)
     return self->priv->world;
 }
 
+void moto_node_set_world(MotoNode *self, MotoWorld *world)
+{
+    self->priv->world = world;
+}
+
 MotoLibrary *moto_node_get_library(MotoNode *self)
 {
     MotoWorld *w = moto_node_get_world(self);
@@ -454,6 +459,11 @@ void moto_param_set_from_string(MotoParam *self,
 const gchar *moto_param_get_name(MotoParam *self)
 {
     return self->priv->name->str;
+}
+
+MotoParamData *moto_param_get_data(MotoParam *self)
+{
+    return self->priv->data;
 }
 
 const gchar *moto_param_get_title(MotoParam *self)

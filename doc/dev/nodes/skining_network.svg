@@ -14,10 +14,38 @@
    sodipodi:version="0.32"
    inkscape:version="0.45+devel"
    version="1.0"
-   sodipodi:docname="skin_network.svg"
+   sodipodi:docname="skining_network.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective75" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective74" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective72" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective71" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="-50 : 600 : 1"
@@ -36,9 +64,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="499.46677"
-     inkscape:cy="342.92003"
+     inkscape:zoom="1"
+     inkscape:cx="514.33705"
+     inkscape:cy="174.22952"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -120,7 +148,7 @@
     </g>
     <g
        id="g3226"
-       transform="matrix(0.7826397,0,0,0.7826397,-106.86409,111.41107)">
+       transform="matrix(0.7826397,0,0,0.7826397,-82.115353,117.06792)">
       <rect
          ry="25.656912"
          y="260.40411"
@@ -230,7 +258,7 @@
     </g>
     <g
        id="g3310"
-       transform="matrix(0.7826397,0,0,0.7826397,-57.892406,76.996728)">
+       transform="matrix(0.7826397,0,0,0.7826397,-57.892406,94.996728)">
       <rect
          ry="25.656912"
          y="55.137981"
@@ -318,7 +346,7 @@
     </g>
     <g
        id="g3342"
-       transform="matrix(0.7826397,0,0,0.7826397,-503.63109,204.65195)">
+       transform="matrix(0.7826397,0,0,0.7826397,-355.63109,256.65195)">
       <rect
          ry="25.656912"
          y="385.88818"
@@ -340,7 +368,7 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:36.19358444px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       style="font-size:36.19358444000000219px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
        x="32.002567"
        y="51.495518"
        id="text3354"><tspan
@@ -350,21 +378,14 @@
          y="51.495518">Moto Skining Network</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 157.78047,402.38126 L 264.44047,506.27204"
-       id="path3365"
-       inkscape:connector-type="polyline"
-       inkscape:connection-start="#g3226"
-       inkscape:connection-end="#g3342" />
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 168.98693,357.68937 L 442.90015,353.23855"
+       d="M 193.73567,362.40499 L 442.90015,354.17978"
        id="path3369"
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3226"
        inkscape:connection-end="#g3239" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 168.98693,375.50373 L 454.94975,461.57809"
+       d="M 193.73567,381.43005 L 454.94975,461.30862"
        id="path3371"
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3226"
@@ -385,21 +406,21 @@
        inkscape:connection-end="#g3247" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 171.95383,216.84581 L 254.6257,185.38375"
+       d="M 171.95383,222.52837 L 254.6257,197.76526"
        id="path3381"
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3195"
        inkscape:connection-end="#g3310" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 393.30158,185.26037 L 458.92263,210.11671"
+       d="M 393.30158,197.15121 L 458.92263,216.22587"
        id="path3383"
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3310"
        inkscape:connection-end="#g3321" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 168.98693,342.08131 L 458.92263,256.78057"
+       d="M 193.73567,345.87855 L 458.92263,259.07684"
        id="path3385"
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3226"
@@ -425,5 +446,48 @@
        inkscape:connector-type="polyline"
        inkscape:connection-start="#g3337"
        inkscape:connection-end="#g3332" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 181.15613,320.4792 L 284.91084,216.23367"
+       id="path2451"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3226"
+       inkscape:connection-end="#g3310" />
+    <g
+       id="g3242"
+       transform="translate(-219,-78)">
+      <rect
+         ry="20.080118"
+         y="584.24823"
+         x="415.44568"
+         height="77.692451"
+         width="137.89325"
+         id="rect2456"
+         style="fill:#ff5a61;fill-opacity:1;stroke:#000000;stroke-width:0.78263968;stroke-opacity:1" />
+      <text
+         id="text2458"
+         y="627.875"
+         x="449.67938"
+         style="font-size:14.46495152px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="627.875"
+           x="449.67938"
+           sodipodi:role="line"
+           id="tspan2460">JointView</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 168.52485,408.03811 L 237.66034,505.85691"
+       id="path3247"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3226"
+       inkscape:connection-end="#g3242" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 334.73025,564.49512 L 383.38595,578.10892"
+       id="path3249"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3242"
+       inkscape:connection-end="#g3342" />
   </g>
 </svg>
