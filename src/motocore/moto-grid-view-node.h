@@ -55,7 +55,7 @@ GType moto_grid_view_node_storage_get_type(void);
 #define MOTO_IS_GRID_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GRID_VIEW_NODE))
 #define MOTO_GRID_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GRID_VIEW_NODE, MotoGridViewNodeClass))
 
-MotoGridViewNode *moto_grid_view_node_new();
+MotoGridViewNode *moto_grid_view_node_new(const gchar *name);
 
 /* class MotoGridViewNodeFactory */
 

@@ -11,6 +11,7 @@
 #include "moto-rotate-order-param-data.h"
 #include "moto-object-param-data.h"
 #include "moto-material-param-data.h"
+#include "moto-camera-param-data.h"
 
 #include "common/matrix.h"
 #include "common/numdef.h"
@@ -627,6 +628,22 @@ static void point_material(MotoParam *param, gpointer p)
     obj->priv->material = (MotoMaterialNode *)p;
 }
 
+static gpointer get_camera(MotoParam *param)
+{
+    return ((MotoObjectNode *)moto_param_get_node(param))->priv->camera;
+}
+
+static void set_camera(MotoParam *param, gpointer p)
+{
+    moto_object_node_set_camera((MotoObjectNode *)moto_param_get_node(param), (MotocameraNode *)p);
+}
+
+static void point_camera(MotoParam *param, gpointer p)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+    obj->priv->camera = (MotocameraNode *)p;
+}
+
 MotoObjectNode *moto_object_node_new(const gchar *name)
 {
     MotoObjectNode *self = \
@@ -723,11 +740,19 @@ MotoObjectNode *moto_object_node_new(const gchar *name)
 
     /* shading block */
     pb = moto_param_block_new("shading", "Shading", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);\
+    moto_node_add_param_block(node, pb);
 
     moto_param_new("material", "Material", MOTO_PARAM_MODE_IN, pb,
             pdata = moto_material_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, point_material, NULL, get_material, set_material);
+
+    /* shading block */
+    pb = moto_param_block_new("camera", "Camera", (MotoNode *)self);
+    moto_node_add_param_block(node, pb);
+
+    moto_param_new("camera", "Camera", MOTO_PARAM_MODE_IN, pb,
+            pdata = moto_camera_param_data_new(NULL));
+    moto_param_data_set_cbs(pdata, point_camera, NULL, get_camera, set_camera);
 
     return self;
 }

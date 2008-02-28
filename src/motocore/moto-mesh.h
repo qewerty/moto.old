@@ -34,6 +34,8 @@ typedef struct _MotoMeshFace MotoMeshFace;
 typedef struct _MotoMeshSubFace MotoMeshSubFace;
 typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *face, MotoMeshVertex *vert);
 
+typedef struct _MotoMeshSelection MotoMeshSelection;
+
 typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
 
 /* class MotoMesh */
@@ -81,6 +83,19 @@ struct _MotoMeshVertexAttr
     guint chnum;
     gfloat *data;
 };
+
+struct MotoMeshSelection
+{
+    guint verts_num;
+    guint *verts;
+    guint edges_num;
+    guint *edges;
+    guint faces_num;
+    guint *faces;
+};
+
+gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
+MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *self);
 
 struct _MotoMesh
 {

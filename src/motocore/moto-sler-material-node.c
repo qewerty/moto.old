@@ -40,7 +40,8 @@ const GLcharARB *fs_source = "\
 varying float lightIntensity;\
 void main()\
 {\
-    gl_FragColor = lightIntensity;\
+    gl_FragColor = vec4(vec3(lightIntensity), 1.0);\
+    /* gl_FragColor = vec4(vec3(0.7), 1.0); */\
 }";
 
 /* forward */

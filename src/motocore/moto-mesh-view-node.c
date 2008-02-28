@@ -19,6 +19,7 @@ struct _MotoMeshViewNodePriv
 {
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
+    MotoMeshSelection *selection;
 
     gboolean prepared;
     GLuint dlist;
