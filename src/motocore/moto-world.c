@@ -1,4 +1,5 @@
 #include <GL/gl.h>
+#include <GL/glu.h>
 
 #include "moto-world.h"
 #include "moto-system.h"
@@ -61,6 +62,7 @@ moto_world_init(MotoWorld *self)
     self->priv->current_node    = NULL;
 
     self->priv->root = NULL;
+    self->priv->camera = NULL;
 }
 
 static void
@@ -176,16 +178,33 @@ void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
     self->priv->root = root;
 }
 
-void moto_world_draw(MotoWorld *self)
+void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
-    glPushMatrix();
+    if(self->priv->camera)
+    {
+        moto_object_node_apply_camera_transform(self->priv->camera, width, height);
+    }
+    else
+    {
+        // g_print("NO CAMERA ;(\n");
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        moto_world_apply_default_camera(self, width, height);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glViewport(0, 0, width, height);
+        gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
+    }
 
     // glScalef(1, 1, -1);
 
     if(self->priv->root)
         moto_object_node_draw(self->priv->root);
+}
 
-    glPopMatrix();
+void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)
+{
+    gluPerspective(60, width/(float)height, 0.3, 150.);
 }
 
 MotoLibrary *moto_world_get_library(MotoWorld *self)

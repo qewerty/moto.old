@@ -82,6 +82,8 @@ MotoObjectNode *moto_object_node_new(const gchar *name);
 const MotoBound *moto_object_node_get_bound(MotoObjectNode *self);
 void moto_object_node_draw(MotoObjectNode *self);
 
+void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
+
 /* class MotoNodeFactory */
 
 struct _MotoObjectNodeFactory

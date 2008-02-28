@@ -5,6 +5,7 @@
 
 #include "moto-camera-node.h"
 #include "moto-camera-param-data.h"
+#include "moto-messager.h"
 
 /* class CameraNode */
 
@@ -81,6 +82,11 @@ MotoCameraNode *moto_camera_node_new(const gchar *name)
     moto_param_data_set_cbs(pdata, NULL, NULL, get_camera, NULL);
 
     return self;
+}
+
+void moto_camera_node_apply(MotoCameraNode *self, gint width, gint height)
+{
+    
 }
 
 /* class CameraNodeFactory */

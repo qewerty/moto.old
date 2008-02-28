@@ -55,7 +55,8 @@ GType moto_camera_node_storage_get_type(void);
 #define MOTO_IS_CAMERA_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_CAMERA_NODE))
 #define MOTO_CAMERA_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_CAMERA_NODE, MotoCameraNodeClass))
 
-MotoCameraNode *moto_camera_node_new();
+MotoCameraNode *moto_camera_node_new(const gchar *name);
+void moto_camera_node_apply(MotoCameraNode *self, gint width, gint height);
 
 /* class MotoCameraNodeFactory */
 

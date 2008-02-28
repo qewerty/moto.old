@@ -156,22 +156,11 @@ static void init_gl(GtkWidget *widget, gpointer data)
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return;
 
-    gint width = widget->allocation.width;
-    gint height = widget->allocation.height;
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     glEnable(GL_DEPTH_TEST);
 
     glClearColor(0.2, 0.2, 0.2, 1);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60, width/(float)height, 0.3, 150.);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glViewport(0, 0, width, height);
-    gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
 
     gdk_gl_drawable_gl_end(gl_drawable);
 }
@@ -190,11 +179,14 @@ draw(GtkWidget *widget,
 
     MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
 
+    gint width = widget->allocation.width;
+    gint height = widget->allocation.height;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3f(1, 0, 0);
 
-    moto_world_draw(twin->priv->world);
+    moto_world_draw(twin->priv->world, width, height);
 
     gdk_gl_drawable_swap_buffers(gl_drawable);
 
@@ -209,18 +201,6 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 
     if( ! GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
     if( ! gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
-
-    gint width = widget->allocation.width;
-    gint height = widget->allocation.height;
-
-    glClearColor(0.2, 0.2, 0.2, 1);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60, width/(float)height, 0.3, 150.);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glViewport(0, 0, width, height);
-    gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
 
     gdk_gl_drawable_gl_end(gl_drawable);
 

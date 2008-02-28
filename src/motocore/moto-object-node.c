@@ -1,6 +1,8 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
+#include "moto-world.h"
+#include "moto-messager.h"
 #include "moto-object-node.h"
 #include "moto-material-node.h"
 #include "moto-float-param-data.h"
@@ -79,6 +81,7 @@ gboolean moto_object_node_get_show_view(MotoObjectNode *self);
 void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view);
 
 void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *material);
+void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera);
 
 /* class ObjectNode */
 
@@ -88,6 +91,7 @@ struct _MotoObjectNodePriv
 {
     MotoGeometryViewNode *view;
     MotoMaterialNode *material;
+    MotoCameraNode *camera;
 
     gfloat tx, ty, tz;
     gfloat rx, ry, rz;
@@ -635,13 +639,13 @@ static gpointer get_camera(MotoParam *param)
 
 static void set_camera(MotoParam *param, gpointer p)
 {
-    moto_object_node_set_camera((MotoObjectNode *)moto_param_get_node(param), (MotocameraNode *)p);
+    moto_object_node_set_camera((MotoObjectNode *)moto_param_get_node(param), (MotoCameraNode *)p);
 }
 
 static void point_camera(MotoParam *param, gpointer p)
 {
     MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
-    obj->priv->camera = (MotocameraNode *)p;
+    obj->priv->camera = (MotoCameraNode *)p;
 }
 
 MotoObjectNode *moto_object_node_new(const gchar *name)
@@ -920,9 +924,15 @@ static void moto_object_node_calc_inverse_transform(MotoObjectNode *self)
     self->priv->inverse_calculated = TRUE;
 }
 
-gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self)
+gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global)
 {
     moto_object_node_calc_inverse_transform(self);
+
+    if(global)
+    {
+        return self->priv->inverse_matrix;
+    }
+
     return self->priv->inverse_matrix;
 }
 
@@ -940,7 +950,7 @@ void moto_object_node_update_parent_inverse(MotoObjectNode *self)
     }
 
     matrix44_copy(self->priv->parent_inverse_matrix,
-                  moto_object_node_get_inverse_matrix(self->priv->parent));
+                  moto_object_node_get_inverse_matrix(self->priv->parent, FALSE));
 }
 
 MotoObjectNode *moto_object_node_get_parent(MotoObjectNode *self)
@@ -1267,6 +1277,36 @@ void moto_object_node_draw(MotoObjectNode *self)
     glPopMatrix();
 }
 
+void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height)
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    if(self->priv->camera)
+    {
+        moto_camera_node_apply(self->priv->camera, width, height);
+    }
+    else
+    {
+        MotoWorld *world = moto_node_get_world((MotoNode *)self);
+        if( ! world)
+        {
+            GString *msg = g_string_new("Object \"");
+            g_string_append(msg, moto_node_get_name((MotoNode *)self));
+            g_string_append(msg, "\" that is used as a camera has no associated world.");
+            moto_error(msg->str);
+            g_string_free(msg, TRUE);
+        }
+
+        moto_world_apply_default_camera(world, width, height);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    /*
+    glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE)); */
+}
+
 MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self)
 {
     return self->priv->view;
@@ -1300,6 +1340,11 @@ void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
 void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *material)
 {
     self->priv->material = material;
+}
+
+void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
+{
+    self->priv->camera = camera;
 }
 
 /* class ObjectNodeFactory */
