@@ -923,22 +923,22 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
     (r)[1] = (m)[13];\
     (r)[2] = (m)[14]
 
-/* Argument 'r' must be an array of 3 values and angle will be written into 'r[0]'
+/* Argument 'r' must be an array of 3 values and angle (in radians) will be written into 'r[0]'
  * Matrix 'm' must not contain scale. */
 #define rotate_x_from_matrix44(r, m, tmpvec)\
-    vector3_set((r), 1, 0, 0);\
+    vector3_set((r), 0.0, 1.0, 0.0);\
+    vector3_transform((tmpvec), (m), (r));\
+    (r)[0] = acos((tmpvec)[2])
+
+#define rotate_y_from_matrix44(r, m, tmpvec)\
+    vector3_set((r), 0.0, 0.0, 1.0);\
     vector3_transform((tmpvec), (m), (r));\
     (r)[0] = acos((tmpvec)[0])
 
-#define rotate_y_from_matrix44(r, m, tmpvec)\
-    vector3_set((r), 0, 1, 0);\
+#define rotate_z_from_matrix44(r, m, tmpvec)\
+    vector3_set((r), 1.0, 0.0, 1.0);\
     vector3_transform((tmpvec), (m), (r));\
     (r)[0] = acos((tmpvec)[1])
-
-#define rotate_z_from_matrix44(r, m, tmpvec)\
-    vector3_set((r), 0, 0, 1);\
-    vector3_transform((tmpvec), (m), (r));\
-    (r)[0] = acos((tmpvec)[2])
 
 #endif /* QEWERTY_XFORM_MACROS_H */
 
