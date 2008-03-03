@@ -117,12 +117,16 @@ static void moto_grid_view_node_draw(MotoGeometryViewNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 
+    // glPushAttrib();
+
+    // glUseProgramObjectARB(0);
+
     if( ! view->priv->prepared)
         moto_grid_view_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
 
-    /* draw */
+    // glPopAttrib();
 }
 
 static void moto_grid_view_node_prepare_for_draw(MotoGeometryViewNode *self)

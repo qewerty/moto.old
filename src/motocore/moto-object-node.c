@@ -83,6 +83,8 @@ void moto_object_node_set_show_view(MotoObjectNode *self, gboolean show_view);
 void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *material);
 void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera);
 
+static void moto_object_node_convert_camera_transform(MotoObjectNode *self);
+
 /* class ObjectNode */
 
 static GObjectClass *object_node_parent_class = NULL;
@@ -128,12 +130,18 @@ struct _MotoObjectNodePriv
     gboolean bound_calculated;
 
     gfloat matrix[16];
+    gfloat global_matrix[16];
     gfloat inverse_matrix[16];
     gfloat global_inverse_matrix[16];
     gfloat parent_inverse_matrix[16];
     gfloat translate_matrix[16];
     gfloat rotate_matrix[16];
     gfloat scale_matrix[16];
+
+    /* camera */
+    gfloat eye[3], up[3], ax[3], ay[3], az[3];
+    gfloat camera_transform[16],
+           global_camera_trasform[16];
 };
 
 static void
@@ -925,6 +933,27 @@ static void moto_object_node_calc_inverse_transform(MotoObjectNode *self)
     self->priv->inverse_calculated = TRUE;
 }
 
+static gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global)
+{
+    moto_object_node_calc_transform(self);
+
+    if(global)
+    {
+        if( ! self->priv->parent)
+            return self->priv->matrix;
+
+        gfloat *parent = \
+            moto_object_node_get_matrix(self->priv->parent, TRUE);
+
+        matrix44_mult(self->priv->global_matrix,
+                parent, self->priv->matrix);
+
+        return self->priv->global_matrix;
+    }
+
+    return self->priv->matrix;
+}
+
 gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global)
 {
     moto_object_node_calc_inverse_transform(self);
@@ -1168,12 +1197,6 @@ static void moto_object_node_calc_transform(MotoObjectNode *self)
     self->priv->inverse_calculated = FALSE;
 }
 
-static gfloat *moto_object_node_get_matrix(MotoObjectNode *self)
-{
-    moto_object_node_calc_transform(self);
-    return self->priv->matrix;
-}
-
 #define rotate(rotate_order) switch(rotate_order)\
 {\
  case MOTO_ROTATE_ORDER_XYZ:\
@@ -1258,7 +1281,7 @@ static void apply_transform(MotoObjectNode *self)
             apply_hardware_transform(self);
         break;
         case MOTO_TRANSFORM_STRATEGY_SOFTWARE:
-            glMultMatrixf(moto_object_node_get_matrix(self));
+            glMultMatrixf(moto_object_node_get_matrix(self, FALSE));
         break;
     }
 }
@@ -1286,6 +1309,41 @@ void moto_object_node_draw(MotoObjectNode *self)
 
     glPopMatrix();
 }
+
+void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3])
+{}
+
+void moto_object_node_slide(MotoObjectNode *self,
+        gfloat dx, gfloat dy, gfloat dz)
+{
+    gfloat ax[] = {1, 0, 0};
+    gfloat ay[] = {0, 1, 0};
+    gfloat az[] = {0, 0, 1};
+    gfloat tax[3], tay[3], taz[3];
+
+    gfloat *matrix = moto_object_node_get_matrix(self, FALSE);
+
+    vector3_transform(tax, matrix, ax);
+    vector3_transform(tay, matrix, ay);
+    vector3_transform(taz, matrix, az);
+
+    gfloat pos[3] = \
+        {self->priv->tx, self->priv->ty, self->priv->tz};
+    point3_move(pos, tax, dx);
+    point3_move(pos, tay, dy);
+    point3_move(pos, taz, dz);
+
+    moto_object_node_set_translate_array(self, pos);
+}
+
+void moto_object_node_roll(MotoObjectNode *self, gfloat dA)
+{}
+
+void moto_object_node_pitch(MotoObjectNode *self, gfloat dA)
+{}
+
+void moto_object_node_yaw(MotoObjectNode *self, gfloat dA)
+{}
 
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height)
 {
@@ -1355,6 +1413,25 @@ void moto_object_node_set_material(MotoObjectNode *self, MotoMaterialNode *mater
 void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
 {
     self->priv->camera = camera;
+}
+
+static void
+moto_object_node_convert_camera_transform(MotoObjectNode *self)
+{
+    gfloat translate[3];
+    gfloat tmpvec[3], rotate[3];
+    gfloat rx, ry, rz;
+
+    translate_from_matrix44(translate, self->priv->camera_transform);
+    rotate_x_from_matrix44(rotate, self->priv->camera_transform, tmpvec);
+    rx = rotate[0];
+    rotate_y_from_matrix44(rotate, self->priv->camera_transform, tmpvec);
+    ry = rotate[0];
+    rotate_z_from_matrix44(rotate, self->priv->camera_transform, tmpvec);
+    rz = rotate[0];
+
+    moto_object_node_set_translate_array(self, translate);
+    moto_object_node_set_rotate(self, rx, ry, rz);
 }
 
 /* class ObjectNodeFactory */

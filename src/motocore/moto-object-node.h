@@ -82,6 +82,12 @@ MotoObjectNode *moto_object_node_new(const gchar *name);
 const MotoBound *moto_object_node_get_bound(MotoObjectNode *self);
 void moto_object_node_draw(MotoObjectNode *self);
 
+void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3]);
+void moto_object_node_slide(MotoObjectNode *self,
+        gfloat dx, gfloat dy, gfloat dz);
+void moto_object_node_roll(MotoObjectNode *self, gfloat dA);
+void moto_object_node_pitch(MotoObjectNode *self, gfloat dA);
+void moto_object_node_yaw(MotoObjectNode *self, gfloat dA);
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
 
 /* class MotoNodeFactory */

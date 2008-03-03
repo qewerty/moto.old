@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "math.h"
 
 #include <gtk/gtkgl.h>
 #include <GL/gl.h>
@@ -8,8 +9,10 @@
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
+#include "motocore/moto-object-node.h"
 #include "motocore/moto-param-data.h"
 #include "motocore/moto-float-param-data.h"
+#include "common/numdef.h"
 
 /* forwards */
 
@@ -18,6 +21,13 @@ static gboolean draw(GtkWidget *widget, GdkEventExpose *event, gpointer data);
 
 static gboolean
 reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data);
+
+static gboolean
+press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gboolean
+release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gboolean
+mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data);
 
 /* class TestWindow */
 
@@ -105,17 +115,26 @@ moto_test_window_init(MotoTestWindow *self)
     /* camera */
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject");
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
-    moto_world_set_camera(self->priv->world, cam_obj);
+    moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
     MotoParam *param = moto_node_get_param(cam_obj, "main", "tx");
     MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "ty");
     MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "tz");
     MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "rx");
+    MotoFloatParamData *rx = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "ry");
+    MotoFloatParamData *ry = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "rz");
+    MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
 
     moto_float_param_data_set(tx, 1);
-    moto_float_param_data_set(ty, -2);
+    moto_float_param_data_set(ty, -9);
     moto_float_param_data_set(tz, 8);
+    moto_float_param_data_set(rx, RAD_PER_DEG*45);
+    moto_float_param_data_set(ry, RAD_PER_DEG*5);
+    moto_float_param_data_set(rz, RAD_PER_DEG*23);
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;
@@ -128,6 +147,10 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_widget_set_gl_capability(area, gl_config,
                 NULL, TRUE, GDK_GL_RGBA_TYPE);
 
+    gtk_widget_add_events(GTK_WIDGET(area), GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+            GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
+            GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
+
     gtk_container_add(GTK_CONTAINER(self), area);
     g_signal_connect(G_OBJECT(self), "delete-event",
                 G_CALLBACK(gtk_main_quit), NULL);
@@ -138,6 +161,14 @@ moto_test_window_init(MotoTestWindow *self)
                 G_CALLBACK(init_gl), NULL);
     g_signal_connect(G_OBJECT(area), "configure-event",
                 G_CALLBACK(reshape), NULL);
+
+    g_signal_connect(G_OBJECT(area), "motion-notify-event",
+            G_CALLBACK(mouse_motion), NULL);
+
+    g_signal_connect(G_OBJECT(area), "button-press-event",
+        G_CALLBACK(press_mouse_button), NULL);
+    g_signal_connect(G_OBJECT(area), "button-release-event",
+        G_CALLBACK(release_mouse_button), NULL);
 }
 
 static void
@@ -201,7 +232,7 @@ draw(GtkWidget *widget,
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glColor3f(1, 0, 0);
+    glColor3f(0.7, 0.7, 0.7);
 
     moto_world_draw(twin->priv->world, width, height);
 
@@ -222,4 +253,101 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
     gdk_gl_drawable_gl_end(gl_drawable);
 
     return FALSE;
+}
+
+static gboolean move = FALSE;
+static gboolean zoom = FALSE;
+static gdouble prev_x = 0;
+static gdouble prev_y = 0;
+
+static gboolean
+press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
+
+    prev_x = event->x;
+    prev_y = event->y;
+
+    switch(event->button)
+    {
+        case 2:
+            move = TRUE;
+        break;
+        case 3:
+            zoom = TRUE;
+        break;
+    }
+
+    draw(widget, (GdkEventExpose *)event, data);
+    return TRUE;
+}
+
+static gboolean
+release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
+
+    move = FALSE;
+    zoom = FALSE;
+
+    if(event->button == 2)
+    {
+
+    }
+
+    draw(widget, (GdkEventExpose *)event, data);
+    return TRUE;
+}
+
+static gboolean
+mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+{
+    GdkGLContext *gl_context = gtk_widget_get_gl_context(widget);
+    GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
+
+    gint width = widget->allocation.width;
+    gint height = widget->allocation.height;
+
+    // temp
+    if( (! prev_x) && (! prev_y))
+    {
+        prev_x = event->x;
+        prev_y = event->y;
+    }
+
+    if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return TRUE;
+
+    if (!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
+
+    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
+    MotoWorld *world = twin->priv->world;
+    MotoObjectNode *cam = moto_world_get_camera(world);
+
+    if(cam && move)
+    {
+        moto_object_node_slide(cam,
+                (prev_x - event->x) / width * 15,
+                (event->y - prev_y) / height * 15,
+                0);
+    }
+    else if(cam && zoom)
+    {
+        gfloat xx = prev_x - event->x;
+        gfloat yy = prev_y - event->y;
+        gfloat factor = xx;
+
+        if(fabs(yy) > fabs(xx))
+            factor = yy;
+
+        moto_object_node_slide(cam, 0, 0, factor*0.07);
+    }
+    else
+        return TRUE;
+
+    draw(widget, (GdkEventExpose *)event, data);
+
+    prev_x = event->x;
+    prev_y = event->y;
+
+    return TRUE;
 }

@@ -180,6 +180,11 @@ void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
     self->priv->root = root;
 }
 
+MotoObjectNode * moto_world_get_camera(MotoWorld *self)
+{
+    return self->priv->camera;
+}
+
 void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera)
 {
     self->priv->camera = camera;

@@ -940,6 +940,13 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
     vector3_transform((tmpvec), (m), (r));\
     (r)[0] = acos((tmpvec)[1])
 
+/* misc */
+
+#define point3_move(p, v, val)\
+    (p)[0] += (v)[0]*val;\
+    (p)[1] += (v)[1]*val;\
+    (p)[2] += (v)[2]*val
+
 #endif /* QEWERTY_XFORM_MACROS_H */
 
 
