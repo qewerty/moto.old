@@ -1,6 +1,6 @@
 /*
 *
-*  Macros for processing transformation matricies.
+*  Print some kind of arrays. Matricies, vectors, etc.
 *  Copyleft (C) 2006 Konstantin Evdokimenko a.k.a Qew[erty] (qewerty@gmail.com)
 *
 *  This program is free software; you can redistribute it and/or
@@ -936,7 +936,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
     (r)[0] = acos((tmpvec)[0])
 
 #define rotate_z_from_matrix44(r, m, tmpvec)\
-    vector3_set((r), 1.0, 0.0, 1.0);\
+    vector3_set((r), 1.0, 0.0, 0.0);\
     vector3_transform((tmpvec), (m), (r));\
     (r)[0] = acos((tmpvec)[1])
 
@@ -948,5 +948,4 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
     (p)[2] += (v)[2]*val
 
 #endif /* QEWERTY_XFORM_MACROS_H */
-
 

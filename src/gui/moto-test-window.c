@@ -257,6 +257,7 @@ reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
 
 static gboolean move = FALSE;
 static gboolean zoom = FALSE;
+static gboolean roll = FALSE;
 static gdouble prev_x = 0;
 static gdouble prev_y = 0;
 
@@ -265,11 +266,17 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
     if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
 
+    gint width = widget->allocation.width;
+    gint height = widget->allocation.height;
+
     prev_x = event->x;
     prev_y = event->y;
 
     switch(event->button)
     {
+        case 1:
+            roll = TRUE;
+        break;
         case 2:
             move = TRUE;
         break;
@@ -289,6 +296,7 @@ release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 
     move = FALSE;
     zoom = FALSE;
+    roll = FALSE;
 
     if(event->button == 2)
     {
@@ -339,7 +347,22 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
         if(fabs(yy) > fabs(xx))
             factor = yy;
 
-        moto_object_node_slide(cam, 0, 0, factor*0.07);
+        moto_object_node_zoom(cam, factor*0.025);
+    }
+    else if(cam && roll)
+    {
+        gfloat xx = prev_x - event->x;
+        gfloat yy = prev_y - event->y;
+        gfloat factor = xx;
+
+        if(fabs(yy) > fabs(xx))
+        {
+            factor  = yy;
+        }
+
+        gint sign = (factor>0)?1:-1;
+
+        moto_object_node_roll(cam, 1*sign);
     }
     else
         return TRUE;
