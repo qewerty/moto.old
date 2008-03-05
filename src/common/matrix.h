@@ -1,6 +1,6 @@
 /*
 *
-*  Print some kind of arrays. Matricies, vectors, etc.
+*  Macros for processing transformation matricies.
 *  Copyleft (C) 2006 Konstantin Evdokimenko a.k.a Qew[erty] (qewerty@gmail.com)
 *
 *  This program is free software; you can redistribute it and/or
@@ -63,29 +63,7 @@ to OpenGL (and math) ones not row/column order difference.
 
 Examples:
 
-// m*m2*m3*vec ???
-
-float vec[3], r[3], rr[3], m[16], m2[16], m3[16];
-...
-vector3_transform(r, m3, vec);
-vector3_transform(rr, m2, r);
-vector3_transform(r, m, rr);
-
-Or:
-
-float vec[3], point[3], normal[3],
-    v(r)[3], p(r)[3], n(r)[3],
-    m[16], m2[16], m3[16], tmp[16], tmp2[16],
-    transbuf[16], revbuf[16];
-...
-matrix44_mult(tmp2, m, m2);
-matrix44_mult(tmp, tmp2, m3);
-
-vector3_transform(vresult, tmp, vec);
-point3_transform(presult, tmp, point);
-normal3_transform(nresult, tmp, normal, transbuf, revbuf);
-// ... or you can manually inverse and transpose a matrix
-// and use vector3_transform macro for transforming normal. =)
+??? TODO
 
 */
 
@@ -948,7 +926,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[0] = atan2(-(m)[9] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2(-(m)[4] / (cosbuf), (m)[0] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[0] = 0;\
         (r)[2] = atan2((m)[1], (m)[5]);\
@@ -962,7 +940,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[0] = atan2((m)[6] / (cosbuf), (m)[5] / (cosbuf));\
         (r)[1] = atan2((m)[8] / (cosbuf), (m)[0] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[0] = 0;\
         (r)[1] = atan2(-(m)[2], (m)[10]);\
@@ -976,7 +954,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[1] = atan2((m)[8] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2((m)[1] / (cosbuf), (m)[5] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[1] = 0;\
         (r)[2] = atan2(-(m)[4], (m)[0]);\
@@ -990,7 +968,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[0] = atan2(-(m)[9] / (cosbuf), (m)[5] / (cosbuf));\
         (r)[1] = atan2(-(m)[2] / (cosbuf), (m)[0] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[0] = atan2((m)[6], (m)[10]);\
         (r)[1] = 0;\
@@ -1004,7 +982,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[1] = atan2(-(m)[2] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2(-(m)[4] / (cosbuf), (m)[5] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[1] = 0;\
         (r)[2] = atan2((m)[1], (m)[0]);\
@@ -1018,7 +996,7 @@ normal3_transform(nresult, tmp, normal, transbuf, revbuf);
         (r)[0] = atan2((m)[6] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2((m)[1] / (cosbuf), (m)[0] / (cosbuf));\
     }\
-    else /* gimbal lock*/ \
+    else /* gimbal lock */ \
     {\
         (r)[0] = 0;\
         (r)[2] = atan2(-(m)[2], (m)[10]);\
