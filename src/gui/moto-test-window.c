@@ -85,10 +85,23 @@ moto_test_window_init(MotoTestWindow *self)
     MotoParam *out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
-    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "View");
+    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView");
 
     in = moto_node_get_param(obj_node, "view", "view");
     out = moto_node_get_param(grid_view_node, "main", "view");
+    moto_param_set_source(in, out);
+
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    in = moto_node_get_param(obj_node, "main", "parent");
+    out = moto_node_get_param(root_node, "main", "transform");
+    moto_param_set_source(in, out);
+
+    moto_world_set_axes(self->priv->world, obj_node);
+
+    MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView");
+
+    in = moto_node_get_param(obj_node, "view", "view");
+    out = moto_node_get_param(axes_view_node, "main", "view");
     moto_param_set_source(in, out);
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
@@ -130,9 +143,9 @@ moto_test_window_init(MotoTestWindow *self)
     MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
 
     moto_float_param_data_set(tx, 1);
-    moto_float_param_data_set(ty, -9);
+    moto_float_param_data_set(ty, 9);
     moto_float_param_data_set(tz, 8);
-    moto_float_param_data_set(rx, RAD_PER_DEG*45);
+    moto_float_param_data_set(rx, RAD_PER_DEG*-45);
     moto_float_param_data_set(ry, RAD_PER_DEG*5);
     moto_float_param_data_set(rz, RAD_PER_DEG*23);
 

@@ -102,13 +102,13 @@ static void draw_grid()
     glBegin(GL_LINES);
     for(s = -10; s < 10; s += 0.1)
     {
-        glVertex3f(s, -10, 0);
-        glVertex3f(s, 10, 0);
+        glVertex3f(s, 0, -10);
+        glVertex3f(s, 0, 10);
     }
     for(s = -10; s < 10; s += 0.1)
     {
-        glVertex3f(-10, s, 0);
-        glVertex3f(10, s, 0);
+        glVertex3f(-10, 0, s);
+        glVertex3f(10, 0, s);
     }
     glEnd();
 }

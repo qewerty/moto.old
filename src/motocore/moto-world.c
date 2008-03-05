@@ -25,6 +25,7 @@ struct _MotoWorldPriv
 
     MotoObjectNode *root;
     MotoObjectNode *camera;
+    MotoObjectNode *global_axes;
     // MotoTimeNode *time;
 
     MotoLibrary *library;
@@ -190,6 +191,16 @@ void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera)
     self->priv->camera = camera;
 }
 
+MotoObjectNode * moto_world_get_axes(MotoWorld *self)
+{
+    return self->priv->global_axes;
+}
+
+void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
+{
+    self->priv->global_axes = axes;
+}
+
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
     if(self->priv->camera)
@@ -208,10 +219,20 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
     }
 
+    // Uncommet to make world coordinate system left
     // glScalef(1, 1, -1);
+
+    glColor4f(1, 1, 1, 1);
 
     if(self->priv->root)
         moto_object_node_draw(self->priv->root);
+
+    if(self->priv->global_axes)
+    {
+        glDisable(GL_DEPTH_TEST);
+        moto_object_node_draw(self->priv->global_axes);
+        glEnable(GL_DEPTH_TEST);
+    }
 }
 
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)

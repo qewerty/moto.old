@@ -25,6 +25,7 @@
 #include <glib-object.h>
 
 #include "moto-forward.h"
+#include "moto-axes-view-node.h"
 
 /* class MotoWorld */
 
@@ -74,6 +75,8 @@ MotoObjectNode *moto_world_get_root(MotoWorld *self);
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
 MotoObjectNode * moto_world_get_camera(MotoWorld *self);
 void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera);
+MotoObjectNode * moto_world_get_axes(MotoWorld *self);
+void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes);
 void moto_world_draw(MotoWorld *self, gint width, gint height);
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
 

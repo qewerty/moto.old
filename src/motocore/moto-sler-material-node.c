@@ -31,7 +31,7 @@ void main()\
     float spec = max(dot(reflectVec, viewVec), 0.0);\
     spec = pow(spec, 16.0);\
 \
-    lightIntensity = Kd*diffuse + Ks*spec;\
+    lightIntensity = gl_Color*Kd*diffuse + Ks*spec;\
 \
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
 }";

@@ -144,11 +144,6 @@ struct _MotoObjectNodePriv
     /* camera */
     gfloat up[3];
     gfloat target[3]; // in world coords
-    // gfloat ax[3], ay[3], az[3];
-    gfloat camera_transform[16],
-           global_camera_trasform[16];
-
-    gboolean use_camera; // TEMP
 };
 
 static void
@@ -174,7 +169,7 @@ moto_object_node_init(MotoObjectNode *self)
 
     self->priv->transform_strategy  = MOTO_TRANSFORM_STRATEGY_SOFTWARE;
     self->priv->transform_order     = MOTO_TRANSFORM_ORDER_TRS;
-    self->priv->rotate_order        = MOTO_ROTATE_ORDER_XYZ;
+    self->priv->rotate_order        = MOTO_ROTATE_ORDER_YXZ;
 
     self->priv->keep_transform  = TRUE;
     self->priv->visible         = TRUE;
@@ -187,7 +182,7 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->parent = NULL;
     self->priv->children = NULL;
 
-    /* optimizators */
+    /* optimizations */
 
     self->priv->inverse_calculated  = FALSE;
     self->priv->bound_calculated    = FALSE;
@@ -220,8 +215,6 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->target[0] = 0;
     self->priv->target[1] = 0;
     self->priv->target[2] = 0;
-
-    self->priv->use_camera = FALSE;
 }
 
 static void
@@ -1423,6 +1416,7 @@ void moto_object_node_roll(MotoObjectNode *self, gfloat da)
 
     /* local matrix */
     gfloat lm[16];
+    gfloat *lmp = lm;
     if(self->priv->parent)
     {
         gfloat *parent_inverse = moto_object_node_get_inverse_matrix(self->priv->parent, TRUE);
@@ -1430,39 +1424,35 @@ void moto_object_node_roll(MotoObjectNode *self, gfloat da)
     }
     else
     {
-        matrix44_copy(lm, gm);
+        // matrix44_copy(lm, gm);
+        lmp = gm;
     }
 
-    gfloat rx, ry, rz,
-           rotate[3], tmpvec[3];
+    gfloat euler[3], cosbuf;
 
-    /*
-    rotate_x_from_matrix44(rotate, lm, tmpvec);
-    rx = rotate[0];
-    rotate_y_from_matrix44(rotate, lm, tmpvec);
-    ry = rotate[0];
-    rotate_z_from_matrix44(rotate, lm, tmpvec);
-    rz = rotate[0];
-    */
-
-    matrix44_copy(self->priv->camera_transform, igm);
-
-    ry = asin(lm[8]);
-    gfloat cy = cos(ry);
-    if(fabs(cy) > 0.005)
+    switch(self->priv->rotate_order)
     {
-        rx = atan2(-lm[9] / cy, lm[10] / cy);
-        rz = atan2(-lm[4] / cy, lm[0] / cy);
-    }
-    else
-    {
-        rx = 0;
-        rz = atan2(lm[1], lm[5]);
+        case MOTO_ROTATE_ORDER_XYZ:
+            euler_xyz_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_XZY:
+            euler_xzy_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_YXZ:
+            euler_yxz_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_YZX:
+            euler_yzx_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_ZXY:
+            euler_zxy_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_ZYX:
+            euler_zyx_from_matrix44(euler, lmp, cosbuf);
+        break;
     }
 
-    // g_print("r = %f|%f|%f\n", rx*DEG_PER_RAD, ry*DEG_PER_RAD, rz*DEG_PER_RAD);
-
-    moto_object_node_set_rotate(self, rx, ry, rz);
+    moto_object_node_set_rotate_array(self, euler);
 }
 
 void moto_object_node_pitch(MotoObjectNode *self, gfloat da)
@@ -1486,7 +1476,7 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
         if( ! world)
         {
             GString *msg = g_string_new("Object \"");
-            g_string_append(msg, moto_node_get_name((MotoNode *)self));
+             g_string_append(msg, moto_node_get_name((MotoNode *)self));
             g_string_append(msg, "\" that is used as a camera has no associated world.");
             moto_error(msg->str);
             g_string_free(msg, TRUE);
@@ -1498,10 +1488,7 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glViewport(0, 0, width, height);
-    if(self->priv->use_camera)
-        glMultMatrixf(self->priv->camera_transform);
-    else
-        glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
+    glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
 }
 
 

@@ -13,6 +13,7 @@
 #include "moto-sler-material-node.h"
 #include "moto-mesh-view-node.h"
 #include "moto-grid-view-node.h"
+#include "moto-axes-view-node.h"
 // #include "moto-nurbs-view-node.h"
 #include "moto-cube-node.h"
 // #include "moto-sphere-node.h"
@@ -144,6 +145,10 @@ MotoSystem *moto_system_new()
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
 
     fac = moto_grid_view_node_factory_new();
+    moto_library_new_entry(lib, "node",
+            g_type_name(moto_node_factory_get_node_type(fac)), fac);
+
+    fac = moto_axes_view_node_factory_new();
     moto_library_new_entry(lib, "node",
             g_type_name(moto_node_factory_get_node_type(fac)), fac);
 
