@@ -169,7 +169,7 @@ moto_object_node_init(MotoObjectNode *self)
 
     self->priv->transform_strategy  = MOTO_TRANSFORM_STRATEGY_SOFTWARE;
     self->priv->transform_order     = MOTO_TRANSFORM_ORDER_TRS;
-    self->priv->rotate_order        = MOTO_ROTATE_ORDER_YXZ;
+    self->priv->rotate_order        = MOTO_ROTATE_ORDER_YZX;
 
     self->priv->keep_transform  = TRUE;
     self->priv->visible         = TRUE;
@@ -1056,6 +1056,21 @@ MotoRotateOrder moto_object_node_get_rotate_order(MotoObjectNode *self)
 
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order)
 {
+    gfloat to_target[3], eye[3];
+    gfloat loc_pos[] = {0, 0, 0};
+    gfloat *matrix = moto_object_node_get_matrix(self, TRUE);
+    point3_transform(eye, matrix, loc_pos);
+    vector3_dif(to_target, self->priv->target, eye);
+    gfloat dist = vector3_length(to_target);
+
+    gfloat az[] = {0, 0, 1};
+    gfloat n[3];
+    vector3_transform(n, matrix, az);
+    vector3_mult(to_target, n, -dist);
+
+    vector3_copy(self->priv->target, eye);
+    point3_move(self->priv->target, to_target, 1);
+
     self->priv->rotate_order =  order;
 }
 
@@ -1358,7 +1373,20 @@ void moto_object_node_zoom(MotoObjectNode *self, gfloat val)
     point3_transform(eye, matrix, loc_pos);
     vector3_dif(to_target, self->priv->target, eye);
 
-    point3_move(eye, to_target, val);
+    // g_print("1\n");
+    if(vector3_length(to_target) < MICRO)
+    {
+        if(val > 0)
+            return;
+
+        gfloat az[] = {0, 0, 1};
+        gfloat n[3];
+        vector3_transform(n, matrix, az);
+
+        point3_move(eye, n, 0.5);
+    }
+    else
+        point3_move(eye, to_target, val);
 
     if(self->priv->parent)
     {
@@ -1373,8 +1401,146 @@ void moto_object_node_zoom(MotoObjectNode *self, gfloat val)
     moto_object_node_set_translate_array(self, loc_pos);
 }
 
-void moto_object_node_thumble(MotoObjectNode *self, gfloat da)
-{}
+void moto_object_node_tumble(MotoObjectNode *self, gfloat dha, gfloat dva)
+{
+    gfloat ax[] = {1, 0, 0};
+    gfloat ay[] = {0, 1, 0};
+    gfloat az[] = {0, 0, 1};
+    gfloat u[3], v[3], n[3], t[3];
+    gfloat to_u[3], to_v[3], to_n[3],
+           pu[3], pv[3], pn[3];
+
+    gfloat to_eye[3], eye[3];
+    gfloat loc_pos[] = {0, 0, 0};
+    gfloat tumble_h_axis[3];
+    gfloat tumble_v_axis[] = {0, 1, 0};
+    gfloat target[3];
+    vector3_copy(target, self->priv->target);
+
+    // vector3_set(target, 0, 0, 0); // TEMP
+
+    gfloat *matrix = moto_object_node_get_matrix(self, TRUE);
+
+    vector3_transform(u, matrix, ax);
+    vector3_transform(v, matrix, ay);
+    vector3_transform(n, matrix, az);
+
+    g_print("_u.l: %f\n", vector3_length(u));
+    g_print("_v.l: %f\n", vector3_length(v));
+    g_print("_n.l: %f\n", vector3_length(n));
+
+    vector3_copy(tumble_h_axis, u);
+    // vector3_copy(tumble_v_axis, v);
+
+    point3_transform(eye, matrix, loc_pos);
+    vector3_sum(pu, eye, u);
+    vector3_sum(pv, eye, v);
+    vector3_sum(pn, eye, n);
+
+    vector3_dif(to_eye, eye, target);
+    vector3_dif(to_u, pu, target);
+    vector3_dif(to_v, pv, target);
+    vector3_dif(to_n, pn, target);
+
+    /*
+    gfloat hc = cos(RAD_PER_DEG*dha);
+    gfloat hs = sin(RAD_PER_DEG*dha);
+    gfloat vc = cos(RAD_PER_DEG*dva);
+    gfloat vs = sin(RAD_PER_DEG*dva);
+    */
+
+    gfloat hrm[16], vrm[16], rm[16];
+    matrix44_rotate_from_axis(hrm, dha, tumble_h_axis[0], tumble_h_axis[1], tumble_h_axis[2]);
+    matrix44_rotate_from_axis(vrm, dva, tumble_v_axis[0], tumble_v_axis[1], tumble_v_axis[2]);
+    matrix44_mult(rm, hrm, vrm);
+
+    /* eye rotation */
+    gfloat to_eye2[3];
+    vector3_transform(to_eye2, rm, to_eye);
+
+    /* u rotation */
+    gfloat to_u2[3];
+    vector3_transform(to_u2, rm, to_u);
+
+    /* v rotation */
+    gfloat to_v2[3];
+    vector3_transform(to_v2, rm, to_v);
+
+    /* n rotation */
+    gfloat to_n2[3];
+    vector3_transform(to_n2, rm, to_n);
+
+    /* new eye, u, v, n */
+    vector3_sum(eye, to_eye2, target);
+    vector3_sum(pu, to_u2, target);
+    vector3_dif(u, pu, eye);
+    vector3_sum(pv, to_v2, target);
+    vector3_dif(v, pv, eye);
+    vector3_sum(pn, to_n2, target);
+    vector3_dif(n, pn, eye);
+
+    /*
+    vector3_normalize(u, t[0]);
+    vector3_normalize(v, t[0]);
+    vector3_normalize(n, t[0]);
+    */
+
+    g_print("u.l: %f\n", vector3_length(u));
+    g_print("v.l: %f\n", vector3_length(v));
+    g_print("n.l: %f\n", vector3_length(n));
+
+    /* inverse global matrix */
+    gfloat igm[16];
+    matrix44_camera_inverse(igm, eye, u, v, n);
+
+    /* global matrix */
+    gfloat gm[16], ambuf[16], detbuf;
+    matrix44_inverse(gm, igm, ambuf, detbuf);
+    if(fabs(detbuf) < MICRO)
+    {
+        moto_error("(moto_object_node_tumble) determinant is zero");
+        return;
+    }
+
+    /* local matrix */
+    gfloat lm[16];
+    gfloat *lmp = gm;
+    if(self->priv->parent)
+    {
+        gfloat *parent_inverse = moto_object_node_get_inverse_matrix(self->priv->parent, TRUE);
+        matrix44_mult(lm, parent_inverse, gm);
+
+        lmp = lm;
+    }
+
+    gfloat translate[3];
+    translate_from_matrix44(translate, lmp);
+    moto_object_node_set_translate_array(self, translate);
+
+    gfloat euler[3], cosbuf;
+    switch(self->priv->rotate_order)
+    {
+        case MOTO_ROTATE_ORDER_XYZ:
+            euler_xyz_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_XZY:
+            euler_xzy_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_YXZ:
+            euler_yxz_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_YZX:
+            euler_yzx_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_ZXY:
+            euler_zxy_from_matrix44(euler, lmp, cosbuf);
+        break;
+        case MOTO_ROTATE_ORDER_ZYX:
+            euler_zyx_from_matrix44(euler, lmp, cosbuf);
+        break;
+    }
+    moto_object_node_set_rotate_array(self, euler);
+}
 
 void moto_object_node_roll(MotoObjectNode *self, gfloat da)
 {
@@ -1400,36 +1566,29 @@ void moto_object_node_roll(MotoObjectNode *self, gfloat da)
 
     /* inverse global matrix */
     gfloat igm[16];
-    igm[0] = u[0]; igm[4] = u[1]; igm[8]  = u[2]; igm[12] = -vector3_dot(eye, u);
-    igm[1] = v[0]; igm[5] = v[1]; igm[9]  = v[2]; igm[13] = -vector3_dot(eye, v);
-    igm[2] = n[0]; igm[6] = n[1]; igm[10] = n[2]; igm[14] = -vector3_dot(eye, n);
-    igm[3] = 0;    igm[7] = 0;    igm[11] = 0;    igm[15] = 1;
+    matrix44_camera_inverse(igm, eye, u, v, n);
 
     /* global matrix */
     gfloat gm[16], ambuf[16], detbuf;
     matrix44_inverse(gm, igm, ambuf, detbuf);
     if(fabs(detbuf) < MICRO)
     {
-        g_print("moto_object_node_roll: [Error] Determinant is zero\n");
+        moto_error("(moto_object_node_roll) determinant is zero");
         return;
     }
 
     /* local matrix */
     gfloat lm[16];
-    gfloat *lmp = lm;
+    gfloat *lmp = gm;
     if(self->priv->parent)
     {
         gfloat *parent_inverse = moto_object_node_get_inverse_matrix(self->priv->parent, TRUE);
         matrix44_mult(lm, parent_inverse, gm);
-    }
-    else
-    {
-        // matrix44_copy(lm, gm);
-        lmp = gm;
+
+        lmp = lm;
     }
 
     gfloat euler[3], cosbuf;
-
     switch(self->priv->rotate_order)
     {
         case MOTO_ROTATE_ORDER_XYZ:

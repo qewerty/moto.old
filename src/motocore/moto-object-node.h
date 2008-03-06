@@ -86,11 +86,13 @@ void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3
 void moto_object_node_slide(MotoObjectNode *self,
         gfloat dx, gfloat dy, gfloat dz);
 void moto_object_node_zoom(MotoObjectNode *self, gfloat val);
-void moto_object_node_thumble(MotoObjectNode *self, gfloat da);
+void moto_object_node_tumble(MotoObjectNode *self,
+        gfloat dha, gfloat dva);
 void moto_object_node_roll(MotoObjectNode *self, gfloat da);
 void moto_object_node_pitch(MotoObjectNode *self, gfloat da);
 void moto_object_node_yaw(MotoObjectNode *self, gfloat da);
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
+void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order);
 
 /* class MotoNodeFactory */
 

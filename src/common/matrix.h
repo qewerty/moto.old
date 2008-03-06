@@ -304,7 +304,7 @@ Examples:
 #define matrix44_rotate_from_axis(m, a, x, y, z)\
     (m)[0]  = (1-cos(a))*(x)*(x) + cos(a);\
     (m)[1]  = (1-cos(a))*(x)*(y) + sin(a)*(z);\
-    (m)[2]  = (1-cos(a))*(x)*(z) + sin(a)(*y);\
+    (m)[2]  = (1-cos(a))*(x)*(z) + sin(a)*(y);\
     (m)[3]  = 0;\
     (m)[4]  = (1-cos(a))*(x)*(y) - sin(a)*(z);\
     (m)[5]  = (1-cos(a))*(y)*(y) + cos(a);\
@@ -1008,6 +1008,12 @@ Examples:
     (p)[0] += (v)[0]*val;\
     (p)[1] += (v)[1]*val;\
     (p)[2] += (v)[2]*val
+
+#define matrix44_camera_inverse(m, eye, u, v, n)\
+    (m)[0] = (u)[0]; (m)[4] = (u)[1]; (m)[8]  = (u)[2]; (m)[12] = -vector3_dot(eye, u);\
+    (m)[1] = (v)[0]; (m)[5] = (v)[1]; (m)[9]  = (v)[2]; (m)[13] = -vector3_dot(eye, v);\
+    (m)[2] = (n)[0]; (m)[6] = (n)[1]; (m)[10] = (n)[2]; (m)[14] = -vector3_dot(eye, n);\
+    (m)[3] = 0;      (m)[7] = 0;      (m)[11] = 0;      (m)[15] = 1
 
 #endif /* QEWERTY_XFORM_MACROS_H */
 

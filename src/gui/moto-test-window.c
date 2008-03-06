@@ -142,12 +142,12 @@ moto_test_window_init(MotoTestWindow *self)
     param = moto_node_get_param(cam_obj, "main", "rz");
     MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
 
-    moto_float_param_data_set(tx, 1);
-    moto_float_param_data_set(ty, 9);
-    moto_float_param_data_set(tz, 8);
-    moto_float_param_data_set(rx, RAD_PER_DEG*-45);
+    moto_float_param_data_set(tx, 0);
+    moto_float_param_data_set(ty, 0);
+    moto_float_param_data_set(tz, 0);
+    /* moto_float_param_data_set(rx, RAD_PER_DEG*-45);
     moto_float_param_data_set(ry, RAD_PER_DEG*5);
-    moto_float_param_data_set(rz, RAD_PER_DEG*23);
+    moto_float_param_data_set(rz, RAD_PER_DEG*23); */
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;
@@ -273,11 +273,16 @@ static gboolean zoom = FALSE;
 static gboolean roll = FALSE;
 static gdouble prev_x = 0;
 static gdouble prev_y = 0;
+MotoRotateOrder ro = MOTO_ROTATE_ORDER_XYZ;
 
 static gboolean
 press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
     if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
+
+    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
+    MotoWorld *world = twin->priv->world;
+    MotoObjectNode *cam = moto_world_get_camera(world);
 
     gint width = widget->allocation.width;
     gint height = widget->allocation.height;
@@ -288,13 +293,26 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
     switch(event->button)
     {
         case 1:
-            roll = TRUE;
+            if(event->state & GDK_MOD1_MASK)
+                roll = TRUE;
+
+            if(event->state & GDK_CONTROL_MASK)
+            {
+                if(ro == MOTO_ROTATE_ORDER_XYZ)
+                    ro = MOTO_ROTATE_ORDER_YZX;
+                else
+                    ro = MOTO_ROTATE_ORDER_XYZ;
+                moto_object_node_set_rotate_order(cam, ro);
+                draw(widget, (GdkEventExpose *)event, data);
+            }
         break;
         case 2:
-            move = TRUE;
+            if(event->state & GDK_MOD1_MASK)
+                move = TRUE;
         break;
         case 3:
-            zoom = TRUE;
+            if(event->state & GDK_MOD1_MASK)
+                zoom = TRUE;
         break;
     }
 
@@ -361,6 +379,7 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
             factor = yy;
 
         moto_object_node_zoom(cam, factor*0.025);
+        // moto_object_node_slide(cam, 0, 0, factor*0.025);
     }
     else if(cam && roll)
     {
@@ -375,7 +394,8 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 
         gint sign = (factor>0)?1:-1;
 
-        moto_object_node_roll(cam, 1*sign);
+        // moto_object_node_roll(cam, 1*sign);
+        moto_object_node_tumble(cam, yy*0.1, xx*0.1);
     }
     else
         return TRUE;
