@@ -24,6 +24,8 @@
 
 #include <math.h>
 
+#include "numdef.h"
+
 /*
 
 Column order like in OpenGL, vectors are columns.
@@ -304,7 +306,7 @@ Examples:
 #define matrix44_rotate_from_axis(m, a, x, y, z)\
     (m)[0]  = (1-cos(a))*(x)*(x) + cos(a);\
     (m)[1]  = (1-cos(a))*(x)*(y) + sin(a)*(z);\
-    (m)[2]  = (1-cos(a))*(x)*(z) + sin(a)*(y);\
+    (m)[2]  = -((1-cos(a))*(x)*(z) + sin(a)*(y));\
     (m)[3]  = 0;\
     (m)[4]  = (1-cos(a))*(x)*(y) - sin(a)*(z);\
     (m)[5]  = (1-cos(a))*(y)*(y) + cos(a);\
@@ -921,7 +923,7 @@ Examples:
 #define euler_xyz_from_matrix44(r, m, cosbuf)\
     (r)[1] = asin((m)[8]);\
     (cosbuf) = cos((r)[1]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[0] = atan2(-(m)[9] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2(-(m)[4] / (cosbuf), (m)[0] / (cosbuf));\
@@ -935,7 +937,7 @@ Examples:
 #define euler_xzy_from_matrix44(r, m, cosbuf)\
     (r)[2] = asin(-(m)[4]);\
     (cosbuf) = cos((r)[2]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[0] = atan2((m)[6] / (cosbuf), (m)[5] / (cosbuf));\
         (r)[1] = atan2((m)[8] / (cosbuf), (m)[0] / (cosbuf));\
@@ -949,7 +951,7 @@ Examples:
 #define euler_yxz_from_matrix44(r, m, cosbuf)\
     (r)[0] = asin(-(m)[9]);\
     (cosbuf) = cos((r)[0]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[1] = atan2((m)[8] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2((m)[1] / (cosbuf), (m)[5] / (cosbuf));\
@@ -963,7 +965,7 @@ Examples:
 #define euler_yzx_from_matrix44(r, m, cosbuf)\
     (r)[2] = asin((m)[1]);\
     (cosbuf) = cos((r)[2]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[0] = atan2(-(m)[9] / (cosbuf), (m)[5] / (cosbuf));\
         (r)[1] = atan2(-(m)[2] / (cosbuf), (m)[0] / (cosbuf));\
@@ -977,7 +979,7 @@ Examples:
 #define euler_zxy_from_matrix44(r, m, cosbuf)\
     (r)[0] = asin((m)[6]);\
     (cosbuf) = cos((r)[0]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[1] = atan2(-(m)[2] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2(-(m)[4] / (cosbuf), (m)[5] / (cosbuf));\
@@ -991,7 +993,7 @@ Examples:
 #define euler_zyx_from_matrix44(r, m, cosbuf)\
     (r)[1] = asin(-(m)[2]);\
     (cosbuf) = cos((r)[1]);\
-    if(fabs(cosbuf) > 0.005)\
+    if(fabs(cosbuf) > MICRO)\
     {\
         (r)[0] = atan2((m)[6] / (cosbuf), (m)[10] / (cosbuf));\
         (r)[2] = atan2((m)[1] / (cosbuf), (m)[0] / (cosbuf));\

@@ -385,17 +385,24 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
     {
         gfloat xx = prev_x - event->x;
         gfloat yy = prev_y - event->y;
-        gfloat factor = xx;
 
-        if(fabs(yy) > fabs(xx))
+        if(event->state & GDK_SHIFT_MASK)
         {
-            factor  = yy;
+            gfloat factor = xx;
+
+            if(fabs(yy) > fabs(xx))
+            {
+                factor  = yy;
+            }
+            gint sign = (factor>0)?1:-1;
+            moto_object_node_roll(cam, 1*sign);
         }
-
-        gint sign = (factor>0)?1:-1;
-
-        // moto_object_node_roll(cam, 1*sign);
-        moto_object_node_tumble(cam, yy*0.1, xx*0.1);
+        else
+        {
+            // moto_object_node_tumble(cam, yy*0.2, xx*0.2);
+            moto_object_node_tumble_h(cam, yy*0.2);
+            moto_object_node_tumble_v(cam, xx*0.2);
+        }
     }
     else
         return TRUE;
