@@ -246,7 +246,7 @@ MotoSystem *moto_system_new()
             g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
 #endif
 
-    moto_library_foreach(lib, "node", print_node_factory, NULL);
+    // moto_library_foreach(lib, "node", print_node_factory, NULL);
 
     return self;
 }

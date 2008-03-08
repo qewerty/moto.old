@@ -156,6 +156,19 @@ MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
     return NULL;
 }
 
+void moto_mesh_foreach_vertex(MotoMesh *self,
+        MotoMeshForeachVertexFunc func)
+{
+    MotoMeshVertex *vert;
+
+    guint i;
+    for(i = 0; i < self->verts_num; i++)
+    {
+        vert = & self->verts[i];
+        func(self, vert);
+    }
+}
+
 void moto_mesh_face_alloc(MotoMeshFace *self)
 {
     self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);

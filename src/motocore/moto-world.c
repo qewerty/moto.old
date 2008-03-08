@@ -239,9 +239,8 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
 
     if(self->priv->global_axes)
     {
-        glDisable(GL_DEPTH_TEST);
+        glClear(GL_DEPTH_BUFFER_BIT);
         moto_object_node_draw(self->priv->global_axes);
-        glEnable(GL_DEPTH_TEST);
     }
 }
 

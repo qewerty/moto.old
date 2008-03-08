@@ -183,6 +183,8 @@ moto_test_window_init(MotoTestWindow *self)
 
     g_signal_connect(G_OBJECT(self), "delete-event",
                 G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(G_OBJECT(self), "destroy",
+                G_CALLBACK(gtk_main_quit), NULL);
 
     g_signal_connect(G_OBJECT(area), "expose-event",
                 G_CALLBACK(draw), NULL);

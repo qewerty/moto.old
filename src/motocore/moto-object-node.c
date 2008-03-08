@@ -936,7 +936,7 @@ static void moto_object_node_calc_inverse_transform(MotoObjectNode *self)
 
     gfloat ambuf[16], detbuf;
     matrix44_inverse(self->priv->inverse_matrix, self->priv->matrix, ambuf, detbuf);
-    if(!detbuf)
+    if( ! detbuf)
     {
         // Exception?
     }
@@ -1104,7 +1104,7 @@ static void moto_object_node_calc_translate(MotoObjectNode *self)
         return;
 
     matrix44_translate(self->priv->translate_matrix,
-            *(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
+            self->priv->tx, self->priv->ty, self->priv->tz);
 
     self->priv->translate_calculated = TRUE;
 }
@@ -1116,48 +1116,48 @@ static void moto_object_node_calc_rotate(MotoObjectNode *self)
 
     gfloat tmp[16], tmp2[16];
 
-    switch(*(self->priv->rotate_order_ptr))
+    switch(self->priv->rotate_order)
     {
      case MOTO_ROTATE_ORDER_XYZ:
-        matrix44_rotate_x(tmp, *(self->priv->rx_ptr));
-        matrix44_rotate_y(self->priv->rotate_matrix, *(self->priv->ry_ptr));
+        matrix44_rotate_x(tmp, self->priv->rx);
+        matrix44_rotate_y(self->priv->rotate_matrix, self->priv->ry);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_z(tmp, *(self->priv->rz_ptr));
+        matrix44_rotate_z(tmp, self->priv->rz);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_XZY:
-        matrix44_rotate_x(tmp, *(self->priv->rx_ptr));
-        matrix44_rotate_z(self->priv->rotate_matrix, *(self->priv->rz_ptr));
+        matrix44_rotate_x(tmp, self->priv->rx);
+        matrix44_rotate_z(self->priv->rotate_matrix, self->priv->rz);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_y(tmp, *(self->priv->ry_ptr));
+        matrix44_rotate_y(tmp, self->priv->ry);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_YXZ:
-        matrix44_rotate_y(tmp, *(self->priv->ry_ptr));
-        matrix44_rotate_x(self->priv->rotate_matrix, *(self->priv->rx_ptr));
+        matrix44_rotate_y(tmp, self->priv->ry);
+        matrix44_rotate_x(self->priv->rotate_matrix, self->priv->rx);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_z(tmp, *(self->priv->rz_ptr));
+        matrix44_rotate_z(tmp, self->priv->rz);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_YZX:
-        matrix44_rotate_y(tmp, *(self->priv->ry_ptr));
-        matrix44_rotate_z(self->priv->rotate_matrix, *(self->priv->rz_ptr));
+        matrix44_rotate_y(tmp, self->priv->ry);
+        matrix44_rotate_z(self->priv->rotate_matrix, self->priv->rz);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_x(tmp, *(self->priv->rx_ptr));
+        matrix44_rotate_x(tmp, self->priv->rx);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_ZXY:
-        matrix44_rotate_z(tmp, *(self->priv->rz_ptr));
-        matrix44_rotate_x(self->priv->rotate_matrix, *(self->priv->rx_ptr));
+        matrix44_rotate_z(tmp, self->priv->rz);
+        matrix44_rotate_x(self->priv->rotate_matrix, self->priv->rx);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_y(tmp, *(self->priv->ry_ptr));
+        matrix44_rotate_y(tmp, self->priv->ry);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_ZYX:
-        matrix44_rotate_z(tmp, *(self->priv->rz_ptr));
-        matrix44_rotate_y(self->priv->rotate_matrix, *(self->priv->ry_ptr));
+        matrix44_rotate_z(tmp, self->priv->rz);
+        matrix44_rotate_y(self->priv->rotate_matrix, self->priv->ry);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_x(tmp, *(self->priv->rx_ptr));
+        matrix44_rotate_x(tmp, self->priv->rx);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
     }
@@ -1170,9 +1170,9 @@ static void moto_object_node_calc_scale(MotoObjectNode *self)
     if(self->priv->scale_calculated)
         return;
 
-    gfloat sx = *(self->priv->sx_ptr);
-    gfloat sy = *(self->priv->sy_ptr);
-    gfloat sz = *(self->priv->sz_ptr);
+    gfloat sx = self->priv->sx;
+    gfloat sy = self->priv->sy;
+    gfloat sz = self->priv->sz;
 
     matrix44_scale(self->priv->scale_matrix, sx, sy, sz);
 
@@ -1191,7 +1191,7 @@ static void moto_object_node_calc_transform(MotoObjectNode *self)
     moto_object_node_calc_rotate(self);
 
     matrix44_identity(self->priv->matrix);
-    switch(*(self->priv->transform_order_ptr))
+    switch(self->priv->transform_order)
     {
         case MOTO_TRANSFORM_ORDER_TRS:
             matrix44_mult(tmp, self->priv->translate_matrix, self->priv->rotate_matrix);
@@ -1226,34 +1226,34 @@ static void moto_object_node_calc_transform(MotoObjectNode *self)
 #define rotate(rotate_order) switch(rotate_order)\
 {\
  case MOTO_ROTATE_ORDER_XYZ:\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
  break;\
  case MOTO_ROTATE_ORDER_XZY:\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
  break;\
  case MOTO_ROTATE_ORDER_YXZ:\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
  break;\
  case MOTO_ROTATE_ORDER_YZX:\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
  break;\
  case MOTO_ROTATE_ORDER_ZXY:\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
  break;\
  case MOTO_ROTATE_ORDER_ZYX:\
-    glRotatef(*(self->priv->rz_ptr)*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef(*(self->priv->ry_ptr)*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef(*(self->priv->rx_ptr)*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef(self->priv->rz*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef(self->priv->ry*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef(self->priv->rx*DEG_PER_RAD, 1, 0, 0);\
     break;\
 }
 
@@ -1264,37 +1264,37 @@ static void apply_hardware_transform(MotoObjectNode *self)
         glMultMatrixf(self->priv->parent_inverse_matrix);
     }
 
-    switch(*(self->priv->transform_order_ptr))
+    switch(self->priv->transform_order)
     {
      case MOTO_TRANSFORM_ORDER_SRT:
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
-        rotate(*(self->priv->rotate_order_ptr));
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
+        rotate(self->priv->rotate_order);
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
      break;
      case MOTO_TRANSFORM_ORDER_STR:
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
-        rotate(*(self->priv->rotate_order_ptr));
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
+        rotate(self->priv->rotate_order);
      break;
      case MOTO_TRANSFORM_ORDER_RST:
-        rotate(*(self->priv->rotate_order_ptr));
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
+        rotate(self->priv->rotate_order);
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
      break;
      case MOTO_TRANSFORM_ORDER_RTS:
-        rotate(*(self->priv->rotate_order_ptr));
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
+        rotate(self->priv->rotate_order);
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
      break;
      case MOTO_TRANSFORM_ORDER_TSR:
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
-        rotate(*(self->priv->rotate_order_ptr));
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
+        rotate(self->priv->rotate_order);
      break;
      case MOTO_TRANSFORM_ORDER_TRS:
-        glTranslatef(*(self->priv->tx_ptr), *(self->priv->ty_ptr), *(self->priv->tz_ptr));
-        rotate(*(self->priv->rotate_order_ptr));
-        glScalef(*(self->priv->sx_ptr), *(self->priv->sy_ptr), *(self->priv->sz_ptr));
+        glTranslatef(self->priv->tx, self->priv->ty, self->priv->tz);
+        rotate(self->priv->rotate_order);
+        glScalef(self->priv->sx, self->priv->sy, self->priv->sz);
      break;
     }
 }

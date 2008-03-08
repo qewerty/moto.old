@@ -35,6 +35,8 @@ typedef struct _MotoGeometryViewState MotoGeometryViewState;
 typedef struct _MotoGeometryViewStateClass MotoGeometryViewStateClass;
 typedef struct _MotoGeometryViewStatePriv MotoGeometryViewStatePriv;
 
+typedef void (*MotoGeometryViewStateDrawFunc)(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
+
 /* class MotoGeometryViewNode */
 
 struct _MotoGeometryViewNode
@@ -50,6 +52,8 @@ struct _MotoGeometryViewNodeClass
 
     MotoGeometryViewNodeDrawMethod draw;
     MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw;
+
+    GSList *states;
 
     /* signals */
     guint before_draw_signal_id;
@@ -71,8 +75,8 @@ void moto_geometry_view_node_draw(MotoGeometryViewNode *self);
 void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self);
 
 MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self);
-void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, MotoGeometryViewState *state);
-void moto_geometry_view_node_set_state_by_name(MotoGeometryViewNode *self, const gchar *state_name);
+void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name);
+GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
 
 /* class MotoGeometryViewState */
 
@@ -99,7 +103,11 @@ GType moto_geometry_view_state_get_type(void);
 
 MotoGeometryViewState *
 moto_geometry_view_state_new(const gchar *name, const gchar *title,
-        MotoGeometryViewNodeDrawMethod draw,
-        MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw);
+        MotoGeometryViewStateDrawFunc draw);
+
+const gchar *moto_geometry_view_state_get_name(MotoGeometryViewState *self);
+const gchar *moto_geometry_view_state_get_title(MotoGeometryViewState *self);
+
+void moto_geometry_view_state_draw(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
 
 #endif /* MOTO_GEOMETRY_VIEW_NODE_H */
