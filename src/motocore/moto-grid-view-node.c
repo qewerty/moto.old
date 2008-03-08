@@ -3,6 +3,7 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
+#include "numdef.h"
 #include "moto-grid-view-node.h"
 #include "moto-geometry-view-param-data.h"
 
@@ -95,17 +96,40 @@ MotoGridViewNode *moto_grid_view_node_new(const gchar *name)
 
 static void draw_grid()
 {
-    float s;
+    gfloat s;
 
-    glLineWidth(1);
+    glLineWidth(0.5);
+    glColor4f(0.6, 0.6, 0.6, 0.2);
 
     glBegin(GL_LINES);
     for(s = -10; s < 10; s += 0.1)
     {
+        if(fmod(fabs(s), 1) < 0.05 || (1 - fmod(fabs(s), 1)) < 0.05)
+            continue;
+
         glVertex3f(s, 0, -10);
         glVertex3f(s, 0, 10);
     }
     for(s = -10; s < 10; s += 0.1)
+    {
+        if(fmod(fabs(s), 1) < 0.05 || (1 - fmod(fabs(s), 1)) < 0.05)
+            continue;
+
+        glVertex3f(-10, 0, s);
+        glVertex3f(10, 0, s);
+    }
+    glEnd();
+
+    glLineWidth(2);
+    glColor4f(0.6, 0.6, 0.6, 0.4);
+
+    glBegin(GL_LINES);
+    for(s = -10; s < 10.5; s += 1)
+    {
+        glVertex3f(s, 0, -10);
+        glVertex3f(s, 0, 10);
+    }
+    for(s = -10; s < 10.5; s += 1)
     {
         glVertex3f(-10, 0, s);
         glVertex3f(10, 0, s);
@@ -117,16 +141,19 @@ static void moto_grid_view_node_draw(MotoGeometryViewNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 
-    // glPushAttrib();
+    glPushAttrib(GL_ENABLE_BIT);
 
-    // glUseProgramObjectARB(0);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
         moto_grid_view_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
 
-    // glPopAttrib();
+    glPopAttrib();
 }
 
 static void moto_grid_view_node_prepare_for_draw(MotoGeometryViewNode *self)

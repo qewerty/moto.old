@@ -1532,7 +1532,7 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
 
     gfloat to_eye[3], eye[3];
     gfloat loc_pos[] = {0, 0, 0};
-    gfloat tumble_axis[3];
+    gfloat tumble_axis[] = {0, 1, 0};
     gfloat target[3];
     vector3_copy(target, self->priv->target);
 
@@ -1541,8 +1541,6 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
     vector3_transform(u, matrix, ax);
     vector3_transform(v, matrix, ay);
     vector3_transform(n, matrix, az);
-
-    vector3_set(tumble_axis, 0, 1, 0);
 
     point3_transform(eye, matrix, loc_pos);
 

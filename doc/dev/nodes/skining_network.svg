@@ -24,6 +24,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_z="700 : 600 : 1"
        inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective3677" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
        id="perspective75" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
@@ -66,7 +73,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1"
      inkscape:cx="514.33705"
-     inkscape:cy="174.22952"
+     inkscape:cy="494.22952"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -375,7 +382,8 @@
          sodipodi:role="line"
          id="tspan3356"
          x="32.002567"
-         y="51.495518">Moto Skining Network</tspan></text>
+         y="51.495518"
+         style="font-weight:bold;-inkscape-font-specification:Bitstream Vera Sans Bold">Moto Skining Network</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 193.73567,362.40499 L 442.90015,354.17978"

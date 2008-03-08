@@ -132,7 +132,6 @@ static void draw_mesh(MotoMesh *mesh)
         MotoMeshFace *face = & mesh->faces[i];
 
         glNormal3fv(face->normal);
-        glColor3f(1, 0, 0);
 
         glBegin(GL_POLYGON);
 

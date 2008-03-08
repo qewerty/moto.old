@@ -203,6 +203,16 @@ void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+
+    glClearColor(0.2, 0.2, 0.2, 1);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+
     if(self->priv->camera)
     {
         moto_object_node_apply_camera_transform(self->priv->camera, width, height);

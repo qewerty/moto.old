@@ -19,6 +19,8 @@ struct _MotoAxesViewNodePriv
 {
     gboolean prepared;
     GLuint dlist;
+
+    GLUquadric *quadric;
 };
 
 static void
@@ -26,7 +28,8 @@ moto_axes_view_node_dispose(GObject *obj)
 {
     MotoAxesViewNode *self = (MotoAxesViewNode *)obj;
 
-    g_slice_free(MotoAxesViewNodePriv, self->priv);
+    glDeleteLists(self->priv->dlist, 1);
+    gluDeleteQuadric(self->priv->quadric);
 
     G_OBJECT_CLASS(axes_view_node_parent_class)->dispose(obj);
 }
@@ -34,6 +37,9 @@ moto_axes_view_node_dispose(GObject *obj)
 static void
 moto_axes_view_node_finalize(GObject *obj)
 {
+    MotoAxesViewNode *self = (MotoAxesViewNode *)obj;
+    g_slice_free(MotoAxesViewNodePriv, self->priv);
+
     axes_view_node_parent_class->finalize(obj);
 }
 
@@ -44,6 +50,8 @@ moto_axes_view_node_init(MotoAxesViewNode *self)
 
     self->priv->prepared = FALSE;
     self->priv->dlist = 0;
+
+    self->priv->quadric = NULL;
 }
 
 static void
@@ -93,43 +101,68 @@ MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
     return self;
 }
 
-static void draw_axes()
+static void draw_axes(MotoAxesViewNode *self)
 {
-    glLineWidth(2);
+    GLint slices = 8;
+    GLUquadric *q = self->priv->quadric;
+
+    glLineWidth(1);
 
     glColor4f(1, 0, 0, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(2, 0, 0);
+    glVertex3f(1, 0, 0);
     glEnd();
+
+    glPushMatrix();
+    glTranslatef(1, 0, 0);
+    glRotatef(90, 0, 1, 0);
+    gluCylinder(q, 0.02, 0, 0.06, slices, 1);
+    glPopMatrix();
 
     glColor4f(0, 1, 0, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(0, 2, 0);
+    glVertex3f(0, 1, 0);
     glEnd();
+
+    glPushMatrix();
+    glTranslatef(0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
+    gluCylinder(q, 0.02, 0, 0.06, slices, 1);
+    glPopMatrix();
 
     glColor4f(0, 0, 1, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, 2);
+    glVertex3f(0, 0, 1);
     glEnd();
+
+    glPushMatrix();
+    glTranslatef(0, 0, 1);
+    // glRotatef(90, 0, 1, 0);
+    gluCylinder(q, 0.02, 0, 0.06, slices, 1);
+    glPopMatrix();
+
 }
 
 static void moto_axes_view_node_draw(MotoGeometryViewNode *self)
 {
     MotoAxesViewNode *view = (MotoAxesViewNode *)self;
 
-    // glPushAttrib();
+    glPushAttrib(GL_ENABLE_BIT);
 
-    // glUseProgramObjectARB(0);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
         moto_axes_view_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
 
-    // glPopAttrib();
+    glPopAttrib();
 }
 
 static void moto_axes_view_node_prepare_for_draw(MotoGeometryViewNode *self)
@@ -139,9 +172,12 @@ static void moto_axes_view_node_prepare_for_draw(MotoGeometryViewNode *self)
     if( ! glIsList(view->priv->dlist))
         view->priv->dlist = glGenLists(1);
 
+    if( ! view->priv->quadric)
+        view->priv->quadric = gluNewQuadric();
+
     glNewList(view->priv->dlist, GL_COMPILE_AND_EXECUTE);
 
-    draw_axes();
+    draw_axes(view);
 
     glEndList();
 

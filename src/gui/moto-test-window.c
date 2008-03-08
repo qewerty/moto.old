@@ -6,6 +6,9 @@
 #include <GL/glu.h>
 
 #include "moto-test-window.h"
+#include "moto-main-menu.h"
+#include "moto-tool-box.h"
+
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
@@ -13,6 +16,8 @@
 #include "motocore/moto-param-data.h"
 #include "motocore/moto-float-param-data.h"
 #include "common/numdef.h"
+
+static MotoTestWindow *twin = NULL;
 
 /* forwards */
 
@@ -164,7 +169,18 @@ moto_test_window_init(MotoTestWindow *self)
             GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
-    gtk_container_add(GTK_CONTAINER(self), area);
+    GtkBox *hbox = gtk_hbox_new(FALSE, 1);
+
+    gtk_box_pack_start(hbox, moto_tool_box_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
+
+    GtkBox *vbox = gtk_vbox_new(FALSE, 1);
+
+    gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 0);
+
+    gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
+
     g_signal_connect(G_OBJECT(self), "delete-event",
                 G_CALLBACK(gtk_main_quit), NULL);
 
@@ -182,6 +198,9 @@ moto_test_window_init(MotoTestWindow *self)
         G_CALLBACK(press_mouse_button), NULL);
     g_signal_connect(G_OBJECT(area), "button-release-event",
         G_CALLBACK(release_mouse_button), NULL);
+
+    gtk_window_set_title((GtkWindow *)self, "Moto v0.0");
+    gtk_widget_set_size_request((GtkWidget *)self, 640, 480);
 }
 
 static void
@@ -205,6 +224,9 @@ GtkWindow *moto_test_window_new()
     // MotoTestWindow *twin = (MotoTestWindow *)self;
 
     // MotoWorld *w = twin->priv->world;
+    //
+
+    twin = (MotoTestWindow *)self;
 
     return self;
 }
@@ -216,12 +238,6 @@ static void init_gl(GtkWidget *widget, gpointer data)
 
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return;
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-
-    glClearColor(0.2, 0.2, 0.2, 1);
 
     gdk_gl_drawable_gl_end(gl_drawable);
 }
@@ -238,14 +254,10 @@ draw(GtkWidget *widget,
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
-
     gint width = widget->allocation.width;
     gint height = widget->allocation.height;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glColor3f(0.7, 0.7, 0.7);
 
     moto_world_draw(twin->priv->world, width, height);
 
@@ -280,7 +292,6 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
     if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
 
-    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
     MotoWorld *world = twin->priv->world;
     MotoObjectNode *cam = moto_world_get_camera(world);
 
@@ -358,7 +369,6 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 
     if (!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    MotoTestWindow *twin = (MotoTestWindow *)gtk_widget_get_parent(widget);
     MotoWorld *world = twin->priv->world;
     MotoObjectNode *cam = moto_world_get_camera(world);
 
