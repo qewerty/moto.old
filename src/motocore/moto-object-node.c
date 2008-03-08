@@ -1434,8 +1434,6 @@ void moto_object_node_tumble_h(MotoObjectNode *self, gfloat da)
 
     gfloat rm[16];
     matrix44_rotate_from_axis(rm, da, tumble_axis[0], tumble_axis[1], tumble_axis[2]);
-    // matrix44_identity(rm);
-    // matrix44_rotate_x(rm, dha);
 
     /* eye rotation */
     gfloat to_eye2[3];
@@ -1458,6 +1456,10 @@ void moto_object_node_tumble_h(MotoObjectNode *self, gfloat da)
     vector3_dif(u, to_u2, to_eye2);
     vector3_dif(v, to_v2, to_eye2);
     vector3_dif(n, to_n2, to_eye2);
+
+    vector3_normalize(u, t[0]);
+    vector3_normalize(v, t[0]);
+    vector3_normalize(n, t[0]);
 
     /* inverse global matrix */
     gfloat igm[16];
@@ -1534,8 +1536,6 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
     gfloat target[3];
     vector3_copy(target, self->priv->target);
 
-    // vector3_set(target, 0, 0, 0); // TEMP
-
     gfloat *matrix = moto_object_node_get_matrix(self, TRUE);
 
     vector3_transform(u, matrix, ax);
@@ -1551,18 +1551,8 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
     vector3_sum(to_v, to_eye, v);
     vector3_sum(to_n, to_eye, n);
 
-    gfloat rm[16], test[16];
+    gfloat rm[16];
     matrix44_rotate_from_axis(rm, da, tumble_axis[0], tumble_axis[1], tumble_axis[2]);
-    // matrix44_identity(rm);
-    matrix44_rotate_y(test, da);
-
-    g_print("test:\n");
-    print_matrix44(test);
-    g_print("rm:\n");
-    print_matrix44(rm);
-    g_print("\n");
-
-    g_assert(matrix44_equal_dif(test, rm, MICRO));
 
     /* eye rotation */
     gfloat to_eye2[3];
@@ -1586,6 +1576,10 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
     vector3_dif(v, to_v2, to_eye2);
     vector3_dif(n, to_n2, to_eye2);
 
+    vector3_normalize(u, t[0]);
+    vector3_normalize(v, t[0]);
+    vector3_normalize(n, t[0]);
+
     /* inverse global matrix */
     gfloat igm[16];
     matrix44_camera_inverse(igm, eye, u, v, n);
@@ -1598,11 +1592,6 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
         moto_error("(moto_object_node_tumble) determinant is zero");
         return;
     }
-
-    gfloat identity[16], mult[16];
-    matrix44_identity(identity);
-    matrix44_mult(mult, igm, gm);
-    // g_assert(matrix44_equal_dif(identity, mult, MICRO));
 
     /* local matrix */
     gfloat lm[16];
@@ -1642,188 +1631,6 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
         break;
     }
 
-    /*
-    g_print("euler: (%f %f %f)\n",
-            euler[0]*DEG_PER_RAD, euler[1]*DEG_PER_RAD, euler[2]*DEG_PER_RAD);
-    */
-    moto_object_node_set_rotate_array(self, euler);
-}
-
-void moto_object_node_tumble(MotoObjectNode *self, gfloat dha, gfloat dva)
-{
-    dha = dha*RAD_PER_DEG;
-    dva = dva*RAD_PER_DEG;
-
-    gfloat ax[] = {1, 0, 0};
-    gfloat ay[] = {0, 1, 0};
-    gfloat az[] = {0, 0, 1};
-    gfloat u[3], v[3], n[3], t[3];
-    gfloat to_u[3], to_v[3], to_n[3];
-
-    gfloat to_eye[3], eye[3];
-    gfloat loc_pos[] = {0, 0, 0};
-    gfloat tumble_h_axis[3];
-    gfloat tumble_v_axis[] = {0, 1, 0};
-    gfloat target[3];
-    vector3_copy(target, self->priv->target);
-
-    // vector3_set(target, 0, 0, 0); // TEMP
-
-    gfloat *matrix = moto_object_node_get_matrix(self, TRUE);
-
-    vector3_transform(u, matrix, ax);
-    vector3_transform(v, matrix, ay);
-    vector3_transform(n, matrix, az);
-
-    g_assert(fabs(vector3_dot(u, v)) < MICRO);
-    g_assert(fabs(vector3_dot(u, n)) < MICRO);
-    g_assert(fabs(vector3_dot(v, n)) < MICRO);
-
-    /*
-    g_print("_u.l: %f\n", vector3_length(u));
-    g_print("_v.l: %f\n", vector3_length(v));
-    g_print("_n.l: %f\n", vector3_length(n));
-    */
-
-    vector3_copy(tumble_h_axis, u);
-    // vector3_copy(tumble_v_axis, v);
-
-    /*
-    g_print("u: ");
-    print_vector3(u);
-    g_print("v: ");
-    print_vector3(v);
-    g_print("n: ");
-    print_vector3(n);
-    */
-
-    point3_transform(eye, matrix, loc_pos);
-
-    vector3_dif(to_eye, eye, target);
-    vector3_sum(to_u, to_eye, u);
-    vector3_sum(to_v, to_eye, v);
-    vector3_sum(to_n, to_eye, n);
-
-    /*
-    gfloat nn[3], ee[3];
-    vector3_copy(nn, to_n);
-    vector3_normalize(nn, t[0]);
-    vector3_copy(ee, to_eye);
-    vector3_normalize(ee, t[0]);
-    g_print("nn:");
-    print_vector3(nn);
-    g_print("ee:");
-    print_vector3(ee);
-    */
-
-    /*
-    gfloat hc = cos(RAD_PER_DEG*dha);
-    gfloat hs = sin(RAD_PER_DEG*dha);
-    gfloat vc = cos(RAD_PER_DEG*dva);
-    gfloat vs = sin(RAD_PER_DEG*dva);
-    */
-
-    gfloat hrm[16], vrm[16], rm[16];
-    matrix44_rotate_from_axis(hrm, dha, tumble_h_axis[0], tumble_h_axis[1], tumble_h_axis[2]);
-    matrix44_rotate_from_axis(vrm, dva, tumble_v_axis[0], tumble_v_axis[1], tumble_v_axis[2]);
-    matrix44_identity(hrm);
-    matrix44_identity(vrm);
-    matrix44_rotate_x(hrm, dha);
-    matrix44_rotate_y(vrm, dva);
-    matrix44_mult(rm, hrm, vrm);
-
-    /* eye rotation */
-    gfloat to_eye2[3];
-    vector3_transform(to_eye2, rm, to_eye);
-
-    /* u rotation */
-    gfloat to_u2[3];
-    vector3_transform(to_u2, rm, to_u);
-
-    /* v rotation */
-    gfloat to_v2[3];
-    vector3_transform(to_v2, rm, to_v);
-
-    /* n rotation */
-    gfloat to_n2[3];
-    vector3_transform(to_n2, rm, to_n);
-
-    /* new eye, u, v, n */
-    vector3_sum(eye, to_eye2, target);
-    vector3_dif(u, to_u2, to_eye2);
-    vector3_dif(v, to_v2, to_eye2);
-    vector3_dif(n, to_n2, to_eye2);
-
-    g_assert(fabs(vector3_dot(u, v)) < MICRO);
-    g_assert(fabs(vector3_dot(u, n)) < MICRO);
-    g_assert(fabs(vector3_dot(v, n)) < MICRO);
-
-    /*
-    g_print("u.l: %f\n", vector3_length(u));
-    g_print("v.l: %f\n", vector3_length(v));
-    g_print("n.l: %f\n", vector3_length(n));
-    */
-
-    /* inverse global matrix */
-    gfloat igm[16];
-    matrix44_camera_inverse(igm, eye, u, v, n);
-
-    /* global matrix */
-    gfloat gm[16], ambuf[16], detbuf;
-    matrix44_inverse(gm, igm, ambuf, detbuf);
-    if(fabs(detbuf) < MICRO)
-    {
-        moto_error("(moto_object_node_tumble) determinant is zero");
-        return;
-    }
-
-    gfloat identity[16], mult[16];
-    matrix44_identity(identity);
-    matrix44_mult(mult, igm, gm);
-    // g_assert(matrix44_equal_dif(identity, mult, MICRO));
-
-    /* local matrix */
-    gfloat lm[16];
-    gfloat *lmp = gm;
-    if(self->priv->parent)
-    {
-        gfloat *parent_inverse = moto_object_node_get_inverse_matrix(self->priv->parent, TRUE);
-        matrix44_mult(lm, parent_inverse, gm);
-
-        lmp = lm;
-    }
-
-    gfloat translate[3];
-    translate_from_matrix44(translate, lmp);
-    moto_object_node_set_translate_array(self, translate);
-
-    gfloat euler[3], cosbuf;
-    switch(self->priv->rotate_order)
-    {
-        case MOTO_ROTATE_ORDER_XYZ:
-            euler_xyz_from_matrix44(euler, lmp, cosbuf);
-        break;
-        case MOTO_ROTATE_ORDER_XZY:
-            euler_xzy_from_matrix44(euler, lmp, cosbuf);
-        break;
-        case MOTO_ROTATE_ORDER_YXZ:
-            euler_yxz_from_matrix44(euler, lmp, cosbuf);
-        break;
-        case MOTO_ROTATE_ORDER_YZX:
-            euler_yzx_from_matrix44(euler, lmp, cosbuf);
-        break;
-        case MOTO_ROTATE_ORDER_ZXY:
-            euler_zxy_from_matrix44(euler, lmp, cosbuf);
-        break;
-        case MOTO_ROTATE_ORDER_ZYX:
-            euler_zyx_from_matrix44(euler, lmp, cosbuf);
-        break;
-    }
-
-    /*
-    g_print("euler: (%f %f %f)\n",
-            euler[0]*DEG_PER_RAD, euler[1]*DEG_PER_RAD, euler[2]*DEG_PER_RAD);
-    */
     moto_object_node_set_rotate_array(self, euler);
 }
 

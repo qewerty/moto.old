@@ -306,7 +306,7 @@ Examples:
 #define matrix44_rotate_from_axis(m, a, x, y, z)\
     (m)[0]  = (1-cos(a))*(x)*(x) + cos(a);\
     (m)[1]  = (1-cos(a))*(x)*(y) + sin(a)*(z);\
-    (m)[2]  = -((1-cos(a))*(x)*(z) + sin(a)*(y));\
+    (m)[2]  = -((1-cos(a))*(x)*(z) + sin(a)*(y)); /* Why minus? 0_o */ \
     (m)[3]  = 0;\
     (m)[4]  = (1-cos(a))*(x)*(y) - sin(a)*(z);\
     (m)[5]  = (1-cos(a))*(y)*(y) + cos(a);\

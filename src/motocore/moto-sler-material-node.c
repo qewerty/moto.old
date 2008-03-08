@@ -236,6 +236,11 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
 {
     MotoSlerMaterialNode *slernode = (MotoSlerMaterialNode *)self;
 
+    glColor4f(1, 1, 1, 1);
+
+    if(1) /* TEMP */
+        return;
+
     if( ! slernode->priv->shader_made)
         slernode->priv->shader_made = make_shader(slernode);
 

@@ -399,7 +399,6 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
         }
         else
         {
-            // moto_object_node_tumble(cam, yy*0.2, xx*0.2);
             moto_object_node_tumble_h(cam, yy*0.2);
             moto_object_node_tumble_v(cam, xx*0.2);
         }

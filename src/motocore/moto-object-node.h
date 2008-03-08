@@ -88,8 +88,6 @@ void moto_object_node_slide(MotoObjectNode *self,
 void moto_object_node_zoom(MotoObjectNode *self, gfloat val);
 void moto_object_node_tumble_h(MotoObjectNode *self, gfloat da);
 void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da);
-void moto_object_node_tumble(MotoObjectNode *self,
-        gfloat dha, gfloat dva);
 void moto_object_node_roll(MotoObjectNode *self, gfloat da);
 void moto_object_node_pitch(MotoObjectNode *self, gfloat da);
 void moto_object_node_yaw(MotoObjectNode *self, gfloat da);
