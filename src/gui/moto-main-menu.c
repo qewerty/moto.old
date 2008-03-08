@@ -65,12 +65,12 @@ moto_main_menu_init(MotoMainMenu *self)
 
     self->priv = g_slice_new(MotoMainMenuPriv);
 
+    /* Root menu items. */
     GtkWidget *project = gtk_menu_item_new_with_label("Project");
     GtkWidget *world = gtk_menu_item_new_with_label("World");
     GtkWidget *node = gtk_menu_item_new_with_label("Node");
     GtkWidget *render = gtk_menu_item_new_with_label("Render");
     GtkWidget *help = gtk_menu_item_new_with_label("Help");
-
     gtk_menu_bar_append(menu_bar, project);
     gtk_menu_bar_append(menu_bar, world);
     gtk_menu_bar_append(menu_bar, node);
