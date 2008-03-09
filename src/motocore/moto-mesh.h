@@ -97,6 +97,11 @@ struct MotoMeshSelection
     guint *faces;
 };
 
+MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num);
+MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
+
+// void moto_mesh_selection_select_vertex
+
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *self);
 

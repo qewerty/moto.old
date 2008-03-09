@@ -105,9 +105,41 @@ GtkWidget *moto_tool_box_new(MotoSystem *system)
     GtkWidget *self = (GtkWidget *)g_object_new(MOTO_TYPE_TOOL_BOX, NULL);
     MotoToolBox *tb = (MotoToolBox *)self;
 
-    tb->priv->system = system;
+    if(system)
+    {
+        g_object_add_weak_pointer(G_OBJECT(system), & tb->priv->system);
+        tb->priv->system = system;
+    }
 
     return self;
+}
+
+void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
+{
+    if( ! system && self->priv->system)
+    {
+        g_object_remove_weak_pointer(G_OBJECT(system), & self->priv->system);
+        self->priv->system = NULL;
+
+        return;
+    }
+
+    if( ! MOTO_IS_SYSTEM(system))
+    {
+        GString *msg = g_string_new("You are trying to set not MotoSystem instance as system for ToolBox");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    if(self->priv->system)
+    {
+        g_object_remove_weak_pointer(G_OBJECT(system), & self->priv->system);
+    }
+
+    g_object_add_weak_pointer(G_OBJECT(system), & self->priv->system);
+    self->priv->system = system;
 }
 
 /* signal callbacks */

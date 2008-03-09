@@ -54,5 +54,6 @@ GType moto_tool_box_get_type(void);
 #define MOTO_TOOL_BOX_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TOOL_BOX, MotoToolBoxClass))
 
 GtkWidget *moto_tool_box_new(MotoSystem *system);
+void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system);
 
 #endif /* MOTO_TOOL_BOX_H */
