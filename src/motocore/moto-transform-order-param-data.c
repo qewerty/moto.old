@@ -7,7 +7,7 @@ static GObjectClass *transform_order_param_data_parent_class = NULL;
 static void
 moto_transform_order_param_data_dispose(GObject *obj)
 {
-    G_OBJECT_CLASS(transform_order_param_data_parent_class)->dispose(obj);
+    transform_order_param_data_parent_class->dispose(obj);
 }
 
 static void
@@ -25,10 +25,12 @@ moto_transform_order_param_data_init(MotoTransformOrderParamData *self)
 static void
 moto_transform_order_param_data_class_init(MotoTransformOrderParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     transform_order_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    transform_order_param_data_parent_class->dispose = moto_transform_order_param_data_dispose;
-    transform_order_param_data_parent_class->finalize = moto_transform_order_param_data_finalize;
+    goclass->dispose = moto_transform_order_param_data_dispose;
+    goclass->finalize = moto_transform_order_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoTransformOrderParamData, moto_transform_order_param_data, MOTO_TYPE_PARAM_DATA);

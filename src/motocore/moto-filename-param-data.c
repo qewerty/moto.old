@@ -24,10 +24,12 @@ moto_filename_param_data_init(MotoFilenameParamData *self)
 static void
 moto_filename_param_data_class_init(MotoFilenameParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     filename_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    filename_param_data_parent_class->dispose = moto_filename_param_data_dispose;
-    filename_param_data_parent_class->finalize = moto_filename_param_data_finalize;
+    goclass->dispose = moto_filename_param_data_dispose;
+    goclass->finalize = moto_filename_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoFilenameParamData, moto_filename_param_data, MOTO_TYPE_STRING_PARAM_DATA);

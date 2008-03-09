@@ -25,10 +25,12 @@ moto_rotate_order_param_data_init(MotoRotateOrderParamData *self)
 static void
 moto_rotate_order_param_data_class_init(MotoRotateOrderParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     rotate_order_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    rotate_order_param_data_parent_class->dispose = moto_rotate_order_param_data_dispose;
-    rotate_order_param_data_parent_class->finalize = moto_rotate_order_param_data_finalize;
+    goclass->dispose = moto_rotate_order_param_data_dispose;
+    goclass->finalize = moto_rotate_order_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoRotateOrderParamData, moto_rotate_order_param_data, MOTO_TYPE_PARAM_DATA);

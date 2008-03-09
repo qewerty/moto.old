@@ -25,10 +25,12 @@ moto_camera_param_data_init(MotoCameraParamData *self)
 static void
 moto_camera_param_data_class_init(MotoCameraParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     camera_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    camera_param_data_parent_class->dispose = moto_camera_param_data_dispose;
-    camera_param_data_parent_class->finalize = moto_camera_param_data_finalize;
+    goclass->dispose = moto_camera_param_data_dispose;
+    goclass->finalize = moto_camera_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoCameraParamData, moto_camera_param_data, MOTO_TYPE_PARAM_DATA);

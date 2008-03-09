@@ -9,6 +9,8 @@ static GObjectClass *geometry_view_node_parent_class = NULL;
 
 struct _MotoGeometryViewNodePriv
 {
+    gboolean disposed;
+
     gboolean prepared;
     MotoGeometryViewState *state;
 };
@@ -18,7 +20,9 @@ moto_geometry_view_node_dispose(GObject *obj)
 {
     MotoGeometryViewNode *self = (MotoGeometryViewNode *)obj;
 
-    g_slice_free(MotoGeometryViewNodePriv, self->priv);
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
 
     geometry_view_node_parent_class->dispose(obj);
 }
@@ -26,6 +30,10 @@ moto_geometry_view_node_dispose(GObject *obj)
 static void
 moto_geometry_view_node_finalize(GObject *obj)
 {
+    MotoGeometryViewNode *self = (MotoGeometryViewNode *)obj;
+
+    g_slice_free(MotoGeometryViewNodePriv, self->priv);
+
     geometry_view_node_parent_class->finalize(obj);
 }
 
@@ -33,6 +41,7 @@ static void
 moto_geometry_view_node_init(MotoGeometryViewNode *self)
 {
     self->priv = g_slice_new(MotoGeometryViewNodePriv);
+    self->priv->disposed = FALSE;
 
     self->priv->prepared = FALSE;
     self->priv->state = NULL;
@@ -43,7 +52,7 @@ moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
-    geometry_view_node_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
+    geometry_view_node_parent_class = g_type_class_peek_parent(klass);
 
     goclass->dispose    = moto_geometry_view_node_dispose;
     goclass->finalize   = moto_geometry_view_node_finalize;

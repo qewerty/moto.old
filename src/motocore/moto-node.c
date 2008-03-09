@@ -19,6 +19,8 @@ static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self);
 
 struct _MotoNodePriv
 {
+    gboolean disposed;
+
     GString *name;
     GSList *param_blocks;
     MotoWorld *world;
@@ -34,11 +36,15 @@ struct _MotoNodePriv
 
 struct _MotoNodeFactoryPriv
 {
+    gboolean disposed;
+
     GType node_type;
 };
 
 struct _MotoParamPriv
 {
+    gboolean disposed;
+
     GValue value;
     MotoParamMode mode;
     MotoParamData *data;
@@ -59,6 +65,8 @@ struct _MotoParamPriv
 
 struct _MotoParamBlockPriv
 {
+    gboolean disposed;
+
     GString *name;
     GString *title;
     gboolean hidden;
@@ -77,10 +85,13 @@ moto_node_dispose(GObject *obj)
 {
     MotoNode *self = (MotoNode *)obj;
 
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
+
     g_string_free(self->priv->name, TRUE);
     g_slist_foreach(self->priv->param_blocks, unref_gobject, NULL);
     g_slist_free(self->priv->param_blocks);
-    g_slice_free(MotoNodePriv, self->priv);
 
     node_parent_class->dispose(obj);
 }
@@ -88,13 +99,18 @@ moto_node_dispose(GObject *obj)
 static void
 moto_node_finalize(GObject *obj)
 {
+    MotoNode *self = (MotoNode *)obj;
+
+    g_slice_free(MotoNodePriv, self->priv);
+
     node_parent_class->finalize(obj);
 }
 
 static void
 moto_node_init(MotoNode *self)
 {
-    self->priv = (MotoNodePriv *)g_slice_new(MotoNodePriv);
+    self->priv = g_slice_new(MotoNodePriv);
+    self->priv->disposed = FALSE;
 
     self->priv->name = g_string_new("");
     self->priv->param_blocks = NULL;
@@ -379,10 +395,13 @@ moto_param_dispose(GObject *obj)
 {
     MotoParam *self = (MotoParam *)obj;
 
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
+
     g_object_unref(self->priv->data);
     g_string_free(self->priv->name, TRUE);
     g_string_free(self->priv->title, TRUE);
-    g_slice_free(MotoParamPriv, self->priv);
 
     param_parent_class->dispose(obj);
 }
@@ -390,6 +409,10 @@ moto_param_dispose(GObject *obj)
 static void
 moto_param_finalize(GObject *obj)
 {
+    MotoParam *self = (MotoParam *)obj;
+
+    g_slice_free(MotoParamPriv, self->priv);
+
     G_OBJECT_CLASS(param_parent_class)->finalize(obj);
 }
 
@@ -397,6 +420,7 @@ static void
 moto_param_init(MotoParam *self)
 {
     self->priv = (MotoParamPriv *)g_slice_new(MotoParamPriv);
+    self->priv->disposed = FALSE;
 
     self->priv->data = NULL;
 
@@ -486,6 +510,22 @@ MotoParam *moto_param_get_source(MotoParam *self)
     return self->priv->source;
 }
 
+static void
+disconnect_on_source_deleted(gpointer data, GObject *where_the_object_was)
+{
+    MotoParam *param = (MotoParam *)data;
+
+    param->priv->source = NULL;
+}
+
+static void
+exclude_from_dests_on_dest_deleted(gpointer data, GObject *where_the_object_was)
+{
+    MotoParam *param = (MotoParam *)data;
+
+    param->priv->dests = g_slist_remove(param->priv->dests, where_the_object_was);
+}
+
 void moto_param_set_source(MotoParam *self, MotoParam *src)
 {
     if( ! src)
@@ -521,6 +561,9 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
     if(src == self->priv->source)
         return;
 
+    g_object_weak_ref(G_OBJECT(src), disconnect_on_source_deleted, self);
+    g_object_weak_ref(G_OBJECT(self), exclude_from_dests_on_dest_deleted, src);
+
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
 
@@ -531,7 +574,12 @@ void moto_param_clear_source(MotoParam *self)
 {
 
     if(self->priv->source)
-        self->priv->dests = g_slist_remove(self->priv->dests, self);
+    {
+        g_object_weak_unref(G_OBJECT(self->priv->source), disconnect_on_source_deleted, self);
+        g_object_weak_unref(G_OBJECT(self), exclude_from_dests_on_dest_deleted, self->priv->source);
+
+        self->priv->source->priv->dests = g_slist_remove(self->priv->source->priv->dests, self);
+    }
     self->priv->source = NULL;
 }
 
@@ -606,12 +654,16 @@ moto_param_block_dispose(GObject *obj)
 {
     MotoParamBlock *self = (MotoParamBlock *)obj;
 
-    G_OBJECT_CLASS(param_block_parent_class)->dispose(obj);
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
 
     g_string_free(self->priv->name, TRUE);
     g_slist_foreach(self->priv->params, unref_gobject, NULL);
     g_slist_free(self->priv->params);
     g_slice_free(MotoParamBlockPriv, self->priv);
+
+    param_block_parent_class->dispose(obj);
 }
 
 static void
@@ -624,6 +676,7 @@ static void
 moto_param_block_init(MotoParamBlock *self)
 {
     self->priv = (MotoParamBlockPriv *)g_slice_new(MotoParamBlockPriv);
+    self->priv->disposed = FALSE;
 
     self->priv->name = g_string_new("");
     self->priv->title = g_string_new("");

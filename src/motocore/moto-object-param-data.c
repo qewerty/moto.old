@@ -25,10 +25,12 @@ moto_object_param_data_init(MotoObjectParamData *self)
 static void
 moto_object_param_data_class_init(MotoObjectParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     object_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    object_param_data_parent_class->dispose = moto_object_param_data_dispose;
-    object_param_data_parent_class->finalize = moto_object_param_data_finalize;
+    goclass->dispose = moto_object_param_data_dispose;
+    goclass->finalize = moto_object_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoObjectParamData, moto_object_param_data, MOTO_TYPE_PARAM_DATA);

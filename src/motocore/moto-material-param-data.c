@@ -25,10 +25,12 @@ moto_material_param_data_init(MotoMaterialParamData *self)
 static void
 moto_material_param_data_class_init(MotoMaterialParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     material_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    material_param_data_parent_class->dispose = moto_material_param_data_dispose;
-    material_param_data_parent_class->finalize = moto_material_param_data_finalize;
+    goclass->dispose = moto_material_param_data_dispose;
+    goclass->finalize = moto_material_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoMaterialParamData, moto_material_param_data, MOTO_TYPE_PARAM_DATA);

@@ -25,10 +25,12 @@ moto_mesh_param_data_init(MotoMeshParamData *self)
 static void
 moto_mesh_param_data_class_init(MotoMeshParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     mesh_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    mesh_param_data_parent_class->dispose = moto_mesh_param_data_dispose;
-    mesh_param_data_parent_class->finalize = moto_mesh_param_data_finalize;
+    goclass->dispose = moto_mesh_param_data_dispose;
+    goclass->finalize = moto_mesh_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoMeshParamData, moto_mesh_param_data, MOTO_TYPE_PARAM_DATA);

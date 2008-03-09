@@ -38,10 +38,12 @@ moto_geometry_node_init(MotoGeometryNode *self)
 static void
 moto_geometry_node_class_init(MotoGeometryNodeClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     geometry_node_parent_class = (GObjectClass *)(g_type_class_peek_parent(klass));
 
-    geometry_node_parent_class->dispose = moto_geometry_node_dispose;
-    geometry_node_parent_class->finalize = moto_geometry_node_finalize;
+    goclass->dispose = moto_geometry_node_dispose;
+    goclass->finalize = moto_geometry_node_finalize;
 
     klass->get_bound = NULL;
 }

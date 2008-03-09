@@ -7,7 +7,7 @@ static GObjectClass *geometry_view_param_data_parent_class = NULL;
 static void
 moto_geometry_view_param_data_dispose(GObject *obj)
 {
-    G_OBJECT_CLASS(geometry_view_param_data_parent_class)->dispose(obj);
+    geometry_view_param_data_parent_class->dispose(obj);
 }
 
 static void
@@ -25,10 +25,12 @@ moto_geometry_view_param_data_init(MotoGeometryViewParamData *self)
 static void
 moto_geometry_view_param_data_class_init(MotoGeometryViewParamDataClass *klass)
 {
+    GObjectClass *goclass = (GObjectClass *)klass;
+
     geometry_view_param_data_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    geometry_view_param_data_parent_class->dispose = moto_geometry_view_param_data_dispose;
-    geometry_view_param_data_parent_class->finalize = moto_geometry_view_param_data_finalize;
+    goclass->dispose = moto_geometry_view_param_data_dispose;
+    goclass->finalize = moto_geometry_view_param_data_finalize;
 }
 
 G_DEFINE_TYPE(MotoGeometryViewParamData, moto_geometry_view_param_data, MOTO_TYPE_PARAM_DATA);

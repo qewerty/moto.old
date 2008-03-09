@@ -203,6 +203,9 @@ moto_test_window_init(MotoTestWindow *self)
     g_signal_connect(G_OBJECT(area), "button-release-event",
         G_CALLBACK(release_mouse_button), NULL);
 
+
+    // g_object_unref(G_OBJECT(grid_view_node));
+
     gtk_window_set_title((GtkWindow *)self, "Moto v0.0");
     gtk_widget_set_size_request((GtkWidget *)self, 640, 480);
 }

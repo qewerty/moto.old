@@ -45,7 +45,7 @@ moto_camera_node_init(MotoCameraNode *self)
 static void
 moto_camera_node_class_init(MotoCameraNodeClass *klass)
 {
-    GObjectClass *goclass = G_OBJECT_CLASS(klass);
+    GObjectClass *goclass = (GObjectClass *)klass;
 
     camera_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 

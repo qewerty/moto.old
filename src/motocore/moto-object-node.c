@@ -607,9 +607,19 @@ static void set_view(MotoParam *param, gpointer p)
     moto_object_node_set_view((MotoObjectNode *)moto_param_get_node(param), (MotoGeometryViewNode *)p);
 }
 
+static void null_pointer_on_view_deleted(gpointer data, GObject *where_the_object_was)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)data;
+
+    obj->priv->view = NULL;
+}
+
 static void point_view(MotoParam *param, gpointer p)
 {
     MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
+
+    g_object_weak_ref(G_OBJECT(p), null_pointer_on_view_deleted, obj);
+
     obj->priv->view = (MotoGeometryViewNode *)p;
 }
 

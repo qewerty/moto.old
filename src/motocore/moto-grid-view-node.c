@@ -18,6 +18,8 @@ static GObjectClass *grid_view_node_parent_class = NULL;
 
 struct _MotoGridViewNodePriv
 {
+    gboolean disposed;
+
     gboolean prepared;
     GLuint dlist;
 };
@@ -27,14 +29,20 @@ moto_grid_view_node_dispose(GObject *obj)
 {
     MotoGridViewNode *self = (MotoGridViewNode *)obj;
 
-    g_slice_free(MotoGridViewNodePriv, self->priv);
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
 
-    G_OBJECT_CLASS(grid_view_node_parent_class)->dispose(obj);
+    grid_view_node_parent_class->dispose(obj);
 }
 
 static void
 moto_grid_view_node_finalize(GObject *obj)
 {
+    MotoGridViewNode *self = (MotoGridViewNode *)obj;
+
+    g_slice_free(MotoGridViewNodePriv, self->priv);
+
     grid_view_node_parent_class->finalize(obj);
 }
 
@@ -42,6 +50,7 @@ static void
 moto_grid_view_node_init(MotoGridViewNode *self)
 {
     self->priv = g_slice_new(MotoGridViewNodePriv);
+    self->priv->disposed = FALSE;
 
     self->priv->prepared = FALSE;
     self->priv->dlist = 0;
