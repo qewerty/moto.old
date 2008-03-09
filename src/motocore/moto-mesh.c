@@ -279,3 +279,264 @@ void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
         func(face, vert);
     }
 }
+
+/* MeshSelectionMask */
+
+MotoMeshSelectionMask *moto_mesh_selection_mask_new(guint verts_num, guint edges_num, guint faces_num)
+{
+    guint i;
+
+    MotoMeshSelectionMask *self = (MotoMeshSelectionMask *)g_try_malloc(sizeof(MotoMeshSelectionMask));
+
+    self->verts_num = verts_num;
+    self->verts = (gboolean *)g_try_malloc(sizeof(gboolean) * verts_num);
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = FALSE;
+
+    self->edges_num = edges_num;
+    self->edges = (gboolean *)g_try_malloc(sizeof(gboolean) * edges_num);
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = FALSE;
+
+    gint bytes = edges_num/8 + 1;
+    self->tmp_edges = (gchar *)g_try_malloc(bytes);
+    for(i = 0; i < bytes; i++)
+        self->tmp_edges[i] = 0;
+
+    self->faces_num = faces_num;
+    self->faces = (gboolean *)g_try_malloc(sizeof(gboolean) * faces_num);
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = FALSE;
+
+    return self;
+}
+
+MotoMeshSelectionMask *moto_mesh_selection_mask_copy(MotoMeshSelectionMask *other)
+{
+    guint verts_num = other->verts_num;
+    guint edges_num = other->edges_num;
+    guint faces_num = other->faces_num;
+
+    guint i;
+
+    MotoMeshSelectionMask *self = (MotoMeshSelectionMask *)g_try_malloc(sizeof(MotoMeshSelectionMask));
+
+    self->verts_num = verts_num;
+    self->verts = (gboolean *)g_try_malloc(sizeof(gboolean) * verts_num);
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = other->verts[i];
+
+    self->edges_num = edges_num;
+    self->edges = (gboolean *)g_try_malloc(sizeof(gboolean) * edges_num);
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = other->edges[i];
+
+    self->faces_num = faces_num;
+    self->faces = (gboolean *)g_try_malloc(sizeof(gboolean) * faces_num);
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = other->faces[i];
+
+    return self;
+}
+
+MotoMeshSelectionMask *moto_mesh_selection_mask_for_mesh(MotoMesh *mesh)
+{
+    return moto_mesh_selection_mask_new(mesh->verts_num, mesh->edges_num, mesh->faces_num);
+}
+
+MotoMeshSelectionMask *moto_mesh_selection_mask_from_selection(MotoMeshSelection *selection, MotoMesh *mesh)
+{
+    guint verts_num = mesh->verts_num;
+    guint edges_num = mesh->edges_num;
+    guint faces_num = mesh->faces_num;
+
+    guint i;
+
+    MotoMeshSelectionMask *self = (MotoMeshSelectionMask *)g_try_malloc(sizeof(MotoMeshSelectionMask));
+
+    self->verts_num = verts_num;
+    self->verts = (gboolean *)g_try_malloc(sizeof(gboolean) * verts_num);
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = FALSE;
+    for(i = 0; i < selection->verts_num; i++)
+        self->verts[selection->verts[i]] = TRUE;
+
+    self->edges_num = edges_num;
+    self->edges = (gboolean *)g_try_malloc(sizeof(gboolean) * edges_num);
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = FALSE;
+    for(i = 0; i < selection->edges_num; i++)
+        self->edges[selection->edges[i]] = TRUE;
+
+    self->faces_num = faces_num;
+    self->faces = (gboolean *)g_try_malloc(sizeof(gboolean) * faces_num);
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = FALSE;
+    for(i = 0; i < selection->faces_num; i++)
+        self->faces[selection->faces[i]] = TRUE;
+
+    return self;
+}
+
+gboolean moto_mesh_selection_mask_is_valid(MotoMeshSelectionMask *self, MotoMesh *mesh)
+{
+    if(self->verts_num != mesh->verts_num || self->edges_num != mesh->edges_num || self->faces_num != mesh->faces_num)
+        return FALSE;
+
+    return TRUE;
+}
+
+void moto_mesh_selection_mask_free(MotoMeshSelectionMask *self)
+{
+    g_free(self->verts);
+    g_free(self->edges);
+    g_free(self->faces);
+    g_free(self);
+}
+
+void moto_mesh_selection_mask_select_edge(MotoMeshSelectionMask *self, guint index)
+{
+    if(index > (self->edges_num - 1))
+        return;
+
+    gchar *edges = self->tmp_edges + (index/8);
+
+    *edges |= 1 << (index % 8);
+}
+
+gboolean moto_mesh_selection_mask_is_edge_selected(MotoMeshSelectionMask *self, guint index)
+{
+    if(index > (self->edges_num - 1))
+        return FALSE;
+
+    gchar *edges = self->tmp_edges + (index/8);
+
+    return *edges & (1 << (index % 8));
+}
+
+/* MeshSelection */
+
+MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num)
+{
+    guint i;
+
+    MotoMeshSelection *self = (MotoMeshSelection *)g_try_malloc(sizeof(MotoMeshSelection));
+
+    self->verts_num = verts_num;
+    self->verts = (guint *)g_try_malloc(sizeof(guint) * verts_num);
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = 0;
+
+    self->edges_num = edges_num;
+    self->edges = (guint *)g_try_malloc(sizeof(guint) * edges_num);
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = 0;
+
+    self->faces_num = faces_num;
+    self->faces = (guint *)g_try_malloc(sizeof(guint) * faces_num);
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = 0;
+
+    return self;
+}
+
+MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other)
+{
+    guint verts_num = other->verts_num;
+    guint edges_num = other->edges_num;
+    guint faces_num = other->faces_num;
+
+    guint i;
+
+    MotoMeshSelection *self = (MotoMeshSelection *)g_try_malloc(sizeof(MotoMeshSelection));
+
+    self->verts_num = verts_num;
+    self->verts = (guint *)g_try_malloc(sizeof(guint) * verts_num);
+    for(i = 0; i < self->verts_num; i++)
+        self->verts[i] = other->verts[i];
+
+    self->edges_num = edges_num;
+    self->edges = (guint *)g_try_malloc(sizeof(guint) * edges_num);
+    for(i = 0; i < self->edges_num; i++)
+        self->edges[i] = other->edges[i];
+
+    self->faces_num = faces_num;
+    self->faces = (guint *)g_try_malloc(sizeof(guint) * faces_num);
+    for(i = 0; i < self->faces_num; i++)
+        self->faces[i] = other->faces[i];
+
+    return self;
+}
+
+MotoMeshSelection *moto_mesh_selection_from_mask(MotoMeshSelectionMask *mask)
+{
+    guint i, j;
+    guint verts_num = 0;
+    guint edges_num = 0;
+    guint faces_num = 0;
+
+    for(i = 0; i < mask->verts_num; i++)
+        if(mask->verts[i])
+            verts_num++;
+
+    for(i = 0; i < mask->edges_num; i++)
+        if(mask->edges[i])
+            edges_num++;
+
+    for(i = 0; i < mask->faces_num; i++)
+        if(mask->faces[i])
+            faces_num++;
+
+    MotoMeshSelection *self = (MotoMeshSelection *)g_try_malloc(sizeof(MotoMeshSelection));
+
+    self->verts_num = verts_num;
+    self->verts = (guint *)g_try_malloc(sizeof(guint) * verts_num);
+    self->edges_num = edges_num;
+    self->edges = (guint *)g_try_malloc(sizeof(guint) * edges_num);
+    self->faces_num = faces_num;
+    self->faces = (guint *)g_try_malloc(sizeof(guint) * faces_num);
+
+    j = 0;
+    for(i = 0; i < mask->verts_num; i++)
+        if(mask->verts[i])
+            self->verts[j++] = i;
+
+    j = 0;
+    for(i = 0; i < mask->edges_num; i++)
+        if(mask->edges[i])
+            self->edges[j++] = i;
+
+    j = 0;
+    for(i = 0; i < mask->faces_num; i++)
+        if(mask->faces[i])
+            self->faces[j++] = i;
+
+    return self;
+}
+
+gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh)
+{
+    guint i;
+
+    for(i = 0; i < self->verts_num; i++)
+        if(self->verts[i] > (mesh->verts_num - 1))
+            return FALSE;
+
+    for(i = 0; i < self->edges_num; i++)
+        if(self->edges[i] > (mesh->edges_num - 1))
+            return FALSE;
+
+    for(i = 0; i < self->faces_num; i++)
+        if(self->faces[i] > (mesh->faces_num - 1))
+            return FALSE;
+
+    return TRUE;
+}
+
+void moto_mesh_selection_free(MotoMeshSelection *self)
+{
+    g_free(self->verts);
+    g_free(self->edges);
+    g_free(self->faces);
+    g_free(self);
+}

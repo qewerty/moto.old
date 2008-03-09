@@ -33,9 +33,10 @@ typedef struct _MotoMeshEdge MotoMeshEdge;
 typedef struct _MotoMeshFace MotoMeshFace;
 typedef struct _MotoMeshSubFace MotoMeshSubFace;
 
-typedef struct _MotoMeshSelection MotoMeshSelection;
-
 typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
+
+typedef struct _MotoMeshSelection MotoMeshSelection;
+typedef struct _MotoMeshSelectionMask MotoMeshSelectionMask;
 
 typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVertex *vert);
 typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
@@ -87,7 +88,28 @@ struct _MotoMeshVertexAttr
     gfloat *data;
 };
 
-struct MotoMeshSelection
+struct _MotoMeshSelectionMask
+{
+    /* TODO: gboolean is temporary solution */
+    guint verts_num;
+    gboolean *verts;
+    guint edges_num;
+    gboolean *edges;
+    gchar *tmp_edges;
+    guint faces_num;
+    gboolean *faces;
+};
+
+MotoMeshSelectionMask *moto_mesh_selection_mask_new(guint verts_num, guint edges_num, guint faces_num);
+MotoMeshSelectionMask *moto_mesh_selection_mask_copy(MotoMeshSelectionMask *other);
+MotoMeshSelectionMask *moto_mesh_selection_mask_for_mesh(MotoMesh *mesh);
+MotoMeshSelectionMask *moto_mesh_selection_mask_from_selection(MotoMeshSelection *selection, MotoMesh *mesh);
+void moto_mesh_selection_mask_free(MotoMeshSelectionMask *self);
+
+void moto_mesh_selection_mask_select_edge(MotoMeshSelectionMask *self, guint index);
+gboolean moto_mesh_selection_mask_is_edge_selected(MotoMeshSelectionMask *self, guint index);
+
+struct _MotoMeshSelection
 {
     guint verts_num;
     guint *verts;
@@ -99,11 +121,10 @@ struct MotoMeshSelection
 
 MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
-
-// void moto_mesh_selection_select_vertex
+MotoMeshSelection *moto_mesh_selection_from_mask(MotoMeshSelectionMask *mask);
+void moto_mesh_selection_free(MotoMeshSelection *self);
 
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
-MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *self);
 
 struct _MotoMesh
 {

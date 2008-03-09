@@ -25,6 +25,7 @@ struct _MotoMeshViewNodePriv
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
     MotoMeshSelection *selection;
+    MotoMeshSelectionMask *selection_mask;
 
     GLuint dlist;
 };
@@ -100,6 +101,16 @@ static void point_mesh(MotoParam *param, gpointer p)
     MotoMeshViewNode *obj = (MotoMeshViewNode *)moto_param_get_node(param);
 
     obj->priv->mesh_ptr = (MotoMesh **)p;
+
+    obj->priv->selection_mask = moto_mesh_selection_mask_for_mesh(*(obj->priv->mesh_ptr));
+
+    /* TEMP */
+
+    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 0);
+    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 1);
+    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 2);
+    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 3);
+    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 4);
 }
 
 static gpointer get_view(MotoParam *param)
@@ -119,7 +130,7 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     MotoParamBlock *pb;
     MotoParamData *pdata;
 
-    moto_geometry_view_node_set_state(gvn, "verts");
+    moto_geometry_view_node_set_state(gvn, "object");
 
     /* params */
 
@@ -204,7 +215,7 @@ static void draw_edge(MotoMesh *mesh, MotoMeshEdge *edge)
     glVertex3fv(mesh->verts[edge->b].xyz);
 }
 
-static void draw_mesh_as_edges(MotoMesh *mesh)
+static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelectionMask *mask)
 {
     glColor4f(1, 1, 1, 0.25);
     int i;
@@ -230,7 +241,21 @@ static void draw_mesh_as_edges(MotoMesh *mesh)
     glColor4f(1, 0, 0, 1);
     glPointSize(4);
     glBegin(GL_LINES);
-    moto_mesh_foreach_edge(mesh, draw_edge);
+
+    MotoMeshEdge *edge;
+    for(i = 0; i < mesh->edges_num; i++)
+    {
+        edge = & mesh->edges[i];
+
+        if(moto_mesh_selection_mask_is_edge_selected(mask, i))
+            glColor4f(0, 1, 0, 1);
+        else
+            glColor4f(1, 0, 0, 1);
+
+        glVertex3fv(mesh->verts[edge->a].xyz);
+        glVertex3fv(mesh->verts[edge->b].xyz);
+    }
+    // moto_mesh_foreach_edge(mesh, draw_edge);
     glEnd();
 
     glPopAttrib();
@@ -320,13 +345,13 @@ static void moto_mesh_view_node_draw_as_verts(MotoGeometryViewState *self, MotoG
 
 static void moto_mesh_view_node_draw_as_edges(MotoGeometryViewState *self, MotoGeometryViewNode *geom)
 {
-    MotoMeshViewNode *view = (MotoMeshViewNode *)geom;
-    MotoMesh *mesh = *(view->priv->mesh_ptr);
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = *(mv->priv->mesh_ptr);
 
     if(! mesh)
         return;
 
-    draw_mesh_as_edges(mesh);
+    draw_mesh_as_edges(mesh, mv->priv->selection_mask);
 }
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeometryViewState *self, MotoGeometryViewNode *geom)
