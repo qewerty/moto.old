@@ -199,12 +199,18 @@ static void draw_mesh_as_verts(MotoMesh *mesh)
     glPopAttrib();
 }
 
+static void draw_edge(MotoMesh *mesh, MotoMeshEdge *edge)
+{
+    glVertex3fv(mesh->verts[edge->a].xyz);
+    glVertex3fv(mesh->verts[edge->b].xyz);
+}
+
 static void draw_mesh_as_edges(MotoMesh *mesh)
 {
+    glColor4f(1, 1, 1, 0.25);
     int i;
     for(i = 0; i < mesh->faces_num; i++)
     {
-        /* TODO: Temporary solution! =) */
 
         MotoMeshFace *face = & mesh->faces[i];
 
@@ -216,14 +222,26 @@ static void draw_mesh_as_edges(MotoMesh *mesh)
 
         glEnd();
     }
+
+    glPushAttrib(GL_ENABLE_BIT);
+
+    glDisable(GL_LIGHTING);
+
+    glColor4f(1, 0, 0, 1);
+    glPointSize(4);
+    glBegin(GL_LINES);
+    moto_mesh_foreach_edge(mesh, draw_edge);
+    glEnd();
+
+    glPopAttrib();
 }
 
 static void draw_mesh_as_faces(MotoMesh *mesh)
 {
+    glColor4f(1, 1, 1, 0.25);
     int i;
     for(i = 0; i < mesh->faces_num; i++)
     {
-        /* TODO: Temporary solution! =) */
 
         MotoMeshFace *face = & mesh->faces[i];
 
@@ -273,7 +291,7 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
 
     glEndList();
 
-    view->priv->prepared = TRUE;
+    // view->priv->prepared = TRUE;
 }
 
 /* states */

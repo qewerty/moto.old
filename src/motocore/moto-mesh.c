@@ -169,6 +169,19 @@ void moto_mesh_foreach_vertex(MotoMesh *self,
     }
 }
 
+void moto_mesh_foreach_edge(MotoMesh *self,
+        MotoMeshForeachEdgeFunc func)
+{
+    MotoMeshEdge *edge;
+
+    guint i;
+    for(i = 0; i < self->edges_num; i++)
+    {
+        edge = & self->edges[i];
+        func(self, edge);
+    }
+}
+
 void moto_mesh_face_alloc(MotoMeshFace *self)
 {
     self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);

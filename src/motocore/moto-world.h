@@ -71,6 +71,9 @@ void moto_world_xml_dump_selected(MotoWorld *self, const gchar *filename, gboole
 
 void moto_world_merge(MotoWorld *self, const gchar *filename);
 
+MotoObjectNode *moto_world_get_current_object(MotoWorld *self);
+void moto_world_set_object_current(MotoWorld *self, MotoObjectNode *obj);
+
 MotoObjectNode *moto_world_get_root(MotoWorld *self);
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root);
 MotoObjectNode * moto_world_get_camera(MotoWorld *self);

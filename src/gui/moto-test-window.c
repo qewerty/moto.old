@@ -114,7 +114,9 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
-    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "View");
+    moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
+
+    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView");
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube");
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material");
 
@@ -171,7 +173,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     GtkBox *hbox = gtk_hbox_new(FALSE, 1);
 
-    gtk_box_pack_start(hbox, moto_tool_box_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
 
     GtkBox *vbox = gtk_vbox_new(FALSE, 1);

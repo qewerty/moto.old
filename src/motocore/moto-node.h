@@ -199,7 +199,7 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
 MotoParamData *moto_param_get_data(MotoParam *self);
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
-MotoParamMode moto_param_get_mode(MotoParam *mode);
+MotoParamMode moto_param_get_mode(MotoParam *self);
 MotoParamBlock *moto_param_get_block(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 
@@ -207,6 +207,7 @@ void moto_param_update(MotoParam *self);
 void moto_param_update_dests(MotoParam *self);
 
 /* Valid only if mode is IN or INOUT and does nothing if else. */
+MotoParam *moto_param_get_source(MotoParam *self);
 void moto_param_set_source(MotoParam *self, MotoParam *src);
 void moto_param_clear_source(MotoParam *self);
 

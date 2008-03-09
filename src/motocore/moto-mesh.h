@@ -38,7 +38,8 @@ typedef struct _MotoMeshSelection MotoMeshSelection;
 typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
 
 typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVertex *vert);
-typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *face, MotoMeshVertex *vert);
+typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
+typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self, MotoMeshVertex *vert);
 
 /* class MotoMesh */
 
@@ -137,6 +138,8 @@ MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
 void moto_mesh_foreach_vertex(MotoMesh *self,
         MotoMeshForeachVertexFunc func);
+void moto_mesh_foreach_edge(MotoMesh *self,
+        MotoMeshForeachEdgeFunc func);
 
 #endif /* MOTO_MESH_H */
 

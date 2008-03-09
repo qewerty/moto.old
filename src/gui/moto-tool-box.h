@@ -24,6 +24,8 @@
 
 #include <gtk/gtk.h>
 
+#include "motocore/moto-forward.h"
+
 typedef struct _MotoToolBox MotoToolBox;
 typedef struct _MotoToolBoxClass MotoToolBoxClass;
 typedef struct _MotoToolBoxPriv MotoToolBoxPriv;
@@ -51,6 +53,6 @@ GType moto_tool_box_get_type(void);
 #define MOTO_IS_TOOL_BOX_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_TOOL_BOX))
 #define MOTO_TOOL_BOX_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TOOL_BOX, MotoToolBoxClass))
 
-GtkWidget *moto_tool_box_new();
+GtkWidget *moto_tool_box_new(MotoSystem *system);
 
 #endif /* MOTO_TOOL_BOX_H */

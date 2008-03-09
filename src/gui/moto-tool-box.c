@@ -8,6 +8,7 @@
 #include "moto-test-window.h"
 #include "moto-tool-box.h"
 
+#include "moto-messager.h"
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
@@ -16,20 +17,9 @@
 #include "motocore/moto-float-param-data.h"
 #include "common/numdef.h"
 
-/* forwards */
+/* forward */
 
-static void init_gl(GtkWidget *widget, gpointer data);
-static gboolean draw(GtkWidget *widget, GdkEventExpose *event, gpointer data);
-
-static gboolean
-reshape(GtkWidget *widget, GdkEventConfigure *event, gpointer data);
-
-static gboolean
-press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data);
-static gboolean
-release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data);
-static gboolean
-mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data);
+void show_component_selection_mode_menu(GtkButton *button, gpointer user_data);
 
 /* class ToolBox */
 
@@ -38,7 +28,6 @@ static GObjectClass *tool_box_parent_class = NULL;
 struct _MotoToolBoxPriv
 {
     MotoSystem *system;
-    MotoWorld *world;
 
     GtkDrawingArea *area;
 
@@ -54,7 +43,6 @@ moto_tool_box_dispose(GObject *obj)
         return;
     self->priv->disposed = TRUE;
 
-    g_object_unref(self->priv->system);
 
     tool_box_parent_class->dispose(obj);
 }
@@ -73,6 +61,9 @@ moto_tool_box_init(MotoToolBox *self)
 {
     self->priv = g_slice_new(MotoToolBoxPriv);
 
+    self->priv->system = NULL;
+
+    /* gui */
     GtkButton *b = (GtkButton *)gtk_button_new();
     gtk_button_set_relief(b, GTK_RELIEF_NONE);
 
@@ -85,6 +76,9 @@ moto_tool_box_init(MotoToolBox *self)
     im = gtk_image_new_from_file("./resources/icons/moto-component-selection-mode-icon.png");
     gtk_button_set_image(b, im);
     gtk_button_set_relief(b, GTK_RELIEF_NONE);
+
+    g_signal_connect(G_OBJECT(b), "clicked",
+            G_CALLBACK(show_component_selection_mode_menu), self);
 
     gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
 
@@ -106,13 +100,104 @@ G_DEFINE_TYPE(MotoToolBox, moto_tool_box, GTK_TYPE_VBOX);
 
 /* methods of class ToolBox */
 
-GtkWidget *moto_tool_box_new()
+GtkWidget *moto_tool_box_new(MotoSystem *system)
 {
-    GtkWindow *self = (GtkWindow *)g_object_new(MOTO_TYPE_TOOL_BOX, NULL);
-    // MotoToolBox *twin = (MotoToolBox *)self;
+    GtkWidget *self = (GtkWidget *)g_object_new(MOTO_TYPE_TOOL_BOX, NULL);
+    MotoToolBox *tb = (MotoToolBox *)self;
 
-    // MotoWorld *w = twin->priv->world;
+    tb->priv->system = system;
 
     return self;
 }
 
+/* signal callbacks */
+
+static void set_state(GtkMenuItem *item, gpointer user_data)
+{
+    MotoGeometryViewNode *geom = (MotoGeometryViewNode *)user_data;
+    MotoGeometryViewState *state = \
+        (MotoGeometryViewState *)g_object_get_data(G_OBJECT(item), "moto-geometry-view-state");
+
+    moto_geometry_view_node_set_state(geom, moto_geometry_view_state_get_name(state));
+}
+
+void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
+{
+    MotoToolBox *tb = (MotoToolBox *)user_data;
+
+    if( ! tb->priv->system)
+    {
+        GString *msg = \
+            g_string_new("ToolBox has no associated MotoSystem instance. I can do nothing.");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
+    if( ! world)
+    {
+        GString *msg = \
+            g_string_new("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+        moto_error(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    MotoObjectNode *object = moto_world_get_current_object(world);
+    if( ! object)
+    {
+        GString *msg = \
+            g_string_new("MotoWorld instance associated ToolBox has no current object. I can do nothing.");
+        moto_warning(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view", "view");
+    if(( ! in_view) || (moto_param_get_mode(in_view) == MOTO_PARAM_MODE_OUT))
+    {
+        GString *msg = \
+            g_string_new("Current object has no a view. I can do nothing.");
+        moto_warning(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    MotoParam *out_view = moto_param_get_source(in_view);
+    if( ! out_view)
+    {
+        GString *msg = \
+            g_string_new("Current object has no a view. I can do nothing.");
+        moto_warning(msg->str);
+        g_string_free(msg, TRUE);
+
+        return;
+    }
+
+    MotoGeometryViewNode *geom = (MotoGeometryViewNode *)moto_param_get_node(out_view);
+
+    GSList *state = moto_geometry_view_node_get_state_list(geom);
+
+    /* menu */
+    GtkMenu *menu = (GtkMenu *)gtk_menu_new();
+    GtkWidget *item;
+
+    for(; state; state = g_slist_next(state))
+    {
+        item = \
+            gtk_menu_item_new_with_label(moto_geometry_view_state_get_title((MotoGeometryViewState *)state->data));
+
+        g_object_set_data((GObject *)item, "moto-geometry-view-state", state->data);
+        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_state), geom);
+
+        gtk_menu_append(menu, item);
+    }
+
+    gtk_widget_show_all((GtkWidget *)menu);
+    gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, 0);
+}

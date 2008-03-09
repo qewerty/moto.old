@@ -23,6 +23,7 @@ struct _MotoWorldPriv
     GSList *selected_nodes;
     MotoNode *current_node;
 
+    MotoObjectNode *current_object;
     MotoObjectNode *root;
     MotoObjectNode *camera;
     MotoObjectNode *global_axes;
@@ -63,8 +64,10 @@ moto_world_init(MotoWorld *self)
     self->priv->selected_nodes  = NULL;
     self->priv->current_node    = NULL;
 
+    self->priv->current_object = NULL;
     self->priv->root = NULL;
     self->priv->camera = NULL;
+    self->priv->global_axes = NULL;
 }
 
 static void
@@ -168,6 +171,16 @@ void moto_world_xml_dump_selected(MotoWorld *self,
 void moto_world_merge(MotoWorld *self, const gchar *filename)
 {
 
+}
+
+MotoObjectNode *moto_world_get_current_object(MotoWorld *self)
+{
+    return self->priv->current_object;
+}
+
+void moto_world_set_object_current(MotoWorld *self, MotoObjectNode *obj)
+{
+    self->priv->current_object = obj;
 }
 
 MotoObjectNode *moto_world_get_root(MotoWorld *self)

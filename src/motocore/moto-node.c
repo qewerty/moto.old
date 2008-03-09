@@ -471,9 +471,19 @@ const gchar *moto_param_get_title(MotoParam *self)
     return self->priv->title->str;
 }
 
+MotoParamMode moto_param_get_mode(MotoParam *self)
+{
+    return self->priv->mode;
+}
+
 static void param_setup_ptr(MotoParam *self, MotoParam *src)
 {
     moto_param_data_point(self->priv->data, moto_param_data_get(src->priv->data));
+}
+
+MotoParam *moto_param_get_source(MotoParam *self)
+{
+    return self->priv->source;
 }
 
 void moto_param_set_source(MotoParam *self, MotoParam *src)
