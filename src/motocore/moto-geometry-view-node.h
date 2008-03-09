@@ -74,6 +74,9 @@ GType moto_geometry_view_node_get_type(void);
 void moto_geometry_view_node_draw(MotoGeometryViewNode *self);
 void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self);
 
+gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self);
+void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean status);
+
 MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self);
 void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name);
 GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);

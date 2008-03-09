@@ -26,7 +26,6 @@ struct _MotoMeshViewNodePriv
     MotoMesh **mesh_ptr;
     MotoMeshSelection *selection;
 
-    gboolean prepared;
     GLuint dlist;
 };
 
@@ -54,7 +53,6 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
     self->priv->mesh = NULL;
     self->priv->mesh_ptr = & self->priv->mesh;
 
-    self->priv->prepared = FALSE;
     self->priv->dlist = 0;
 }
 
@@ -93,8 +91,8 @@ G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOMETRY_VIEW_NOD
 
 static void update_mesh(MotoParam *param)
 {
-    MotoMeshViewNode *obj = (MotoMeshViewNode *)moto_param_get_node(param);
-    obj->priv->prepared = FALSE;
+    MotoGeometryViewNode *obj = (MotoGeometryViewNode *)moto_param_get_node(param);
+    moto_geometry_view_node_set_prepared(obj, FALSE);
 }
 
 static void point_mesh(MotoParam *param, gpointer p)
@@ -189,6 +187,7 @@ static void draw_mesh_as_verts(MotoMesh *mesh)
     glPushAttrib(GL_ENABLE_BIT);
 
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
 
     glColor4f(1, 0, 0, 1);
     glPointSize(4);
@@ -226,6 +225,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh)
     glPushAttrib(GL_ENABLE_BIT);
 
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
 
     glColor4f(1, 0, 0, 1);
     glPointSize(4);
@@ -262,7 +262,7 @@ static void moto_mesh_view_node_draw(MotoGeometryViewNode *self)
     if( ! *(view->priv->mesh_ptr))
         return;
 
-    if( ! view->priv->prepared)
+    if( ! moto_geometry_view_node_get_prepared(self))
         moto_mesh_view_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
@@ -291,7 +291,7 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
 
     glEndList();
 
-    // view->priv->prepared = TRUE;
+    moto_geometry_view_node_set_prepared(self, TRUE);
 }
 
 /* states */

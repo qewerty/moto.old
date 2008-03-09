@@ -9,6 +9,7 @@ static GObjectClass *geometry_view_node_parent_class = NULL;
 
 struct _MotoGeometryViewNodePriv
 {
+    gboolean prepared;
     MotoGeometryViewState *state;
 };
 
@@ -33,6 +34,7 @@ moto_geometry_view_node_init(MotoGeometryViewNode *self)
 {
     self->priv = g_slice_new(MotoGeometryViewNodePriv);
 
+    self->priv->prepared = FALSE;
     self->priv->state = NULL;
 }
 
@@ -124,6 +126,16 @@ void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self)
     g_signal_emit(self, klass->after_prepare_for_draw_signal_id, 0, NULL);
 }
 
+gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self)
+{
+    return self->priv->prepared;
+}
+
+void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean status)
+{
+    self->priv->prepared = status;
+}
+
 MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self)
 {
     return self->priv->state;
@@ -136,7 +148,12 @@ void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *
     {
         if(g_utf8_collate(moto_geometry_view_state_get_name((MotoGeometryViewState *)state->data), state_name) == 0)
         {
-            self->priv->state = (MotoGeometryViewState *)state->data;
+            MotoGeometryViewState *s = (MotoGeometryViewState *)state->data;
+            if(s != self->priv->state)
+            {
+                 self->priv->state = s;
+                 moto_geometry_view_node_set_prepared(self, FALSE);
+            }
             return;
         }
     }
