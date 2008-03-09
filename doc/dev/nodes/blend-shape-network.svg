@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45+devel"
+   version="1.0"
+   sodipodi:docname="blendshape_network.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective67" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective60" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective3359" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective75" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective74" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective72" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective71" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-50 : 600 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="700 : 600 : 1"
+       inkscape:persp3d-origin="300 : 400 : 1"
+       id="perspective10" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="716.69974"
+     inkscape:cy="353.85253"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="721"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:connector-spacing="3" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="rect3360"
+       width="1053.2629"
+       height="563.98749"
+       x="-0.17779541"
+       y="180.79807"
+       ry="0" />
+    <rect
+       style="opacity:1;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-opacity:1"
+       id="rect3358"
+       width="1052.6774"
+       height="184.35284"
+       x="-0.098477155"
+       y="0.11713308"
+       ry="0" />
+    <g
+       id="g3195"
+       transform="matrix(0.7826397,0,0,0.7826397,9.789153,112.5266)">
+      <rect
+         ry="25.656912"
+         y="67.393806"
+         x="48.935478"
+         height="138.66574"
+         width="178.21037"
+         id="rect2389"
+         style="opacity:1;fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text2391"
+         y="103.99807"
+         x="68.571434"
+         style="font-size:18.60694885px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="103.99807"
+           x="68.571434"
+           id="tspan2393"
+           sodipodi:role="line">Some </tspan><tspan
+           id="tspan2395"
+           y="127.25676"
+           x="68.571434"
+           sodipodi:role="line">  Mesh</tspan><tspan
+           id="tspan2397"
+           y="150.51544"
+           x="68.571434"
+           sodipodi:role="line">    Generator</tspan></text>
+      <text
+         id="text3169"
+         y="176.95163"
+         x="78.571426"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="176.95163"
+           x="78.571426"
+           id="tspan3171"
+           sodipodi:role="line">(MeshFile, Cube, ...)</tspan></text>
+    </g>
+    <g
+       id="g3420"
+       transform="translate(-104,105)">
+      <rect
+         ry="20.080118"
+         y="197.53473"
+         x="459.31396"
+         height="77.692451"
+         width="137.89325"
+         id="rect3304"
+         style="fill:#d1d1d1;fill-opacity:1;stroke:#000000;stroke-width:0.78263968;stroke-opacity:1" />
+      <text
+         id="text3306"
+         y="243.11656"
+         x="476.29507"
+         style="font-size:17.03824615px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="243.11656"
+           x="476.29507"
+           sodipodi:role="line"
+           id="tspan3308">BlendShape</tspan></text>
+    </g>
+    <g
+       id="g3337"
+       transform="matrix(0.7826397,0,0,0.7826397,-47.250741,89.71694)">
+      <rect
+         ry="25.656912"
+         y="234.45961"
+         x="823.33362"
+         height="99.269753"
+         width="176.18994"
+         id="rect3315"
+         style="fill:#ff5a61;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text3317"
+         y="290.20267"
+         x="863.24176"
+         style="font-size:18.48226166px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="290.20267"
+           x="863.24176"
+           sodipodi:role="line"
+           id="tspan3319">MeshView</tspan></text>
+    </g>
+    <g
+       id="g3332"
+       transform="matrix(0.7826397,0,0,0.7826397,92.10577,-34.94821)">
+      <rect
+         ry="25.656912"
+         y="385.88818"
+         x="944.76215"
+         height="99.269753"
+         width="176.18994"
+         id="rect3326"
+         style="fill:#febd44;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text3328"
+         y="444.46347"
+         x="988.16528"
+         style="font-size:27.47477531px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="444.46347"
+           x="988.16528"
+           sodipodi:role="line"
+           id="tspan3330">Object</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:36.19358444px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="32.002567"
+       y="51.495518"
+       id="text3354"><tspan
+         sodipodi:role="line"
+         id="tspan3356"
+         x="32.002567"
+         y="51.495518"
+         style="font-weight:bold;-inkscape-font-specification:Bitstream Vera Sans Bold">Moto Blend Shape Network</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 735.4074,310.24093 L 831.12281,307.72906"
+       id="path3391"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3337"
+       inkscape:connection-end="#g3332" />
+    <g
+       id="g3384"
+       transform="matrix(0.7826397,0,0,0.7826397,11.963896,245.08676)">
+      <rect
+         ry="25.656912"
+         y="67.393806"
+         x="48.935478"
+         height="138.66574"
+         width="178.21037"
+         id="rect3386"
+         style="opacity:1;fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text3388"
+         y="103.99807"
+         x="68.571434"
+         style="font-size:18.60694885px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="103.99807"
+           x="68.571434"
+           id="tspan3390"
+           sodipodi:role="line">Some </tspan><tspan
+           id="tspan3392"
+           y="127.25676"
+           x="68.571434"
+           sodipodi:role="line">  Mesh</tspan><tspan
+           id="tspan3394"
+           y="150.51544"
+           x="68.571434"
+           sodipodi:role="line">    Generator</tspan></text>
+      <text
+         id="text3396"
+         y="176.95163"
+         x="78.571426"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="176.95163"
+           x="78.571426"
+           id="tspan3398"
+           sodipodi:role="line">(MeshFile, Cube, ...)</tspan></text>
+    </g>
+    <g
+       id="g3400"
+       transform="matrix(0.7826397,0,0,0.7826397,14.9639,370.08676)">
+      <rect
+         ry="25.656912"
+         y="67.393806"
+         x="48.935478"
+         height="138.66574"
+         width="178.21037"
+         id="rect3402"
+         style="opacity:1;fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text3404"
+         y="103.99807"
+         x="68.571434"
+         style="font-size:18.60694885px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="103.99807"
+           x="68.571434"
+           id="tspan3406"
+           sodipodi:role="line">Some </tspan><tspan
+           id="tspan3408"
+           y="127.25676"
+           x="68.571434"
+           sodipodi:role="line">  Mesh</tspan><tspan
+           id="tspan3410"
+           y="150.51544"
+           x="68.571434"
+           sodipodi:role="line">    Generator</tspan></text>
+      <text
+         id="text3412"
+         y="176.95163"
+         x="78.571426"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="176.95163"
+           x="78.571426"
+           id="tspan3414"
+           sodipodi:role="line">(MeshFile, Cube, ...)</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 187.95383,247.41926 L 354.92265,313.81039"
+       id="path3425"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3195"
+       inkscape:connection-end="#g3420" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 493.59853,332.97342 L 596.73152,320.46809"
+       id="path3427"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3420"
+       inkscape:connection-end="#g3337" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 190.12858,349.62514 L 354.92265,343.82246"
+       id="path3429"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3384"
+       inkscape:connection-end="#g3420" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 193.12858,445.50258 L 354.92265,372.61669"
+       id="path3431"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3400"
+       inkscape:connection-end="#g3420" />
+    <text
+       xml:space="preserve"
+       style="font-size:33.81431198px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="97.829567"
+       y="122.66827"
+       id="text3433"><tspan
+         sodipodi:role="line"
+         id="tspan3435"
+         x="97.829567"
+         y="122.66827">All meshes must have equal number of verticies!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.64124966px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="268.64264"
+       y="274.86096"
+       id="text2439"><tspan
+         sodipodi:role="line"
+         id="tspan2441"
+         x="268.64264"
+         y="274.86096"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Basis</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.64124966px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="234.13483"
+       y="340.92557"
+       id="text2451"><tspan
+         sodipodi:role="line"
+         id="tspan2453"
+         x="234.13483"
+         y="340.92557"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Shape1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.64124966px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="279.72995"
+       y="423.40958"
+       id="text2455"><tspan
+         sodipodi:role="line"
+         id="tspan2457"
+         x="279.72995"
+         y="423.40958"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Shape2</tspan></text>
+    <g
+       id="g2462"
+       transform="matrix(0.5542793,0,0,0.5542793,407.49409,485.61213)">
+      <rect
+         ry="20.080118"
+         y="197.53473"
+         x="459.31396"
+         height="77.692451"
+         width="137.89325"
+         id="rect2464"
+         style="fill:#d1d1d1;fill-opacity:1;stroke:#000000;stroke-width:0.78263968;stroke-opacity:1" />
+      <text
+         id="text2466"
+         y="243.11656"
+         x="476.29507"
+         style="font-size:17.03824615px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="243.11656"
+           x="476.29507"
+           sodipodi:role="line"
+           id="tspan2468">BlendShape</tspan></text>
+    </g>
+    <g
+       id="g2470"
+       transform="matrix(0.4338009,0,0,0.4338009,416.32161,462.99891)">
+      <rect
+         ry="25.656912"
+         y="234.45961"
+         x="823.33362"
+         height="99.269753"
+         width="176.18994"
+         id="rect2472"
+         style="fill:#ff5a61;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text2474"
+         y="290.20267"
+         x="863.24176"
+         style="font-size:18.48226166px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="290.20267"
+           x="863.24176"
+           sodipodi:role="line"
+           id="tspan2476">MeshView</tspan></text>
+    </g>
+    <g
+       id="g2478"
+       transform="matrix(0.4338009,0,0,0.4338009,493.56403,393.8996)">
+      <rect
+         ry="25.656912"
+         y="385.88818"
+         x="944.76215"
+         height="99.269753"
+         width="176.18994"
+         id="rect2480"
+         style="fill:#febd44;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text2482"
+         y="444.46347"
+         x="988.16528"
+         style="font-size:27.47477531px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="444.46347"
+           x="988.16528"
+           sodipodi:role="line"
+           id="tspan2484">Object</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.55427927px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 850.13277,585.23078 L 903.18584,583.83851"
+       id="path2486"
+       inkscape:connector-type="polyline" />
+    <text
+       xml:space="preserve"
+       style="font-size:8.66962051px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="599.55695"
+       y="568.40717"
+       id="text2528"><tspan
+         sodipodi:role="line"
+         id="tspan2530"
+         x="599.55695"
+         y="568.40717"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Basis</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:8.66962051px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="615.42133"
+       y="605.06708"
+       id="text2532"><tspan
+         sodipodi:role="line"
+         id="tspan2534"
+         x="615.42133"
+         y="605.06708"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Shape1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:8.66962051px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="607.45972"
+       y="655.73602"
+       id="text2536"><tspan
+         sodipodi:role="line"
+         id="tspan2538"
+         x="607.45972"
+         y="655.73602"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">Shape2</tspan></text>
+    <g
+       id="g2540"
+       transform="matrix(0.4338009,0,0,0.4338009,432.62751,472.95033)">
+      <rect
+         ry="25.656912"
+         y="67.393806"
+         x="48.935478"
+         height="138.66574"
+         width="178.21037"
+         id="rect2542"
+         style="opacity:1;fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+      <text
+         id="text2544"
+         y="103.99807"
+         x="68.571434"
+         style="font-size:18.60694885px;font-style:normal;font-weight:normal;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="103.99807"
+           x="68.571434"
+           id="tspan2546"
+           sodipodi:role="line">Some </tspan><tspan
+           id="tspan2548"
+           y="127.25676"
+           x="68.571434"
+           sodipodi:role="line">  Mesh</tspan><tspan
+           id="tspan2550"
+           y="150.51544"
+           x="68.571434"
+           sodipodi:role="line">    Generator</tspan></text>
+      <text
+         id="text2552"
+         y="176.95163"
+         x="78.571426"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="176.95163"
+           x="78.571426"
+           id="tspan2554"
+           sodipodi:role="line">(MeshFile, Cube, ...)</tspan></text>
+    </g>
+    <g
+       id="g3358"
+       transform="translate(14.294541,123.418)">
+      <rect
+         ry="11.129992"
+         y="527.01782"
+         x="473.3461"
+         height="41.653324"
+         width="78.307823"
+         id="rect3361"
+         style="fill:#ffb380;fill-opacity:1;stroke:#000000;stroke-width:0.43380091;stroke-opacity:1" />
+      <text
+         id="text3363"
+         y="552.31812"
+         x="498.75391"
+         style="font-size:12px;font-style:normal;font-weight:bold;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+         xml:space="preserve"><tspan
+           y="552.31812"
+           x="498.75391"
+           id="tspan3365"
+           sodipodi:role="line">Edit</tspan></text>
+    </g>
+    <g
+       id="g3367"
+       transform="translate(51.064093,59.778389)">
+      <rect
+         ry="11.129992"
+         y="527.01782"
+         x="473.3461"
+         height="41.653324"
+         width="78.307823"
+         id="rect3369"
+         style="fill:#ffb380;fill-opacity:1;stroke:#000000;stroke-width:0.43380091;stroke-opacity:1" />
+      <text
+         id="text3371"
+         y="552.31812"
+         x="498.75391"
+         style="font-size:12px;font-style:normal;font-weight:bold;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+         xml:space="preserve"><tspan
+           y="552.31812"
+           x="498.75391"
+           id="tspan3373"
+           sodipodi:role="line">Edit</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 485.89537,562.55605 L 487.44625,555.45302"
+       id="path3375"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g2540" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 521.07232,562.55605 L 543.72293,586.57931"
+       id="path3377"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g2540"
+       inkscape:connection-end="#g3367" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 499.9817,562.55605 L 521.60408,650.21892"
+       id="path3379"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g2540"
+       inkscape:connection-end="#g3358" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 602.93492,610.21728 L 661.86541,614.10062"
+       id="path3381"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3367"
+       inkscape:connection-end="#g2462" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 566.16536,658.86619 L 661.86541,628.73408"
+       id="path3385"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3358"
+       inkscape:connection-end="#g2462" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 531.38049,548.04565 L 661.86541,601.02797"
+       id="path3387"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g2540"
+       inkscape:connection-end="#g2462" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 738.73059,606.14764 L 773.26757,596.72491"
+       id="path3389"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g2462"
+       inkscape:connection-end="#g2470" />
+    <text
+       xml:space="preserve"
+       style="font-size:36.9703598px;font-style:normal;font-weight:bold;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       x="605.70782"
+       y="481.0661"
+       id="text3391"><tspan
+         sodipodi:role="line"
+         id="tspan3393"
+         x="605.70782"
+         y="481.0661">Examaple</tspan></text>
+  </g>
+</svg>
