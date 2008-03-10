@@ -39,6 +39,11 @@ struct _MotoWorld
 struct _MotoWorldClass
 {
     GObjectClass parent;
+
+    /* signals */
+    guint button_press_signal_id;
+    guint button_release_signal_id;
+    guint motion_notify_signal_id;
 };
 
 GType moto_world_get_type(void);
@@ -84,5 +89,12 @@ void moto_world_draw(MotoWorld *self, gint width, gint height);
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
 
 MotoLibrary *moto_world_get_library(MotoWorld *self);
+
+void moto_world_process_button_press(MotoWorld *self,
+    gint x, gint y, gint width, gint height);
+void moto_world_process_button_release(MotoWorld *self,
+    gint x, gint y, gint width, gint height);
+void moto_world_process_motion(MotoWorld *self,
+    gint x, gint y, gint width, gint height);
 
 #endif /* MOTO_WORLD_H */

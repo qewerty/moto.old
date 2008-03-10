@@ -1,4 +1,3 @@
-
 /* ##################################################################################
 #
 #  Moto Animation System (http://motoanim.sf.net)
@@ -25,9 +24,11 @@
 
 #include "glib-object.h"
 
+#include "moto-ray.h"
+#include "moto-intersection.h"
+
 typedef struct _MotoBound MotoBound;
 typedef struct _MotoBoundClass MotoBoundClass;
-typedef struct _MotoBoundPriv MotoBoundPriv;
 
 /* class MotoBound */
 
@@ -35,7 +36,9 @@ struct _MotoBound
 {
     GObject parent;
 
-    MotoBoundPriv *priv;
+    gfloat min_x, gfloat max_x;
+    gfloat min_y, gfloat max_y;
+    gfloat min_z, gfloat max_z;
 };
 
 struct _MotoBoundClass
@@ -52,12 +55,16 @@ GType moto_bound_get_type(void);
 #define MOTO_IS_BOUND_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_BOUND))
 #define MOTO_BOUND_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_BOUND, MotoBoundClass))
 
-MotoBound *moto_bound_new(gfloat minx, gfloat maxx,
-                          gfloat miny, gfloat maxy,
-                          gfloat minz, gfloat maxz);
+MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
+                          gfloat min_y, gfloat max_y,
+                          gfloat min_z, gfloat max_z);
 
 MotoBound *moto_bound_new_from_array(gfloat array[6]);
 
+gboolean moto_bound_intersect(MotoBound *self, MotoRay *ray,
+        MotoIntersection *intersection);
+
+gboolean moto_bound_is_valid(MotoBound *self);
 void moto_bound_draw(MotoBound *self);
 
 #endif /* MOTO_BOUND_H */

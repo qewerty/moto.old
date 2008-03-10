@@ -60,6 +60,10 @@ struct _MotoGeometryViewNodeClass
     guint after_draw_signal_id;
     guint before_prepare_for_draw_signal_id;
     guint after_prepare_for_draw_signal_id;
+
+    guint button_press_signal_id;
+    guint button_release_signal_id;
+    guint motion_notify_signal_id;
 };
 
 GType moto_geometry_view_node_get_type(void);

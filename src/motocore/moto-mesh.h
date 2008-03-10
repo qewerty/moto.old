@@ -133,6 +133,7 @@ struct _MotoMesh
 
     guint edges_num;
     MotoMeshEdge *edges;
+    guint32 *edges_hard;
 
     guint faces_num;
     MotoMeshFace *faces;

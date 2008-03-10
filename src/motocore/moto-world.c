@@ -7,6 +7,8 @@
 #include "moto-library.h"
 #include "moto-object-node.h"
 #include "moto-messager.h"
+#include "moto-ray.h"
+#include "moto-intersection.h"
 // #include "moto-time-node.h"
 
 /* class World */
@@ -267,3 +269,139 @@ MotoLibrary *moto_world_get_library(MotoWorld *self)
     return self->priv->library;
 }
 
+typedef struct _MotoIntersectData
+{
+    MotoObjectNode *obj;
+    MotoRay ray;
+    gfloat dist;
+} MotoIntersectData;
+
+static void intersect_object(gpointer data, gpointer user_data)
+{
+
+    MotoObjectNode *obj = (MotoObjectNode *)data;
+    MotoIntersectData *idata = (MotoIntersectData *)user_data;
+
+    gfloat *iom = moto_object_node_get_inverse_matrix(obj, TRUE);
+
+    MotoRay ray;
+    moto_ray_copy(& ray, & idata->ray);
+    moto_ray_transform(& ray, iom);
+
+    MotoIntersection intersection;
+    moto_intersection_reset(& intersection);
+
+    MotoBound *b = moto_object_node_get_bound(obj, FALSE);
+    moto_bound_intersect(b, & ray, & intersection);
+
+    if( ! intersection.hit)
+        return;
+    moto_intersection_reset(& intersection);
+
+    moto_object_node_intersect(b, & ray, & intersection);
+
+    if( ! intersection.hit)
+        return;
+
+
+
+    if(intersection.dist < idata->dist || ( ! idata->obj))
+    {
+        idata->obj = obj;
+
+        idata->dist = intersection.dist;
+    }
+}
+
+void moto_world_process_button_press(MotoWorld *self,
+    gint x, gint y, gint width, gint height)
+{
+    /*
+    if(self->priv->manipulator)
+    {
+        moto_world_manipulator_process_button_press(self->priv->manipulator,
+                x, y, width, height);
+
+        return;
+    }
+    */
+
+    /* detect intersection */
+
+    /* TODO: Temporary camera data */
+    gfloat fovy = 60*RAD_PER_DEG;
+    gfloat z_near = 0.3;
+    gfloat z_far = 150;
+
+    MotoIntersectData idata;
+    idata.obj = NULL;
+    idata.dist = MACRO;
+
+    gfloat tmp;
+    gfloat point[3];
+    gfloat model[16];
+    matrix44_identity(model);
+    gfloat proj[16];
+    matrix44_perspective(proj, fovy, width/(gfloat)height, z_near, z_far);
+    gfloat viewport[] = {0 , 0, width, height};
+
+    if( ! gluUnProject(x, y, 0, model, proj, viewport,
+            & idata.ray.pos[0], & idata.ray.pos[1], & idata.ray.pos[2]))
+    {
+        // TODO: Error
+
+        return;
+    }
+    if( ! gluUnProject(x, y, 1, model, proj, viewport,
+            & point[0], & point[1], & point[2]))
+    {
+        // TODO: Error
+
+        return;
+    }
+    vector3_dif(idata.ray.dir, point, idata.ray.pos);
+    vector3_normalize(idata.ray.dir, tmp);
+
+    moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
+            intersect_object, & idata);
+    if(idata.obj)
+    {
+        g_signal_emit(G_OBJECT(idata.obj),
+                MOTO_OBJECT_NODE_GET_CLASS(object)->button_press_signal_id,
+                0, NULL);
+    }
+}
+
+void moto_world_process_button_release(MotoWorld *self,
+    gint x, gint y, gint width, gint height)
+{
+    /*
+    if(self->priv->manipulator)
+    {
+        moto_world_manipulator_process_button_release(self->priv->manipulator,
+                x, y, width, height);
+
+        return;
+    }
+    */
+
+    if(self->priv->root)
+        moto_object_node_process_button_release(self->priv->root, x, y, width, height);
+}
+
+void moto_world_process_motion(MotoWorld *self,
+    gint x, gint y, gint width, gint height)
+{
+    /*
+    if(self->priv->manipulator)
+    {
+        moto_world_manipulator_process_motion(self->priv->manipulator,
+                x, y, width, height);
+
+        return;
+    }
+    */
+
+    if(self->priv->root)
+        moto_object_node_process_motion(self->priv->root, x, y, width, height);
+}

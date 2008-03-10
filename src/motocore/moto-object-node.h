@@ -66,6 +66,11 @@ struct _MotoObjectNode
 struct _MotoObjectNodeClass
 {
     MotoNodeClass parent;
+
+    /* signals */
+    guint button_press_signal_id;
+    guint button_release_signal_id;
+    guint motion_notify_signal_id;
 };
 
 GType moto_object_node_get_type(void);
@@ -93,6 +98,13 @@ void moto_object_node_pitch(MotoObjectNode *self, gfloat da);
 void moto_object_node_yaw(MotoObjectNode *self, gfloat da);
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order);
+
+gboolean moto_object_node_process_button_press(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height);
+gboolean moto_object_node_process_button_release(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height);
+gboolean moto_object_node_process_motion(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height);
 
 /* class MotoNodeFactory */
 

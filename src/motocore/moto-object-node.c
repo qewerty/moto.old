@@ -1791,6 +1791,66 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
     self->priv->camera = camera;
 }
 
+gboolean moto_object_node_process_button_press(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height)
+{
+    MotoBound *bound = moto_object_node_get_bound(self);
+
+    if(self->priv->view)
+        if(moto_geometry_view_node_process_button_press(self->priv->view, x, y, width, height))
+            return TRUE;
+
+    GSList *child = self->priv->children;
+    for(; child; child = g_slist_next(child))
+    {
+        if(moto_object_node_process_button_press((MotoObjectNode *)child->data,
+                x, y, width, height))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+gboolean moto_object_node_process_button_release(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height)
+{
+    MotoBound *bound = moto_object_node_get_bound(self);
+
+    if(self->priv->view)
+        if(moto_geometry_view_node_process_button_release(self->priv->view, x, y, width, height))
+            return TRUE;
+
+    GSList *child = self->priv->children;
+    for(; child; child = g_slist_next(child))
+    {
+        if(moto_object_node_process_button_release((MotoObjectNode *)child->data,
+                x, y, width, height))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+gboolean moto_object_node_process_motion(MotoObjectNode *self,
+    gint x, gint y, gint width, gint height)
+{
+    MotoBound *bound = moto_object_node_get_bound(self);
+
+    if(self->priv->view)
+        if(moto_geometry_view_node_process_motion(self->priv->view, x, y, width, height))
+            return TRUE;
+
+    GSList *child = self->priv->children;
+    for(; child; child = g_slist_next(child))
+    {
+        if(moto_object_node_process_motion((MotoObjectNode *)child->data,
+                x, y, width, height))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 /*
 static void
 moto_object_node_convert_camera_transform(MotoObjectNode *self)
