@@ -36,7 +36,6 @@ typedef struct _MotoMeshSubFace MotoMeshSubFace;
 typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
 
 typedef struct _MotoMeshSelection MotoMeshSelection;
-typedef struct _MotoMeshSelectionMask MotoMeshSelectionMask;
 
 typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVertex *vert);
 typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
@@ -88,41 +87,40 @@ struct _MotoMeshVertexAttr
     gfloat *data;
 };
 
-struct _MotoMeshSelectionMask
-{
-    /* TODO: gboolean is temporary solution */
-    guint verts_num;
-    gboolean *verts;
-    guint edges_num;
-    gboolean *edges;
-    gchar *tmp_edges;
-    guint faces_num;
-    gboolean *faces;
-};
-
-MotoMeshSelectionMask *moto_mesh_selection_mask_new(guint verts_num, guint edges_num, guint faces_num);
-MotoMeshSelectionMask *moto_mesh_selection_mask_copy(MotoMeshSelectionMask *other);
-MotoMeshSelectionMask *moto_mesh_selection_mask_for_mesh(MotoMesh *mesh);
-MotoMeshSelectionMask *moto_mesh_selection_mask_from_selection(MotoMeshSelection *selection, MotoMesh *mesh);
-void moto_mesh_selection_mask_free(MotoMeshSelectionMask *self);
-
-void moto_mesh_selection_mask_select_edge(MotoMeshSelectionMask *self, guint index);
-gboolean moto_mesh_selection_mask_is_edge_selected(MotoMeshSelectionMask *self, guint index);
-
 struct _MotoMeshSelection
 {
     guint verts_num;
-    guint *verts;
+    guint32 *verts;
     guint edges_num;
-    guint *edges;
+    guint32 *edges;
     guint faces_num;
-    guint *faces;
+    guint32 *faces;
 };
 
 MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
-MotoMeshSelection *moto_mesh_selection_from_mask(MotoMeshSelectionMask *mask);
+MotoMeshSelection *moto_mesh_selection_for_mesh(MotoMesh *mesh);
 void moto_mesh_selection_free(MotoMeshSelection *self);
+
+void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self);
+void moto_mesh_selection_toggle_vertex_selection(MotoMeshSelection *self, guint index);
+gboolean moto_mesh_selection_is_vertex_selected(MotoMeshSelection *self, guint index);
+
+void moto_mesh_selection_select_edge(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_edge(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_all_edges(MotoMeshSelection *self);
+void moto_mesh_selection_toggle_edge_selection(MotoMeshSelection *self, guint index);
+gboolean moto_mesh_selection_is_edge_selected(MotoMeshSelection *self, guint index);
+
+void moto_mesh_selection_select_face(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_face(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_all_faces(MotoMeshSelection *self);
+void moto_mesh_selection_toggle_face_selection(MotoMeshSelection *self, guint index);
+gboolean moto_mesh_selection_is_face_selected(MotoMeshSelection *self, guint index);
+
+void moto_mesh_selection_deselect_all(MotoMeshSelection *self);
 
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 

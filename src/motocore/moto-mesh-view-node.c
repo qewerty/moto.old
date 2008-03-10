@@ -25,7 +25,6 @@ struct _MotoMeshViewNodePriv
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
     MotoMeshSelection *selection;
-    MotoMeshSelectionMask *selection_mask;
 
     GLuint dlist;
 };
@@ -50,6 +49,8 @@ static void
 moto_mesh_view_node_init(MotoMeshViewNode *self)
 {
     self->priv = g_slice_new(MotoMeshViewNodePriv);
+
+    self->priv->selection = NULL;
 
     self->priv->mesh = NULL;
     self->priv->mesh_ptr = & self->priv->mesh;
@@ -102,15 +103,16 @@ static void point_mesh(MotoParam *param, gpointer p)
 
     obj->priv->mesh_ptr = (MotoMesh **)p;
 
-    obj->priv->selection_mask = moto_mesh_selection_mask_for_mesh(*(obj->priv->mesh_ptr));
+    obj->priv->selection = moto_mesh_selection_for_mesh(*(obj->priv->mesh_ptr));
 
     /* TEMP */
 
-    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 0);
-    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 1);
-    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 2);
-    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 3);
-    moto_mesh_selection_mask_select_edge(obj->priv->selection_mask, 4);
+    moto_mesh_selection_select_edge(obj->priv->selection, 0);
+    moto_mesh_selection_select_edge(obj->priv->selection, 1);
+    moto_mesh_selection_select_edge(obj->priv->selection, 2);
+    moto_mesh_selection_select_edge(obj->priv->selection, 3);
+    moto_mesh_selection_select_edge(obj->priv->selection, 4);
+    moto_mesh_selection_deselect_edge(obj->priv->selection, 3);
 }
 
 static gpointer get_view(MotoParam *param)
@@ -215,7 +217,7 @@ static void draw_edge(MotoMesh *mesh, MotoMeshEdge *edge)
     glVertex3fv(mesh->verts[edge->b].xyz);
 }
 
-static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelectionMask *mask)
+static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
 {
     glColor4f(1, 1, 1, 0.25);
     int i;
@@ -247,7 +249,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelectionMask *mask)
     {
         edge = & mesh->edges[i];
 
-        if(moto_mesh_selection_mask_is_edge_selected(mask, i))
+        if(moto_mesh_selection_is_edge_selected(selection, i))
             glColor4f(0, 1, 0, 1);
         else
             glColor4f(1, 0, 0, 1);
@@ -351,7 +353,7 @@ static void moto_mesh_view_node_draw_as_edges(MotoGeometryViewState *self, MotoG
     if(! mesh)
         return;
 
-    draw_mesh_as_edges(mesh, mv->priv->selection_mask);
+    draw_mesh_as_edges(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeometryViewState *self, MotoGeometryViewNode *geom)
