@@ -280,7 +280,7 @@ void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
     }
 }
 
-/* MeshSelectionMask */
+/* MeshSelection */
 
 MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num)
 {
@@ -288,6 +288,10 @@ MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, gui
 
     MotoMeshSelection *self = \
         (MotoMeshSelection *)g_try_malloc(sizeof(MotoMeshSelection));
+
+    self->verts_num = verts_num;
+    self->edges_num = edges_num;
+    self->faces_num = faces_num;
 
     num = verts_num/32 + 1;
     self->verts = (guint32 *)g_try_malloc(num * sizeof(guint32));
@@ -309,26 +313,26 @@ MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, gui
 
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other)
 {
-    guint verts_num = other->verts_num;
-    guint edges_num = other->edges_num;
-    guint faces_num = other->faces_num;
-
     guint i, num;
 
     MotoMeshSelection *self = \
         (MotoMeshSelection *)g_try_malloc(sizeof(MotoMeshSelection));
 
-    num = verts_num/32 + 1;
+    self->verts_num = other->verts_num;
+    self->edges_num = other->edges_num;
+    self->faces_num = other->faces_num;
+
+    num = self->verts_num/32 + 1;
     self->verts = (guint32 *)g_try_malloc(num * sizeof(guint32));
     for(i = 0; i < num; i++)
         self->verts[i] = other->verts[i];
 
-    num = edges_num/32 + 1;
+    num = self->edges_num/32 + 1;
     self->edges = (guint32 *)g_try_malloc(num * sizeof(guint32));
     for(i = 0; i < num; i++)
         self->edges[i] = other->edges[i];
 
-    num = faces_num/32 + 1;
+    num = self->faces_num/32 + 1;
     self->faces = (guint32 *)g_try_malloc(num * sizeof(guint32));
     for(i = 0; i < num; i++)
         self->faces[i] = other->faces[i];
@@ -388,7 +392,7 @@ gboolean moto_mesh_selection_is_vertex_selected(MotoMeshSelection *self, guint i
     if(index > (self->verts_num - 1))
         return FALSE;
 
-    return *(self->verts + (index/8)) & (1 << (index % 8));
+    return *(self->verts + (index/32)) & (1 << (index % 32));
 }
 
 /* edge selection */
@@ -473,6 +477,13 @@ gboolean moto_mesh_selection_is_face_selected(MotoMeshSelection *self, guint ind
         return FALSE;
 
     return *(self->faces + (index/32)) & (1 << (index % 32));
+}
+
+void moto_mesh_selection_deselect_all(MotoMeshSelection *self)
+{
+    moto_mesh_selection_deselect_all_verts(self);
+    moto_mesh_selection_deselect_all_edges(self);
+    moto_mesh_selection_deselect_all_faces(self);
 }
 
 /* is selection valid */
