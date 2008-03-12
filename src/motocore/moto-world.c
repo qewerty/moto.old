@@ -285,22 +285,21 @@ static void intersect_object(gpointer data, gpointer user_data)
     gfloat *iom = moto_object_node_get_inverse_matrix(obj, TRUE);
 
     MotoRay ray;
-    moto_ray_copy(& ray, & idata->ray);
-    moto_ray_transform(& ray, iom);
+    moto_ray_set_transformed(& ray, & idata->ray, iom);
 
     MotoIntersection intersection;
     moto_intersection_reset(& intersection);
 
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
-    moto_bound_intersect(b, & ray, & intersection);
+    moto_bound_intersect_ray(b, & ray, & intersection);
 
-    if( ! intersection.hit)
+    if( ! intersection.hits_num)
         return;
     moto_intersection_reset(& intersection);
 
-    moto_object_node_intersect(b, & ray, & intersection);
+    moto_object_node_intersect_ray(b, & ray, & intersection);
 
-    if( ! intersection.hit)
+    if( ! intersection.hits_num)
         return;
 
 

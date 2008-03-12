@@ -19,18 +19,27 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_INTERSECTION_H
-#define MOTO_INTERSECTION_H
+#ifndef _MOTO_INTERSECTION_H_
+#define _MOTO_INTERSECTION_H_
 
 typedef struct _MotoIntersection MotoIntersection;
+typedef struct _MotoRayHit MotoRayHit;
+
+struct _MotoRayHit
+{
+    float dist;
+    float point[3];
+    float normal[3];
+    char is_entering;
+};
 
 struct _MotoIntersection
 {
-    char hit;
-    float dist;
+     unsigned int hits_num;
+     MotoRayHit hits[8];
 };
 
 void moto_intersection_reset(MotoIntersection *self);
 void moto_intersection_copy(MotoIntersection *self, MotoIntersection *other);
 
-#endif /* MOTO_INTERSECTION_H */
+#endif /* _MOTO_INTERSECTION_H_ */

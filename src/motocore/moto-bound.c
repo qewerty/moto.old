@@ -1,4 +1,5 @@
 #include "moto-bound.h"
+#include "common/matrix.h"
 #include "common/numdef.h"
 
 /* class Bound */
@@ -24,12 +25,12 @@ moto_bound_finalize(GObject *obj)
 static void
 moto_bound_init(MotoBound *self)
 {
-    self->min_x = 0;
-    self->max_x = 0;
-    self->min_y = 0;
-    self->max_y = 0;
-    self->min_z = 0;
-    self->max_z = 0;
+    self->bound[0] = 0;
+    self->bound[1] = 0;
+    self->bound[2] = 0;
+    self->bound[3] = 0;
+    self->bound[4] = 0;
+    self->bound[5] = 0;
 }
 
 static void
@@ -55,97 +56,34 @@ MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
 {
     MotoBound *self = (MotoBound *)g_object_new(MOTO_TYPE_BOUND, NULL);
 
-    self->min_x = min_x;
-    self->max_x = max_x;
-    self->min_y = min_y;
-    self->max_y = max_y;
-    self->min_z = min_z;
-    self->max_z = max_z;
+    self->bound[0] = min_x;
+    self->bound[1] = max_x;
+    self->bound[2] = min_y;
+    self->bound[3] = max_y;
+    self->bound[4] = min_z;
+    self->bound[5] = max_z;
 
     return self;
 }
 
 MotoBound *moto_bound_new_from_array(gfloat array[6])
 {
-    return moto_bound_new(array[0], array[1], array[2],
-                          array[3], array[4], array[5]);
+    MotoBound *self = (MotoBound *)g_object_new(MOTO_TYPE_BOUND, NULL);
+
+    self->bound[0] = array[0];
+    self->bound[1] = array[1];
+    self->bound[2] = array[2];
+    self->bound[3] = array[3];
+    self->bound[4] = array[4];
+    self->bound[5] = array[5];
+
+    return self;
 }
 
-gboolean moto_bound_intersect(MotoBound *self, MotoRay *ray,
+gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
         MotoIntersection *intersection)
 {
-    gfloat t_hit, numer, denom;
-
-    gfloat t_in  = -100000;
-    gfloat t_out = 100000;
-
-    gint in_surf, out_surf;
-
-    gint i;
-    for(i = 0; i < 6; i++)
-    {
-        switch(i)
-        {
-            case 0:
-                numer = fabs(self->max_y) - ray->pos[1];
-                denom = ray->dir[1];
-            break;
-            case 1:
-                numer = fabs(self->min_y) + ray->pos[1];
-                denom = -ray->dir[1];
-            break;
-            case 2:
-                numer = fabs(self->max_x) - ray->pos[0];
-                denom = ray->dir[0];
-            break;
-            case 3:
-                numer = fabs(self->min_x) + ray->pos[0];
-                denom = -ray->dir[0];
-            break;
-            case 4:
-                numer = fabs(self->max_z) - ray->pos[2];
-                denom = ray->dir[2];
-            break;
-            case 5:
-                numer = fabs(self->min_z) + ray->pos[2];
-                denom = -ray->dir[2];
-            break;
-        }
-
-        if(fabs(denom) < MICRO)
-        {
-            if(numer < 0) return FALSE;
-        }
-        else
-        {
-            t_hit = numer / denom;
-            if(denom > 0)
-            {
-                if(t_hit < t_out)
-                {
-                    t_out = t_hit;
-                    out_surf = i;
-                }
-            }
-            else
-            {
-                if(t_hit > t_in)
-                {
-                    t_in = t_hit;
-                    in_surf = i;
-                }
-            }
-        }
-
-        if(t_in >= t_out)
-            return FALSE;
-    }
-
-    gint num = 0;
-
-
-
-    return num > 0;
+    return moto_ray_intersect(ray, intersection, self->bound);
 }
 
 gboolean moto_bound_is_valid(MotoBound *self)

@@ -183,7 +183,7 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     return self;
 }
 
-static void process_vertex(MotoMeshFace *face, MotoMeshVertex *vert)
+static void process_vertex(MotoMeshFace *face, MotoMeshVert *vert)
 {
     glVertex3fv(vert->xyz);
 }
@@ -207,7 +207,7 @@ static void draw_mesh_as_object(MotoMesh *mesh)
     }
 }
 
-void draw_vertex(MotoMesh *mesh, MotoMeshVertex *vert)
+void draw_vertex(MotoMesh *mesh, MotoMeshVert *vert)
 {
     glVertex3fv(vert->xyz);
 }
@@ -239,7 +239,7 @@ static void draw_mesh_as_verts(MotoMesh *mesh, MotoMeshSelection *selection)
     glPointSize(4);
     glBegin(GL_POINTS);
 
-    MotoMeshVertex *vert;
+    MotoMeshVert *vert;
     for(i = 0; i < mesh->verts_num; i++)
     {
         vert = & mesh->verts[i];

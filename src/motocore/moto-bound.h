@@ -36,9 +36,7 @@ struct _MotoBound
 {
     GObject parent;
 
-    gfloat min_x, gfloat max_x;
-    gfloat min_y, gfloat max_y;
-    gfloat min_z, gfloat max_z;
+    gfloat bound[6];
 };
 
 struct _MotoBoundClass
@@ -61,7 +59,7 @@ MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
 
 MotoBound *moto_bound_new_from_array(gfloat array[6]);
 
-gboolean moto_bound_intersect(MotoBound *self, MotoRay *ray,
+gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
         MotoIntersection *intersection);
 
 gboolean moto_bound_is_valid(MotoBound *self);

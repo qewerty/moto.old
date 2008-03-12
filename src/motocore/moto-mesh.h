@@ -26,24 +26,25 @@
 
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
+typedef struct _MotoMeshPriv MotoMeshPriv;
 
-typedef struct _MotoMeshVertex MotoMeshVertex;
+typedef struct _MotoMeshVert MotoMeshVert;
 typedef struct _MotoMeshEdge MotoMeshEdge;
 
 typedef struct _MotoMeshFace MotoMeshFace;
 typedef struct _MotoMeshSubFace MotoMeshSubFace;
 
-typedef struct _MotoMeshVertexAttr MotoMeshVertexAttr;
+typedef struct _MotoMeshVertAttr MotoMeshVertAttr;
 
 typedef struct _MotoMeshSelection MotoMeshSelection;
 
-typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVertex *vert);
+typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVert *vert);
 typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
-typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self, MotoMeshVertex *vert);
+typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self, MotoMeshVert *vert);
 
 /* class MotoMesh */
 
-struct _MotoMeshVertex
+struct _MotoMeshVert
 {
     gfloat xyz[3];
     gfloat normal[3];
@@ -80,7 +81,7 @@ void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh);
 void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
         MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh);
 
-struct _MotoMeshVertexAttr
+struct _MotoMeshVertAttr
 {
     GString *name;
     guint chnum;
@@ -129,16 +130,18 @@ struct _MotoMesh
     GObject parent;
 
     guint verts_num;
-    MotoMeshVertex *verts;
+    MotoMeshVert *verts;
 
     guint edges_num;
     MotoMeshEdge *edges;
-    guint32 *edges_hard;
+    guint32 *hard_edge_flags;
 
     guint faces_num;
     MotoMeshFace *faces;
 
     GSList *verts_attrs;
+
+    MotoMeshPriv *priv;
 };
 
 struct _MotoMeshClass
@@ -158,13 +161,42 @@ GType moto_mesh_get_type(void);
 MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num);
 MotoMesh *moto_mesh_copy(MotoMesh *other);
 
-MotoMeshVertexAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
-MotoMeshVertexAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
+MotoMeshVertAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
+MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
 void moto_mesh_foreach_vertex(MotoMesh *self,
         MotoMeshForeachVertexFunc func);
 void moto_mesh_foreach_edge(MotoMesh *self,
         MotoMeshForeachEdgeFunc func);
+
+/* Euler operators.
+ * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh).
+ * Thanks Briggs! */
+
+/* make face & kill face */
+MotoMeshFace *moto_mesh_MF(MotoMesh *self);
+gboolean moto_mesh_KF(MotoMesh *self, MotoMeshFace *f);
+
+/* make edge & kill edge */
+MotoMeshEdge *moto_mesh_ME(MotoMesh *self, MotoMeshVert *v1, MotoMeshVert *v2);
+gboolean moto_mesh_KE(MotoMesh *self, MotoMeshEdge *e);
+
+/* make vert & kill vert */
+MotoMeshVert *moto_mesh_MV(MotoMesh *self, MotoMeshEdge *e);
+gboolean moto_mesh_KV(MotoMesh *self, MotoMeshVert *v);
+
+/* slpit edge, make vert & join edge, kill vert */
+MotoMeshVert *moto_mesh_SEMV(MotoMesh *self, MotoMeshEdge *e);
+gboolean moto_mesh_JEKV(MotoMesh *self, MotoMeshEdge *e);
+
+/* slpit face, make edge & join face, kill edge */
+MotoMeshEdge *moto_mesh_SFME(MotoMesh *self,
+        MotoMeshFace *f, MotoMeshVert *v1, MotoMeshVert *v2);
+gboolean moto_mesh_JFKE(MotoMesh *self,
+        MotoMeshFace *f1, MotoMeshFace *f2);
+
+/* Perform previous Euler operators.  */
+void moto_mesh_perform_euler(MotoMesh *self);
 
 #endif /* MOTO_MESH_H */
 

@@ -2,7 +2,7 @@
 
 void moto_intersection_reset(MotoIntersection *self)
 {
-    self->hit = 0;
+    self->hits_num = 0;
     self->dist = 0;
 }
 

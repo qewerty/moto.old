@@ -1,4 +1,3 @@
-
 /* ##################################################################################
 #
 #  Moto Animation System (http://motoanim.sf.net)
@@ -20,8 +19,10 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_RAY_H
-#define MOTO_RAY_H
+#ifndef _MOTO_RAY_H_
+#define _MOTO_RAY_H_
+
+#include "moto-intersection.h"
 
 typedef struct _MotoRay MotoRay;
 
@@ -33,5 +34,58 @@ struct _MotoRay
 
 void moto_ray_copy(MotoRay *self, MotoRay *other);
 void moto_ray_transform(MotoRay *self, float m[16]);
+void moto_ray_set_transformed(MotoRay *self, MotoRay *other, float m[16]);
 
-#endif /* MOTO_RAY_H */
+/* intersections */
+
+int moto_ray_intersect_plane(MotoRay *self,
+        MotoIntersection *intersection,
+        float point[3], float normal[3]);
+
+int moto_ray_intersect_plane_check(MotoRay *self,
+        float point[3], float normal[3]);
+
+int moto_ray_intersect_triangle(MotoRay *self,
+        MotoIntersection *intersection,
+        float A[3], float B[3], float C[3]);
+
+int moto_ray_intersect_triangle_check(MotoRay *self,
+        float A[3], float B[3], float C[3]);
+
+int moto_ray_intersect_cube(MotoRay *self,
+        MotoIntersection *intersection,
+        float origin[3], float width);
+
+int moto_ray_intersect_cube_check(MotoRay *self,
+        float origin[3], float width);
+
+int moto_ray_intersect_sphere(MotoRay *self,
+        MotoIntersection *intersection,
+        float origin[3], float radius);
+
+int moto_ray_intersect_sphere_check(MotoRay *self,
+        float origin[3], float radius);
+
+int moto_ray_intersect_sphere_2(MotoRay *self,
+        MotoIntersection *intersection,
+        float origin[3], float square_radius);
+
+int moto_ray_intersect_sphere_2_check(MotoRay *self,
+        float origin[3], float square_radius);
+
+
+/**
+ * moto_ray_intersect_bound:
+ * @self: a #MotoRay.
+ * @intersection: a #MotoIntersection.
+ * @bound: array of six values (min_x, max_x, min_y, max_y, min_z, max_z).
+ *
+ * Finds intersection with axis-aligned bounding box.
+ *
+ * Returns: 0 if no intersections found else returns not 0.
+ */
+int moto_ray_intersect_bound(MotoRay *self,
+        MotoIntersection *intersection,
+        float bound[6]);
+
+#endif /* _MOTO_RAY_H_ */
