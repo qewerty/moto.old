@@ -22,6 +22,8 @@
 #ifndef _MOTO_RAY_H_
 #define _MOTO_RAY_H_
 
+#include <math.h>
+
 #include "moto-intersection.h"
 
 typedef struct _MotoRay MotoRay;
@@ -45,12 +47,20 @@ int moto_ray_intersect_plane(MotoRay *self,
 int moto_ray_intersect_plane_check(MotoRay *self,
         float point[3], float normal[3]);
 
+int moto_ray_intersect_plane_dist(MotoRay *self,
+        float *dist,
+        float point[3],
+        float normal[3]);
+
 int moto_ray_intersect_triangle(MotoRay *self,
         MotoIntersection *intersection,
         float A[3], float B[3], float C[3]);
 
 int moto_ray_intersect_triangle_check(MotoRay *self,
         float A[3], float B[3], float C[3]);
+
+int moto_ray_intersect_triangle_dist(MotoRay *self,
+        float *dist, float A[3], float B[3], float C[3]);
 
 int moto_ray_intersect_cube(MotoRay *self,
         MotoIntersection *intersection,
@@ -59,12 +69,22 @@ int moto_ray_intersect_cube(MotoRay *self,
 int moto_ray_intersect_cube_check(MotoRay *self,
         float origin[3], float width);
 
+int moto_ray_intersect_cube_dist(MotoRay *self,
+        float *dist,
+        float origin[3],
+        float width);
+
 int moto_ray_intersect_sphere(MotoRay *self,
         MotoIntersection *intersection,
         float origin[3], float radius);
 
 int moto_ray_intersect_sphere_check(MotoRay *self,
         float origin[3], float radius);
+
+int moto_ray_intersect_sphere_dist(MotoRay *self,
+        float *dist,
+        float origin[3],
+        float radius);
 
 int moto_ray_intersect_sphere_2(MotoRay *self,
         MotoIntersection *intersection,
@@ -73,6 +93,10 @@ int moto_ray_intersect_sphere_2(MotoRay *self,
 int moto_ray_intersect_sphere_2_check(MotoRay *self,
         float origin[3], float square_radius);
 
+int moto_ray_intersect_sphere_2_dist(MotoRay *self,
+        float *dist,
+        float origin[3],
+        float square_radius);
 
 /**
  * moto_ray_intersect_bound:

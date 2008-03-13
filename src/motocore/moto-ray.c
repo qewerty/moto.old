@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "moto-ray.h"
 #include "common/matrix.h"
 
@@ -77,41 +79,223 @@ int moto_ray_intersect_plane(MotoRay *self,
     return 1;
 }
 
+int moto_ray_intersect_plane_check(MotoRay *self,
+        float point[3], float normal[3])
+{
+    float dif[3];
+    vector3_dif(dif, point, self->pos);
+    float numer = vector3_dot(normal, dif);
+    float denom = vector3_dot(normal, self->dir);
+
+    if(fabs(denom) < MICRO) /* parallel */
+    {
+        return 0;
+    }
+
+    if(numer/denom < MICRO)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int moto_ray_intersect_plane_dist(MotoRay *self,
+        float *dist,
+        float point[3],
+        float normal[3])
+{
+    float dif[3];
+    vector3_dif(dif, point, self->pos);
+    float numer = vector3_dot(normal, dif);
+    float denom = vector3_dot(normal, self->dir);
+
+    if(fabs(denom) < MICRO) /* parallel */
+    {
+        return 0;
+    }
+
+    *dist = numer/denom;
+
+    if(*dist < MICRO)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+/* TODO: Needs to be optimized? */
 int moto_ray_intersect_triangle(MotoRay *self,
         MotoIntersection *intersection,
         float A[3], float B[3], float C[3])
 {
     float tmp;
+    float normal[3], v1[3], v2[3];
+    vector3_dif(v1, B, A);
+    vector3_dif(v2, C, A);
+
+    vector3_cross(normal, v1, v2);
+    vector3_normalize(normal, tmp);
+
+    if( ! moto_ray_intersect_plane(self, intersection, A, normal))
+        return 0;
+
     float n1[3], n2[3], n3[3], oA[3], oB[3], oC[3];
     vector3_dif(oA, A, self->pos);
     vector3_dif(oB, B, self->pos);
     vector3_dif(oC, C, self->pos);
 
-    vector3_cross(n1, oC, oA);
-    vector3_normalize(n1, tmp);
-    if(vector3_dot(n1, self->dir) > 0)
-        return 0;
+    if(vector3_dot(self->dir, normal) < 0) /* faceforward */
+    {
+        vector3_cross(n1, oC, oA);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
 
-    vector3_cross(n2, oB, oC);
-    vector3_normalize(n2, tmp);
-    if(vector3_dot(n2, self->dir) > 0)
-        return 0;
+        vector3_cross(n2, oB, oC);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
 
-    vector3_cross(n3, oA, oB);
-    vector3_normalize(n3, tmp);
-    if(vector3_dot(n3, self->dir) > 0)
-        return 0;
+        vector3_cross(n3, oA, oB);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+    else
+    {
+        vector3_cross(n1, oA, oC);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
 
+        vector3_cross(n2, oC, oB);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n3, oB, oA);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+
+    return 1;
+}
+
+int moto_ray_intersect_triangle_check(MotoRay *self,
+        float A[3], float B[3], float C[3])
+{
+    float tmp;
     float normal[3], v1[3], v2[3];
     vector3_dif(v1, B, A);
     vector3_dif(v2, C, A);
-    vector3_normalize(v1, tmp);
-    vector3_normalize(v2, tmp);
 
     vector3_cross(normal, v1, v2);
     vector3_normalize(normal, tmp);
 
-    return moto_ray_intersect_plane(self, intersection, A, normal);
+    if( ! moto_ray_intersect_plane_check(self, A, normal))
+        return 0;
+
+    float n1[3], n2[3], n3[3], oA[3], oB[3], oC[3];
+    vector3_dif(oA, A, self->pos);
+    vector3_dif(oB, B, self->pos);
+    vector3_dif(oC, C, self->pos);
+
+    if(vector3_dot(self->dir, normal) < 0) /* faceforward */
+    {
+        vector3_cross(n1, oC, oA);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n2, oB, oC);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n3, oA, oB);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+    else
+    {
+        vector3_cross(n1, oA, oC);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n2, oC, oB);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n3, oB, oA);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+
+    return 1;
+}
+
+int moto_ray_intersect_triangle_dist(MotoRay *self,
+        float *dist, float A[3], float B[3], float C[3])
+{
+    float tmp;
+    float normal[3], v1[3], v2[3];
+    vector3_dif(v1, B, A);
+    vector3_dif(v2, C, A);
+
+    vector3_cross(normal, v1, v2);
+    vector3_normalize(normal, tmp);
+
+    if( ! moto_ray_intersect_plane_dist(self, dist, A, normal))
+        return 0;
+
+    float n1[3], n2[3], n3[3], oA[3], oB[3], oC[3];
+    vector3_dif(oA, A, self->pos);
+    vector3_dif(oB, B, self->pos);
+    vector3_dif(oC, C, self->pos);
+
+    if(vector3_dot(self->dir, normal) < 0) /* faceforward */
+    {
+        vector3_cross(n1, oC, oA);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n2, oB, oC);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n3, oA, oB);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+    else
+    {
+        vector3_cross(n1, oA, oC);
+        vector3_normalize(n1, tmp);
+        if(vector3_dot(n1, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n2, oC, oB);
+        vector3_normalize(n2, tmp);
+        if(vector3_dot(n2, self->dir) > 0)
+            return 0;
+
+        vector3_cross(n3, oB, oA);
+        vector3_normalize(n3, tmp);
+        if(vector3_dot(n3, self->dir) > 0)
+            return 0;
+    }
+
+    return 1;
 }
 
 int moto_ray_intersect_cube(MotoRay *self,
@@ -130,8 +314,22 @@ int moto_ray_intersect_sphere(MotoRay *self,
         MotoIntersection *intersection,
         float origin[3], float radius)
 {
-    moto_ray_intersect_sphere_2(self, intersection, origin, radius*radius);
+    return moto_ray_intersect_sphere_2(self, intersection, origin, radius*radius);
 }
+
+/*
+int moto_ray_intersect_sphere_check(MotoRay *self,
+        float origin[3], float radius)
+{
+    return moto_ray_intersect_sphere_2_check(self, origin, radius*radius);
+}
+
+int moto_ray_intersect_sphere_dist(MotoRay *self,
+        float *dist, float origin[3], float radius)
+{
+    return moto_ray_intersect_sphere_2_dist(self, dist, origin, radius*radius);
+}
+*/
 
 int moto_ray_intersect_sphere_2(MotoRay *self,
         MotoIntersection *intersection,

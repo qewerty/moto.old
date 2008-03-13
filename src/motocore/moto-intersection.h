@@ -22,6 +22,8 @@
 #ifndef _MOTO_INTERSECTION_H_
 #define _MOTO_INTERSECTION_H_
 
+#define MOTO_INTERSECTION_MAX_HITS 8
+
 typedef struct _MotoIntersection MotoIntersection;
 typedef struct _MotoRayHit MotoRayHit;
 
@@ -36,7 +38,7 @@ struct _MotoRayHit
 struct _MotoIntersection
 {
      unsigned int hits_num;
-     MotoRayHit hits[8];
+     MotoRayHit hits[MOTO_INTERSECTION_MAX_HITS];
 };
 
 void moto_intersection_reset(MotoIntersection *self);
