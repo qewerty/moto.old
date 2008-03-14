@@ -11,9 +11,7 @@
 #define MICRO           0.000001
 #define MACRO           (1/MICRO)
 
-/*
-#define MIN(a, b)       ((a)<(b)?(a):(b))
-#define MAX(a, b)       ((a)>(b)?(a):(b))
-#define ABS(a)          ((a)>0?(a):-(a)) */
+#define min(a, b)       ((a)<(b)?(a):(b))
+#define max(a, b)       ((a)>(b)?(a):(b))
 
 #endif /* NUM_DEF_H */

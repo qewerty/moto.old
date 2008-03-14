@@ -2,6 +2,7 @@
 
 #include "moto-ray.h"
 #include "common/matrix.h"
+#include "common/numdef.h"
 
 /* macros */
 
@@ -310,6 +311,30 @@ int moto_ray_intersect_cube(MotoRay *self,
     return moto_ray_intersect_bound(self, intersection, bound);
 }
 
+int moto_ray_intersect_cube_check(MotoRay *self,
+        float origin[3], float width)
+{
+    float hw = width/2;
+    float bound[] = {origin[0] - hw, origin[0] + hw,
+                     origin[1] - hw, origin[1] + hw,
+                     origin[2] - hw, origin[2] + hw};
+
+    return moto_ray_intersect_bound_check(self, bound);
+}
+
+int moto_ray_intersect_cube_dist(MotoRay *self,
+        float *dist,
+        float origin[3],
+        float width)
+{
+    float hw = width/2;
+    float bound[] = {origin[0] - hw, origin[0] + hw,
+                     origin[1] - hw, origin[1] + hw,
+                     origin[2] - hw, origin[2] + hw};
+
+    return moto_ray_intersect_bound_dist(self, dist, bound);
+}
+
 int moto_ray_intersect_sphere(MotoRay *self,
         MotoIntersection *intersection,
         float origin[3], float radius)
@@ -317,7 +342,6 @@ int moto_ray_intersect_sphere(MotoRay *self,
     return moto_ray_intersect_sphere_2(self, intersection, origin, radius*radius);
 }
 
-/*
 int moto_ray_intersect_sphere_check(MotoRay *self,
         float origin[3], float radius)
 {
@@ -329,7 +353,6 @@ int moto_ray_intersect_sphere_dist(MotoRay *self,
 {
     return moto_ray_intersect_sphere_2_dist(self, dist, origin, radius*radius);
 }
-*/
 
 int moto_ray_intersect_sphere_2(MotoRay *self,
         MotoIntersection *intersection,
@@ -338,9 +361,9 @@ int moto_ray_intersect_sphere_2(MotoRay *self,
     float tmp, dst[3];
     vector3_dif(dst, self->pos, origin);
 
-    float B = 2*vector3_dot(dst, self->dir);
+    float B = vector3_dot(dst, self->dir);
     float C = vector3_dot(dst, dst) - square_radius;
-    float D = B*B - 4*C;
+    float D = B*B - C;
 
     if(D > MICRO)
     {
@@ -357,7 +380,7 @@ int moto_ray_intersect_sphere_2(MotoRay *self,
             vector3_normalize(intersection->hits[0].normal, tmp);
 
             intersection->hits[0].is_entering = \
-                (vector3_dot(intersection->hits[0].normal, self->dir) > 0);
+                (vector3_dot(intersection->hits[0].normal, self->dir) < 0);
 
             intersection->hits_num++;
         }
@@ -373,7 +396,7 @@ int moto_ray_intersect_sphere_2(MotoRay *self,
             vector3_normalize(intersection->hits[intersection->hits_num].normal, tmp);
 
             intersection->hits[intersection->hits_num].is_entering = \
-                (vector3_dot(intersection->hits[intersection->hits_num].normal, self->dir) > 0);
+                (vector3_dot(intersection->hits[intersection->hits_num].normal, self->dir) < 0);
 
             intersection->hits_num++;
         }
@@ -403,6 +426,79 @@ int moto_ray_intersect_sphere_2(MotoRay *self,
     return 0;
 }
 
+int moto_ray_intersect_sphere_2_check(MotoRay *self,
+        float origin[3], float square_radius)
+{
+    float dst[3];
+    vector3_dif(dst, self->pos, origin);
+
+    float B = vector3_dot(dst, self->dir);
+    float C = vector3_dot(dst, dst) - square_radius;
+    float D = B*B - C;
+
+    if(D > MICRO)
+    {
+        float sqrtD = sqrt(D);
+        if((sqrtD - B) > MICRO)
+            return 1;
+
+        if((-sqrtD - B) > MICRO)
+            return 1;
+    }
+    else if(D >= 0 && D < MICRO)
+    {
+        if(-B < MICRO)
+            return 1;
+    }
+
+    return 0;
+}
+
+int moto_ray_intersect_sphere_2_dist(MotoRay *self,
+        float *dist, float origin[3], float square_radius)
+{
+    float dst[3], dd[2];
+    vector3_dif(dst, self->pos, origin);
+
+    float B = vector3_dot(dst, self->dir);
+    float C = vector3_dot(dst, dst) - square_radius;
+    float D = B*B - C;
+
+    if(D > MICRO)
+    {
+        float sqrtD = sqrt(D);
+        int num = 0;
+
+        dd[0] = sqrtD - B;
+        if(dd[0] > MICRO)
+        {
+            *dist = dd[0];
+            num++;
+        }
+
+        dd[1] = -sqrtD - B;
+        if(dd[1] > MICRO)
+        {
+            *dist = dd[1];
+            num++;
+        }
+
+        if( ! num)
+            return 0;
+        if(num == 2)
+            *dist = min(dd[0], dd[1]);
+        return 1;
+    }
+    else if(D >= 0 && D < MICRO)
+    {
+        *dist = -B;
+        if(*dist < MICRO)
+            return 1;
+    }
+
+    return 0;
+}
+
 int moto_ray_intersect_bound(MotoRay *self,
         MotoIntersection *intersection,
         float bound[6])
@@ -412,7 +508,7 @@ int moto_ray_intersect_bound(MotoRay *self,
     float t_in  = -100000;
     float t_out = 100000;
 
-    int in_surf, out_surf;
+    int in_surf = 0, out_surf = 1;
 
     int i;
     for(i = 0; i < 6; i++)
@@ -499,4 +595,167 @@ int moto_ray_intersect_bound(MotoRay *self,
     }
 
     return (intersection->hits_num > 0);
+}
+
+int moto_ray_intersect_bound_check(MotoRay *self, float bound[6])
+{
+    float t_hit, numer, denom;
+
+    float t_in  = -100000;
+    float t_out = 100000;
+
+    int in_surf, out_surf;
+
+    int i;
+    for(i = 0; i < 6; i++)
+    {
+        switch(i)
+        {
+            case 0:
+                numer = max_y - self->pos[1];
+                denom = self->dir[1];
+            break;
+            case 1:
+                numer = -min_y + self->pos[1];
+                denom = -self->dir[1];
+            break;
+            case 2:
+                numer = max_x - self->pos[0];
+                denom = self->dir[0];
+            break;
+            case 3:
+                numer = -min_x + self->pos[0];
+                denom = -self->dir[0];
+            break;
+            case 4:
+                numer = max_z - self->pos[2];
+                denom = self->dir[2];
+            break;
+            case 5:
+                numer = -min_z + self->pos[2];
+                denom = -self->dir[2];
+            break;
+        }
+
+        if(fabs(denom) < MICRO) /* parallel */
+        {
+            if(numer < 0) return 0;
+        }
+        else
+        {
+            t_hit = numer / denom;
+            if(denom > 0)
+            {
+                if(t_hit < t_out)
+                {
+                    t_out = t_hit;
+                    out_surf = i;
+                }
+            }
+            else
+            {
+                if(t_hit > t_in)
+                {
+                    t_in = t_hit;
+                    in_surf = i;
+                }
+            }
+        }
+
+        if(t_in >= t_out)
+            return 0;
+    }
+
+    if(t_in > MICRO)
+        return 1;
+    if(t_out > MICRO)
+        return 1;
+
+    return 0;
+}
+
+int moto_ray_intersect_bound_dist(MotoRay *self,
+        float *dist, float bound[6])
+{
+    float t_hit, numer, denom;
+
+    float t_in  = -100000;
+    float t_out = 100000;
+
+    int i;
+    for(i = 0; i < 6; i++)
+    {
+        switch(i)
+        {
+            case 0:
+                numer = max_y - self->pos[1];
+                denom = self->dir[1];
+            break;
+            case 1:
+                numer = -min_y + self->pos[1];
+                denom = -self->dir[1];
+            break;
+            case 2:
+                numer = max_x - self->pos[0];
+                denom = self->dir[0];
+            break;
+            case 3:
+                numer = -min_x + self->pos[0];
+                denom = -self->dir[0];
+            break;
+            case 4:
+                numer = max_z - self->pos[2];
+                denom = self->dir[2];
+            break;
+            case 5:
+                numer = -min_z + self->pos[2];
+                denom = -self->dir[2];
+            break;
+        }
+
+        if(fabs(denom) < MICRO) /* parallel */
+        {
+            if(numer < 0) return 0;
+        }
+        else
+        {
+            t_hit = numer / denom;
+            if(denom > 0)
+            {
+                if(t_hit < t_out)
+                {
+                    t_out = t_hit;
+                }
+            }
+            else
+            {
+                if(t_hit > t_in)
+                {
+                    t_in = t_hit;
+                }
+            }
+        }
+
+        if(t_in >= t_out)
+            return 0;
+    }
+
+    int num = 0;
+    if(t_in > MICRO)
+    {
+        *dist = t_in;
+        num++;
+    }
+    if(t_out > MICRO)
+    {
+        *dist = t_out;
+        num++;
+    }
+
+    if( ! num)
+        return 0;
+    if(num == 2)
+        *dist = t_in;
+
+    return 1;
 }

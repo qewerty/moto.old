@@ -82,9 +82,7 @@ int moto_ray_intersect_sphere_check(MotoRay *self,
         float origin[3], float radius);
 
 int moto_ray_intersect_sphere_dist(MotoRay *self,
-        float *dist,
-        float origin[3],
-        float radius);
+        float *dist, float origin[3], float radius);
 
 int moto_ray_intersect_sphere_2(MotoRay *self,
         MotoIntersection *intersection,
@@ -94,9 +92,7 @@ int moto_ray_intersect_sphere_2_check(MotoRay *self,
         float origin[3], float square_radius);
 
 int moto_ray_intersect_sphere_2_dist(MotoRay *self,
-        float *dist,
-        float origin[3],
-        float square_radius);
+        float *dist, float origin[3], float square_radius);
 
 /**
  * moto_ray_intersect_bound:
@@ -111,5 +107,11 @@ int moto_ray_intersect_sphere_2_dist(MotoRay *self,
 int moto_ray_intersect_bound(MotoRay *self,
         MotoIntersection *intersection,
         float bound[6]);
+
+int moto_ray_intersect_bound_check(MotoRay *self,
+        float bound[6]);
+
+int moto_ray_intersect_bound_dist(MotoRay *self,
+        float *dist, float bound[6]);
 
 #endif /* _MOTO_RAY_H_ */
