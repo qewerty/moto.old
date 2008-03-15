@@ -114,4 +114,8 @@ int moto_ray_intersect_bound_check(MotoRay *self,
 int moto_ray_intersect_bound_dist(MotoRay *self,
         float *dist, float bound[6]);
 
+/*
+ * TODO: Cone, cylinder?
+ */
+
 #endif /* _MOTO_RAY_H_ */

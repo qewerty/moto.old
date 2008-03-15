@@ -246,11 +246,11 @@ void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
  */
 MotoLibrary *moto_world_get_library(MotoWorld *self);
 
-void moto_world_process_button_press(MotoWorld *self,
+void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height);
-void moto_world_process_button_release(MotoWorld *self,
+void moto_world_button_release(MotoWorld *self,
     gint x, gint y, gint width, gint height);
-void moto_world_process_motion(MotoWorld *self,
+void moto_world_motion_notify(MotoWorld *self,
     gint x, gint y, gint width, gint height);
 
 G_END_DECLS
