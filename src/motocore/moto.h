@@ -23,3 +23,7 @@
 #include "moto-system.h"
 #include "moto-world.h"
 #include "moto-node.h"
+#include "moto-object-node.h"
+#include "moto-camera-node.h"
+#include "moto-geometry-view-node.h"
+#include "moto-mesh-view-node.h"

@@ -19,11 +19,11 @@ moto_param_data_finalize(GObject *obj)
 static void
 moto_param_data_init(MotoParamData *self)
 {
-    self->param     = NULL;
-    self->point     = NULL;
-    self->update    = NULL;
-    self->get       = NULL;
-    self->set       = NULL;
+    self->param_func     = NULL;
+    self->point_func     = NULL;
+    self->update_func    = NULL;
+    self->get_func       = NULL;
+    self->set_func       = NULL;
 }
 
 static void
@@ -43,35 +43,35 @@ G_DEFINE_ABSTRACT_TYPE(MotoParamData, moto_param_data, G_TYPE_OBJECT);
 
 void moto_param_data_point(MotoParamData *self, gpointer p)
 {
-    if(self->point)
-        self->point(self->param, p);
+    if(self->point_func)
+        self->point_func(self->param, p);
 }
 
 void moto_param_data_update(MotoParamData *self)
 {
-    if(self->update)
-        self->update(self->param);
+    if(self->update_func)
+        self->update_func(self->param);
 }
 
 gpointer moto_param_data_get(MotoParamData *self)
 {
-    if(self->get)
-        return self->get(self->param);
+    if(self->get_func)
+        return self->get_func(self->param);
     return NULL;
 }
 
 void moto_param_data_set(MotoParamData *self, gpointer p)
 {
-    if(self->set)
-        self->set(self->param, p);
+    if(self->set_func)
+        self->set_func(self->param, p);
 }
 
 void moto_param_data_set_cbs(MotoParamData *self,
         MotoParamDataPointFunc point, MotoParamDataUpdateFunc update,
         MotoParamDataGetFunc get, MotoParamDataSetFunc set)
 {
-    self->point     = point;
-    self->update    = update;
-    self->get       = get;
-    self->set       = set;
+    self->point_func     = point;
+    self->update_func    = update;
+    self->get_func       = get;
+    self->set_func       = set;
 }

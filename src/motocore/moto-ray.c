@@ -47,6 +47,12 @@ void moto_ray_set_transformed(MotoRay *self, MotoRay *other, float m[16])
     vector3_transform(self->dir, m, other->dir);
 }
 
+void moto_ray_normalize(MotoRay *self)
+{
+    float lenbuf;
+    vector3_normalize(self->dir, lenbuf);
+}
+
 int moto_ray_intersect_plane(MotoRay *self,
         MotoIntersection *intersection,
         float point[3], float normal[3])
