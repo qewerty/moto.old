@@ -30,6 +30,7 @@ typedef struct _MotoGeometryViewNodePriv MotoGeometryViewNodePriv;
 
 typedef void (*MotoGeometryViewNodeDrawMethod)(MotoGeometryViewNode *self);
 typedef void (*MotoGeometryViewNodePrepareForDrawMethod)(MotoGeometryViewNode *self);
+typedef MotoGeometryNode *(*MotoGeometryViewNodeGetGeometryMethod)(MotoGeometryViewNode *self);
 
 typedef struct _MotoGeometryViewState MotoGeometryViewState;
 typedef struct _MotoGeometryViewStateClass MotoGeometryViewStateClass;
@@ -52,6 +53,7 @@ struct _MotoGeometryViewNodeClass
 
     MotoGeometryViewNodeDrawMethod draw;
     MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw;
+    MotoGeometryViewNodeGetGeometryMethod get_geometry;
 
     GSList *states;
 
@@ -84,6 +86,8 @@ void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean s
 MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self);
 void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name);
 GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
+
+MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self);
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
     gint x, gint y, gint width, gint height);

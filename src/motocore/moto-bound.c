@@ -80,6 +80,23 @@ MotoBound *moto_bound_new_from_array(gfloat array[6])
     return self;
 }
 
+void moto_bound_copy(MotoBound *self, MotoBound *other)
+{
+    self->bound[0] = other->bound[0];
+    self->bound[1] = other->bound[1];
+    self->bound[2] = other->bound[2];
+    self->bound[3] = other->bound[3];
+    self->bound[4] = other->bound[4];
+    self->bound[5] = other->bound[5];
+}
+
+void moto_bound_print(MotoBound *self)
+{
+    g_print("min_x: %f; max_x: %f\n", self->bound[0], self->bound[1]);
+    g_print("min_y: %f; max_y: %f\n", self->bound[2], self->bound[3]);
+    g_print("min_z: %f; max_z: %f\n", self->bound[4], self->bound[5]);
+}
+
 gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
         MotoIntersection *intersection)
 {

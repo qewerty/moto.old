@@ -59,6 +59,7 @@ moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
 
     klass->draw = NULL;
     klass->prepare_for_draw = NULL;
+    klass->get_geometry = NULL;
 
     klass->states = NULL;
 
@@ -179,6 +180,15 @@ void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *
 GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self)
 {
     return MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self)->states;
+}
+
+MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self)
+{
+    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+
+    if(klass->get_geometry)
+        return klass->get_geometry(self);
+    return NULL;
 }
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,

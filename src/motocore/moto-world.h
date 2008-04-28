@@ -248,8 +248,8 @@ void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
  */
 MotoLibrary *moto_world_get_library(MotoWorld *self);
 
-void moto_world_foreach_node(MotoWorld *self, MotoWorldForeachNodeFunc func,
-        GType type, gpointer user_data);
+void moto_world_foreach_node(MotoWorld *self, GType type,
+        MotoWorldForeachNodeFunc func,gpointer user_data);
 
 void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height);

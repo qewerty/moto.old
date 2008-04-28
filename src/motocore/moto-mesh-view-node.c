@@ -10,6 +10,7 @@
 
 static void moto_mesh_view_node_draw(MotoGeometryViewNode *self);
 static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self);
+static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeometryViewNode *self);
 
 static void moto_mesh_view_node_draw_as_object(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
 static void moto_mesh_view_node_draw_as_verts(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
@@ -79,8 +80,9 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
     goclass->dispose    = moto_mesh_view_node_dispose;
     goclass->finalize   = moto_mesh_view_node_finalize;
 
-    gvclass->draw              = moto_mesh_view_node_draw;
-    gvclass->prepare_for_draw  = moto_mesh_view_node_prepare_for_draw;
+    gvclass->draw               = moto_mesh_view_node_draw;
+    gvclass->prepare_for_draw   = moto_mesh_view_node_prepare_for_draw;
+    gvclass->get_geometry       = moto_mesh_view_node_get_geometry;
 
     gvclass->states = g_slist_append(gvclass->states,
             moto_geometry_view_state_new("object", "Object",
@@ -364,6 +366,15 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
     glEndList();
 
     moto_geometry_view_node_set_prepared(self, TRUE);
+}
+
+static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeometryViewNode *self)
+{
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "main", "mesh");
+    MotoParam *s = moto_param_get_source(p);
+    if( ! s)
+        return NULL;
+    return (MotoGeometryNode *)moto_param_get_node(s);
 }
 
 /* states */

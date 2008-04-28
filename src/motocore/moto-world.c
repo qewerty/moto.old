@@ -274,14 +274,17 @@ MotoLibrary *moto_world_get_library(MotoWorld *self)
     return self->priv->library;
 }
 
-void moto_world_foreach_node(MotoWorld *self, MotoWorldForeachNodeFunc func,
-        GType type, gpointer user_data)
+void moto_world_foreach_node(MotoWorld *self, GType type,
+        MotoWorldForeachNodeFunc func,gpointer user_data)
 {
     GSList *node = self->priv->nodes;
     for(; node; node=g_slist_next(node))
     {
-        if(G_TYPE_CHECK_INSTANCE_TYPE(node->data, type) && ( ! func(self, (MotoNode *)node->data, user_data)))
-            return;
+        if(G_TYPE_CHECK_INSTANCE_TYPE(node->data, MOTO_TYPE_OBJECT_NODE))
+        {
+            if( ! func(self, (MotoNode *)node->data, user_data))
+                return;
+        }
     }
 }
 
@@ -307,19 +310,18 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
 
     if( !  moto_ray_intersect_bound_dist(& ray, & dist, b->bound))
-        return;
+        return TRUE;
 
-    if(dist < idata->dist || ( ! idata->obj))
+    if(( ! idata->obj) || (dist > 0 && dist < idata->dist))
     {
         idata->obj = obj;
-
         idata->dist = dist;
     }
 
     return TRUE;
 }
 
-void moto_world_process_button_press(MotoWorld *self,
+void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height)
 {
     /*
@@ -345,15 +347,24 @@ void moto_world_process_button_press(MotoWorld *self,
 
     gfloat tmp;
     gfloat point[3];
-    gdouble model[16];
-    matrix44_identity(model);
-    gdouble proj[16];
+    GLdouble model[16];
+    if(self->priv->camera)
+    {
+        gfloat *cim = moto_object_node_get_inverse_matrix(self->priv->camera, TRUE);
+        matrix44_copy(model, cim);
+    }
+    else
+    {
+        matrix44_identity(model);
+    }
+
+    GLdouble proj[16];
     gfloat ar = width/(gfloat)height;
     matrix44_perspective(proj, fovy, ar, z_near, z_far);
-    gint viewport[] = {0 , 0, width, height};
+    GLint viewport[] = {0 , 0, width, height};
 
     GLdouble tmp_x, tmp_y, tmp_z;
-    if( ! gluUnProject(x, y, 0, model, proj, viewport,
+    if( ! gluUnProject(x, y, 0.0, model, proj, viewport,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -364,7 +375,7 @@ void moto_world_process_button_press(MotoWorld *self,
     idata.ray.pos[1] = (gfloat)tmp_y;
     idata.ray.pos[2] = (gfloat)tmp_z;
 
-    if( ! gluUnProject(x, y, 1, model, proj, viewport,
+    if( ! gluUnProject(x, y, 1.0, model, proj, viewport,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -378,13 +389,20 @@ void moto_world_process_button_press(MotoWorld *self,
     vector3_dif(idata.ray.dir, point, idata.ray.pos);
     vector3_normalize(idata.ray.dir, tmp);
 
+    print_vector3(idata.ray.pos);
+    print_vector3(idata.ray.dir);
+
     moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
             intersect_object, & idata);
     if(idata.obj)
     {
+
+        /*
         g_signal_emit(G_OBJECT(idata.obj),
                 MOTO_OBJECT_NODE_GET_CLASS(idata.obj)->button_press_signal_id,
                 0, NULL);
+                */
+        moto_object_node_button_press(idata.obj, x, y, width, height);
     }
 }
 
@@ -402,7 +420,7 @@ void moto_world_process_button_release(MotoWorld *self,
     */
 
     if(self->priv->root)
-        moto_object_node_process_button_release(self->priv->root, x, y, width, height);
+        moto_object_node_button_release(self->priv->root, x, y, width, height);
 }
 
 void moto_world_process_motion(MotoWorld *self,
@@ -419,5 +437,5 @@ void moto_world_process_motion(MotoWorld *self,
     */
 
     if(self->priv->root)
-        moto_object_node_process_motion(self->priv->root, x, y, width, height);
+        moto_object_node_motion(self->priv->root, x, y, width, height);
 }

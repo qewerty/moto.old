@@ -5,6 +5,7 @@
 /* forwards */
 
 static void moto_cube_node_update(MotoNode *self);
+static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self);
 
 /* class CubeNode */
 
@@ -22,6 +23,9 @@ struct _MotoCubeNodePriv
 
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
+
+    MotoBound *bound;
+    gboolean bound_calculated;
 };
 
 static void
@@ -29,6 +33,7 @@ moto_cube_node_dispose(GObject *obj)
 {
     MotoCubeNode *self = (MotoCubeNode *)obj;
 
+    g_object_unref(self->priv->bound);
     g_slice_free(MotoCubeNodePriv, self->priv);
 
     G_OBJECT_CLASS(cube_node_parent_class)->dispose(obj);
@@ -55,6 +60,9 @@ moto_cube_node_init(MotoCubeNode *self)
 
     self->priv->mesh = NULL;
     self->priv->mesh_ptr = & self->priv->mesh;
+
+    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    self->priv->bound_calculated = FALSE;
 }
 
 static void
@@ -62,8 +70,11 @@ moto_cube_node_class_init(MotoCubeNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
+    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
 
     cube_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    gnclass->get_bound = moto_cube_node_get_bound;
 
     goclass->dispose    = moto_cube_node_dispose;
     goclass->finalize   = moto_cube_node_finalize;
@@ -235,6 +246,33 @@ static void moto_cube_node_update(MotoNode *self)
     if(param && moto_param_has_dests(param))
         moto_cube_update_nurbs(cube);
     */
+}
+
+static void calc_bound(MotoCubeNode *self)
+{
+    gfloat size_x = *(self->priv->size_x_ptr);
+    gfloat size_y = *(self->priv->size_y_ptr);
+    gfloat size_z = *(self->priv->size_z_ptr);
+    gfloat hsx = size_x / 2;
+    gfloat hsy = size_y / 2;
+    gfloat hsz = size_z / 2; 
+
+    self->priv->bound->bound[0] = -hsx;
+    self->priv->bound->bound[1] =  hsx;
+    self->priv->bound->bound[2] = -hsy;
+    self->priv->bound->bound[3] =  hsy;
+    self->priv->bound->bound[4] = -hsz;
+    self->priv->bound->bound[5] =  hsz;
+}
+
+static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self)
+{
+    MotoCubeNode *cube = (MotoCubeNode *)self;
+
+    if( ! cube->priv->bound_calculated)
+        calc_bound(cube);
+
+    return cube->priv->bound;
 }
 
 /* class CubeNodeFactory */

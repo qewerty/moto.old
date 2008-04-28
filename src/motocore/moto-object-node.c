@@ -962,7 +962,7 @@ static void moto_object_node_calc_inverse_transform(MotoObjectNode *self)
     self->priv->inverse_calculated = TRUE;
 }
 
-static gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global)
+gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global)
 {
     moto_object_node_calc_transform(self);
 
@@ -1052,6 +1052,17 @@ static void calc_global_bound(MotoObjectNode *self)
 
 static void calc_local_bound(MotoObjectNode *self)
 {
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "view", "view");
+    MotoParam *s = moto_param_get_source(p);
+    if( ! s)
+        return;
+    MotoGeometryViewNode *gvn = (MotoGeometryViewNode *)moto_param_get_node(s);
+    MotoGeometryNode *gn = moto_geometry_view_node_get_geometry(gvn);
+    if( ! gn)
+        return;
+
+    moto_bound_copy(self->priv->local_bound, moto_geometry_node_get_bound(gn));
+
     self->priv->local_bound_calculated = TRUE;
 }
 
@@ -1811,9 +1822,10 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
     self->priv->camera = camera;
 }
 
-gboolean moto_object_node_process_button_press(MotoObjectNode *self,
+gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
+    g_print("moto_object_node_button_press:\n");
     if(self->priv->view)
         if(moto_geometry_view_node_process_button_press(self->priv->view, x, y, width, height))
             return TRUE;
@@ -1821,7 +1833,7 @@ gboolean moto_object_node_process_button_press(MotoObjectNode *self,
     GSList *child = self->priv->children;
     for(; child; child = g_slist_next(child))
     {
-        if(moto_object_node_process_button_press((MotoObjectNode *)child->data,
+        if(moto_object_node_button_press((MotoObjectNode *)child->data,
                 x, y, width, height))
             return TRUE;
     }
@@ -1829,7 +1841,7 @@ gboolean moto_object_node_process_button_press(MotoObjectNode *self,
     return FALSE;
 }
 
-gboolean moto_object_node_process_button_release(MotoObjectNode *self,
+gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(self->priv->view)
@@ -1839,7 +1851,7 @@ gboolean moto_object_node_process_button_release(MotoObjectNode *self,
     GSList *child = self->priv->children;
     for(; child; child = g_slist_next(child))
     {
-        if(moto_object_node_process_button_release((MotoObjectNode *)child->data,
+        if(moto_object_node_button_release((MotoObjectNode *)child->data,
                 x, y, width, height))
             return TRUE;
     }
@@ -1847,7 +1859,7 @@ gboolean moto_object_node_process_button_release(MotoObjectNode *self,
     return FALSE;
 }
 
-gboolean moto_object_node_process_motion(MotoObjectNode *self,
+gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(self->priv->view)
@@ -1857,7 +1869,7 @@ gboolean moto_object_node_process_motion(MotoObjectNode *self,
     GSList *child = self->priv->children;
     for(; child; child = g_slist_next(child))
     {
-        if(moto_object_node_process_motion((MotoObjectNode *)child->data,
+        if(moto_object_node_motion((MotoObjectNode *)child->data,
                 x, y, width, height))
             return TRUE;
     }

@@ -109,7 +109,7 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(axes_view_node, "main", "view");
     moto_param_set_source(in, out);
 
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
     in = moto_node_get_param(obj_node, "main", "parent");
     out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
@@ -333,6 +333,8 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
                 zoom = TRUE;
         break;
     }
+
+    moto_world_button_press(world, event->x, event->y, width, height);
 
     draw(widget, (GdkEventExpose *)event, data);
     return TRUE;
