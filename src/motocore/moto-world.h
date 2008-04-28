@@ -27,6 +27,8 @@
 #include "moto-forward.h"
 #include "moto-axes-view-node.h"
 
+typedef gboolean (MotoWorldForeachNodeFunc)(MotoWorld *world, MotoNode *node, gpointer user_data);
+
 G_BEGIN_DECLS
 
 /* class MotoWorld */
@@ -245,6 +247,9 @@ void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height);
  * Returns instance of MotoLibrary which the world use.
  */
 MotoLibrary *moto_world_get_library(MotoWorld *self);
+
+void moto_world_foreach_node(MotoWorld *self, MotoWorldForeachNodeFunc func,
+        GType type, gpointer user_data);
 
 void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height);

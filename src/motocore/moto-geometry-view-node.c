@@ -181,6 +181,16 @@ GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self)
     return MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self)->states;
 }
 
+gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height)
+{}
+gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height)
+{}
+gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height)
+{}
+
 /* class GeometryViewState */
 
 static GObjectClass *geometry_view_state_parent_class = NULL;

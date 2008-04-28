@@ -85,6 +85,13 @@ MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *s
 void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name);
 GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
 
+gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height);
+gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height);
+gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
+    gint x, gint y, gint width, gint height);
+
 /* class MotoGeometryViewState */
 
 struct _MotoGeometryViewState

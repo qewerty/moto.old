@@ -129,8 +129,10 @@ struct _MotoObjectNodePriv
     MotoObjectNode *parent;
     GSList *children;
 
-    MotoBound *bound;
-    gboolean bound_calculated;
+    MotoBound *local_bound;
+    gboolean local_bound_calculated;
+    MotoBound *global_bound;
+    gboolean global_bound_calculated;
 
     gfloat matrix[16];
     gfloat global_matrix[16];
@@ -151,6 +153,8 @@ moto_object_node_dispose(GObject *obj)
 {
     MotoObjectNode *self = (MotoObjectNode *)obj;
 
+    g_object_unref(self->priv->local_bound);
+    g_object_unref(self->priv->global_bound);
     g_slice_free(MotoObjectNodePriv, self->priv);
 
     G_OBJECT_CLASS(object_node_parent_class)->dispose(G_OBJECT(self));
@@ -175,6 +179,9 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->visible         = TRUE;
     self->priv->show_view       = TRUE;
 
+    self->priv->local_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    self->priv->global_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+
     moto_object_node_set_translate(self, 0, 0, 0);
     moto_object_node_set_rotate(self, 0, 0, 0);
     moto_object_node_set_scale(self, 1, 1, 1);
@@ -184,8 +191,9 @@ moto_object_node_init(MotoObjectNode *self)
 
     /* optimizations */
 
-    self->priv->inverse_calculated  = FALSE;
-    self->priv->bound_calculated    = FALSE;
+    self->priv->inverse_calculated      = FALSE;
+    self->priv->local_bound_calculated  = FALSE;
+    self->priv->global_bound_calculated = FALSE;
 
     /* pointers */
 
@@ -1037,16 +1045,28 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
     moto_object_node_update_parent_inverse(self);
 }
 
-static void calc_bound(MotoObjectNode *self)
+static void calc_global_bound(MotoObjectNode *self)
 {
-
+    self->priv->global_bound_calculated = TRUE;
 }
 
-const MotoBound *moto_object_node_get_bound(MotoObjectNode *self)
+static void calc_local_bound(MotoObjectNode *self)
 {
-    if( ! self->priv->bound_calculated)
-       calc_bound(self);
-    return self->priv->bound;
+    self->priv->local_bound_calculated = TRUE;
+}
+
+MotoBound *moto_object_node_get_bound(MotoObjectNode *self, gboolean global)
+{
+    if(global)
+    {
+        if( ! self->priv->global_bound_calculated)
+            calc_global_bound(self);
+        return self->priv->global_bound;
+    }
+
+    if( ! self->priv->local_bound_calculated)
+        calc_local_bound(self);
+    return self->priv->local_bound;
 }
 
 MotoTransformOrder moto_object_node_get_transform_order(MotoObjectNode *self)
@@ -1794,8 +1814,6 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
 gboolean moto_object_node_process_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoBound *bound = moto_object_node_get_bound(self);
-
     if(self->priv->view)
         if(moto_geometry_view_node_process_button_press(self->priv->view, x, y, width, height))
             return TRUE;
@@ -1814,8 +1832,6 @@ gboolean moto_object_node_process_button_press(MotoObjectNode *self,
 gboolean moto_object_node_process_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoBound *bound = moto_object_node_get_bound(self);
-
     if(self->priv->view)
         if(moto_geometry_view_node_process_button_release(self->priv->view, x, y, width, height))
             return TRUE;
@@ -1834,8 +1850,6 @@ gboolean moto_object_node_process_button_release(MotoObjectNode *self,
 gboolean moto_object_node_process_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoBound *bound = moto_object_node_get_bound(self);
-
     if(self->priv->view)
         if(moto_geometry_view_node_process_motion(self->priv->view, x, y, width, height))
             return TRUE;

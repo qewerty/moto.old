@@ -84,7 +84,7 @@ GType moto_object_node_get_type(void);
 
 MotoObjectNode *moto_object_node_new(const gchar *name);
 
-const MotoBound *moto_object_node_get_bound(MotoObjectNode *self);
+MotoBound *moto_object_node_get_bound(MotoObjectNode *self, gboolean global);
 void moto_object_node_draw(MotoObjectNode *self);
 
 void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3]);
@@ -98,6 +98,8 @@ void moto_object_node_pitch(MotoObjectNode *self, gfloat da);
 void moto_object_node_yaw(MotoObjectNode *self, gfloat da);
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order);
+
+gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global);
 
 gboolean moto_object_node_process_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);

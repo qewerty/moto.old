@@ -83,18 +83,18 @@ MotoBound *moto_bound_new_from_array(gfloat array[6])
 gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
         MotoIntersection *intersection)
 {
-    return moto_ray_intersect(ray, intersection, self->bound);
+    return moto_ray_intersect_bound(ray, intersection, self->bound);
 }
 
 gboolean moto_bound_is_valid(MotoBound *self)
 {
-    if(self->min_x >= self->max_x)
+    if(self->bound[0] >= self->bound[1])
         return FALSE;
 
-    if(self->min_y >= self->max_y)
+    if(self->bound[2] >= self->bound[3])
         return FALSE;
 
-    if(self->min_z >= self->max_z)
+    if(self->bound[4] >= self->bound[5])
         return FALSE;
 
     return TRUE;

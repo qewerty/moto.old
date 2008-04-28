@@ -765,3 +765,16 @@ int moto_ray_intersect_bound_dist(MotoRay *self,
 
     return 1;
 }
+
+int moto_ray_intersect_cylinder(MotoRay *self,
+        MotoIntersection *intersection,
+        float a[3], float b[3], float radius)
+{}
+
+int moto_ray_intersect_cylinder_check(MotoRay *self,
+        float a[3], float b[3], float radius)
+{}
+
+int moto_ray_intersect_cylinder_dist(MotoRay *self,
+        float *dist, float a[3], float b[3], float radius)
+{}

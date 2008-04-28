@@ -1,6 +1,9 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "common/numdef.h"
+#include "common/matrix.h"
+
 #include "moto-world.h"
 #include "moto-node.h"
 #include "moto-system.h"
@@ -118,7 +121,9 @@ void moto_world_add_node(MotoWorld *self, MotoNode *node)
 }
 
 MotoNode *moto_world_create_node(MotoWorld *self,
-        const gchar *type_name, const gchar *node_name)
+        const gchar *type_name,
+        const gchar *node_name,
+        const gchar *path)
 {
     MotoLibrary *lib = moto_world_get_library(self);
     if( ! lib)
@@ -170,7 +175,7 @@ void moto_world_xml_dump_selected(MotoWorld *self,
 
 }
 
-void moto_world_merge(MotoWorld *self, const gchar *filename)
+void moto_world_merge(MotoWorld *self, MotoWorld *other)
 {
 
 }
@@ -269,6 +274,17 @@ MotoLibrary *moto_world_get_library(MotoWorld *self)
     return self->priv->library;
 }
 
+void moto_world_foreach_node(MotoWorld *self, MotoWorldForeachNodeFunc func,
+        GType type, gpointer user_data)
+{
+    GSList *node = self->priv->nodes;
+    for(; node; node=g_slist_next(node))
+    {
+        if(G_TYPE_CHECK_INSTANCE_TYPE(node->data, type) && ( ! func(self, (MotoNode *)node->data, user_data)))
+            return;
+    }
+}
+
 typedef struct _MotoIntersectData
 {
     MotoObjectNode *obj;
@@ -276,40 +292,31 @@ typedef struct _MotoIntersectData
     gfloat dist;
 } MotoIntersectData;
 
-static void intersect_object(gpointer data, gpointer user_data)
+static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user_data)
 {
 
-    MotoObjectNode *obj = (MotoObjectNode *)data;
+    MotoObjectNode *obj = (MotoObjectNode *)node;
     MotoIntersectData *idata = (MotoIntersectData *)user_data;
+    gfloat dist;
 
     gfloat *iom = moto_object_node_get_inverse_matrix(obj, TRUE);
 
     MotoRay ray;
     moto_ray_set_transformed(& ray, & idata->ray, iom);
 
-    MotoIntersection intersection;
-    moto_intersection_reset(& intersection);
-
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
-    moto_bound_intersect_ray(b, & ray, & intersection);
 
-    if( ! intersection.hits_num)
-        return;
-    moto_intersection_reset(& intersection);
-
-    moto_object_node_intersect_ray(b, & ray, & intersection);
-
-    if( ! intersection.hits_num)
+    if( !  moto_ray_intersect_bound_dist(& ray, & dist, b->bound))
         return;
 
-
-
-    if(intersection.dist < idata->dist || ( ! idata->obj))
+    if(dist < idata->dist || ( ! idata->obj))
     {
         idata->obj = obj;
 
-        idata->dist = intersection.dist;
+        idata->dist = dist;
     }
+
+    return TRUE;
 }
 
 void moto_world_process_button_press(MotoWorld *self,
@@ -338,26 +345,36 @@ void moto_world_process_button_press(MotoWorld *self,
 
     gfloat tmp;
     gfloat point[3];
-    gfloat model[16];
+    gdouble model[16];
     matrix44_identity(model);
-    gfloat proj[16];
-    matrix44_perspective(proj, fovy, width/(gfloat)height, z_near, z_far);
-    gfloat viewport[] = {0 , 0, width, height};
+    gdouble proj[16];
+    gfloat ar = width/(gfloat)height;
+    matrix44_perspective(proj, fovy, ar, z_near, z_far);
+    gint viewport[] = {0 , 0, width, height};
 
+    GLdouble tmp_x, tmp_y, tmp_z;
     if( ! gluUnProject(x, y, 0, model, proj, viewport,
-            & idata.ray.pos[0], & idata.ray.pos[1], & idata.ray.pos[2]))
+            & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
 
         return;
     }
+    idata.ray.pos[0] = (gfloat)tmp_x;
+    idata.ray.pos[1] = (gfloat)tmp_y;
+    idata.ray.pos[2] = (gfloat)tmp_z;
+
     if( ! gluUnProject(x, y, 1, model, proj, viewport,
-            & point[0], & point[1], & point[2]))
+            & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
 
         return;
     }
+    point[0] = (gfloat)tmp_x;
+    point[1] = (gfloat)tmp_y;
+    point[2] = (gfloat)tmp_z;
+
     vector3_dif(idata.ray.dir, point, idata.ray.pos);
     vector3_normalize(idata.ray.dir, tmp);
 
@@ -366,7 +383,7 @@ void moto_world_process_button_press(MotoWorld *self,
     if(idata.obj)
     {
         g_signal_emit(G_OBJECT(idata.obj),
-                MOTO_OBJECT_NODE_GET_CLASS(object)->button_press_signal_id,
+                MOTO_OBJECT_NODE_GET_CLASS(idata.obj)->button_press_signal_id,
                 0, NULL);
     }
 }

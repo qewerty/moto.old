@@ -19,7 +19,7 @@ moto_param_data_finalize(GObject *obj)
 static void
 moto_param_data_init(MotoParamData *self)
 {
-    self->param_func     = NULL;
+    self->param     = NULL;
     self->point_func     = NULL;
     self->update_func    = NULL;
     self->get_func       = NULL;

@@ -82,43 +82,43 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
-    MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root");
+    MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root", NULL);
     moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
 
-    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     MotoParam *in = moto_node_get_param(obj_node, "main", "parent");
     MotoParam *out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
-    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView");
+    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView", NULL);
 
     in = moto_node_get_param(obj_node, "view", "view");
     out = moto_node_get_param(grid_view_node, "main", "view");
     moto_param_set_source(in, out);
 
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     in = moto_node_get_param(obj_node, "main", "parent");
     out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
     moto_world_set_axes(self->priv->world, obj_node);
 
-    MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView");
+    MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
 
     in = moto_node_get_param(obj_node, "view", "view");
     out = moto_node_get_param(axes_view_node, "main", "view");
     moto_param_set_source(in, out);
 
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object");
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     in = moto_node_get_param(obj_node, "main", "parent");
     out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView");
-    MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube");
-    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material");
+    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
+    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material", NULL);
 
     in = moto_node_get_param(obj_node, "view", "view");
     out = moto_node_get_param(view_node, "main", "view");
@@ -133,7 +133,7 @@ moto_test_window_init(MotoTestWindow *self)
     moto_param_set_source(in, out);
 
     /* camera */
-    MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject");
+    MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
     MotoParam *param = moto_node_get_param(cam_obj, "main", "tx");
