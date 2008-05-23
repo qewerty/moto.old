@@ -1824,20 +1824,13 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
 }
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray)
+    gint x, gint y, gint width, gint height, MotoRay *ray,
+    GLdouble model[16], GLdouble proj[16], GLint view[4])
 {
     if(self->priv->view)
         if(moto_geometry_view_node_process_button_press(self->priv->view,
-                    x, y, width, height, ray))
+                    x, y, width, height, ray, model, proj, view))
             return TRUE;
-
-    GSList *child = self->priv->children;
-    for(; child; child = g_slist_next(child))
-    {
-        if(moto_object_node_button_press((MotoObjectNode *)child->data,
-                x, y, width, height, ray))
-            return TRUE;
-    }
 
     return FALSE;
 }

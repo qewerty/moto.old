@@ -1,5 +1,5 @@
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include "moto-mesh-view-node.h"
 #include "moto-mesh.h"

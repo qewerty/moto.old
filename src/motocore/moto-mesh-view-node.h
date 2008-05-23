@@ -47,7 +47,7 @@ struct _MotoMeshViewNodeClass
     MotoGeometryViewNodeClass parent;
 };
 
-GType moto_mesh_view_node_storage_get_type(void);
+GType moto_mesh_view_node_get_type(void);
 
 #define MOTO_TYPE_MESH_VIEW_NODE (moto_mesh_view_node_get_type())
 #define MOTO_MESH_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_MESH_VIEW_NODE, MotoMeshViewNode))

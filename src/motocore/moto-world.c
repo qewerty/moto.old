@@ -371,20 +371,16 @@ void moto_world_button_press(MotoWorld *self,
     idata.dist = MACRO;
 
     gfloat point[3];
-    GLdouble model[16], a[16], b[16];
+    GLdouble model[16];
     if(self->priv->camera)
     {
         gfloat *cim = moto_object_node_get_inverse_matrix(self->priv->camera, TRUE);
-        matrix44_copy(a, cim);
+        matrix44_copy(model, cim);
     }
     else
     {
         matrix44_identity(model);
     }
-    /* Why -Y scaling is needed? 0_o */
-    matrix44_scale(b, 1, -1, 1);
-    matrix44_mult(model, b, a);
-    // matrix44_copy(model, a);
 
     GLdouble proj[16];
     GLdouble ar = width/(GLdouble)height;
@@ -393,7 +389,7 @@ void moto_world_button_press(MotoWorld *self,
     GLint viewport[] = {0 , 0, width, height};
 
     GLdouble tmp_x, tmp_y, tmp_z;
-    if( ! gluUnProject(x, y, 0.0, model, proj, viewport,
+    if( ! gluUnProject(x, height-y, 0.0, model, proj, viewport,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -404,7 +400,7 @@ void moto_world_button_press(MotoWorld *self,
     idata.ray.pos[1] = (gfloat)tmp_y;
     idata.ray.pos[2] = (gfloat)tmp_z;
 
-    if( ! gluUnProject(x, y, 1.0, model, proj, viewport,
+    if( ! gluUnProject(x, height-y, 1.0, model, proj, viewport,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -432,12 +428,17 @@ void moto_world_button_press(MotoWorld *self,
                 MOTO_OBJECT_NODE_GET_CLASS(idata.obj)->button_press_signal_id,
                 0, NULL);
                 */
+        gfloat *om = moto_object_node_get_matrix(idata.obj, TRUE);
         gfloat *iom = moto_object_node_get_inverse_matrix(idata.obj, TRUE);
+
+        GLdouble model2[16];
+        matrix44_mult(model2, model, om);
 
         MotoRay ray;
         moto_ray_set_transformed(& ray, & idata.ray, iom);
         moto_ray_normalize(& ray);
-        moto_object_node_button_press(idata.obj, x, y, width, height, & ray);
+        moto_object_node_button_press(idata.obj, x, y, width, height, & ray,
+                model2, proj, viewport);
     }
 }
 

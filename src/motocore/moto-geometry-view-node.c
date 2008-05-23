@@ -1,6 +1,9 @@
 #include <GL/gl.h>
 
 // TEMP
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 #include "moto-mesh-view-node.h"
 #include "common/numdef.h"
 #include "common/matrix.h"
@@ -197,7 +200,8 @@ MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *sel
 }
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray)
+    gint x, gint y, gint width, gint height, MotoRay *ray,
+    GLdouble model[16], GLdouble proj[16], GLint view[4])
 {
     // TEMP: Will segfault if not MotoMeshView
     MotoMeshViewNode *mv = (MotoMeshViewNode *)self;
@@ -213,16 +217,29 @@ gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self
         return TRUE;
     }
 
+    /* Array of intersected verts. */
+    GArray *hits = g_array_new(FALSE, FALSE, sizeof(gint));
+
     gint index = -1;
     gfloat dist, dist_tmp;
     dist = MACRO;
-    gfloat square_radius = 0.05*0.05;
+    gfloat square_radius = 0.25*0.25;
+    gfloat fovy = atan((1/proj[5]))*2;
 
     gint i;
     for(i = 0; i < mesh->verts_num; i++)
     {
-        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, mesh->verts[i].xyz, square_radius))
+        gfloat *xyz = mesh->verts[i].xyz;
+
+        /* perspective compensatioin for sphere radius */
+        gfloat p2v[3]; /* Vector from ray origin to vertex. */
+        vector3_dif(p2v, xyz, ray->pos);
+        gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
+
+        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
             continue;
+
+        g_array_append_val(hits, i);
 
         if(dist_tmp < dist)
         {
@@ -233,6 +250,27 @@ gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self
 
     if(index > -1)
     {
+        /* Detecting which of intersected verts is nearest to cursor. */
+        GLdouble win_dist,
+                 min_win_dist = MACRO;
+        GLdouble win_x, win_y, win_z, xx, yy;
+        gint i, ii;
+        for(i = 0; i < hits->len; i++)
+        {
+            ii = g_array_index(hits, gint, i);
+            gluProject(mesh->verts[ii].xyz[0], mesh->verts[ii].xyz[1], mesh->verts[ii].xyz[2],
+                    model, proj, view, & win_x, & win_y, & win_z);
+
+            xx = (x - win_x);
+            yy = (height - y - win_y);
+            win_dist = sqrt(xx*xx + yy*yy);
+            if(win_dist < min_win_dist)
+            {
+                min_win_dist = win_dist;
+                index = ii;
+            }
+        }
+
         moto_mesh_selection_toggle_vertex_selection(moto_mesh_view_node_get_selection(mv), index);
         moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
         moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);

@@ -22,6 +22,9 @@
 #ifndef MOTO_OBJECT_NODE_H
 #define MOTO_OBJECT_NODE_H
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 #include "moto-ray.h"
 #include "moto-node.h"
 #include "moto-bound.h"
@@ -104,7 +107,8 @@ gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global);
 gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global);
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray);
+    gint x, gint y, gint width, gint height, MotoRay *ray,
+    GLdouble model[16], GLdouble proj[16], GLint view[4]);
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_object_node_motion(MotoObjectNode *self,

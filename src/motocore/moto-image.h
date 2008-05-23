@@ -26,6 +26,7 @@
 
 typedef struct _MotoImage MotoImage;
 typedef struct _MotoImageClass MotoImageClass;
+typedef struct _MotoImageArbitraryChannel MotoImageArbitraryChannel;
 
 /* class MotoImage */
 
@@ -40,8 +41,16 @@ typedef enum
 {
     MOTO_IMAGE_MODE_RGB,
     MOTO_IMAGE_MODE_RGBA,
-    MOTO_IMAGE_MODE_GRAYSCALE
+    MOTO_IMAGE_MODE_GRAYSCALE,
+    MOTO_IMAGE_MODE_ARBITRARY
 } MotoImageMode;
+
+struct _MotoImageArbitraryChannel
+{
+    GString *name;
+    gsize size;
+    void *data;
+};
 
 struct _MotoImage
 {
@@ -49,7 +58,7 @@ struct _MotoImage
 
     MotoImagePrecision  precision;
     MotoImageMode       mode;
-    guchar              chnum;
+    gsize               chnum;
     guint               width,
                         height;
 
@@ -60,7 +69,11 @@ struct _MotoImage
         guint8      *uint8_data;
         guint16     *uint16_data;
         gfloat      *float_data;
+        void        *data;
     };
+
+    /* for arbitrary data */
+    GSList *arbitrary_channels;
 };
 
 struct _MotoImageClass
@@ -79,6 +92,10 @@ GType moto_image_get_type(void);
 
 MotoImage *moto_image_new(MotoImagePrecision precision,
         MotoImageMode mode, guint width, guint height);
+
+/* Only for MOTO_IMAGE_MODE_ARBITRARY */
+MotoImageArbitraryChannel *moto_image_get_channel(MotoImage *self, const gchar *name);
+void moto_image_add_channel(MotoImage *self, const gchar *name, gsize size);
 
 #endif /* MOTO_IMAGE_H */
 

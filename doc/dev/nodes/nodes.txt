@@ -75,9 +75,16 @@ INPUTS:
     ...
 OUTPUTS:
     ...
+    
+~Transform(Node)
+================
+INPUTS:
+    Transform   parent
+OUTPUTS
+    Transform   transform
 
-Object(Node)
-============
+Object(Transform)
+=================
 INPUTS:
     float           tx
     float           ty
@@ -92,4 +99,11 @@ INPUTS:
     RotateOrder     rotate_order
     GeometryView    view
 OUTPUTS:
-    Transform   transform
+    ...
+
+Joint(Transform)
+=================
+INPUTS:
+    ...
+OUTPUTS:
+    ...

@@ -132,6 +132,35 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(mat_node, "main", "material");
     moto_param_set_source(in, out);
 
+    /* cube instance */
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
+    in = moto_node_get_param(obj_node, "main", "parent");
+    out = moto_node_get_param(root_node, "main", "transform");
+    moto_param_set_source(in, out);
+    in = moto_node_get_param(obj_node, "view", "view");
+    out = moto_node_get_param(view_node, "main", "view");
+    moto_param_set_source(in, out);
+
+    MotoParam *param;
+    param = moto_node_get_param(obj_node, "main", "tx");
+    MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(obj_node, "main", "ty");
+    MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(obj_node, "main", "tz");
+    MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
+    moto_float_param_data_set(tx, 4);
+    moto_float_param_data_set(ty, 3);
+    moto_float_param_data_set(tz, 2);
+    param = moto_node_get_param(obj_node, "main", "rx");
+    MotoFloatParamData *rx = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(obj_node, "main", "ry");
+    MotoFloatParamData *ry = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(obj_node, "main", "rz");
+    MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
+    moto_float_param_data_set(rx, 45*RAD_PER_DEG);
+    moto_float_param_data_set(ry, 20*RAD_PER_DEG);
+    moto_float_param_data_set(rz, 56*RAD_PER_DEG);
+
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
@@ -148,12 +177,12 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
-    MotoParam *param = moto_node_get_param(cam_obj, "main", "tx");
-    MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(cam_obj, "main", "tx");
+    tx = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "ty");
-    MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
+    ty = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "tz");
-    MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
+    tz = (MotoFloatParamData *)moto_param_get_data(param);
 
     /* WARNING! Unused.
     param = moto_node_get_param(cam_obj, "main", "rx");

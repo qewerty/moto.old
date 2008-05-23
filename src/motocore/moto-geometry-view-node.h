@@ -22,6 +22,9 @@
 #ifndef MOTO_GEOMETRY_VIEW_NODE_H
 #define MOTO_GEOMETRY_VIEW_NODE_H
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 #include "moto-ray.h"
 #include "moto-geometry-node.h"
 
@@ -91,7 +94,8 @@ GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
 MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self);
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray);
+    gint x, gint y, gint width, gint height, MotoRay *ray,
+    GLdouble model[16], GLdouble proj[16], GLint view[4]);
 gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
