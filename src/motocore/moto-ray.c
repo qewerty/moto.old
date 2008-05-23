@@ -721,7 +721,8 @@ int moto_ray_intersect_bound_dist(MotoRay *self,
 
         if(fabs(denom) < MICRO) /* parallel */
         {
-            if(numer < 0) return 0;
+            if(numer < 0)
+                return 0;
         }
         else
         {
@@ -742,8 +743,10 @@ int moto_ray_intersect_bound_dist(MotoRay *self,
             }
         }
 
-        if(t_in >= t_out)
+        if(t_in > t_out)
+        {
             return 0;
+        }
     }
 
     int num = 0;

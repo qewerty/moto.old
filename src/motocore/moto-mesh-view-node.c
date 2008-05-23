@@ -185,6 +185,16 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     return self;
 }
 
+MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self)
+{
+    return self->priv->mesh;
+}
+
+MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self)
+{
+    return self->priv->selection;
+}
+
 static void process_vertex(MotoMeshFace *face, MotoMeshVert *vert)
 {
     glVertex3fv(vert->xyz);

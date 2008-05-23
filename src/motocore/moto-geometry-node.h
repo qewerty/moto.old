@@ -56,6 +56,6 @@ GType moto_geometry_node_get_type(void);
 #define MOTO_IS_GEOMETRY_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_NODE))
 #define MOTO_GEOMETRY_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_NODE, MotoGeometryNodeClass))
 
-const MotoBound *moto_geometry_node_get_bound(MotoGeometryNode *self);
+MotoBound *moto_geometry_node_get_bound(MotoGeometryNode *self);
 
 #endif /* MOTO_GEOMETRY_NODE_H */

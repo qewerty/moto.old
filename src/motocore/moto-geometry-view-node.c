@@ -1,5 +1,10 @@
 #include <GL/gl.h>
 
+// TEMP
+#include "moto-mesh-view-node.h"
+#include "common/numdef.h"
+#include "common/matrix.h"
+
 #include "moto-messager.h"
 #include "moto-geometry-view-node.h"
 
@@ -192,14 +197,61 @@ MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *sel
 }
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
-    gint x, gint y, gint width, gint height)
-{}
+    gint x, gint y, gint width, gint height, MotoRay *ray)
+{
+    // TEMP: Will segfault if not MotoMeshView
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)self;
+    if( ! G_TYPE_CHECK_INSTANCE_TYPE(G_OBJECT(mv), MOTO_TYPE_MESH_VIEW_NODE))
+    {
+        g_print("Not a MeshView instance\n");
+        return TRUE;
+    }
+    MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
+    if( ! mesh)
+    {
+        g_print("No mesh\n");
+        return TRUE;
+    }
+
+    gint index = -1;
+    gfloat dist, dist_tmp;
+    dist = MACRO;
+    gfloat square_radius = 0.05*0.05;
+
+    gint i;
+    for(i = 0; i < mesh->verts_num; i++)
+    {
+        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, mesh->verts[i].xyz, square_radius))
+            continue;
+
+        if(dist_tmp < dist)
+        {
+            dist = dist_tmp;
+            index = i;
+        }
+    }
+
+    if(index > -1)
+    {
+        moto_mesh_selection_toggle_vertex_selection(moto_mesh_view_node_get_selection(mv), index);
+        moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
+        moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
+    }
+
+    return TRUE;
+}
+
 gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
     gint x, gint y, gint width, gint height)
-{}
+{
+    return TRUE;
+}
+
 gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
     gint x, gint y, gint width, gint height)
-{}
+{
+    return TRUE;
+}
 
 /* class GeometryViewState */
 

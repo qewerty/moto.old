@@ -22,6 +22,7 @@
 #ifndef MOTO_OBJECT_NODE_H
 #define MOTO_OBJECT_NODE_H
 
+#include "moto-ray.h"
 #include "moto-node.h"
 #include "moto-bound.h"
 #include "moto-geometry-view-node.h"
@@ -103,7 +104,7 @@ gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global);
 gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global);
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
-    gint x, gint y, gint width, gint height);
+    gint x, gint y, gint width, gint height, MotoRay *ray);
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_object_node_motion(MotoObjectNode *self,

@@ -12,6 +12,7 @@
 #include "moto-messager.h"
 #include "moto-ray.h"
 #include "moto-intersection.h"
+#include "moto-ray-view-node.h"
 // #include "moto-time-node.h"
 
 /* class World */
@@ -35,6 +36,13 @@ struct _MotoWorldPriv
     // MotoTimeNode *time;
 
     MotoLibrary *library;
+
+    // Default camera settings
+    gfloat fovy;
+    gfloat z_near, z_far;
+
+    // Misc
+    gboolean left_coords;
 };
 
 static void
@@ -73,6 +81,13 @@ moto_world_init(MotoWorld *self)
     self->priv->root = NULL;
     self->priv->camera = NULL;
     self->priv->global_axes = NULL;
+
+    // Default camera settings
+    self->priv->fovy = 60*RAD_PER_DEG;
+    self->priv->z_near = 0.3;
+    self->priv->z_far = 150;
+
+    self->priv->left_coords = FALSE;
 }
 
 static void
@@ -239,7 +254,6 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     }
     else
     {
-        // g_print("NO CAMERA ;(\n");
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         moto_world_apply_default_camera(self, width, height);
@@ -249,8 +263,8 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
     }
 
-    // Uncommet to make world coordinate system left
-    // glScalef(1, 1, -1);
+    if(self->priv->left_coords)
+        glScalef(1, 1, -1);
 
     glColor4f(1, 1, 1, 1);
 
@@ -266,7 +280,8 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
 
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)
 {
-    gluPerspective(60, width/(float)height, 0.3, 150.);
+    gluPerspective(self->priv->fovy*DEG_PER_RAD, width/(GLdouble)height,
+            self->priv->z_near, self->priv->z_far);
 }
 
 MotoLibrary *moto_world_get_library(MotoWorld *self)
@@ -274,8 +289,19 @@ MotoLibrary *moto_world_get_library(MotoWorld *self)
     return self->priv->library;
 }
 
+MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name)
+{
+    GSList *node = self->priv->nodes;
+    for(; node; node = g_slist_next(node))
+    {
+        if(g_utf8_collate(name, moto_node_get_name((MotoNode *)node->data)) == 0)
+            return (MotoNode *)node->data;
+    }
+    return NULL;
+}
+
 void moto_world_foreach_node(MotoWorld *self, GType type,
-        MotoWorldForeachNodeFunc func,gpointer user_data)
+        MotoWorldForeachNodeFunc func, gpointer user_data)
 {
     GSList *node = self->priv->nodes;
     for(; node; node=g_slist_next(node))
@@ -306,16 +332,20 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
 
     MotoRay ray;
     moto_ray_set_transformed(& ray, & idata->ray, iom);
+    moto_ray_normalize(& ray);
 
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
 
     if( !  moto_ray_intersect_bound_dist(& ray, & dist, b->bound))
         return TRUE;
 
-    if(( ! idata->obj) || (dist > 0 && dist < idata->dist))
+    if(( ! idata->obj) || dist < idata->dist)
     {
-        idata->obj = obj;
-        idata->dist = dist;
+        if(dist > MICRO)
+        {
+            idata->obj = obj;
+            idata->dist = dist;
+        }
     }
 
     return TRUE;
@@ -336,31 +366,30 @@ void moto_world_button_press(MotoWorld *self,
 
     /* detect intersection */
 
-    /* TODO: Temporary camera data */
-    gfloat fovy = 60*RAD_PER_DEG;
-    gfloat z_near = 0.3;
-    gfloat z_far = 150;
-
     MotoIntersectData idata;
     idata.obj = NULL;
     idata.dist = MACRO;
 
-    gfloat tmp;
     gfloat point[3];
-    GLdouble model[16];
+    GLdouble model[16], a[16], b[16];
     if(self->priv->camera)
     {
         gfloat *cim = moto_object_node_get_inverse_matrix(self->priv->camera, TRUE);
-        matrix44_copy(model, cim);
+        matrix44_copy(a, cim);
     }
     else
     {
         matrix44_identity(model);
     }
+    /* Why -Y scaling is needed? 0_o */
+    matrix44_scale(b, 1, -1, 1);
+    matrix44_mult(model, b, a);
+    // matrix44_copy(model, a);
 
     GLdouble proj[16];
-    gfloat ar = width/(gfloat)height;
-    matrix44_perspective(proj, fovy, ar, z_near, z_far);
+    GLdouble ar = width/(GLdouble)height;
+    matrix44_perspective(proj, self->priv->fovy, ar,
+            self->priv->z_near, self->priv->z_far);
     GLint viewport[] = {0 , 0, width, height};
 
     GLdouble tmp_x, tmp_y, tmp_z;
@@ -387,22 +416,28 @@ void moto_world_button_press(MotoWorld *self,
     point[2] = (gfloat)tmp_z;
 
     vector3_dif(idata.ray.dir, point, idata.ray.pos);
-    vector3_normalize(idata.ray.dir, tmp);
-
-    print_vector3(idata.ray.pos);
-    print_vector3(idata.ray.dir);
+    moto_ray_normalize(& idata.ray);
 
     moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
             intersect_object, & idata);
+
+    // TEMP
+    MotoRayViewNode *rv = (MotoRayViewNode *)moto_world_get_node(self, "RayView");
+    moto_ray_view_node_set_ray(rv, & idata.ray);
+
     if(idata.obj)
     {
-
         /*
         g_signal_emit(G_OBJECT(idata.obj),
                 MOTO_OBJECT_NODE_GET_CLASS(idata.obj)->button_press_signal_id,
                 0, NULL);
                 */
-        moto_object_node_button_press(idata.obj, x, y, width, height);
+        gfloat *iom = moto_object_node_get_inverse_matrix(idata.obj, TRUE);
+
+        MotoRay ray;
+        moto_ray_set_transformed(& ray, & idata.ray, iom);
+        moto_ray_normalize(& ray);
+        moto_object_node_button_press(idata.obj, x, y, width, height, & ray);
     }
 }
 

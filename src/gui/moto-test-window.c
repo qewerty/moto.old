@@ -101,7 +101,7 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(root_node, "main", "transform");
     moto_param_set_source(in, out);
 
-    moto_world_set_axes(self->priv->world, obj_node);
+    moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
     MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
 
@@ -132,6 +132,18 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(mat_node, "main", "material");
     moto_param_set_source(in, out);
 
+    /* ray */
+    MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
+    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
+
+    in = moto_node_get_param(obj_node, "view", "view");
+    out = moto_node_get_param(ray_view_node, "main", "view");
+    moto_param_set_source(in, out);
+
+    in = moto_node_get_param(obj_node, "main", "parent");
+    out = moto_node_get_param(root_node, "main", "transform");
+    moto_param_set_source(in, out);
+
     /* camera */
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
@@ -142,12 +154,15 @@ moto_test_window_init(MotoTestWindow *self)
     MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "tz");
     MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
+
+    /* WARNING! Unused.
     param = moto_node_get_param(cam_obj, "main", "rx");
     MotoFloatParamData *rx = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "ry");
     MotoFloatParamData *ry = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(cam_obj, "main", "rz");
     MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
+    */
 
     moto_float_param_data_set(tx, 0);
     moto_float_param_data_set(ty, 0);
@@ -171,15 +186,15 @@ moto_test_window_init(MotoTestWindow *self)
             GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
-    GtkBox *hbox = gtk_hbox_new(FALSE, 1);
+    GtkBox *hbox = (GtkBox *)gtk_hbox_new(FALSE, 1);
 
     gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
 
-    GtkBox *vbox = gtk_vbox_new(FALSE, 1);
+    GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 
     gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
-    gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
 

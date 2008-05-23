@@ -1753,6 +1753,8 @@ void moto_object_node_yaw(MotoObjectNode *self, gfloat da)
 
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height)
 {
+    glViewport(0, 0, width, height);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
@@ -1777,8 +1779,7 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glViewport(0, 0, width, height);
-    glMultMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
+    glLoadMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
 }
 
 
@@ -1823,18 +1824,18 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
 }
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
-    gint x, gint y, gint width, gint height)
+    gint x, gint y, gint width, gint height, MotoRay *ray)
 {
-    g_print("moto_object_node_button_press:\n");
     if(self->priv->view)
-        if(moto_geometry_view_node_process_button_press(self->priv->view, x, y, width, height))
+        if(moto_geometry_view_node_process_button_press(self->priv->view,
+                    x, y, width, height, ray))
             return TRUE;
 
     GSList *child = self->priv->children;
     for(; child; child = g_slist_next(child))
     {
         if(moto_object_node_button_press((MotoObjectNode *)child->data,
-                x, y, width, height))
+                x, y, width, height, ray))
             return TRUE;
     }
 
