@@ -13,6 +13,7 @@
 #include "moto-ray.h"
 #include "moto-intersection.h"
 #include "moto-ray-view-node.h"
+#include "moto-transform-info.h"
 // #include "moto-time-node.h"
 
 /* class World */
@@ -43,6 +44,7 @@ struct _MotoWorldPriv
 
     // Misc
     gboolean left_coords;
+    gfloat select_bound_extent;
 };
 
 static void
@@ -88,6 +90,7 @@ moto_world_init(MotoWorld *self)
     self->priv->z_far = 150;
 
     self->priv->left_coords = FALSE;
+    self->priv->select_bound_extent = 0.2;
 }
 
 static void
@@ -335,8 +338,10 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
     moto_ray_normalize(& ray);
 
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
+    MotoBound bb;
+    moto_bound_set_extended(& bb, b, world->priv->select_bound_extent);
 
-    if( !  moto_ray_intersect_bound_dist(& ray, & dist, b->bound))
+    if( !  moto_ray_intersect_bound_dist(& ray, & dist, bb.bound))
         return TRUE;
 
     if(( ! idata->obj) || dist < idata->dist)
@@ -370,26 +375,29 @@ void moto_world_button_press(MotoWorld *self,
     idata.obj = NULL;
     idata.dist = MACRO;
 
+    MotoTransformInfo tinfo;
+    tinfo.view[0] = 0;
+    tinfo.view[1] = 0;
+    tinfo.view[2] = width;
+    tinfo.view[3] = height;
+
     gfloat point[3];
-    GLdouble model[16];
     if(self->priv->camera)
     {
         gfloat *cim = moto_object_node_get_inverse_matrix(self->priv->camera, TRUE);
-        matrix44_copy(model, cim);
+        matrix44_copy(tinfo.model, cim);
     }
     else
     {
-        matrix44_identity(model);
+        matrix44_identity(tinfo.model);
     }
 
-    GLdouble proj[16];
     GLdouble ar = width/(GLdouble)height;
-    matrix44_perspective(proj, self->priv->fovy, ar,
+    matrix44_perspective(tinfo.proj, self->priv->fovy, ar,
             self->priv->z_near, self->priv->z_far);
-    GLint viewport[] = {0 , 0, width, height};
 
     GLdouble tmp_x, tmp_y, tmp_z;
-    if( ! gluUnProject(x, height-y, 0.0, model, proj, viewport,
+    if( ! gluUnProject(x, height-y, 0.0, tinfo.model, tinfo.proj, tinfo.view,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -400,7 +408,7 @@ void moto_world_button_press(MotoWorld *self,
     idata.ray.pos[1] = (gfloat)tmp_y;
     idata.ray.pos[2] = (gfloat)tmp_z;
 
-    if( ! gluUnProject(x, height-y, 1.0, model, proj, viewport,
+    if( ! gluUnProject(x, height-y, 1.0, tinfo.model, tinfo.proj, tinfo.view,
             & tmp_x, & tmp_y, & tmp_z))
     {
         // TODO: Error
@@ -431,14 +439,16 @@ void moto_world_button_press(MotoWorld *self,
         gfloat *om = moto_object_node_get_matrix(idata.obj, TRUE);
         gfloat *iom = moto_object_node_get_inverse_matrix(idata.obj, TRUE);
 
-        GLdouble model2[16];
-        matrix44_mult(model2, model, om);
+        MotoTransformInfo tinfo2;
+        moto_transform_info_set_proj(& tinfo2, tinfo.proj);
+        moto_transform_info_set_view(& tinfo2, tinfo.view);
+        matrix44_mult(tinfo2.model, tinfo.model, om);
 
         MotoRay ray;
         moto_ray_set_transformed(& ray, & idata.ray, iom);
         moto_ray_normalize(& ray);
         moto_object_node_button_press(idata.obj, x, y, width, height, & ray,
-                model2, proj, viewport);
+                & tinfo2);
     }
 }
 

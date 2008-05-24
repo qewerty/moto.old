@@ -66,6 +66,7 @@ moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
     goclass->finalize   = moto_geometry_view_node_finalize;
 
     klass->draw = NULL;
+    klass->select = NULL;
     klass->prepare_for_draw = NULL;
     klass->get_geometry = NULL;
 
@@ -144,6 +145,16 @@ void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self)
     g_signal_emit(self, klass->after_prepare_for_draw_signal_id, 0, NULL);
 }
 
+gboolean moto_geometry_view_node_select(MotoGeometryViewNode *self,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
+{
+    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+
+    if(klass->select)
+        return klass->select(self, x, y, width, height, ray, tinfo);
+    return TRUE;
+}
+
 gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self)
 {
     return self->priv->prepared;
@@ -177,10 +188,8 @@ void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *
     }
 
     GString *msg = g_string_new("instance \"");
-    g_string_append(msg, moto_node_get_name((MotoNode *)self));
-    g_string_append(msg, "\" of GeometryViewNode has no state with name \"");
-    g_string_append(msg, state_name);
-    g_string_append(msg, "\"");
+    g_string_printf(msg, "instance \"%s\" of GeometryViewNode has no state with name \"%s\"",
+            moto_node_get_name((MotoNode *)self), state_name);
     moto_warning(msg->str);
     g_string_free(msg, TRUE);
 }
@@ -200,83 +209,12 @@ MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *sel
 }
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray,
-    GLdouble model[16], GLdouble proj[16], GLint view[4])
+    gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
-    // TEMP: Will segfault if not MotoMeshView
-    MotoMeshViewNode *mv = (MotoMeshViewNode *)self;
-    if( ! G_TYPE_CHECK_INSTANCE_TYPE(G_OBJECT(mv), MOTO_TYPE_MESH_VIEW_NODE))
-    {
-        g_print("Not a MeshView instance\n");
-        return TRUE;
-    }
-    MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
-    if( ! mesh)
-    {
-        g_print("No mesh\n");
-        return TRUE;
-    }
+    /* ray is in object space.
+     * tinfo contains all transformation info needed for projecting smth into window. */
 
-    /* Array of intersected verts. */
-    GArray *hits = g_array_new(FALSE, FALSE, sizeof(gint));
-
-    gint index = -1;
-    gfloat dist, dist_tmp;
-    dist = MACRO;
-    gfloat square_radius = 0.25*0.25;
-    gfloat fovy = atan((1/proj[5]))*2;
-
-    gint i;
-    for(i = 0; i < mesh->verts_num; i++)
-    {
-        gfloat *xyz = mesh->verts[i].xyz;
-
-        /* perspective compensatioin for sphere radius */
-        gfloat p2v[3]; /* Vector from ray origin to vertex. */
-        vector3_dif(p2v, xyz, ray->pos);
-        gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
-
-        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
-            continue;
-
-        g_array_append_val(hits, i);
-
-        if(dist_tmp < dist)
-        {
-            dist = dist_tmp;
-            index = i;
-        }
-    }
-
-    if(index > -1)
-    {
-        /* Detecting which of intersected verts is nearest to cursor. */
-        GLdouble win_dist,
-                 min_win_dist = MACRO;
-        GLdouble win_x, win_y, win_z, xx, yy;
-        gint i, ii;
-        for(i = 0; i < hits->len; i++)
-        {
-            ii = g_array_index(hits, gint, i);
-            gluProject(mesh->verts[ii].xyz[0], mesh->verts[ii].xyz[1], mesh->verts[ii].xyz[2],
-                    model, proj, view, & win_x, & win_y, & win_z);
-
-            xx = (x - win_x);
-            yy = (height - y - win_y);
-            win_dist = sqrt(xx*xx + yy*yy);
-            if(win_dist < min_win_dist)
-            {
-                min_win_dist = win_dist;
-                index = ii;
-            }
-        }
-
-        moto_mesh_selection_toggle_vertex_selection(moto_mesh_view_node_get_selection(mv), index);
-        moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
-        moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
-    }
-
-    return TRUE;
+    return moto_geometry_view_node_select(self, x, y, width, height, ray, tinfo);
 }
 
 gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
@@ -300,6 +238,7 @@ struct _MotoGeometryViewStatePriv
     GString *name;
     GString *title;
     MotoGeometryViewStateDrawFunc draw;
+    MotoGeometryViewStateSelectFunc select;
 };
 
 static void
@@ -351,7 +290,7 @@ G_DEFINE_TYPE(MotoGeometryViewState, moto_geometry_view_state, G_TYPE_OBJECT);
 
 MotoGeometryViewState *
 moto_geometry_view_state_new(const gchar *name, const gchar *title,
-        MotoGeometryViewStateDrawFunc draw)
+        MotoGeometryViewStateDrawFunc draw, MotoGeometryViewStateSelectFunc select)
 {
     MotoGeometryViewState *self = (MotoGeometryViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
 
@@ -359,6 +298,7 @@ moto_geometry_view_state_new(const gchar *name, const gchar *title,
     g_string_assign(self->priv->title, title);
 
     self->priv->draw = draw;
+    self->priv->select = select;
 
     return self;
 }
@@ -377,5 +317,13 @@ void moto_geometry_view_state_draw(MotoGeometryViewState *self, MotoGeometryView
 {
     if(self->priv->draw)
         self->priv->draw(self, geom);
+}
+
+gboolean moto_geometry_view_state_select(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
+{
+    if(self->priv->select)
+        return self->priv->select(self, geom, x, y, width, height, ray, tinfo);
+    return TRUE;
 }
 

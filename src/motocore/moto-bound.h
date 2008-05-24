@@ -60,6 +60,7 @@ MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
 MotoBound *moto_bound_new_from_array(gfloat array[6]);
 
 void moto_bound_copy(MotoBound *self, MotoBound *other);
+void moto_bound_set_extended(MotoBound *self, MotoBound *other, gfloat extent);
 void moto_bound_print(MotoBound *self);
 
 gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,

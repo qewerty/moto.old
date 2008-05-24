@@ -26,6 +26,7 @@
 #include <GL/glu.h>
 
 #include "moto-ray.h"
+#include "moto-transform-info.h"
 #include "moto-geometry-node.h"
 
 typedef struct _MotoGeometryViewNode MotoGeometryViewNode;
@@ -34,6 +35,8 @@ typedef struct _MotoGeometryViewNodePriv MotoGeometryViewNodePriv;
 
 typedef void (*MotoGeometryViewNodeDrawMethod)(MotoGeometryViewNode *self);
 typedef void (*MotoGeometryViewNodePrepareForDrawMethod)(MotoGeometryViewNode *self);
+typedef gboolean (*MotoGeometryViewNodeSelectMethod)(MotoGeometryViewNode *self,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 typedef MotoGeometryNode *(*MotoGeometryViewNodeGetGeometryMethod)(MotoGeometryViewNode *self);
 
 typedef struct _MotoGeometryViewState MotoGeometryViewState;
@@ -41,6 +44,8 @@ typedef struct _MotoGeometryViewStateClass MotoGeometryViewStateClass;
 typedef struct _MotoGeometryViewStatePriv MotoGeometryViewStatePriv;
 
 typedef void (*MotoGeometryViewStateDrawFunc)(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
+typedef gboolean (*MotoGeometryViewStateSelectFunc)(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
 /* class MotoGeometryViewNode */
 
@@ -57,6 +62,7 @@ struct _MotoGeometryViewNodeClass
 
     MotoGeometryViewNodeDrawMethod draw;
     MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw;
+    MotoGeometryViewNodeSelectMethod select;
     MotoGeometryViewNodeGetGeometryMethod get_geometry;
 
     GSList *states;
@@ -83,6 +89,8 @@ GType moto_geometry_view_node_get_type(void);
 
 void moto_geometry_view_node_draw(MotoGeometryViewNode *self);
 void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self);
+gboolean moto_geometry_view_node_select(MotoGeometryViewNode *self,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
 gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self);
 void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean status);
@@ -94,8 +102,7 @@ GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
 MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self);
 
 gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
-    gint x, gint y, gint width, gint height, MotoRay *ray,
-    GLdouble model[16], GLdouble proj[16], GLint view[4]);
+    gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
@@ -126,11 +133,13 @@ GType moto_geometry_view_state_get_type(void);
 
 MotoGeometryViewState *
 moto_geometry_view_state_new(const gchar *name, const gchar *title,
-        MotoGeometryViewStateDrawFunc draw);
+        MotoGeometryViewStateDrawFunc draw, MotoGeometryViewStateSelectFunc select);
 
 const gchar *moto_geometry_view_state_get_name(MotoGeometryViewState *self);
 const gchar *moto_geometry_view_state_get_title(MotoGeometryViewState *self);
 
 void moto_geometry_view_state_draw(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
+gboolean moto_geometry_view_state_select(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+        gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
 #endif /* MOTO_GEOMETRY_VIEW_NODE_H */

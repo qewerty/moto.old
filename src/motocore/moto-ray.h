@@ -116,6 +116,26 @@ int moto_ray_intersect_bound_check(MotoRay *self,
 int moto_ray_intersect_bound_dist(MotoRay *self,
         float *dist, float bound[6]);
 
+/**
+ * moto_ray_intersect_oriented_bound:
+ * @self: a #MotoRay.
+ * @intersection: a #MotoIntersection.
+ * @bound: array of six values (min_x, max_x, min_y, max_y, min_z, max_z).
+ *
+ * Finds intersection with axis-aligned bounding box.
+ *
+ * Returns: 0 if no intersections found else returns not 0.
+ */
+int moto_ray_intersect_oriented_bound(MotoRay *self,
+        MotoIntersection *intersection,
+        float bound[6]);
+
+int moto_ray_intersect_oriented_bound_check(MotoRay *self,
+        float bound[6]);
+
+int moto_ray_intersect_oriented_bound_dist(MotoRay *self,
+        float *dist, float bound[6]);
+
 /*
  * TODO: Cone, cylinder?
  */

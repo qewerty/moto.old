@@ -253,9 +253,9 @@ static void calc_bound(MotoCubeNode *self)
     gfloat size_x = *(self->priv->size_x_ptr);
     gfloat size_y = *(self->priv->size_y_ptr);
     gfloat size_z = *(self->priv->size_z_ptr);
-    gfloat hsx = size_x / 2 + 0.2;
-    gfloat hsy = size_y / 2 + 0.2;
-    gfloat hsz = size_z / 2 + 0.2;
+    gfloat hsx = size_x / 2;
+    gfloat hsy = size_y / 2;
+    gfloat hsz = size_z / 2;
 
     self->priv->bound->bound[0] = -hsx;
     self->priv->bound->bound[1] =  hsx;

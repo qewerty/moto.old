@@ -26,6 +26,7 @@
 #include <GL/glu.h>
 
 #include "moto-ray.h"
+#include "moto-transform-info.h"
 #include "moto-node.h"
 #include "moto-bound.h"
 #include "moto-geometry-view-node.h"
@@ -108,7 +109,7 @@ gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean globa
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
-    GLdouble model[16], GLdouble proj[16], GLint view[4]);
+    MotoTransformInfo *tinfo);
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_object_node_motion(MotoObjectNode *self,

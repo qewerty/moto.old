@@ -90,6 +90,16 @@ void moto_bound_copy(MotoBound *self, MotoBound *other)
     self->bound[5] = other->bound[5];
 }
 
+void moto_bound_set_extended(MotoBound *self, MotoBound *other, gfloat extent)
+{
+    self->bound[0] = other->bound[0] - extent;
+    self->bound[1] = other->bound[1] + extent;
+    self->bound[2] = other->bound[2] - extent;
+    self->bound[3] = other->bound[3] + extent;
+    self->bound[4] = other->bound[4] - extent;
+    self->bound[5] = other->bound[5] + extent;
+}
+
 void moto_bound_print(MotoBound *self)
 {
     g_print("min_x: %f; max_x: %f\n", self->bound[0], self->bound[1]);

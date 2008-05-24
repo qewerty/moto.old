@@ -1047,6 +1047,19 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
 
 static void calc_global_bound(MotoObjectNode *self)
 {
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "view", "view");
+    MotoParam *s = moto_param_get_source(p);
+    if( ! s)
+        return;
+    MotoGeometryViewNode *gvn = (MotoGeometryViewNode *)moto_param_get_node(s);
+    MotoGeometryNode *gn = moto_geometry_view_node_get_geometry(gvn);
+    if( ! gn)
+        return;
+
+    MotoBound *b = moto_geometry_node_get_bound(gn);
+
+    /* TODO */
+
     self->priv->global_bound_calculated = TRUE;
 }
 
@@ -1825,11 +1838,11 @@ void moto_object_node_set_camera(MotoObjectNode *self, MotoCameraNode *camera)
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
-    GLdouble model[16], GLdouble proj[16], GLint view[4])
+    MotoTransformInfo *tinfo)
 {
     if(self->priv->view)
         if(moto_geometry_view_node_process_button_press(self->priv->view,
-                    x, y, width, height, ray, model, proj, view))
+                    x, y, width, height, ray, tinfo))
             return TRUE;
 
     return FALSE;
