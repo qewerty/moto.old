@@ -152,16 +152,19 @@ gpointer moto_library_get_entry(MotoLibrary *self,
     return slot_get_entry(slot, entry_name);
 }
 
-/* WARNING: This is NOT thread-safe!  */
-
-static MotoLibraryForeachFunc lib_foreach_callback = NULL;
+typedef struct _LibForeachUserData
+{
+    MotoLibraryForeachFunc callback;
+    gpointer user_data;
+} LibForeachUserData;
 
 static void
 lib_foreach(GQuark key_id, gpointer data, gpointer user_data)
 {
-    if(lib_foreach_callback)
-        if(lib_foreach_callback(data, user_data))
-            lib_foreach_callback = NULL;
+    LibForeachUserData *lfud = (LibForeachUserData *)user_data;
+    if(lfud->callback)
+        if(lfud->callback(data, lfud->user_data))
+            lfud->callback = NULL;
 }
 
 void moto_library_foreach(MotoLibrary *self, const gchar *slot_name,
@@ -174,6 +177,6 @@ void moto_library_foreach(MotoLibrary *self, const gchar *slot_name,
         return;
     }
 
-    lib_foreach_callback = func;
-    g_datalist_foreach(& slot->dl, lib_foreach, user_data);
+    LibForeachUserData lfud = {func, user_data};
+    g_datalist_foreach(& slot->dl, lib_foreach, & lfud);
 }
