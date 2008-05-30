@@ -4,6 +4,8 @@
 #include "common/numdef.h"
 #include "common/matrix.h"
 
+#include "moto-factory.h"
+
 #include "moto-world.h"
 #include "moto-node.h"
 #include "moto-system.h"
@@ -17,6 +19,18 @@
 // #include "moto-time-node.h"
 
 /* class World */
+
+/* for mutex factory */
+static gpointer create_mutex(gpointer user_data)
+{
+    return (gpointer)g_mutex_new();
+}
+static void free_mutex(GQuark key_id, gpointer data, gpointer user_data)
+{
+    g_mutex_free((GMutex *)data);
+}
+
+#define get_mutex(factory, name) ((GMutex *)moto_factory_get(factory, name))
 
 static GObjectClass *world_parent_class = NULL;
 
@@ -45,12 +59,24 @@ struct _MotoWorldPriv
     // Misc
     gboolean left_coords;
     gfloat select_bound_extent;
+
+    MotoFactory mutex_factory;
+
+    GMutex *loading_mutex;
+    GMutex *add_node_mutex;
+    GMutex *delete_node_mutex;
+    GMutex *set_current_object_mutex;
+    GMutex *set_root_mutex;
+    GMutex *set_camera_mutex;
+    GMutex *set_axes_mutex;
 };
 
 static void
 moto_world_dispose(GObject *obj)
 {
     MotoWorld *self = (MotoWorld *)obj;
+
+    moto_factory_free_all(& self->priv->mutex_factory);
 
     g_string_free(self->priv->filename, TRUE);
     g_slice_free(MotoWorldPriv, self->priv);
@@ -84,13 +110,24 @@ moto_world_init(MotoWorld *self)
     self->priv->camera = NULL;
     self->priv->global_axes = NULL;
 
-    // Default camera settings
+    /* Default camera settings */
     self->priv->fovy = 60*RAD_PER_DEG;
     self->priv->z_near = 0.3;
     self->priv->z_far = 150;
 
     self->priv->left_coords = FALSE;
     self->priv->select_bound_extent = 0.2;
+
+    moto_factory_init(& self->priv->mutex_factory, create_mutex, free_mutex, NULL);
+
+    /* */
+    self->priv->loading_mutex               = get_mutex(& self->priv->mutex_factory, "loading");
+    self->priv->add_node_mutex              = get_mutex(& self->priv->mutex_factory, "add_node");
+    self->priv->delete_node_mutex           = get_mutex(& self->priv->mutex_factory, "delete_node");
+    self->priv->set_current_object_mutex    = get_mutex(& self->priv->mutex_factory, "set_current_object");
+    self->priv->set_root_mutex              = get_mutex(& self->priv->mutex_factory, "set_root");
+    self->priv->set_camera_mutex            = get_mutex(& self->priv->mutex_factory, "set_camera");
+    self->priv->set_axes_mutex              = get_mutex(& self->priv->mutex_factory, "set_axes");
 }
 
 static void
@@ -123,6 +160,9 @@ MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib)
     MotoWorld *self = moto_world_new("", lib);
 
     /* load world from dump */
+    g_mutex_lock(self->priv->loading_mutex);
+        /* Loading ... */
+    g_mutex_unlock(self->priv->loading_mutex);
 
     return self;
 }
@@ -135,7 +175,10 @@ const gchar *moto_world_get_name(MotoWorld *self)
 void moto_world_add_node(MotoWorld *self, MotoNode *node)
 {
     moto_node_set_world(node, self);
+
+    g_mutex_lock(self->priv->add_node_mutex);
     self->priv->nodes = g_slist_append(self->priv->nodes, node);
+    g_mutex_unlock(self->priv->add_node_mutex);
 }
 
 MotoNode *moto_world_create_node(MotoWorld *self,
@@ -205,7 +248,9 @@ MotoObjectNode *moto_world_get_current_object(MotoWorld *self)
 
 void moto_world_set_object_current(MotoWorld *self, MotoObjectNode *obj)
 {
+    g_mutex_lock(self->priv->set_current_object_mutex);
     self->priv->current_object = obj;
+    g_mutex_unlock(self->priv->set_current_object_mutex);
 }
 
 MotoObjectNode *moto_world_get_root(MotoWorld *self)
@@ -216,7 +261,9 @@ MotoObjectNode *moto_world_get_root(MotoWorld *self)
 void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
 {
     /* TODO: Check that new root is a node in this world! */
+    g_mutex_lock(self->priv->set_root_mutex);
     self->priv->root = root;
+    g_mutex_unlock(self->priv->set_root_mutex);
 }
 
 MotoObjectNode * moto_world_get_camera(MotoWorld *self)
@@ -226,7 +273,9 @@ MotoObjectNode * moto_world_get_camera(MotoWorld *self)
 
 void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera)
 {
+    g_mutex_lock(self->priv->set_camera_mutex);
     self->priv->camera = camera;
+    g_mutex_unlock(self->priv->set_camera_mutex);
 }
 
 MotoObjectNode * moto_world_get_axes(MotoWorld *self)
@@ -236,7 +285,9 @@ MotoObjectNode * moto_world_get_axes(MotoWorld *self)
 
 void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
 {
+    g_mutex_lock(self->priv->set_axes_mutex);
     self->priv->global_axes = axes;
+    g_mutex_unlock(self->priv->set_axes_mutex);
 }
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)
@@ -309,7 +360,7 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
     GSList *node = self->priv->nodes;
     for(; node; node=g_slist_next(node))
     {
-        if(G_TYPE_CHECK_INSTANCE_TYPE(node->data, MOTO_TYPE_OBJECT_NODE))
+        if(G_TYPE_CHECK_INSTANCE_TYPE(node->data, type))
         {
             if( ! func(self, (MotoNode *)node->data, user_data))
                 return;
@@ -439,9 +490,7 @@ void moto_world_button_press(MotoWorld *self,
         gfloat *om = moto_object_node_get_matrix(idata.obj, TRUE);
         gfloat *iom = moto_object_node_get_inverse_matrix(idata.obj, TRUE);
 
-        MotoTransformInfo tinfo2;
-        moto_transform_info_set_proj(& tinfo2, tinfo.proj);
-        moto_transform_info_set_view(& tinfo2, tinfo.view);
+        MotoTransformInfo tinfo2 = tinfo;
         matrix44_mult(tinfo2.model, tinfo.model, om);
 
         MotoRay ray;
