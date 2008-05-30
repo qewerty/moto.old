@@ -29,7 +29,7 @@ typedef struct _MotoGeometryNode MotoGeometryNode;
 typedef struct _MotoGeometryNodeClass MotoGeometryNodeClass;
 typedef struct _MotoGeometryNodePriv MotoGeometryNodePriv;
 
-typedef const MotoBound *(*MotoGeometryNodeGetBoundMethod)(MotoGeometryNode *self);
+typedef MotoBound *(*MotoGeometryNodeGetBoundMethod)(MotoGeometryNode *self);
 
 /* class MotoGeometryNode */
 

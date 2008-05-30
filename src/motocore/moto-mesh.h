@@ -24,6 +24,8 @@
 
 #include "glib-object.h"
 
+#include "moto-ray.h"
+
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
 typedef struct _MotoMeshPriv MotoMeshPriv;
@@ -32,6 +34,8 @@ typedef struct _MotoMeshVert MotoMeshVert;
 typedef struct _MotoMeshEdge MotoMeshEdge;
 
 typedef struct _MotoMeshFace MotoMeshFace;
+typedef struct _MotoMeshFaceHole MotoMeshFaceHole;
+typedef struct _MotoTriangle MotoTriangle;
 typedef struct _MotoMeshSubFace MotoMeshSubFace;
 
 typedef struct _MotoMeshVertAttr MotoMeshVertAttr;
@@ -55,14 +59,34 @@ struct _MotoMeshEdge
     guint a, b;
 };
 
+struct _MotoMeshFaceHole
+{
+    guint verts_num;
+    guint *indecies;
+};
+
+void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint verts_num);
+
+struct _MotoTriangle
+{
+    guint a, b, c;
+};
+
 struct _MotoMeshFace
 {
     gfloat normal[3];
     guint verts_num;
     guint *indecies;
 
+    guint holes_num;
+    MotoMeshFaceHole *holes;
+
+    /* read-only */
+    guint triangles_num;
+    MotoTriangle *triangles;
+
     /* If convexes is NULL face is not tesselated and considered as convex. */
-    MotoMeshSubFace *convexes;
+    MotoMeshSubFace *convexes; // temporary unused
 };
 
 struct _MotoMeshSubFace
@@ -71,12 +95,14 @@ struct _MotoMeshSubFace
     guint *indecies;
 };
 
-void moto_mesh_face_alloc(MotoMeshFace *self);
+void moto_mesh_face_init(MotoMeshFace *self, guint verts_num, guint holes_num);
+void moto_mesh_face_alloc(MotoMeshFace *self); // TODO: Remove deprecated!
 void moto_mesh_face_free(MotoMeshFace *self);
 void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh);
 /* Tesselation must be performed after normal is calculated.  */
 void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh);
 // void moto_mesh_face_draw(MotoMeshFace *self);
+gboolean moto_mesh_face_intersect_ray(MotoMeshFace *self,  MotoMesh *mesh, MotoRay *ray, gfloat *dist);
 
 void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
         MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh);
@@ -169,9 +195,10 @@ void moto_mesh_foreach_vertex(MotoMesh *self,
 void moto_mesh_foreach_edge(MotoMesh *self,
         MotoMeshForeachEdgeFunc func);
 
+void moto_mesh_tesselate_faces(MotoMesh *self);
+
 /* Euler operators.
- * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh).
- * Thanks Briggs! */
+ * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh). */
 
 /* make face & kill face */
 MotoMeshFace *moto_mesh_MF(MotoMesh *self);

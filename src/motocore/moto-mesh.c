@@ -182,6 +182,75 @@ void moto_mesh_foreach_edge(MotoMesh *self,
     }
 }
 
+typedef struct _FaceTessData
+{
+    MotoMesh *mesh;
+    guint start_index,
+          end_index;
+} FaceTessData;
+
+static gpointer face_tesselation_thread(FaceTessData *data)
+{
+    MotoMesh *mesh = data->mesh;
+
+    guint i;
+    for(i = data->start_index; i < data->end_index; i++)
+        moto_mesh_face_tesselate(& mesh->faces[i], mesh);
+
+    return NULL;
+}
+
+void moto_mesh_tesselate_faces(MotoMesh *self)
+{
+    if(self->faces_num < 5000)
+    {
+        /* Tesselation in the main thread. */
+        guint i;
+        for(i = 0; i < self->faces_num; i++)
+            moto_mesh_face_tesselate(& self->faces[i], self);
+    }
+    else
+    {
+        /* Multi-threaded mesh face tesselation. */
+        guint threads_num = (self->faces_num > 20000)?4:(self->faces_num > 15000)?3:2;
+        GThread *threads[threads_num];
+        FaceTessData tess_data[threads_num];
+
+        guint faces_per_thread = self->faces_num / threads_num;
+
+        guint i;
+        for(i = 0; i < threads_num; i++)
+        {
+            tess_data[i].mesh = self;
+            tess_data[i].start_index = i*faces_per_thread;
+            tess_data[i].end_index = min(tess_data[i].start_index + faces_per_thread, self->faces_num);
+
+            threads[i] = g_thread_create_full((GThreadFunc)face_tesselation_thread, & tess_data[i],
+                                              524288, TRUE, TRUE, G_THREAD_PRIORITY_URGENT,  NULL);
+        }
+        for(i = 0; i < threads_num; i++)
+            g_thread_join(threads[i]);
+    }
+}
+
+void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint verts_num)
+{
+    self->verts_num = verts_num;
+    self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);
+}
+
+void moto_mesh_face_init(MotoMeshFace *self,
+        guint verts_num, guint holes_num)
+{
+    self->verts_num = verts_num;
+    self->holes_num = holes_num;
+    // self->triangles_num = triangles_num;
+
+    self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);
+    self->holes = (MotoMeshFaceHole *)g_try_malloc(sizeof(MotoMeshFaceHole) * self->holes_num);
+    // self->triangles = (MotoTriangle *)g_try_malloc(sizeof(MotoTriangle) * self->triangles_num);
+}
+
 void moto_mesh_face_alloc(MotoMeshFace *self)
 {
     self->indecies = (guint *)g_try_malloc(sizeof(guint) * self->verts_num);
@@ -190,6 +259,14 @@ void moto_mesh_face_alloc(MotoMeshFace *self)
 void moto_mesh_face_free(MotoMeshFace *self)
 {
     g_free(self->indecies);
+
+    guint i;
+    for(i = 0; i < self->holes_num; i++)
+        g_free(self->holes[i].indecies);
+    g_free(self->holes);
+
+    if(self->triangles)
+        g_free(self->triangles);
 }
 
 /* Newell's method */
@@ -221,50 +298,31 @@ typedef struct _Vector
     gfloat xyz[3];
 } Vector;
 
-#define index(i, vnum) ((i) % (vnum))
+void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh)
+{}
 
-static gboolean has_concaves(Vector *crosses, guint num, gfloat normal[3])
+gboolean
+moto_mesh_face_intersect_ray(MotoMeshFace *self,
+        MotoMesh *mesh, MotoRay *ray, gfloat *dist)
 {
-    if(num <= 3)
-        return FALSE;
-
-    guint i;
-    for(i = 0; i < num; i++)
+    if( ! self->triangles)
     {
-        if(vector3_dot(normal, crosses[i].xyz) < 0)
+        /* TODO: Intersection with convex polygon. */
+    }
+
+    MotoTriangle *t;
+    guint i;
+    for(i = 0; i < self->triangles_num; i++)
+    {
+        t = & self->triangles[i];
+        if(moto_ray_intersect_triangle_dist(ray, dist,
+                    mesh->verts[t->a].xyz,
+                    mesh->verts[t->b].xyz,
+                    mesh->verts[t->c].xyz))
             return TRUE;
     }
 
     return FALSE;
-}
-
-void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh)
-{
-    Vector crosses[self->verts_num];
-    Vector a, b;
-    gfloat lenbuf;
-    guint vnum = self->verts_num;
-
-    guint i;
-    for(i = 0; i < self->verts_num; i++)
-    {
-        vector3_dif(a.xyz,
-                    mesh->verts[self->indecies[index(i-1, vnum)]].xyz,
-                    mesh->verts[self->indecies[index(i, vnum)]].xyz);
-        vector3_dif(b.xyz,
-                    mesh->verts[self->indecies[index(i, vnum)]].xyz,
-                    mesh->verts[self->indecies[index(i+1, vnum)]].xyz);
-
-        vector3_cross(crosses[i].xyz, a.xyz, b.xyz);
-        vector3_normalize(crosses[i].xyz, lenbuf);
-    }
-
-    if(has_concaves(crosses, self->verts_num, self->normal))
-    {
-        /* Face is convex and may be drawn as is. */
-        self->convexes = NULL;
-        return;
-    }
 }
 
 void moto_mesh_face_foreach_vertex(MotoMeshFace *face,

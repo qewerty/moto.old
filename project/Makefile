@@ -2,9 +2,9 @@ PROGRAM := moto
 
 source_dirs := ../../src ../../src/common ../../src/motocore ../../src/gui
 
-override INCLUDES += `pkg-config --cflags gtkglext-1.0`
+override INCLUDES += `pkg-config --cflags gthread-2.0 gtkglext-1.0`
 override CFLAGS += -pipe $(INCLUDES) -DWITH_MOTO_WOBJ_MESH_LOADER
-override LIBS   += `pkg-config --libs gtkglext-1.0` -lGL -lGLU
+override LIBS   += `pkg-config --libs gthread-2.0 gtkglext-1.0` -lGL -lGLU
 
 CC = gcc
 

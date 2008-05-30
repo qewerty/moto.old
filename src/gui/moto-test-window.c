@@ -71,6 +71,12 @@ moto_test_window_finalize(GObject *obj)
     test_window_parent_class->finalize(obj);
 }
 
+static void quit(MotoTestWindow *self)
+{
+    // g_object_unref(self->priv->world);
+    gtk_main_quit();
+}
+
 static void
 moto_test_window_init(MotoTestWindow *self)
 {
@@ -228,9 +234,9 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
 
     g_signal_connect(G_OBJECT(self), "delete-event",
-                G_CALLBACK(gtk_main_quit), NULL);
+                G_CALLBACK(quit), NULL);
     g_signal_connect(G_OBJECT(self), "destroy",
-                G_CALLBACK(gtk_main_quit), NULL);
+                G_CALLBACK(quit), NULL);
 
     g_signal_connect(G_OBJECT(area), "expose-event",
                 G_CALLBACK(draw), NULL);

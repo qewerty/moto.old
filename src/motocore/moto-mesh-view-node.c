@@ -401,8 +401,9 @@ static gboolean moto_mesh_view_node_select(MotoGeometryViewNode *self,
 
     MotoGeometryViewState *state = moto_geometry_view_node_get_state((MotoGeometryViewNode *)self);
     if(state)
-        moto_geometry_view_state_select(state, (MotoGeometryViewNode *)self,
+        return moto_geometry_view_state_select(state, (MotoGeometryViewNode *)self,
                 x, y, width, height, ray, tinfo);
+    return FALSE;
 }
 
 static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeometryViewNode *self)
@@ -446,20 +447,20 @@ moto_mesh_view_node_select_as_verts(MotoGeometryViewState *self, MotoGeometryVie
     MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
     if( ! mesh)
     {
-        g_print("No mesh\n");
-        return TRUE;
+        // g_print("No mesh\n");
+        return FALSE;
     }
 
     /* Array of intersected verts. */
-    GArray *hits = g_array_new(FALSE, FALSE, sizeof(gint));
+    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->verts_num/10)));
 
-    gint index = -1;
+    guint index;
     gfloat dist, dist_tmp;
     dist = MACRO;
     gfloat square_radius = 0.25*0.25;
     gfloat fovy = atan((1/tinfo->proj[5]))*2;
 
-    gint i;
+    guint i;
     for(i = 0; i < mesh->verts_num; i++)
     {
         gfloat *xyz = mesh->verts[i].xyz;
@@ -481,13 +482,13 @@ moto_mesh_view_node_select_as_verts(MotoGeometryViewState *self, MotoGeometryVie
         }
     }
 
-    if(index > -1)
+    if(hits->len > 0)
     {
         /* Detecting which of intersected verts is nearest to cursor. */
         GLdouble win_dist,
                  min_win_dist = MACRO;
         GLdouble win_x, win_y, win_z, xx, yy;
-        gint i, ii;
+        guint i, ii;
         for(i = 0; i < hits->len; i++)
         {
             ii = g_array_index(hits, gint, i);
@@ -509,6 +510,7 @@ moto_mesh_view_node_select_as_verts(MotoGeometryViewState *self, MotoGeometryVie
         moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
     }
 
+    g_array_free(hits, TRUE);
     return TRUE;
 }
 

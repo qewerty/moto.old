@@ -19,13 +19,11 @@ static Slot *slot_new(GType type)
     return self;
 }
 
-/*
-static void slot_delete(Slot *self)
+static void slot_free(Slot *self)
 {
     g_datalist_clear(& self->dl);
     g_free(self);
 }
-*/
 
 static gboolean slot_check_entry(Slot *self, gpointer entry)
 {
@@ -35,10 +33,10 @@ static gboolean slot_check_entry(Slot *self, gpointer entry)
 static void slot_new_entry(Slot *self, const gchar *name, gpointer entry)
 {
     g_assert(slot_check_entry(self, entry));
-    g_datalist_set_data(& self->dl, name, entry);
+    g_datalist_set_data_full(& self->dl, name, entry, (GDestroyNotify)g_object_unref);
 }
 
-static  gpointer slot_get_entry(Slot *self, const gchar *name)
+static gpointer slot_get_entry(Slot *self, const gchar *name)
 {
     return g_datalist_get_data(& self->dl, name);
 }
@@ -50,6 +48,8 @@ static GObjectClass *library_parent_class = NULL;
 struct _MotoLibraryPriv
 {
     GData *slots;
+    GMutex *new_slot_mutex;
+    GMutex *new_entry_mutex;
 };
 
 static void
@@ -57,7 +57,12 @@ moto_library_dispose(GObject *obj)
 {
     MotoLibrary *self = (MotoLibrary *)obj;
 
+    /* Slots are deleted by destroy_func whicj has been set while adding data ti datalist. */
     g_datalist_clear(& self->priv->slots);
+
+    g_mutex_free(self->priv->new_slot_mutex);
+    g_mutex_free(self->priv->new_entry_mutex);
+
     g_slice_free(MotoLibraryPriv, self->priv);
 
     G_OBJECT_CLASS(library_parent_class)->dispose(obj);
@@ -75,6 +80,8 @@ moto_library_init(MotoLibrary *self)
     self->priv = g_slice_new(MotoLibraryPriv);
 
     g_datalist_init(& self->priv->slots);
+    self->priv->new_slot_mutex = g_mutex_new();
+    self->priv->new_entry_mutex = g_mutex_new();
 
 }
 
@@ -108,8 +115,10 @@ void moto_library_new_slot(MotoLibrary *self, const gchar *slot_name, GType type
         return;
     }
 
+    g_mutex_lock(self->priv->new_slot_mutex);
     Slot *slot = slot_new(type);
-    g_datalist_set_data(& self->priv->slots, slot_name, slot);
+    g_datalist_set_data_full(& self->priv->slots, slot_name, slot, (GDestroyNotify)slot_free);
+    g_mutex_unlock(self->priv->new_slot_mutex);
 }
 
 gboolean moto_library_new_entry(MotoLibrary *self,
@@ -134,7 +143,9 @@ gboolean moto_library_new_entry(MotoLibrary *self,
         return FALSE;
     }
 
+    g_mutex_lock(self->priv->new_entry_mutex);
     slot_new_entry(slot, entry_name, entry);
+    g_mutex_unlock(self->priv->new_entry_mutex);
 
     return TRUE;
 }
