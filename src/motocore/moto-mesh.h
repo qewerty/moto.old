@@ -198,7 +198,9 @@ void moto_mesh_foreach_edge(MotoMesh *self,
 void moto_mesh_tesselate_faces(MotoMesh *self);
 
 /* Euler operators.
- * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh). */
+ * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh).
+ * A mesh object remembers information about how many new verts/edges/faces must be created or deleted
+ * while perforforming any of these operators. You do not need think about memory for mesh components. */
 
 /* make face & kill face */
 MotoMeshFace *moto_mesh_MF(MotoMesh *self);
@@ -222,8 +224,14 @@ MotoMeshEdge *moto_mesh_SFME(MotoMesh *self,
 gboolean moto_mesh_JFKE(MotoMesh *self,
         MotoMeshFace *f1, MotoMeshFace *f2);
 
-/* Perform previous Euler operators.  */
-void moto_mesh_perform_euler(MotoMesh *self);
+/* Perform previous operators.  */
+void moto_mesh_perform_operators(MotoMesh *self);
+
+/* Check has the mesh unperformed euler operations or not.  */
+gboolean moto_mesh_has_operators(MotoMesh *self);
+
+/* Clear sequence of mesh operators. */
+void moto_mesh_clear_operators(MotoMesh *self);
 
 #endif /* MOTO_MESH_H */
 
