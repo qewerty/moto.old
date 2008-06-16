@@ -97,11 +97,12 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
 {
     MotoCubeNode *self = (MotoCubeNode *)g_object_new(MOTO_TYPE_CUBE_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
+    moto_node_set_name(node, name);
+
+    /* params */
 
     MotoParamBlock *pb;
     MotoParamData *pdata;
-
-    /* params */
 
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);

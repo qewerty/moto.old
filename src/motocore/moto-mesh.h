@@ -46,6 +46,8 @@ typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVert *vert);
 typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
 typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self, MotoMeshVert *vert);
 
+typedef struct _MotoMeshOp MotoMeshOp;
+
 /* class MotoMesh */
 
 struct _MotoMeshVert
@@ -202,12 +204,55 @@ void moto_mesh_tesselate_faces(MotoMesh *self);
  * A mesh object remembers information about how many new verts/edges/faces must be created or deleted
  * while perforforming any of these operators. You do not need think about memory for mesh components. */
 
+struct _MotoMeshOp
+{
+    GObject parent;
+};
+
+/**
+ * moto_mesh_op_empty:
+ *
+ * Creates new mesh operator which do nothing.
+ */
+MotoMeshOp *moto_mesh_op_empty();
+
+/**
+ * moto_mesh_op_combine:
+ * @ops: Array of pointers to mesh operators.
+ *
+ * Creates new mesh operator which perform sequence of other operators in order given in array passed though ops argument.
+ *
+ * Returns: instance of newly created MotoMeshOp.
+ */
+MotoMeshOp *moto_mesh_op_combine(MotoMeshOp *ops);
+
+MotoMesh *moto_mesh_op_perform(MotoMeshOp *self, MotoMesh *mesh, MotoMeshSelection *selection);
+gboolean moto_mesh_op_check(MotoMeshOp *self, MotoMesh *mesh);
+
 /* make face & kill face */
-MotoMeshFace *moto_mesh_MF(MotoMesh *self);
-gboolean moto_mesh_KF(MotoMesh *self, MotoMeshFace *f);
+
+/**
+ * moto_mesh_MF:
+ * @indecies: The pointer to array of vertex indecies which will be verts of new face.
+ *
+ * Creates new face from given vertex indecies.
+ *
+ * Returns: MotoMeshFace instance or NULL if indecies are invalid.
+ */
+MotoMeshOp *moto_mesh_op_MF(MotoMesh *self, guint *indecies);
+
+/**
+ * moto_mesh_KF:
+ * @face_index: The index of the face to delete.
+ *
+ * Delete the face by given index.
+ *
+ * Returns: TRUE on succeed or FALSE of operation can not be performed.
+ */
+gboolean moto_mesh_KF(MotoMesh *self, guint face_index);
 
 /* make edge & kill edge */
-MotoMeshEdge *moto_mesh_ME(MotoMesh *self, MotoMeshVert *v1, MotoMeshVert *v2);
+MotoMeshEdge *moto_mesh_ME(MotoMesh *self, guint v1, guint v2);
 gboolean moto_mesh_KE(MotoMesh *self, MotoMeshEdge *e);
 
 /* make vert & kill vert */

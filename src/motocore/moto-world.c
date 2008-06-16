@@ -16,7 +16,7 @@
 #include "moto-intersection.h"
 #include "moto-ray-view-node.h"
 #include "moto-transform-info.h"
-// #include "moto-time-node.h"
+#include "moto-time-node.h"
 
 /* class World */
 
@@ -48,15 +48,19 @@ struct _MotoWorldPriv
     MotoObjectNode *root;
     MotoObjectNode *camera;
     MotoObjectNode *global_axes;
-    // MotoTimeNode *time;
+    MotoTimeNode *time_node;
 
     MotoLibrary *library;
 
-    // Default camera settings
+    /* Default camera settings */
     gfloat fovy;
     gfloat z_near, z_far;
 
-    // Misc
+    /* Animation */
+    GTimer *timer;
+    gfloat fps;
+
+    /* Misc */
     gboolean left_coords;
     gfloat select_bound_extent;
 
@@ -75,6 +79,8 @@ static void
 moto_world_dispose(GObject *obj)
 {
     MotoWorld *self = (MotoWorld *)obj;
+
+    g_timer_destroy(self->priv->timer);
 
     moto_factory_free_all(& self->priv->mutex_factory);
 
@@ -120,7 +126,10 @@ moto_world_init(MotoWorld *self)
 
     moto_factory_init(& self->priv->mutex_factory, create_mutex, free_mutex, NULL);
 
-    /* */
+    /* Animation */
+    self->priv->timer = g_timer_new();
+
+    /* Misc */
     self->priv->loading_mutex               = get_mutex(& self->priv->mutex_factory, "loading");
     self->priv->add_node_mutex              = get_mutex(& self->priv->mutex_factory, "add_node");
     self->priv->delete_node_mutex           = get_mutex(& self->priv->mutex_factory, "delete_node");
@@ -139,6 +148,17 @@ moto_world_class_init(MotoWorldClass *klass)
 
     goclass->dispose    = moto_world_dispose;
     goclass->finalize   = moto_world_finalize;
+
+    klass->updated_signal_id = g_signal_newv ("updated",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
 }
 
 G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);
@@ -406,6 +426,25 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
 
     return TRUE;
 }
+
+/* Animation */
+
+void moto_world_start_anim(MotoWorld *self)
+{
+    g_timer_start(self->priv->timer);
+}
+
+void moto_world_stop_anim(MotoWorld *self)
+{
+    g_timer_stop(self->priv->timer);
+}
+
+void moto_world_update(MotoWorld *self)
+{
+    // moto_node_update(self->priv->time_node);
+}
+
+/*  */
 
 void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height)

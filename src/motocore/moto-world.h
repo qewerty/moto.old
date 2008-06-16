@@ -56,6 +56,8 @@ struct _MotoWorldClass
     guint button_press_signal_id;
     guint button_release_signal_id;
     guint motion_notify_signal_id;
+
+    guint updated_signal_id;
 };
 
 GType moto_world_get_type(void) G_GNUC_CONST;
@@ -252,6 +254,15 @@ MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name);
 
 void moto_world_foreach_node(MotoWorld *self, GType type,
         MotoWorldForeachNodeFunc func,gpointer user_data);
+
+/* Animation */
+
+void moto_world_start_anim(MotoWorld *self);
+void moto_world_stop_anim(MotoWorld *self);
+
+void moto_world_update(MotoWorld *self);
+
+/* Signals??? (TODO: These must be signals not just functions.) */
 
 void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height);

@@ -35,6 +35,8 @@ typedef enum
     MOTO_PARAM_MODE_INOUT
 } MotoParamMode;
 
+G_BEGIN_DECLS
+
 /* class MotoNode */
 
 struct _MotoNode
@@ -74,6 +76,7 @@ MotoParam *moto_node_get_param(MotoNode *self,
 
 void moto_node_update_param_dests(MotoNode *self,
         const gchar *block_name, const gchar *param_name);
+void moto_node_update_all_param_dests(MotoNode *self);
 
 gboolean moto_node_is_hidden(MotoNode *self);
 void moto_node_set_hidden(MotoNode *self, gboolean hidden);
@@ -254,5 +257,7 @@ MotoParam *moto_param_block_get_param(MotoParamBlock *self, const gchar *name);
 void moto_param_block_add_param(MotoParamBlock *self, MotoParam *param);
 
 MotoNode *moto_param_block_get_node(MotoParamBlock *self);
+
+G_END_DECLS
 
 #endif /* MOTO_NODE_H */
