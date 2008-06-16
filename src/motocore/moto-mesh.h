@@ -79,6 +79,13 @@ struct _MotoMeshFace
     gfloat normal[3];
     guint verts_num;
     guint *indecies;
+    union
+    {
+        /* Small meshes use small indecies. ;) */
+        guint16 *v16;
+        guint32 *v32;
+        guint64 *v64; /* Very big meshes. 0_o */
+    };
 
     guint holes_num;
     MotoMeshFaceHole *holes;
