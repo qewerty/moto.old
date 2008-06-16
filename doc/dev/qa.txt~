@@ -1,0 +1,24 @@
+Quality Assuarance Document
+===========================
+
+Code
+----
+
+ * Code uses GTK-style coding conventions.
+ * All GObject based types must be enclosed with G_BEGIN_DECLS ... G_END_DECLS.
+ * All GObject based types must check disposed flag in its dispose function
+   to prevent double disposing.
+ * All headers must have GNU GPL note on their top.
+ * All headers must have brief description of file contents.
+   
+Documentation
+-------------
+
+ * All public functions and macros must be documented with gtk-doc.
+
+Testing
+-------
+
+ * All functions and macros must be tested at least in two different test cases.
+   One or more test cases must test function in multi-threaded environment if
+   this has sense. Details in STD.

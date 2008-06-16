@@ -1,0 +1,25 @@
+WARNING: Check for errors before commiting!!!
+
+
+
+Updating all nodes in the Moto world
+====================================
+
+Algorithm of updating world in Moto is very simple.
+
+1.) Detecting all important (mostly objects and transforms) nodes on the leafs
+    of the DAG.
+3.) Recurcively call their 'update' method beginning. Leafs must firstly call
+   'update' method on all their dependencies and then update themselves.
+   And flag 'to_be_updated' is set to FALSE to prevent double updating.
+    
+Performance
+-----------
+
+ * Nodes are lazy and can do nothing if their dependencies wasn't updated.
+ * If node has many output parameters, Moto updates only those nodes which
+   depend on actually updated parameters.
+ * Performance may be improved on multi-core CPUs by detecting branches which
+   do not intersect each other in DAG and running 'update' in separate thread.
+   But this has not any sense if thread running time overhead is more than time
+   between two frames.

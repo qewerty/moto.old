@@ -1,0 +1,109 @@
+* Begining character "~" indicates abstact node type.
+
+
+~Node
+=====
+INPUTS:
+    ...
+OUTPUTS:
+    ...
+
+~Geometry(Node)
+==============
+INPUTS:
+    ...
+OUTPUTS:
+    ...
+
+Cube(Geometry)
+==============
+INPUTS:
+    float   size_x
+    float   size_y
+    float   size_x
+    int     div_x
+    int     div_y
+    int     div_z
+OUTPUTS:
+    Mesh    out_mesh
+    NURBS   out_nurbs
+
+Sphere(Geometry)
+================
+INPUTS:
+    float   radius
+    int     segments
+    int     slices
+OUTPUTS:
+    Mesh    out_mesh
+    NURBS   out_nurbs
+
+Extrude(Node)
+=============
+INPUTS:
+    float           tx
+    float           ty
+    float           tz
+    float           sx
+    float           sy
+    float           sz
+    float           rx
+    float           ry
+    float           rz
+    int             divisions
+    Mesh            in_mesh
+OUTPUTS:
+    Mesh            out_mesh
+
+~GeometryView(Node)
+===================
+INPUTS:
+    ...
+OUTPUTS:
+    GeometryView    view
+
+MeshView(GeometryView)
+======================
+INPUTS:
+    ...
+OUTPUTS:
+    ...
+
+NURBSView(GeometryView)
+=======================
+INPUTS:
+    ...
+OUTPUTS:
+    ...
+    
+~Transform(Node)
+================
+INPUTS:
+    Transform   parent
+OUTPUTS
+    Transform   transform
+
+Object(Transform)
+=================
+INPUTS:
+    float           tx
+    float           ty
+    float           tz
+    float           sx
+    float           sy
+    float           sz
+    float           rx
+    float           ry
+    float           rz
+    TransformOrder  translate_order
+    RotateOrder     rotate_order
+    GeometryView    view
+OUTPUTS:
+    ...
+
+Joint(Transform)
+=================
+INPUTS:
+    ...
+OUTPUTS:
+    ...
