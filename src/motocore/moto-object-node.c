@@ -7,15 +7,7 @@
 #include "moto-messager.h"
 #include "moto-object-node.h"
 #include "moto-material-node.h"
-#include "moto-float-param-data.h"
-#include "moto-bool-param-data.h"
-#include "moto-geometry-view-param-data.h"
-#include "moto-transform-strategy-param-data.h"
-#include "moto-transform-order-param-data.h"
-#include "moto-rotate-order-param-data.h"
-#include "moto-object-param-data.h"
-#include "moto-material-param-data.h"
-#include "moto-camera-param-data.h"
+#include "moto-camera-node.h"
 
 #include "common/matrix.h"
 #include "common/numdef.h"
@@ -169,6 +161,7 @@ moto_object_node_finalize(GObject *obj)
 static void
 moto_object_node_init(MotoObjectNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
     self->priv = g_slice_new(MotoObjectNodePriv);
 
     self->priv->transform_strategy  = MOTO_TRANSFORM_STRATEGY_SOFTWARE;
@@ -195,17 +188,38 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->local_bound_calculated  = FALSE;
     self->priv->global_bound_calculated = FALSE;
 
+    GParamSpec *pspec; // FIXME: Implement.
+
+    moto_node_add_params(node,
+            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec,        "Transform", "Transform/Parent",
+            "tx", "Transform X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
+            "ty", "Transform Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
+            "tz", "Transform Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
+            "rx", "Rotate X",    G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Rotate",
+            "ry", "Rotate Y",    G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Rotate",
+            "rz", "Rotate Z",    G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Rotate",
+            "sx", "Scale X",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
+            "sy", "Scale Y",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
+            "sz", "Scale Z",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
+            //"ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, 1.0f, pspec,   "Transform", "Transform/Misc"
+            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc"
+            "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
+            "view", "View",   MOTO_TYPE_GEOMETRY_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
+            "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec,      "View", "View",
+            "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading", "Shading/Material",
+            NULL);
+
     /* pointers */
 
-    self->priv->tx_ptr = & self->priv->tx;
-    self->priv->ty_ptr = & self->priv->ty;
-    self->priv->tz_ptr = & self->priv->tz;
-    self->priv->rx_ptr = & self->priv->rx;
-    self->priv->ry_ptr = & self->priv->ry;
-    self->priv->rz_ptr = & self->priv->rz;
-    self->priv->sx_ptr = & self->priv->sx;
-    self->priv->sy_ptr = & self->priv->sy;
-    self->priv->sz_ptr = & self->priv->sz;
+    self->priv->tx_ptr = moto_node_param_value_pointer(node, "tx", gfloat);
+    self->priv->ty_ptr = moto_node_param_value_pointer(node, "ty", gfloat);
+    self->priv->tz_ptr = moto_node_param_value_pointer(node, "tz", gfloat);
+    self->priv->rx_ptr = moto_node_param_value_pointer(node, "rx", gfloat);
+    self->priv->ry_ptr = moto_node_param_value_pointer(node, "ry", gfloat);
+    self->priv->rz_ptr = moto_node_param_value_pointer(node, "rz", gfloat);
+    self->priv->sx_ptr = moto_node_param_value_pointer(node, "sx", gfloat);
+    self->priv->sy_ptr = moto_node_param_value_pointer(node, "sy", gfloat);
+    self->priv->sz_ptr = moto_node_param_value_pointer(node, "sz", gfloat);
 
     self->priv->transform_strategy_ptr = & self->priv->transform_strategy;
     self->priv->transform_order_ptr = & self->priv->transform_order;
@@ -690,111 +704,7 @@ MotoObjectNode *moto_object_node_new(const gchar *name)
         (MotoObjectNode *)g_object_new(MOTO_TYPE_OBJECT_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
-    /* params */
-    /* WARNING: Implementation of *_param_data_* may be changed in future!  */
-
     moto_node_set_name(node, name);
-
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
-    /* main block */
-    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("parent", "Parent", MOTO_PARAM_MODE_IN, pb,
-            pdata = moto_object_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, point_parent, update_parent, get_parent, set_parent);
-
-    moto_param_new("transform", "Transform", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_object_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, NULL, NULL, get_transform, NULL);
-
-    moto_param_new("tx", "Translate X", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_tx, update_tx, get_tx, set_tx);
-
-    moto_param_new("ty", "Translate Y", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_ty, update_ty, get_ty, set_ty);
-
-    moto_param_new("tz", "Translate Z", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_tz, update_tz, get_tz, set_tz);
-
-    moto_param_new("rx", "Rotate X",    MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_rx, update_rx, get_rx, set_rx);
-
-    moto_param_new("ry", "Rotate Y",    MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_ry, update_ry, get_ry, set_ry);
-
-    moto_param_new("rz", "Rotate Z",    MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(0));
-    moto_param_data_set_cbs(pdata, point_rz, update_rz, get_rz, set_rz);
-
-    moto_param_new("sx", "Scale X",     MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(1));
-    moto_param_data_set_cbs(pdata, point_sx, update_sx, get_sx, set_sx);
-
-    moto_param_new("sy", "Scale Y",     MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(1));
-    moto_param_data_set_cbs(pdata, point_sy, update_sy, get_sy, set_sy);
-
-    moto_param_new("sz", "Scale Z",     MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_float_param_data_new(1));
-    moto_param_data_set_cbs(pdata, point_sz, update_sz, get_sz, set_sz);
-
-    moto_param_new("ts", "Transform Strategy", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_transform_strategy_param_data_new(MOTO_TRANSFORM_STRATEGY_SOFTWARE));
-    moto_param_data_set_cbs(pdata, point_ts, NULL, get_ts, set_ts);
-
-    /* TODO: Temporary disabled!
-    moto_param_new("to", "Transform Order", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_transform_order_param_data_new(MOTO_TRANSFORM_ORDER_TRS));
-    moto_param_data_set_cbs(pdata, point_to, update_to, get_to, set_to);
-    */
-
-    moto_param_new("ro", "Rotate Order",    MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_rotate_order_param_data_new(MOTO_ROTATE_ORDER_XYZ));
-    moto_param_data_set_cbs(pdata, point_ro, update_ro, get_ro, set_ro);
-
-    moto_param_new("kt", "Keep Transform", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_bool_param_data_new(TRUE));
-    moto_param_data_set_cbs(pdata, point_kt, update_kt, get_kt, set_kt);
-
-    /* view block */
-    pb = moto_param_block_new("view", "View", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("visible", "Visible", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_bool_param_data_new(TRUE));
-    moto_param_data_set_cbs(pdata, point_visible, NULL, get_visible, set_visible);
-
-    moto_param_new("view", "View", MOTO_PARAM_MODE_IN, pb,
-            pdata = moto_geometry_view_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, point_view, NULL, get_view, set_view);
-
-    moto_param_new("show_view", "Show View", MOTO_PARAM_MODE_INOUT, pb,
-            pdata = moto_bool_param_data_new(TRUE));
-    moto_param_data_set_cbs(pdata, point_show_view, NULL, get_show_view, set_show_view);
-
-    /* shading block */
-    pb = moto_param_block_new("shading", "Shading", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("material", "Material", MOTO_PARAM_MODE_IN, pb,
-            pdata = moto_material_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, point_material, NULL, get_material, set_material);
-
-    /* shading block */
-    pb = moto_param_block_new("camera", "Camera", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("camera", "Camera", MOTO_PARAM_MODE_IN, pb,
-            pdata = moto_camera_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, point_camera, NULL, get_camera, set_camera);
 
     return self;
 }
@@ -1047,7 +957,7 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
 
 static void calc_global_bound(MotoObjectNode *self)
 {
-    MotoParam *p = moto_node_get_param((MotoNode *)self, "view", "view");
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
@@ -1065,7 +975,7 @@ static void calc_global_bound(MotoObjectNode *self)
 
 static void calc_local_bound(MotoObjectNode *self)
 {
-    MotoParam *p = moto_node_get_param((MotoNode *)self, "view", "view");
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
