@@ -13,8 +13,6 @@
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
 #include "motocore/moto-object-node.h"
-#include "motocore/moto-param-data.h"
-#include "motocore/moto-float-param-data.h"
 #include "common/numdef.h"
 
 /* forward */
@@ -189,7 +187,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view", "view");
+    MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view");
     if(( ! in_view) || (moto_param_get_mode(in_view) == MOTO_PARAM_MODE_OUT))
     {
         GString *msg = \

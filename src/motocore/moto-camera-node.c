@@ -4,7 +4,6 @@
 #include "GL/glu.h"
 
 #include "moto-camera-node.h"
-#include "moto-camera-param-data.h"
 #include "moto-messager.h"
 
 /* class CameraNode */
@@ -69,17 +68,16 @@ MotoCameraNode *moto_camera_node_new(const gchar *name)
 
     moto_node_set_name(node, name);
 
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
     /* params */
 
+    /*
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
     moto_param_new("camera", "Camera", MOTO_PARAM_MODE_OUT, pb,
             pdata = moto_camera_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, NULL, NULL, get_camera, NULL);
+    */
 
     return self;
 }

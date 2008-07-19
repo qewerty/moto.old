@@ -53,12 +53,6 @@ typedef enum
     MOTO_ROTATE_ORDER_ZXY, MOTO_ROTATE_ORDER_ZYX
 } MotoRotateOrder;
 
-typedef enum
-{
-    MOTO_TRANSFORM_STRATEGY_SOFTWARE,
-    MOTO_TRANSFORM_STRATEGY_HARDWARE
-} MotoTransformStrategy;
-
 /* class MotoObjectNode */
 
 struct _MotoObjectNode

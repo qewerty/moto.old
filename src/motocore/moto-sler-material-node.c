@@ -4,7 +4,6 @@
 #include <GL/gl.h>
 
 #include "moto-sler-material-node.h"
-#include "moto-material-param-data.h"
 #include "moto-messager.h"
 
 /* Temporary GLSL shader sources. */
@@ -126,17 +125,16 @@ MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name)
 
     moto_node_set_name((MotoNode *)self, name);
 
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
     /* params */
 
+    /*
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
     moto_param_new("material", "Material", MOTO_PARAM_MODE_OUT, pb,
             pdata = moto_material_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, NULL, NULL, get_material, NULL);
+    */
 
     return self;
 }

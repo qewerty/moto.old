@@ -1,6 +1,4 @@
 #include "moto-mesh-file-node.h"
-#include "moto-mesh-param-data.h"
-#include "moto-filename-param-data.h"
 #include "moto-library.h"
 #include "moto-messager.h"
 #include "moto-mesh-loader.h"
@@ -125,10 +123,9 @@ MotoMeshFileNode *moto_mesh_file_node_new()
 
     /* params */
 
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
     /* main block */
+
+    /*
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
@@ -139,6 +136,7 @@ MotoMeshFileNode *moto_mesh_file_node_new()
     moto_param_new("mesh", "Polygonal Mesh", MOTO_PARAM_MODE_OUT, pb,
             pdata = moto_mesh_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, NULL, NULL, get_mesh, NULL);
+    */
 
     return self;
 }
@@ -228,7 +226,7 @@ static void moto_mesh_file_node_update(MotoNode *self)
 
     MotoParam *param;
 
-    param = moto_node_get_param(self, "main", "mesh");
+    param = moto_node_get_param(self, "mesh");
     if(param && 1)//moto_param_has_dests(param)) /* FIXME */
         moto_mesh_file_node_update_mesh(mesh_file);
 }

@@ -10,7 +10,6 @@
 #include "moto-messager.h"
 #include "moto-world.h"
 #include "moto-time-node.h"
-#include "moto-float-param-data.h"
 
 /* forwards */
 
@@ -84,9 +83,7 @@ MotoTimeNode *moto_time_node_new(const gchar *name)
 
     /* params */
 
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
+    /*
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
@@ -97,6 +94,7 @@ MotoTimeNode *moto_time_node_new(const gchar *name)
     moto_param_new("frame", "Frame", MOTO_PARAM_MODE_OUT, pb,
             pdata = moto_float_param_data_new(1.0));
     moto_param_data_set_cbs(pdata, NULL, NULL, NULL, NULL);
+    */
 
     return self;
 }

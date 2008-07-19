@@ -46,7 +46,7 @@ struct _MotoCameraNodeClass
     MotoNodeClass parent;
 };
 
-GType moto_camera_node_storage_get_type(void);
+GType moto_camera_node_get_type(void);
 
 #define MOTO_TYPE_CAMERA_NODE (moto_camera_node_get_type())
 #define MOTO_CAMERA_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_CAMERA_NODE, MotoCameraNode))

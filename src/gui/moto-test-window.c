@@ -13,8 +13,6 @@
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
 #include "motocore/moto-object-node.h"
-#include "motocore/moto-param-data.h"
-#include "motocore/moto-float-param-data.h"
 #include "common/numdef.h"
 
 static MotoTestWindow *twin = NULL;
@@ -93,37 +91,36 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root", NULL);
     moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
 
-    param = moto_node_get_param(root_node, "main", "ty");
-    MotoFloatParamData *pd = (MotoFloatParamData *)moto_param_get_data(param);
+    param = moto_node_get_param(root_node, "ty");
     // moto_float_param_data_set(pd, 10);
 
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    MotoParam *in = moto_node_get_param(obj_node, "main", "parent");
-    MotoParam *out = moto_node_get_param(root_node, "main", "transform");
+    MotoParam *in = moto_node_get_param(obj_node, "parent");
+    MotoParam *out = moto_node_get_param(root_node, "transform");
     moto_param_set_source(in, out);
 
     MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView", NULL);
 
-    in = moto_node_get_param(obj_node, "view", "view");
-    out = moto_node_get_param(grid_view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view");
+    out = moto_node_get_param(grid_view_node, "view");
     moto_param_set_source(in, out);
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    in = moto_node_get_param(obj_node, "main", "parent");
-    out = moto_node_get_param(root_node, "main", "transform");
+    in = moto_node_get_param(obj_node, "parent");
+    out = moto_node_get_param(root_node, "transform");
     moto_param_set_source(in, out);
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
     MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
 
-    in = moto_node_get_param(obj_node, "view", "view");
-    out = moto_node_get_param(axes_view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view");
+    out = moto_node_get_param(axes_view_node, "view");
     moto_param_set_source(in, out);
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
-    in = moto_node_get_param(obj_node, "main", "parent");
-    out = moto_node_get_param(root_node, "main", "transform");
+    in = moto_node_get_param(obj_node, "parent");
+    out = moto_node_get_param(root_node, "transform");
     moto_param_set_source(in, out);
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
@@ -132,85 +129,54 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material", NULL);
 
-    in = moto_node_get_param(obj_node, "view", "view");
-    out = moto_node_get_param(view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view");
+    out = moto_node_get_param(view_node, "view");
     moto_param_set_source(in, out);
 
-    in = moto_node_get_param(view_node, "main", "mesh");
-    out = moto_node_get_param(cube_node, "main", "mesh");
+    in = moto_node_get_param(view_node, "mesh");
+    out = moto_node_get_param(cube_node, "mesh");
     moto_param_set_source(in, out);
 
-    in = moto_node_get_param(obj_node, "shading", "material");
-    out = moto_node_get_param(mat_node, "main", "material");
+    in = moto_node_get_param(obj_node, "material");
+    out = moto_node_get_param(mat_node, "material");
     moto_param_set_source(in, out);
 
     /* cube instance */
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
-    in = moto_node_get_param(obj_node, "main", "parent");
-    out = moto_node_get_param(root_node, "main", "transform");
+    in = moto_node_get_param(obj_node, "parent");
+    out = moto_node_get_param(root_node, "transform");
     moto_param_set_source(in, out);
-    in = moto_node_get_param(obj_node, "view", "view");
-    out = moto_node_get_param(view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view");
+    out = moto_node_get_param(view_node, "view");
     moto_param_set_source(in, out);
 
 
-    param = moto_node_get_param(obj_node, "main", "tx");
-    MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(obj_node, "main", "ty");
-    MotoFloatParamData *ty = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(obj_node, "main", "tz");
-    MotoFloatParamData *tz = (MotoFloatParamData *)moto_param_get_data(param);
-    moto_float_param_data_set(tx, 4);
-    moto_float_param_data_set(ty, 3);
-    moto_float_param_data_set(tz, 2);
-    param = moto_node_get_param(obj_node, "main", "rx");
-    MotoFloatParamData *rx = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(obj_node, "main", "ry");
-    MotoFloatParamData *ry = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(obj_node, "main", "rz");
-    MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
-    moto_float_param_data_set(rx, 45*RAD_PER_DEG);
-    moto_float_param_data_set(ry, 20*RAD_PER_DEG);
-    moto_float_param_data_set(rz, 56*RAD_PER_DEG);
+    param = moto_node_get_param(obj_node, "tx");
+    param = moto_node_get_param(obj_node, "ty");
+    param = moto_node_get_param(obj_node, "tz");
+    param = moto_node_get_param(obj_node, "rx");
+    param = moto_node_get_param(obj_node, "ry");
+    param = moto_node_get_param(obj_node, "rz");
 
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
 
-    in = moto_node_get_param(obj_node, "view", "view");
-    out = moto_node_get_param(ray_view_node, "main", "view");
+    in = moto_node_get_param(obj_node, "view");
+    out = moto_node_get_param(ray_view_node, "view");
     moto_param_set_source(in, out);
 
-    in = moto_node_get_param(obj_node, "main", "parent");
-    out = moto_node_get_param(root_node, "main", "transform");
+    in = moto_node_get_param(obj_node, "parent");
+    out = moto_node_get_param(root_node, "transform");
     moto_param_set_source(in, out);
 
     /* camera */
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
-    param = moto_node_get_param(cam_obj, "main", "tx");
-    tx = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(cam_obj, "main", "ty");
-    ty = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(cam_obj, "main", "tz");
-    tz = (MotoFloatParamData *)moto_param_get_data(param);
-
-    /* WARNING! Unused.
-    param = moto_node_get_param(cam_obj, "main", "rx");
-    MotoFloatParamData *rx = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(cam_obj, "main", "ry");
-    MotoFloatParamData *ry = (MotoFloatParamData *)moto_param_get_data(param);
-    param = moto_node_get_param(cam_obj, "main", "rz");
-    MotoFloatParamData *rz = (MotoFloatParamData *)moto_param_get_data(param);
-    */
-
-    moto_float_param_data_set(tx, 0);
-    moto_float_param_data_set(ty, 0);
-    moto_float_param_data_set(tz, 0);
-    /* moto_float_param_data_set(rx, RAD_PER_DEG*-45);
-    moto_float_param_data_set(ry, RAD_PER_DEG*5);
-    moto_float_param_data_set(rz, RAD_PER_DEG*23); */
+    param = moto_node_get_param(cam_obj, "tx");
+    param = moto_node_get_param(cam_obj, "ty");
+    param = moto_node_get_param(cam_obj, "tz");
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;

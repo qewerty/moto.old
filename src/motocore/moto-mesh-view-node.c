@@ -6,8 +6,6 @@
 
 #include "moto-mesh-view-node.h"
 #include "moto-mesh.h"
-#include "moto-mesh-param-data.h"
-#include "moto-geometry-view-param-data.h"
 
 /* forwards */
 
@@ -179,13 +177,11 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 
     moto_node_set_name(node, name);
 
-    MotoParamBlock *pb;
-    MotoParamData *pdata;
-
     moto_geometry_view_node_set_state(gv, "object");
 
     /* params */
 
+    /*
     pb = moto_param_block_new("main", "Main", (MotoNode *)self);
     moto_node_add_param_block(node, pb);
 
@@ -196,6 +192,7 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
     moto_param_new("view", "Geometry View", MOTO_PARAM_MODE_OUT, pb,
             pdata = moto_geometry_view_param_data_new(NULL));
     moto_param_data_set_cbs(pdata, NULL, NULL, view_param_get, NULL);
+    */
 
     return self;
 }
@@ -414,7 +411,7 @@ static gboolean moto_mesh_view_node_select(MotoGeometryViewNode *self,
 
 static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeometryViewNode *self)
 {
-    MotoParam *p = moto_node_get_param((MotoNode *)self, "main", "mesh");
+    MotoParam *p = moto_node_get_param((MotoNode *)self, "mesh");
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return NULL;

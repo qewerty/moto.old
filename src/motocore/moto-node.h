@@ -71,6 +71,7 @@ void moto_node_add_param(MotoNode *self, MotoParam *param,
         const gchar *domain, const gchar *group);
 void moto_node_add_params(MotoNode *self, ...);
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
+GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
 
 #define moto_node_param_value_pointer(self, name, c_type) \
     moto_param_value_pointer(moto_node_get_param(self, name), c_type)
@@ -204,6 +205,7 @@ const gchar *moto_param_get_title(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 MotoParamMode moto_param_get_mode(MotoParam *self);
 
+GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);
 #define moto_param_value_pointer(p, c_type) ((c_type *)moto_param_get_value_pointer(p))
 #define moto_param_value(p, c_type) (*moto_param_value_ptr(p, c_type))

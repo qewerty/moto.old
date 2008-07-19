@@ -18,7 +18,7 @@ static Domain *domain_new()
     return self;
 }
 
-static domain_free(Domain *self)
+static void domain_free(Domain *self)
 {
     g_slist_free(self->params);
     g_slice_free(Domain, self);
@@ -176,14 +176,14 @@ void moto_node_set_name(MotoNode *self, const gchar *name)
 void moto_node_add_param(MotoNode *self, MotoParam *param,
         const gchar *domain, const gchar *group)
 {
-    Domain *d = (Domain *)mapped_list_get(& self->priv->pdomains, domain);
+    Domain *d = (Domain *)moto_mapped_list_get(& self->priv->pdomains, domain);
     if( ! d)
     {
         d = domain_new();
-        mapped_list_set(& self->priv->pdomains, domain, d);
+        moto_mapped_list_set(& self->priv->pdomains, domain, d);
     }
     domain_add_param(d, param);
-    mapped_list_set(& self->priv->params, moto_param_get_name(param), param);
+    moto_mapped_list_set(& self->priv->params, moto_param_get_name(param), param);
 }
 
 void moto_node_add_params(MotoNode *self, ...)
@@ -242,7 +242,7 @@ void moto_node_add_params(MotoNode *self, ...)
         gchar *domain   = va_arg(ap, gchar*);
         gchar *group    = va_arg(ap, gchar*);
 
-        MotoParam *p = moto_param_new(pname, ptitle, MOTO_PARAM_MODE_INOUT, &v, pspec, self);
+        MotoParam *p = moto_param_new(pname, ptitle, pmode, &v, pspec, self);
 
         moto_node_add_param(self, p, domain, group);
     }
@@ -251,6 +251,14 @@ void moto_node_add_params(MotoNode *self, ...)
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name)
 {
     return moto_mapped_list_get(& self->priv->params, name);
+}
+
+GValue *moto_node_get_param_value(MotoNode *self, const gchar *name)
+{
+    MotoParam *p = moto_node_get_param(self, name);
+    if( ! p)
+        return NULL;
+    return moto_param_get_value(p);
 }
 
 gboolean moto_node_is_hidden(MotoNode *self)
@@ -523,8 +531,10 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
         return NULL;
     if( ! value)
         return NULL;
+    /*
     if( ! pspec)
         return NULL;
+    */
 
     GValue none = {0, };
 
@@ -555,6 +565,11 @@ const gchar *moto_param_get_title(MotoParam *self)
 MotoParamMode moto_param_get_mode(MotoParam *self)
 {
     return self->priv->mode;
+}
+
+GValue * moto_param_get_value(MotoParam *self)
+{
+    return & self->priv->value;
 }
 
 gpointer moto_param_get_value_pointer(MotoParam *self)
