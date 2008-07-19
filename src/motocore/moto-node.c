@@ -557,6 +557,11 @@ MotoParamMode moto_param_get_mode(MotoParam *self)
     return self->priv->mode;
 }
 
+gpointer moto_param_get_value_pointer(MotoParam *self)
+{
+    return self->priv->value.data;
+}
+
 MotoParam *moto_param_get_source(MotoParam *self)
 {
     return self->priv->source;

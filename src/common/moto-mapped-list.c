@@ -56,5 +56,5 @@ void moto_mapped_list_free_all(MotoMappedList *self, GFunc data_delete_func)
 {
     g_assert(data_delete_func);
     g_slist_foreach(self->sl, data_delete_func, NULL);
-    moto_mapped_list_free(self->sl);
+    moto_mapped_list_free(self);
 }

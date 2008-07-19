@@ -57,9 +57,6 @@ void moto_object_node_set_scale_z(MotoObjectNode *self, gfloat z);
 MotoGeometryViewNode *moto_object_node_get_view(MotoObjectNode *self);
 void moto_object_node_set_view(MotoObjectNode *self, MotoGeometryViewNode *view);
 
-MotoTransformStrategy moto_object_node_get_transform_strategy(MotoObjectNode *self);
-void moto_object_node_set_transform_strategy(MotoObjectNode *self, MotoTransformStrategy ts);
-
 MotoTransformOrder moto_object_node_get_transform_order(MotoObjectNode *self);
 void moto_object_node_set_transform_order(MotoObjectNode *self, MotoTransformOrder ts);
 
@@ -97,10 +94,8 @@ struct _MotoObjectNodePriv
     gfloat *rx_ptr, *ry_ptr, *rz_ptr;
     gfloat *sx_ptr, *sy_ptr, *sz_ptr;
 
-    MotoTransformStrategy   transform_strategy;
     MotoTransformOrder      transform_order;
     MotoRotateOrder         rotate_order;
-    MotoTransformStrategy   *transform_strategy_ptr;
     MotoTransformOrder      *transform_order_ptr;
     MotoRotateOrder         *rotate_order_ptr;
 
@@ -164,7 +159,6 @@ moto_object_node_init(MotoObjectNode *self)
     MotoNode *node = (MotoNode *)self;
     self->priv = g_slice_new(MotoObjectNodePriv);
 
-    self->priv->transform_strategy  = MOTO_TRANSFORM_STRATEGY_SOFTWARE;
     self->priv->transform_order     = MOTO_TRANSFORM_ORDER_TRS;
     self->priv->rotate_order        = MOTO_ROTATE_ORDER_XYZ;
 
@@ -221,7 +215,6 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->sy_ptr = moto_node_param_value_pointer(node, "sy", gfloat);
     self->priv->sz_ptr = moto_node_param_value_pointer(node, "sz", gfloat);
 
-    self->priv->transform_strategy_ptr = & self->priv->transform_strategy;
     self->priv->transform_order_ptr = & self->priv->transform_order;
     self->priv->rotate_order_ptr = & self->priv->rotate_order;
 
@@ -507,22 +500,6 @@ static void point_sz(MotoParam *param, gpointer p)
 {
     MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
     obj->priv->sz_ptr = (gfloat *)p;
-}
-
-static gpointer get_ts(MotoParam *param)
-{
-    return & ((MotoObjectNode *)moto_param_get_node(param))->priv->transform_strategy;
-}
-
-static void set_ts(MotoParam *param, gpointer p)
-{
-    moto_object_node_set_transform_strategy((MotoObjectNode *)moto_param_get_node(param), *((MotoTransformStrategy *)p));
-}
-
-static void point_ts(MotoParam *param, gpointer p)
-{
-    MotoObjectNode *obj = (MotoObjectNode *)moto_param_get_node(param);
-    obj->priv->transform_strategy_ptr = (MotoTransformStrategy *)p;
 }
 
 /*
@@ -1038,16 +1015,6 @@ void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder ord
     self->priv->rotate_order =  order;
 }
 
-MotoTransformStrategy moto_object_node_get_trasform_strategy(MotoObjectNode *self)
-{
-    return self->priv->transform_strategy;
-}
-
-void moto_object_node_set_transform_strategy(MotoObjectNode *self, MotoTransformStrategy ts)
-{
-    self->priv->transform_strategy = ts;
-}
-
 gboolean moto_object_node_get_keep_transform(MotoObjectNode *self)
 {
     return self->priv->keep_transform;
@@ -1055,7 +1022,7 @@ gboolean moto_object_node_get_keep_transform(MotoObjectNode *self)
 
 void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt)
 {
-    if(kt != self->priv->transform_strategy)
+    if(kt != self->priv->keep_transform)
     {
         self->priv->transform_calculated = FALSE;
         self->priv->keep_transform = kt;
@@ -1265,15 +1232,7 @@ static void apply_hardware_transform(MotoObjectNode *self)
 
 static void apply_transform(MotoObjectNode *self)
 {
-    switch(*(self->priv->transform_strategy_ptr))
-    {
-        case MOTO_TRANSFORM_STRATEGY_HARDWARE:
-            apply_hardware_transform(self);
-        break;
-        case MOTO_TRANSFORM_STRATEGY_SOFTWARE:
-            glMultMatrixf(moto_object_node_get_matrix(self, FALSE));
-        break;
-    }
+    glMultMatrixf(moto_object_node_get_matrix(self, FALSE));
 }
 
 static void apply_global_transform(MotoObjectNode *self)
