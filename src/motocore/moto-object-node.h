@@ -46,12 +46,18 @@ typedef enum
     MOTO_TRANSFORM_ORDER_STR, MOTO_TRANSFORM_ORDER_SRT
 } MotoTransformOrder;
 
+GType moto_transform_order_get_type(void);
+#define MOTO_TYPE_TRANSFORM_ORDER (moto_transform_order_get_type())
+
 typedef enum
 {
     MOTO_ROTATE_ORDER_XYZ, MOTO_ROTATE_ORDER_XZY,
     MOTO_ROTATE_ORDER_YXZ, MOTO_ROTATE_ORDER_YZX,
     MOTO_ROTATE_ORDER_ZXY, MOTO_ROTATE_ORDER_ZYX
 } MotoRotateOrder;
+
+GType moto_rotate_order_get_type(void);
+#define MOTO_TYPE_ROTATE_ORDER (moto_rotate_order_get_type())
 
 /* class MotoObjectNode */
 

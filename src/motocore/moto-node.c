@@ -238,7 +238,12 @@ void moto_node_add_params(MotoNode *self, ...)
                 g_value_set_pointer(&v, va_arg(ap, gpointer));
             break;
             default:
-                g_value_set_object(&v, va_arg(ap, gpointer));
+                if(g_type_is_a(ptype, G_TYPE_ENUM))
+                {
+                    g_value_set_enum(&v, va_arg(ap, gint));
+                }
+                else
+                    g_value_set_object(&v, va_arg(ap, gpointer));
         }
 
         GParamSpec *pspec = va_arg(ap, GParamSpec*);
@@ -708,6 +713,8 @@ void moto_param_update(MotoParam *self)
         return;
 
     g_value_transform(& self->priv->source->priv->value, & self->priv->value);
+
+    moto_node_update(moto_param_get_node(self));
 }
 
 void moto_param_update_dests(MotoParam *self)

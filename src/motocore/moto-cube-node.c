@@ -12,10 +12,6 @@ static GObjectClass *cube_node_parent_class = NULL;
 
 struct _MotoCubeNodePriv
 {
-    gfloat size_x;
-    gfloat size_y;
-    gfloat size_z;
-
     gfloat *size_x_ptr;
     gfloat *size_y_ptr;
     gfloat *size_z_ptr;
@@ -47,18 +43,25 @@ moto_cube_node_finalize(GObject *obj)
 static void
 moto_cube_node_init(MotoCubeNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
+
     self->priv = g_slice_new(MotoCubeNodePriv);
 
-    self->priv->size_x = 1;
-    self->priv->size_y = 1;
-    self->priv->size_z = 1;
-
-    self->priv->size_x_ptr = & self->priv->size_x;
-    self->priv->size_y_ptr = & self->priv->size_y;
-    self->priv->size_z_ptr = & self->priv->size_z;
-
     self->priv->mesh = NULL;
-    self->priv->mesh_ptr = & self->priv->mesh;
+
+    GParamSpec *pspec = NULL; // FIXME: Implement.
+    moto_node_add_params(node,
+            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
+            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
+            "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            NULL);
+
+    self->priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
+    self->priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
+    self->priv->size_z_ptr = moto_node_param_value_pointer(node, "size_z", gfloat);
+
+    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
     self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     self->priv->bound_calculated = FALSE;
@@ -85,13 +88,6 @@ G_DEFINE_TYPE(MotoCubeNode, moto_cube_node, MOTO_TYPE_GEOMETRY_NODE);
 
 /* methods of class CubeNode */
 
-static gpointer get_mesh(MotoParam *param)
-{
-    MotoCubeNode *node = (MotoCubeNode *)moto_param_get_node(param);
-
-    return & node->priv->mesh;
-}
-
 MotoCubeNode *moto_cube_node_new(const gchar *name)
 {
     MotoCubeNode *self = (MotoCubeNode *)g_object_new(MOTO_TYPE_CUBE_NODE, NULL);
@@ -99,15 +95,6 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
     moto_node_set_name(node, name);
 
     /* params */
-
-    /*
-    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("mesh", "Polygonal Mesh", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_mesh_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, NULL, NULL, get_mesh, NULL);
-    */
 
     moto_node_update((MotoNode *)self);
 
@@ -122,6 +109,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     /* TODO: Temporary solution! */
 
     MotoMesh *mesh = self->priv->mesh = moto_mesh_new(8, 12, 6);
+
+    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
+    g_value_set_object(moto_param_get_value(pm), mesh);
+    moto_param_update_dests(pm);
 
     gfloat size_x = *(self->priv->size_x_ptr);
     gfloat size_y = *(self->priv->size_y_ptr);

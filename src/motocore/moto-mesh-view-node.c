@@ -263,7 +263,7 @@ static void draw_mesh_as_verts(MotoMesh *mesh, MotoMeshSelection *selection)
     {
         vert = & mesh->verts[i];
 
-        if(moto_mesh_selection_is_vertex_selected(selection, i))
+        if(selection && moto_mesh_selection_is_vertex_selected(selection, i))
             glColor4f(0, 1, 0, 1);
         else
             glColor4f(1, 0, 0, 1);
@@ -309,7 +309,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
     {
         edge = & mesh->edges[i];
 
-        if(moto_mesh_selection_is_edge_selected(selection, i))
+        if(selection && moto_mesh_selection_is_edge_selected(selection, i))
             glColor4f(0, 1, 0, 1);
         else
             glColor4f(1, 0, 0, 1);
@@ -331,7 +331,7 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
 
         MotoMeshFace *face = & mesh->faces[i];
 
-        if(moto_mesh_selection_is_face_selected(selection, i))
+        if(selection && moto_mesh_selection_is_face_selected(selection, i))
             glColor4f(0.5, 1, 0.2, 0.25);
         else
             glColor4f(1, 1, 1, 0.25);
@@ -382,7 +382,7 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeometryViewNode *self)
 
     glEndList();
 
-    moto_geometry_view_node_set_prepared(self, TRUE);
+    // moto_geometry_view_node_set_prepared(self, TRUE);
 }
 
 static gboolean moto_mesh_view_node_select(MotoGeometryViewNode *self,
@@ -503,7 +503,9 @@ moto_mesh_view_node_select_as_verts(MotoGeometryViewState *self, MotoGeometryVie
             }
         }
 
-        moto_mesh_selection_toggle_vertex_selection(moto_mesh_view_node_get_selection(mv), index);
+        MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
+        if(sel)
+            moto_mesh_selection_toggle_vertex_selection(sel, index);
         moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
         moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
     }
@@ -589,7 +591,9 @@ moto_mesh_view_node_select_as_edges(MotoGeometryViewState *self, MotoGeometryVie
             }
         }
 
-        moto_mesh_selection_toggle_edge_selection(moto_mesh_view_node_get_selection(mv), index);
+        MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
+        if(self)
+            moto_mesh_selection_toggle_edge_selection(sel, index);
         moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
         moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
     }
@@ -644,7 +648,9 @@ moto_mesh_view_node_select_as_faces(MotoGeometryViewState *self, MotoGeometryVie
 
     if(num > 0)
     {
-        moto_mesh_selection_toggle_face_selection(moto_mesh_view_node_get_selection(mv), index);
+        MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
+        if(self)
+            moto_mesh_selection_toggle_face_selection(sel, index);
         moto_geometry_view_node_set_prepared((MotoGeometryViewNode *)mv, FALSE);
         moto_geometry_view_node_draw((MotoGeometryViewNode *)mv);
     }

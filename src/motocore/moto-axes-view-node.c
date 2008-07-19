@@ -45,7 +45,16 @@ moto_axes_view_node_finalize(GObject *obj)
 static void
 moto_axes_view_node_init(MotoAxesViewNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
+
     self->priv = g_slice_new(MotoAxesViewNodePriv);
+
+    /* params */
+
+    GParamSpec *pspec = NULL; // FIXME: Implement.
+    moto_node_add_params(node,
+            "view", "View", MOTO_TYPE_GEOMETRY_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry", "Geometry",
+            NULL);
 
     self->priv->prepared = FALSE;
     self->priv->dlist = 0;
@@ -84,17 +93,6 @@ MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
-
-    /* params */
-
-    /*
-    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("view", "Geometry View", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_geometry_view_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, NULL, NULL, get_view, NULL);
-    */
 
     return self;
 }

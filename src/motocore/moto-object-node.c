@@ -24,6 +24,46 @@ void moto_object_node_set_scale(MotoObjectNode *self, gfloat x, gfloat y, gfloat
 
 // static void moto_object_node_convert_camera_transform(MotoObjectNode *self);
 
+/* enums */
+
+GType moto_transform_order_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        GEnumValue values[] = {
+            {MOTO_TRANSFORM_ORDER_TRS, "TRANSFORM_ORDER_TRS", "TRANSFORM_ORDER_TRS"},
+            {MOTO_TRANSFORM_ORDER_TSR, "TRANSFORM_ORDER_TSR", "TRANSFORM_ORDER_TSR"},
+            {MOTO_TRANSFORM_ORDER_RTS, "TRANSFORM_ORDER_RTS", "TRANSFORM_ORDER_RTS"},
+            {MOTO_TRANSFORM_ORDER_RST, "TRANSFORM_ORDER_RST", "TRANSFORM_ORDER_RST"},
+            {MOTO_TRANSFORM_ORDER_STR, "TRANSFORM_ORDER_STR", "TRANSFORM_ORDER_STR"},
+            {MOTO_TRANSFORM_ORDER_SRT, "TRANSFORM_ORDER_SRT", "TRANSFORM_ORDER_SRT"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoTransformOrder", values);
+    }
+    return type;
+}
+
+GType moto_rotate_order_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        GEnumValue values[] = {
+            {MOTO_ROTATE_ORDER_XYZ, "ROTATE_ORDER_XYZ", "ROTATE_ORDER_XYZ"},
+            {MOTO_ROTATE_ORDER_XZY, "ROTATE_ORDER_XZY", "ROTATE_ORDER_XZY"},
+            {MOTO_ROTATE_ORDER_YXZ, "ROTATE_ORDER_YXZ", "ROTATE_ORDER_YXZ"},
+            {MOTO_ROTATE_ORDER_YZX, "ROTATE_ORDER_YZX", "ROTATE_ORDER_YZX"},
+            {MOTO_ROTATE_ORDER_ZXY, "ROTATE_ORDER_ZXY", "ROTATE_ORDER_ZXY"},
+            {MOTO_ROTATE_ORDER_ZYX, "ROTATE_ORDER_ZYX", "ROTATE_ORDER_ZYX"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoRotateOrder", values);
+    }
+    return type;
+}
+
 /* class ObjectNode */
 
 static GObjectClass *object_node_parent_class = NULL;
@@ -49,10 +89,8 @@ struct _MotoObjectNodePriv
              transform_calculated,
              inverse_calculated;
 
-    gboolean keep_transform;
     gboolean *keep_transform_ptr;
 
-    gboolean visible;
     gboolean *visible_ptr;
 
     MotoObjectNode *parent;
@@ -104,9 +142,6 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->transform_order     = MOTO_TRANSFORM_ORDER_TRS;
     self->priv->rotate_order        = MOTO_ROTATE_ORDER_XYZ;
 
-    self->priv->keep_transform  = TRUE;
-    self->priv->visible         = TRUE;
-
     self->priv->local_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     self->priv->global_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
 
@@ -138,7 +173,8 @@ moto_object_node_init(MotoObjectNode *self)
             "sx", "Scale X",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             "sy", "Scale Y",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             "sz", "Scale Z",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
-            //"ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, 1.0f, pspec,   "Transform", "Transform/Misc"
+            "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_TRS, pspec,   "Transform", "Transform/Misc",
+            "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec,   "Transform", "Transform/Misc",
             "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
             "view", "View",   MOTO_TYPE_GEOMETRY_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
@@ -158,13 +194,14 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->sy_ptr = moto_node_param_value_pointer(node, "sy", gfloat);
     self->priv->sz_ptr = moto_node_param_value_pointer(node, "sz", gfloat);
 
-    // self->priv->transform_order_ptr = moto_node_param_value_pointer(node, "to", MotoTransformOrder);
-    // self->priv->rotate_order_ptr = moto_node_param_value_pointer(node, "ro", MotoRotateOrder);
+    self->priv->transform_order_ptr = moto_node_param_value_pointer(node, "to", MotoTransformOrder);
+    self->priv->rotate_order_ptr = moto_node_param_value_pointer(node, "ro", MotoRotateOrder);
 
     self->priv->keep_transform_ptr = moto_node_param_value_pointer(node, "kt", gboolean);
 
     self->priv->visible_ptr = moto_node_param_value_pointer(node, "visible", gboolean);
 
+    self->priv->camera_ptr = moto_node_param_value_pointer(node, "cam", MotoCameraNode*);
     self->priv->view_ptr = moto_node_param_value_pointer(node, "view", MotoGeometryViewNode*);
     self->priv->material_ptr = moto_node_param_value_pointer(node, "view", MotoMaterialNode*);;
 
@@ -446,7 +483,7 @@ void moto_object_node_set_transform_order(MotoObjectNode *self, MotoTransformOrd
 
 MotoRotateOrder moto_object_node_get_rotate_order(MotoObjectNode *self)
 {
-    return self->priv->rotate_order;
+    return *(self->priv->rotate_order_ptr);
 }
 
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order)
@@ -466,20 +503,20 @@ void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder ord
     vector3_copy(self->priv->target, eye);
     point3_move(self->priv->target, to_target, 1);
 
-    self->priv->rotate_order = order;
+    g_value_set_enum(moto_node_get_param_value((MotoNode *)self, "ro"), order);
 }
 
 gboolean moto_object_node_get_keep_transform(MotoObjectNode *self)
 {
-    return self->priv->keep_transform;
+    return *(self->priv->keep_transform_ptr);
 }
 
 void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt)
 {
-    if(kt != self->priv->keep_transform)
+    if(kt != (*(self->priv->keep_transform_ptr)))
     {
         self->priv->transform_calculated = FALSE;
-        self->priv->keep_transform = kt;
+        g_value_set_enum(moto_node_get_param_value((MotoNode *)self, "kt"), kt);
     }
 }
 
@@ -1086,12 +1123,12 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
 
 gboolean moto_object_node_get_visible(MotoObjectNode *self)
 {
-    return self->priv->visible;
+    return *(self->priv->visible_ptr);
 }
 
 void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
 {
-    self->priv->visible = visible;
+    g_value_set_boolean(moto_node_get_param_value((MotoNode *)self, "visible"), visible);
 }
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,

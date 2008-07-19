@@ -92,7 +92,6 @@ moto_test_window_init(MotoTestWindow *self)
     moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
 
     param = moto_node_get_param(root_node, "ty");
-    // moto_float_param_data_set(pd, 10);
 
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     MotoParam *in = moto_node_get_param(obj_node, "parent");
@@ -103,12 +102,12 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(grid_view_node, "view");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     in = moto_node_get_param(obj_node, "parent");
     out = moto_node_get_param(root_node, "transform");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
@@ -116,12 +115,12 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(axes_view_node, "view");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
     in = moto_node_get_param(obj_node, "parent");
     out = moto_node_get_param(root_node, "transform");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
 
@@ -131,11 +130,11 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(view_node, "view");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     in = moto_node_get_param(view_node, "mesh");
     out = moto_node_get_param(cube_node, "mesh");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     in = moto_node_get_param(obj_node, "material");
     out = moto_node_get_param(mat_node, "material");
@@ -145,10 +144,10 @@ moto_test_window_init(MotoTestWindow *self)
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
     in = moto_node_get_param(obj_node, "parent");
     out = moto_node_get_param(root_node, "transform");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(view_node, "view");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
 
     param = moto_node_get_param(obj_node, "tx");
