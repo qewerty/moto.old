@@ -29,6 +29,8 @@ static gboolean
 moto_mesh_view_node_select_as_faces(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
+static void moto_mesh_view_node_update(MotoNode *self);
+
 /* class MeshViewNode */
 
 static GObjectClass *mesh_view_node_parent_class = NULL;
@@ -94,6 +96,7 @@ static void
 moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
+    MotoNodeClass *nclass = MOTO_NODE_CLASS(klass);
     MotoGeometryViewNodeClass *gvclass = \
         MOTO_GEOMETRY_VIEW_NODE_CLASS(klass);
 
@@ -101,6 +104,8 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
 
     goclass->dispose    = moto_mesh_view_node_dispose;
     goclass->finalize   = moto_mesh_view_node_finalize;
+
+    nclass->update = moto_mesh_view_node_update;
 
     gvclass->draw               = moto_mesh_view_node_draw;
     gvclass->prepare_for_draw   = moto_mesh_view_node_prepare_for_draw;
@@ -149,34 +154,6 @@ static void mesh_param_update(MotoParam *param)
         moto_mesh_selection_free(mv->priv->selection);
         mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
     }
-}
-
-static void mesh_param_point(MotoParam *param, gpointer p)
-{
-    MotoMeshViewNode *mv = (MotoMeshViewNode *)moto_param_get_node(param);
-
-    (*(mv->priv->mesh_ptr)) = *(MotoMesh **)p;
-
-    if( ! (*(mv->priv->mesh_ptr)))
-        return;
-
-    if( ! mv->priv->selection)
-    {
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
-
-        return;
-    }
-
-    if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
-    {
-        moto_mesh_selection_free(mv->priv->selection);
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
-    }
-}
-
-static gpointer view_param_get(MotoParam *param)
-{
-    return moto_param_get_node(param);
 }
 
 MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
@@ -656,6 +633,30 @@ moto_mesh_view_node_select_as_faces(MotoGeometryViewState *self, MotoGeometryVie
     }
 
     return TRUE;
+}
+
+static void moto_mesh_view_node_update(MotoNode *self)
+{
+    MotoMeshViewNode *gv = (MotoGeometryViewNode *)self;
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)self;
+
+    moto_geometry_view_node_set_prepared(gv, FALSE);
+
+    if( ! (*(mv->priv->mesh_ptr)))
+        return;
+
+    if( ! mv->priv->selection)
+    {
+        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+
+        return;
+    }
+
+    if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
+    {
+        moto_mesh_selection_free(mv->priv->selection);
+        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+    }
 }
 
 /* class MeshViewNodeFactory */

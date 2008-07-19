@@ -138,7 +138,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(obj_node, "material");
     out = moto_node_get_param(mat_node, "material");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     /* cube instance */
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
@@ -148,6 +148,9 @@ moto_test_window_init(MotoTestWindow *self)
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(view_node, "view");
     moto_param_set_source(in, out);
+
+    g_value_set_float(moto_node_get_param_value(obj_node, "tx"), 2.5f);
+    g_value_set_float(moto_node_get_param_value(obj_node, "ty"), 3.1f);
 
 
     param = moto_node_get_param(obj_node, "tx");
