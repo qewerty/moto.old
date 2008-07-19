@@ -17,7 +17,8 @@ void moto_mapped_list_set(MotoMappedList *self, const gchar *k, gpointer data)
     if(d)
     {
         GSList *l = g_slist_find(self->sl, d);
-        l->data = d;
+        if(l)
+            l->data = data;
     }
     else
     {

@@ -110,9 +110,11 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->local_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     self->priv->global_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
 
+    /*
     moto_object_node_set_translate(self, 0, 0, 0);
     moto_object_node_set_rotate(self, 0, 0, 0);
     moto_object_node_set_scale(self, 1, 1, 1);
+    */
 
     self->priv->parent = NULL;
     self->priv->children = NULL;
@@ -124,9 +126,9 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->global_bound_calculated = FALSE;
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
-
     moto_node_add_params(node,
-            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec,        "Transform", "Transform/Parent",
+            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec,        "Transform", "Transform",
+            "transform", "Transform",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_OUT, self, pspec,        "Transform", "Transform",
             "tx", "Transform X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
             "ty", "Transform Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
             "tz", "Transform Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Transform", "Transform/Translate",
@@ -137,7 +139,7 @@ moto_object_node_init(MotoObjectNode *self)
             "sy", "Scale Y",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             "sz", "Scale Z",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             //"ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, 1.0f, pspec,   "Transform", "Transform/Misc"
-            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc"
+            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
             "view", "View",   MOTO_TYPE_GEOMETRY_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
             "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec,      "View", "View",
@@ -156,8 +158,8 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->sy_ptr = moto_node_param_value_pointer(node, "sy", gfloat);
     self->priv->sz_ptr = moto_node_param_value_pointer(node, "sz", gfloat);
 
-    self->priv->transform_order_ptr = moto_node_param_value_pointer(node, "to", MotoTransformOrder);
-    self->priv->rotate_order_ptr = moto_node_param_value_pointer(node, "ro", MotoRotateOrder);
+    // self->priv->transform_order_ptr = moto_node_param_value_pointer(node, "to", MotoTransformOrder);
+    // self->priv->rotate_order_ptr = moto_node_param_value_pointer(node, "ro", MotoRotateOrder);
 
     self->priv->keep_transform_ptr = moto_node_param_value_pointer(node, "kt", gboolean);
 
@@ -715,7 +717,6 @@ void moto_object_node_zoom(MotoObjectNode *self, gfloat val)
     point3_transform(eye, matrix, loc_pos);
     vector3_dif(to_target, self->priv->target, eye);
 
-    // g_print("1\n");
     if(vector3_length(to_target) < MICRO)
     {
         if(val > 0)

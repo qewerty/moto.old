@@ -195,10 +195,10 @@ void moto_node_add_params(MotoNode *self, ...)
 
     while(1)
     {
-        gchar *pname    = va_arg(ap, gchar *);
+        gchar *pname    = va_arg(ap, gchar*);
         if( ! pname)
-            break;
-        gchar *ptitle   = va_arg(ap, gchar *);
+            return;
+        gchar *ptitle   = va_arg(ap, gchar*);
         GType ptype     = va_arg(ap, GType);
         MotoParamMode pmode = va_arg(ap, MotoParamMode);
 
@@ -207,6 +207,9 @@ void moto_node_add_params(MotoNode *self, ...)
 
         switch(ptype)
         {
+            case G_TYPE_BOOLEAN:
+                g_value_set_boolean(&v, va_arg(ap, gboolean));
+            break;
             case G_TYPE_INT:
                 g_value_set_int(&v, va_arg(ap, gint));
             break;
@@ -238,7 +241,7 @@ void moto_node_add_params(MotoNode *self, ...)
                 g_value_set_object(&v, va_arg(ap, gpointer));
         }
 
-        GParamSpec *pspec = va_arg(ap, gpointer);
+        GParamSpec *pspec = va_arg(ap, GParamSpec*);
         gchar *domain   = va_arg(ap, gchar*);
         gchar *group    = va_arg(ap, gchar*);
 
@@ -540,8 +543,14 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
 
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
 
-    self->priv->value = none;
+    g_string_assign(self->priv->name, name);
+    g_string_assign(self->priv->title, title);
+    self->priv->mode = mode;
+    self->priv->node = node;
 
+    self->priv->value = none;
+    g_value_init(& self->priv->value, G_VALUE_TYPE(value));
+    g_value_copy(value, & self->priv->value);
 
     return self;
 }
@@ -608,17 +617,17 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
         return;
     }
 
-    if(src->priv->mode == MOTO_PARAM_MODE_IN)
+    if( ! (src->priv->mode & MOTO_PARAM_MODE_OUT))
     {
         GString *msg = g_string_new("You are trying to connect source that has no output (\"");
-        g_string_append(msg, moto_param_get_name(self));
+        g_string_append(msg, moto_param_get_name(src));
         g_string_append(msg, "\"). I won't connect it.");
         moto_warning(msg->str);
         g_string_free(msg, TRUE);
         return;
     }
 
-    if(self->priv->mode == MOTO_PARAM_MODE_OUT)
+    if( ! (self->priv->mode & MOTO_PARAM_MODE_IN))
     {
         GString *msg = g_string_new("You are trying to connect source to output parameter (\"");
         g_string_append(msg, moto_param_get_name(self));
@@ -638,6 +647,8 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
 
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
+
+    moto_param_update(self);
 }
 
 void moto_param_clear_source(MotoParam *self)
@@ -693,7 +704,7 @@ MotoNode *moto_param_get_node(MotoParam *self)
 
 void moto_param_update(MotoParam *self)
 {
-    if(! self->priv->source)
+    if( ! self->priv->source)
         return;
 
     g_value_transform(& self->priv->source->priv->value, & self->priv->value);
