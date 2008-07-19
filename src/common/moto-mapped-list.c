@@ -13,7 +13,7 @@ GSList *moto_mapped_list_find(MotoMappedList *self, gconstpointer data)
 
 void moto_mapped_list_set(MotoMappedList *self, const gchar *k, gpointer data)
 {
-    d = g_datalist_get_data(& self->dl, k);
+    gpointer d = g_datalist_get_data(& self->dl, k);
     if(d)
     {
         GSList *l = g_slist_find(self->sl, d);
@@ -44,4 +44,17 @@ void moto_mapped_list_remove_data(MotoMappedList *self, const gchar *k)
 void moto_mapped_list_foreach(MotoMappedList *self, GFunc func, gpointer user_data)
 {
     g_slist_foreach(self->sl, func, user_data);
+}
+
+void moto_mapped_list_free(MotoMappedList *self)
+{
+    g_slist_free(self->sl);
+    g_datalist_clear(& self->dl);
+}
+
+void moto_mapped_list_free_all(MotoMappedList *self, GFunc data_delete_func)
+{
+    g_assert(data_delete_func);
+    g_slist_foreach(self->sl, data_delete_func, NULL);
+    moto_mapped_list_free(self->sl);
 }

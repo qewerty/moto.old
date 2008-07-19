@@ -1,3 +1,5 @@
+#include "common/moto-mapped-list.h"
+
 #include "moto-node.h"
 #include "moto-world.h"
 #include "moto-param-data.h"
@@ -22,16 +24,18 @@ struct _MotoNodePriv
     gboolean disposed;
 
     GString *name;
-    GSList *param_blocks;
     MotoWorld *world;
+
+    MotoMappedList params;
+    MotoMappedList pdomains;
 
     gboolean hidden;
 
-    /* For exporting optimization. */
-    GTimeVal last_modified;
-
     GSList *tags;
     GSList *notes;
+
+    /* For exporting optimization. */
+    GTimeVal last_modified;
 };
 
 struct _MotoNodeFactoryPriv
@@ -46,34 +50,19 @@ struct _MotoParamPriv
     gboolean disposed;
 
     GValue value;
-    MotoParamMode mode;
-    MotoParamData *data;
-
+    GValue default_value;
     MotoParam *source;
     GSList *dests;
 
     GString *name;
     GString *title;
+    MotoNode *node;
+    MotoParamMode mode;
 
     gboolean hidden;
     GTimeVal last_modified; /* For exporting optimization. */
 
-    MotoParamBlock *pb;
-
     /* GList *notes; // ??? */
-};
-
-struct _MotoParamBlockPriv
-{
-    gboolean disposed;
-
-    GString *name;
-    GString *title;
-    gboolean hidden;
-
-    GSList *params;
-
-    MotoNode *node;
 };
 
 /* class Node */
@@ -90,8 +79,8 @@ moto_node_dispose(GObject *obj)
     self->priv->disposed = TRUE;
 
     g_string_free(self->priv->name, TRUE);
-    g_slist_foreach(self->priv->param_blocks, unref_gobject, NULL);
-    g_slist_free(self->priv->param_blocks);
+    moto_mapped_list_free_all(& self->priv->params, unref_gobject);
+    // moto_mapped_list_free_all(& self->priv->pdomains, unref_gobject);
 
     node_parent_class->dispose(obj);
 }
@@ -113,8 +102,10 @@ moto_node_init(MotoNode *self)
     self->priv->disposed = FALSE;
 
     self->priv->name = g_string_new("");
-    self->priv->param_blocks = NULL;
     self->priv->world = NULL;
+
+    moto_mapped_list_init(& self->priv->params);
+    moto_mapped_list_init(& self->priv->pdomains);
 
     self->priv->hidden = FALSE;
     g_get_current_time(& self->priv->last_modified);
@@ -149,51 +140,9 @@ void moto_node_set_name(MotoNode *self, const gchar *name)
     g_string_assign(self->priv->name, name);
 }
 
-MotoParamBlock *moto_node_get_param_block(MotoNode *self, const gchar *name)
+MotoParam *moto_node_get_param(MotoNode *self, const gchar *name)
 {
-    GSList *pb = self->priv->param_blocks;
-    for(; pb; pb = g_slist_next(pb))
-    {
-        if(g_utf8_collate(moto_param_block_get_name(MOTO_PARAM_BLOCK(pb->data)), name) == 0)
-        {
-            return (MotoParamBlock *)(pb->data);
-        }
-    }
-    return NULL;
-}
-
-void moto_node_add_param_block(MotoNode *self, MotoParamBlock *pb)
-{
-    if(pb == NULL)
-        return;
-
-    if(moto_node_get_param_block(self, moto_param_block_get_name(pb)))
-    {
-        GString *msg = g_string_new("Node \"");
-        g_string_append(msg, moto_node_get_name(self));
-        g_string_append(msg, "\" already has parameter block with name \"");
-        g_string_append(msg, moto_param_block_get_name(pb));
-        g_string_append(msg, "\". I won't add it.");
-        return;
-    }
-
-    self->priv->param_blocks = g_slist_append(self->priv->param_blocks, pb);
-    pb->priv->node = self;
-}
-
-void moto_node_del_param_block(MotoNode *self, MotoParamBlock *pb)
-{
-    /* TODO */
-    moto_warning("Method \"moto_node_del_param_block\" is not implemented yet!");
-}
-
-MotoParam *moto_node_get_param(MotoNode *self,
-        const gchar *block_name, const gchar *param_name)
-{
-    MotoParamBlock *pb = moto_node_get_param_block(self, block_name);
-    if( ! pb)
-        return NULL;
-    return moto_param_block_get_param(pb, param_name);
+    // TODO
 }
 
 gboolean moto_node_is_hidden(MotoNode *self)
@@ -214,6 +163,14 @@ void moto_node_hide(MotoNode *self)
 void moto_node_show(MotoNode *self)
 {
     moto_node_set_hidden(self, TRUE);
+}
+
+void moto_node_update(MotoNode *self)
+{
+    MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
+
+    if(klass->update)
+        klass->update(self);
 }
 
 const GTimeVal *moto_node_get_last_modified(MotoNode *self)
@@ -454,22 +411,9 @@ G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
 /* methods of class Param */
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data)
+        MotoNode *node, MotoParamMode mode, GValue *value)
 {
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
-
-    g_assert(data);
-    self->priv->data = data;
-    data->param = self;
-
-    g_string_assign(self->priv->name, name);
-    g_string_assign(self->priv->title, title);
-
-    self->priv->mode = mode;
-
-    self->priv->pb = pb;
-    if(pb)
-        moto_param_block_add_param(pb, self);
 
     return self;
 }
@@ -483,11 +427,6 @@ void moto_param_set_from_string(MotoParam *self,
 const gchar *moto_param_get_name(MotoParam *self)
 {
     return self->priv->name->str;
-}
-
-MotoParamData *moto_param_get_data(MotoParam *self)
-{
-    return self->priv->data;
 }
 
 const gchar *moto_param_get_title(MotoParam *self)
@@ -643,148 +582,4 @@ void moto_param_update_dests(MotoParam *self)
         moto_param_update(param);
     }
 
-}
-
-/* class ParamBlock */
-
-static GObjectClass *param_block_parent_class = NULL;
-
-static void
-moto_param_block_dispose(GObject *obj)
-{
-    MotoParamBlock *self = (MotoParamBlock *)obj;
-
-    if(self->priv->disposed)
-        return;
-    self->priv->disposed = TRUE;
-
-    g_string_free(self->priv->name, TRUE);
-    g_slist_foreach(self->priv->params, unref_gobject, NULL);
-    g_slist_free(self->priv->params);
-    g_slice_free(MotoParamBlockPriv, self->priv);
-
-    param_block_parent_class->dispose(obj);
-}
-
-static void
-moto_param_block_finalize(GObject *obj)
-{
-    G_OBJECT_CLASS(param_block_parent_class)->finalize(obj);
-}
-
-static void
-moto_param_block_init(MotoParamBlock *self)
-{
-    self->priv = (MotoParamBlockPriv *)g_slice_new(MotoParamBlockPriv);
-    self->priv->disposed = FALSE;
-
-    self->priv->name = g_string_new("");
-    self->priv->title = g_string_new("");
-    self->priv->hidden = FALSE;
-
-    self->priv->params = NULL;
-
-    self->priv->node = NULL;
-}
-
-static void
-moto_param_block_class_init(MotoParamBlockClass *klass)
-{
-    GObjectClass *goclass = (GObjectClass *)klass;
-
-    param_block_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
-
-    goclass->dispose    = moto_param_block_dispose;
-    goclass->finalize   = moto_param_block_finalize;
-}
-
-G_DEFINE_TYPE(MotoParamBlock, moto_param_block, G_TYPE_OBJECT);
-
-/* methods of class ParamBlock */
-
-MotoParamBlock *moto_param_block_new(const gchar *name, const gchar *title,
-        MotoNode *node)
-{
-    MotoParamBlock *self = (MotoParamBlock *)g_object_new(MOTO_TYPE_PARAM_BLOCK, NULL);
-
-    g_string_assign(self->priv->name, name);
-    g_string_assign(self->priv->title, title);
-
-    g_assert(node);
-    self->priv->node = node;
-
-    return self;
-}
-
-const gchar *moto_param_block_get_name(MotoParamBlock *self)
-{
-    return self->priv->name->str;
-}
-
-void moto_param_block_set_name(MotoParamBlock *self, const gchar *name)
-{
-    g_string_assign(self->priv->name, name);
-}
-
-const gchar *moto_param_block_get_title(MotoParamBlock *self)
-{
-    return self->priv->title->str;
-}
-
-void moto_param_block_set_title(MotoParamBlock *self, const gchar *title)
-{
-    g_string_assign(self->priv->title, title);
-}
-
-MotoParam *
-moto_param_block_get_param(MotoParamBlock *self,
-        const gchar *name)
-{
-    GSList *param = self->priv->params;
-    for(; param; param = g_slist_next(param))
-    {
-        if(g_utf8_collate(moto_param_get_name((MotoParam *)param->data), name) == 0)
-            return (MotoParam *)param->data;
-    }
-    return NULL;
-}
-
-void moto_param_block_add_param(MotoParamBlock *self, MotoParam *param)
-{
-    if( ! param)
-    {
-        GString *msg = g_string_new("You are trying to add nothing (None|NULL) to parameter block \"");
-        g_string_append(msg, moto_param_block_get_name(self));
-        g_string_append(msg, "\" instead of Param instance. I won't add it.");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
-        return;
-    }
-
-    if(g_slist_find(self->priv->params, param))
-    {
-        GString *msg = g_string_new("Parameter \"");
-        g_string_append(msg, moto_param_get_name(param));
-        g_string_append(msg, "\" already within the block \"");
-        g_string_append(msg, moto_param_block_get_name(self));
-        g_string_append(msg, "\". I won't add it again.");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
-        return;
-    }
-
-    self->priv->params = g_slist_append(self->priv->params, param);
-}
-
-MotoNode *moto_param_block_get_node(MotoParamBlock *self)
-{
-    return self->priv->node;
-}
-
-void moto_node_update(MotoNode *self)
-{
-    MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
-
-    if(klass->update)
-        klass->update(self);
 }
