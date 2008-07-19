@@ -30,9 +30,9 @@ typedef GType (*MotoNodeFactoryGetNodeTypeMethod)(MotoNodeFactory *self);
 
 typedef enum
 {
-    MOTO_PARAM_MODE_IN,
-    MOTO_PARAM_MODE_OUT,
-    MOTO_PARAM_MODE_INOUT
+    MOTO_PARAM_MODE_IN      = 1,
+    MOTO_PARAM_MODE_OUT     = 2,
+    MOTO_PARAM_MODE_INOUT   = 3
 } MotoParamMode;
 
 G_BEGIN_DECLS
@@ -67,15 +67,9 @@ void moto_node_set_name(MotoNode *self, const gchar *name);
 
 gboolean moto_node_is_valid(MotoNode *self);
 
-MotoParamBlock *moto_node_get_param_block(MotoNode *self, const gchar *name);
-void moto_node_add_param_block(MotoNode *self, MotoParamBlock *pb);
-void moto_node_del_param_block(MotoNode *self, MotoParamBlock *pb);
+MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 
-MotoParam *moto_node_get_param(MotoNode *self,
-        const gchar *block_name, const gchar *param_name);
-
-void moto_node_update_param_dests(MotoNode *self,
-        const gchar *block_name, const gchar *param_name);
+void moto_node_update_param_dests(MotoNode *self, const gchar *name);
 void moto_node_update_all_param_dests(MotoNode *self);
 
 gboolean moto_node_is_hidden(MotoNode *self);
@@ -99,10 +93,9 @@ void moto_node_del_tag(MotoNode *self, const gchar *tag);
 gboolean moto_node_has_tag(MotoNode *self, const gchar *tag);
 
 /* Get dump for saving. */
-gconstpointer moto_node_get_binary_dump(MotoNode *self, glong *numbytes);
-const gchar *moto_node_get_xml_dump(MotoNode *self, glong *numbytes);
+gconstpointer moto_node_get_dump(MotoNode *self, glong *numbytes);
 
-/* Update node internals. This must not affect and other node. */
+/* Update node internals. This must not affect on other nodes. */
 void moto_node_update(MotoNode *self);
 
 MotoWorld *moto_node_get_world(MotoNode *self);
@@ -197,17 +190,12 @@ GType moto_param_get_type(void);
 #define MOTO_PARAM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM, MotoParamClass))
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data);
+        MotoNode *node, MotoParamMode mode, GValue *value);
 
-MotoParam *moto_param_new2(const gchar *name, const gchar *title,
-    GValue default_value, MotoParamMode mode, MotoNode *node);
-
-MotoParamData *moto_param_get_data(MotoParam *self);
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
-MotoParamMode moto_param_get_mode(MotoParam *self);
-MotoParamBlock *moto_param_get_block(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
+MotoParamMode moto_param_get_mode(MotoParam *self);
 
 void moto_param_update(MotoParam *self);
 void moto_param_update_dests(MotoParam *self);
@@ -224,42 +212,6 @@ gboolean moto_param_has_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */
 gboolean moto_param_is_valid(MotoParam *self);
-
-/* class MotoParamBlock */
-
-struct _MotoParamBlock
-{
-    GObject parent;
-
-    MotoParamBlockPriv *priv;
-};
-
-struct _MotoParamBlockClass
-{
-    GObjectClass parent;
-};
-
-GType moto_param_block_get_type(void);
-
-#define MOTO_TYPE_PARAM_BLOCK (moto_param_block_get_type())
-#define MOTO_PARAM_BLOCK(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_BLOCK, MotoParamBlock))
-#define MOTO_PARAM_BLOCK_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_BLOCK, MotoParamBlockClass))
-#define MOTO_IS_PARAM_BLOCK(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_BLOCK))
-#define MOTO_IS_PARAM_BLOCK_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_BLOCK))
-#define MOTO_PARAM_BLOCK_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_BLOCK, MotoParamBlockClass))
-
-MotoParamBlock *moto_param_block_new(const gchar *name, const gchar *title,
-        MotoNode *node);
-
-const gchar *moto_param_block_get_name(MotoParamBlock *self);
-void moto_param_block_set_name(MotoParamBlock *self, const gchar *name);
-const gchar *moto_param_block_get_title(MotoParamBlock *self);
-void moto_param_block_set_title(MotoParamBlock *self, const gchar *title);
-
-MotoParam *moto_param_block_get_param(MotoParamBlock *self, const gchar *name);
-void moto_param_block_add_param(MotoParamBlock *self, MotoParam *param);
-
-MotoNode *moto_param_block_get_node(MotoParamBlock *self);
 
 G_END_DECLS
 

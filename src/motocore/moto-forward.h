@@ -53,13 +53,6 @@ typedef struct _MotoParam MotoParam;
 typedef struct _MotoParamClass MotoParamClass;
 typedef struct _MotoParamPriv MotoParamPriv;
 
-typedef struct _MotoParamData MotoParamData;
-typedef struct _MotoParamDataClass MotoParamDataClass;
-
-typedef struct _MotoParamBlock MotoParamBlock;
-typedef struct _MotoParamBlockClass MotoParamBlockClass;
-typedef struct _MotoParamBlockPriv MotoParamBlockPriv;
-
 typedef struct _MotoManipulator MotoManipulator;
 typedef struct _MotoManipulatorClass MotoManipulatorClass;
 
