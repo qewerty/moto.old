@@ -67,6 +67,9 @@ void moto_node_set_name(MotoNode *self, const gchar *name);
 
 gboolean moto_node_is_valid(MotoNode *self);
 
+void moto_node_add_param(MotoNode *self, MotoParam *param,
+        const gchar *domain, const gchar *group);
+void moto_node_add_params(MotoNode *self, ...);
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 
 void moto_node_update_param_dests(MotoNode *self, const gchar *name);
@@ -190,7 +193,8 @@ GType moto_param_get_type(void);
 #define MOTO_PARAM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM, MotoParamClass))
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoNode *node, MotoParamMode mode, GValue *value);
+        MotoParamMode mode, GValue *value, GParamSpec *pspec,
+        MotoNode *node);
 
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);

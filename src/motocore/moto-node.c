@@ -2,15 +2,48 @@
 
 #include "moto-node.h"
 #include "moto-world.h"
-#include "moto-param-data.h"
 #include "moto-messager.h"
 
 /* utils */
+
+typedef struct _Domain
+{
+    GSList *params;
+} Domain;
+
+static Domain *domain_new()
+{
+    Domain *self = g_slice_new(Domain);
+    self->params = NULL;
+    return self;
+}
+
+static domain_free(Domain *self)
+{
+    g_slist_free(self->params);
+    g_slice_free(Domain, self);
+}
+
+static void domain_add_param(Domain *self, MotoParam *param)
+{
+    self->params = g_slist_append(self->params, param);
+}
+
+static void domain_foreach_param(Domain *self, GFunc func, gpointer user_data)
+{
+    g_slist_foreach(self->params, func, user_data);
+}
 
 static void
 unref_gobject(gpointer data, gpointer user_data)
 {
     g_object_unref(data);
+}
+
+static void
+free_domain(Domain *domain, gpointer user_data)
+{
+    domain_free(domain);
 }
 
 /* forwards */
@@ -50,7 +83,7 @@ struct _MotoParamPriv
     gboolean disposed;
 
     GValue value;
-    GValue default_value;
+    GParamSpec *pspec;
     MotoParam *source;
     GSList *dests;
 
@@ -80,7 +113,7 @@ moto_node_dispose(GObject *obj)
 
     g_string_free(self->priv->name, TRUE);
     moto_mapped_list_free_all(& self->priv->params, unref_gobject);
-    // moto_mapped_list_free_all(& self->priv->pdomains, unref_gobject);
+    moto_mapped_list_free_all(& self->priv->pdomains, (GFunc)free_domain);
 
     node_parent_class->dispose(obj);
 }
@@ -140,9 +173,84 @@ void moto_node_set_name(MotoNode *self, const gchar *name)
     g_string_assign(self->priv->name, name);
 }
 
+void moto_node_add_param(MotoNode *self, MotoParam *param,
+        const gchar *domain, const gchar *group)
+{
+    Domain *d = (Domain *)mapped_list_get(& self->priv->pdomains, domain);
+    if( ! d)
+    {
+        d = domain_new();
+        mapped_list_set(& self->priv->pdomains, domain, d);
+    }
+    domain_add_param(d, param);
+    mapped_list_set(& self->priv->params, moto_param_get_name(param), param);
+}
+
+void moto_node_add_params(MotoNode *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    GValue none = {0,};
+
+    while(1)
+    {
+        gchar *pname    = va_arg(ap, gchar *);
+        if( ! pname)
+            break;
+        gchar *ptitle   = va_arg(ap, gchar *);
+        GType ptype     = va_arg(ap, GType);
+        MotoParamMode pmode = va_arg(ap, MotoParamMode);
+
+        GValue v = none;
+        g_value_init(&v, ptype);
+
+        switch(ptype)
+        {
+            case G_TYPE_INT:
+                g_value_set_int(&v, va_arg(ap, gint));
+            break;
+            case G_TYPE_UINT:
+                g_value_set_uint(&v, va_arg(ap, guint));
+            break;
+            case G_TYPE_LONG:
+                g_value_set_long(&v, va_arg(ap, glong));
+            break;
+            case G_TYPE_ULONG:
+                g_value_set_ulong(&v, va_arg(ap, gulong));
+            break;
+            case G_TYPE_INT64:
+                g_value_set_int64(&v, va_arg(ap, gint64));
+            break;
+            case G_TYPE_UINT64:
+                g_value_set_uint64(&v, va_arg(ap, guint64));
+            break;
+            case G_TYPE_FLOAT:
+                g_value_set_float(&v, (gfloat)va_arg(ap, gdouble));
+            break;
+            case G_TYPE_DOUBLE:
+                g_value_set_double(&v, va_arg(ap, gdouble));
+            break;
+            case G_TYPE_POINTER:
+                g_value_set_pointer(&v, va_arg(ap, gpointer));
+            break;
+            default:
+                g_value_set_object(&v, va_arg(ap, gpointer));
+        }
+
+        GParamSpec *pspec = va_arg(ap, gpointer);
+        gchar *domain   = va_arg(ap, gchar*);
+        gchar *group    = va_arg(ap, gchar*);
+
+        MotoParam *p = moto_param_new(pname, ptitle, MOTO_PARAM_MODE_INOUT, &v, pspec, self);
+
+        moto_node_add_param(self, p, domain, group);
+    }
+}
+
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name)
 {
-    // TODO
+    return moto_mapped_list_get(& self->priv->params, name);
 }
 
 gboolean moto_node_is_hidden(MotoNode *self)
@@ -171,6 +279,8 @@ void moto_node_update(MotoNode *self)
 
     if(klass->update)
         klass->update(self);
+
+    moto_node_update_last_modified(self);
 }
 
 const GTimeVal *moto_node_get_last_modified(MotoNode *self)
@@ -356,7 +466,6 @@ moto_param_dispose(GObject *obj)
         return;
     self->priv->disposed = TRUE;
 
-    g_object_unref(self->priv->data);
     g_string_free(self->priv->name, TRUE);
     g_string_free(self->priv->title, TRUE);
 
@@ -379,8 +488,6 @@ moto_param_init(MotoParam *self)
     self->priv = (MotoParamPriv *)g_slice_new(MotoParamPriv);
     self->priv->disposed = FALSE;
 
-    self->priv->data = NULL;
-
     self->priv->source = NULL;
     self->priv->dests = NULL;
 
@@ -391,8 +498,6 @@ moto_param_init(MotoParam *self)
 
     self->priv->hidden = FALSE;
     g_get_current_time(& self->priv->last_modified);
-
-    self->priv->pb = NULL;
 }
 
 static void
@@ -411,9 +516,22 @@ G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
 /* methods of class Param */
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoNode *node, MotoParamMode mode, GValue *value)
+        MotoParamMode mode, GValue *value, GParamSpec *pspec,
+        MotoNode *node)
 {
+    if( ! node)
+        return NULL;
+    if( ! value)
+        return NULL;
+    if( ! pspec)
+        return NULL;
+
+    GValue none = {0, };
+
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
+
+    self->priv->value = none;
+
 
     return self;
 }
@@ -437,11 +555,6 @@ const gchar *moto_param_get_title(MotoParam *self)
 MotoParamMode moto_param_get_mode(MotoParam *self)
 {
     return self->priv->mode;
-}
-
-static void param_setup_ptr(MotoParam *self, MotoParam *src)
-{
-    moto_param_data_point(self->priv->data, moto_param_data_get(src->priv->data));
 }
 
 MotoParam *moto_param_get_source(MotoParam *self)
@@ -505,8 +618,6 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
 
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
-
-    param_setup_ptr(self, src);
 }
 
 void moto_param_clear_source(MotoParam *self)
@@ -552,27 +663,25 @@ gboolean moto_param_has_dests(MotoParam *self)
 
 gboolean moto_param_is_valid(MotoParam *self)
 {
-    return (MOTO_IS_PARAM_BLOCK(self->priv->pb) && \
-            MOTO_IS_NODE(moto_param_block_get_node(self->priv->pb)));
+    return MOTO_IS_NODE(moto_param_get_node(self));
 }
 
 MotoNode *moto_param_get_node(MotoParam *self)
 {
-    if(self->priv->pb == NULL)
-        return NULL;
-
-    return moto_param_block_get_node(self->priv->pb);
+    return self->priv->node;
 }
 
 void moto_param_update(MotoParam *self)
 {
-    if(self->priv->data)
-        moto_param_data_update(self->priv->data);
+    if(! self->priv->source)
+        return;
+
+    g_value_transform(& self->priv->source->priv->value, & self->priv->value);
 }
 
 void moto_param_update_dests(MotoParam *self)
 {
-    if(self->priv->mode == MOTO_PARAM_MODE_IN)
+    if( ! (self->priv->mode & MOTO_PARAM_MODE_OUT))
         return;
 
     GSList *dest = self->priv->dests;
