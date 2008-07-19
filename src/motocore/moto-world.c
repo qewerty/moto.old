@@ -310,6 +310,11 @@ void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
     g_mutex_unlock(self->priv->set_axes_mutex);
 }
 
+gboolean __draw_object(MotoWorld *world, MotoNode *node, gpointer user_data)
+{
+    moto_object_node_draw_full((MotoObjectNode *)node, FALSE, TRUE);
+}
+
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
     glEnable(GL_BLEND);
@@ -342,8 +347,11 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
 
     glColor4f(1, 1, 1, 1);
 
-    if(self->priv->root)
-        moto_object_node_draw(self->priv->root);
+    // if(self->priv->root)
+    //    moto_object_node_draw_full(self->priv->root, FALSE, TRUE);
+
+    moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
+            __draw_object, NULL);
 
     if(self->priv->global_axes)
     {

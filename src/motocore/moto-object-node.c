@@ -1366,22 +1366,34 @@ static void apply_transform(MotoObjectNode *self)
     }
 }
 
-void moto_object_node_draw(MotoObjectNode *self)
+static void apply_global_transform(MotoObjectNode *self)
+{
+    glMultMatrixf(moto_object_node_get_matrix(self, TRUE));
+}
+
+void moto_object_node_draw_full(MotoObjectNode *self,
+        gboolean recursive, gboolean use_global)
 {
     if( ! *(self->priv->visible_ptr))
         return;
 
     glPushMatrix();
 
-    apply_transform(self);
+    if(use_global)
+        apply_global_transform(self);
+    else
+        apply_transform(self);
 
     if(self->priv->material)
         moto_material_node_use(self->priv->material);
 
-    GSList *child = self->priv->children;
-    for(; child; child = g_slist_next(child))
+    if(recursive)
     {
-        moto_object_node_draw((MotoObjectNode *)child->data);
+        GSList *child = self->priv->children;
+        for(; child; child = g_slist_next(child))
+        {
+            moto_object_node_draw((MotoObjectNode *)child->data);
+        }
     }
 
     if(*(self->priv->show_view_ptr) && self->priv->view)

@@ -110,9 +110,11 @@ static void _moto_time_node_update(MotoNode *self)
         return;
     }
 
+    /*
     self->priv->time = moto_world_get_current_time(world);
     self->priv->frame = 1.0f + (gfloat)(moto_world_get_current_time(world) / moto_world_get_fps(world));
+    */
 
     /* Chain up updates to all nodes which depend on this. */
-    moto_node_update_all_param_dests(self);
+    // moto_node_update_all_param_dests(self);
 }

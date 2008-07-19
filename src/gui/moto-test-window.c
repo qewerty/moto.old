@@ -83,6 +83,8 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv = g_slice_new(MotoTestWindowPriv);
     self->priv->disposed = FALSE;
 
+    MotoParam *param;
+
     self->priv->system = moto_system_new();
     moto_system_get_library(self->priv->system);
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
@@ -90,6 +92,10 @@ moto_test_window_init(MotoTestWindow *self)
 
     MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root", NULL);
     moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
+
+    param = moto_node_get_param(root_node, "main", "ty");
+    MotoFloatParamData *pd = (MotoFloatParamData *)moto_param_get_data(param);
+    // moto_float_param_data_set(pd, 10);
 
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
     MotoParam *in = moto_node_get_param(obj_node, "main", "parent");
@@ -147,7 +153,7 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(view_node, "main", "view");
     moto_param_set_source(in, out);
 
-    MotoParam *param;
+
     param = moto_node_get_param(obj_node, "main", "tx");
     MotoFloatParamData *tx = (MotoFloatParamData *)moto_param_get_data(param);
     param = moto_node_get_param(obj_node, "main", "ty");

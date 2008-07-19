@@ -65,13 +65,24 @@ struct _MotoMeshFaceHole
 {
     guint verts_num;
     guint *indecies;
+    union
+    {
+        guint16 *v16;
+        guint32 *v32;
+        guint64 *v64;
+    };
 };
 
 void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint verts_num);
 
-struct _MotoTriangle
+struct _MotoTriangle16
 {
-    guint a, b, c;
+    guint16 a, b, c; // 96bit
+};
+
+struct _MotoTriangle32
+{
+    guint32 a, b, c; // 96bit
 };
 
 struct _MotoMeshFace
@@ -92,10 +103,13 @@ struct _MotoMeshFace
 
     /* read-only */
     guint triangles_num;
-    MotoTriangle *triangles;
-
-    /* If convexes is NULL face is not tesselated and considered as convex. */
-    MotoMeshSubFace *convexes; // temporary unused
+    /*
+    union
+    {
+        MotoTriangle16  *tri16;
+        MotoTriangle132 *tri32;
+    }
+    */
 };
 
 struct _MotoMeshSubFace
@@ -196,6 +210,8 @@ GType moto_mesh_get_type(void);
 MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num);
 MotoMesh *moto_mesh_copy(MotoMesh *other);
 
+#define moto_mesh_get_index_size(mesh) (((mesh)->verts_num <= G_MAXUINT16)?1:2)
+
 MotoMeshVertAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
 MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
@@ -203,6 +219,8 @@ void moto_mesh_foreach_vertex(MotoMesh *self,
         MotoMeshForeachVertexFunc func);
 void moto_mesh_foreach_edge(MotoMesh *self,
         MotoMeshForeachEdgeFunc func);
+// void moto_mesh_foreach_face(MotoMesh *self,
+//        MotoMeshForeachFaceFunc func);
 
 void moto_mesh_tesselate_faces(MotoMesh *self);
 

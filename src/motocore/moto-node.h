@@ -199,6 +199,9 @@ GType moto_param_get_type(void);
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, MotoParamBlock *pb, MotoParamData *data);
 
+MotoParam *moto_param_new2(const gchar *name, const gchar *title,
+    GValue default_value, MotoParamMode mode, MotoNode *node);
+
 MotoParamData *moto_param_get_data(MotoParam *self);
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);

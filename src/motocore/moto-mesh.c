@@ -81,7 +81,7 @@ MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num)
     self->faces = (MotoMeshFace *)g_try_malloc(sizeof(MotoMeshFace) * faces_num);
     guint i;
     for(i = 0; i < faces_num; i++)
-        self->faces[i].convexes = NULL;
+        ;//self->faces[i].convexes = NULL;
 
     return self;
 }
@@ -156,6 +156,7 @@ MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name)
     return NULL;
 }
 
+/*
 void moto_mesh_foreach_vertex(MotoMesh *self,
         MotoMeshForeachVertexFunc func)
 {
@@ -168,6 +169,7 @@ void moto_mesh_foreach_vertex(MotoMesh *self,
         func(self, vert);
     }
 }
+*/
 
 void moto_mesh_foreach_edge(MotoMesh *self,
         MotoMeshForeachEdgeFunc func)
@@ -265,8 +267,8 @@ void moto_mesh_face_free(MotoMeshFace *self)
         g_free(self->holes[i].indecies);
     g_free(self->holes);
 
-    if(self->triangles)
-        g_free(self->triangles);
+    // if(self->triangles)
+    //    g_free(self->triangles);
 }
 
 /* Newell's method */
@@ -305,11 +307,12 @@ gboolean
 moto_mesh_face_intersect_ray(MotoMeshFace *self,
         MotoMesh *mesh, MotoRay *ray, gfloat *dist)
 {
-    if( ! self->triangles)
+    // if( ! self->triangles)
     {
         /* TODO: Intersection with convex polygon. */
     }
 
+    /*
     MotoTriangle *t;
     guint i;
     for(i = 0; i < self->triangles_num; i++)
@@ -321,6 +324,7 @@ moto_mesh_face_intersect_ray(MotoMeshFace *self,
                     mesh->verts[t->c].xyz))
             return TRUE;
     }
+    */
 
     return FALSE;
 }
