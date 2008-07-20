@@ -126,7 +126,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material", NULL);
+    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
 
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(view_node, "view");
@@ -149,16 +149,13 @@ moto_test_window_init(MotoTestWindow *self)
     out = moto_node_get_param(view_node, "view");
     moto_param_set_source(in, out);
 
-    g_value_set_float(moto_node_get_param_value(obj_node, "tx"), 2.5f);
-    g_value_set_float(moto_node_get_param_value(obj_node, "ty"), 3.1f);
-
-
-    param = moto_node_get_param(obj_node, "tx");
-    param = moto_node_get_param(obj_node, "ty");
-    param = moto_node_get_param(obj_node, "tz");
-    param = moto_node_get_param(obj_node, "rx");
-    param = moto_node_get_param(obj_node, "ry");
-    param = moto_node_get_param(obj_node, "rz");
+    moto_node_set_params(obj_node,
+            "tx", 2.5f,
+            "ty", 3.1f,
+            "tz", -1.5f,
+            "rx", DEG_PER_RAD*45,
+            "ry", DEG_PER_RAD*30,
+            "rz", DEG_PER_RAD*15);
 
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
@@ -176,9 +173,6 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
-    param = moto_node_get_param(cam_obj, "tx");
-    param = moto_node_get_param(cam_obj, "ty");
-    param = moto_node_get_param(cam_obj, "tz");
 
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;

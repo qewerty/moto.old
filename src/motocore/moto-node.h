@@ -73,6 +73,21 @@ void moto_node_add_params(MotoNode *self, ...);
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
 
+void moto_node_set_param_boolean(MotoNode *self, const gchar *name, gboolean value);
+void moto_node_set_param_int(MotoNode *self, const gchar *name, gint value);
+void moto_node_set_param_uint(MotoNode *self, const gchar *name, guint value);
+void moto_node_set_param_long(MotoNode *self, const gchar *name, glong value);
+void moto_node_set_param_ulong(MotoNode *self, const gchar *name, gulong value);
+void moto_node_set_param_int64(MotoNode *self, const gchar *name, gint64 value);
+void moto_node_set_param_uint64(MotoNode *self, const gchar *name, guint64 value);
+void moto_node_set_param_float(MotoNode *self, const gchar *name, gfloat value);
+void moto_node_set_param_double(MotoNode *self, const gchar *name, gdouble value);
+void moto_node_set_param_pointer(MotoNode *self, const gchar *name, gpointer value);
+void moto_node_set_param_enum(MotoNode *self, const gchar *name, gint value);
+void moto_node_set_param_object(MotoNode *self, const gchar *name, GObject *value);
+
+void moto_node_set_params(MotoNode *self, ...);
+
 #define moto_node_param_value_pointer(self, name, c_type) \
     moto_param_value_pointer(moto_node_get_param(self, name), c_type)
 
@@ -209,6 +224,19 @@ GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);
 #define moto_param_value_pointer(p, c_type) ((c_type *)moto_param_get_value_pointer(p))
 #define moto_param_value(p, c_type) (*moto_param_value_ptr(p, c_type))
+
+void moto_param_set_boolean(MotoParam *self, gboolean value);
+void moto_param_set_int(MotoParam *self, gint value);
+void moto_param_set_uint(MotoParam *self, guint value);
+void moto_param_set_long(MotoParam *self, glong value);
+void moto_param_set_ulong(MotoParam *self, gulong value);
+void moto_param_set_int64(MotoParam *self, gint64 value);
+void moto_param_set_uint64(MotoParam *self, guint64 value);
+void moto_param_set_float(MotoParam *self, gfloat value);
+void moto_param_set_double(MotoParam *self, gdouble value);
+void moto_param_set_pointer(MotoParam *self, gpointer value);
+void moto_param_set_enum(MotoParam *self, gint value);
+void moto_param_set_object(MotoParam *self, GObject *value);
 
 void moto_param_update(MotoParam *self);
 void moto_param_update_dests(MotoParam *self);

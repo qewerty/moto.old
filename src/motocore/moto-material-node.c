@@ -49,6 +49,8 @@ void moto_material_node_use(MotoMaterialNode *self)
     MotoMaterialNodeClass *klass = MOTO_MATERIAL_NODE_GET_CLASS(self);
 
     if(klass->use)
+    {
         klass->use(self);
+    }
 }
 

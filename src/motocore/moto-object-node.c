@@ -203,7 +203,7 @@ moto_object_node_init(MotoObjectNode *self)
 
     self->priv->camera_ptr = moto_node_param_value_pointer(node, "cam", MotoCameraNode*);
     self->priv->view_ptr = moto_node_param_value_pointer(node, "view", MotoGeometryViewNode*);
-    self->priv->material_ptr = moto_node_param_value_pointer(node, "view", MotoMaterialNode*);;
+    self->priv->material_ptr = moto_node_param_value_pointer(node, "material", MotoMaterialNode*);;
 
     /* camera */
     self->priv->target[0] = 0;
@@ -703,7 +703,14 @@ void moto_object_node_draw_full(MotoObjectNode *self,
         apply_transform(self);
 
     if(*(self->priv->material_ptr))
+    {
         moto_material_node_use(*(self->priv->material_ptr));
+    }
+
+    if(*(self->priv->view_ptr))
+    {
+        moto_geometry_view_node_draw(*(self->priv->view_ptr));
+    }
 
     if(recursive)
     {

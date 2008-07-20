@@ -85,7 +85,16 @@ moto_sler_material_node_finalize(GObject *obj)
 static void
 moto_sler_material_node_init(MotoSlerMaterialNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
+
     self->priv = g_slice_new(MotoSlerMaterialNodePriv);
+
+    /* params */
+
+    GParamSpec *pspec = NULL; // FIXME: Implement.
+    moto_node_add_params(node,
+            "material", "Material", MOTO_TYPE_SLER_MATERIAL_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Material", "Material",
+            NULL);
 
     // TODO: Temporary! When internal Sler editor is integrated 'use_external' default value will be FALSE.
     self->priv->use_external = TRUE;
@@ -112,29 +121,13 @@ G_DEFINE_TYPE(MotoSlerMaterialNode, moto_sler_material_node, MOTO_TYPE_MATERIAL_
 
 /* methods of class SlerMaterialNode */
 
-static gpointer get_material(MotoParam *param)
-{
-    return moto_param_get_node(param);
-}
-
 MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name)
 {
     MotoSlerMaterialNode *self = \
         (MotoSlerMaterialNode *)g_object_new(MOTO_TYPE_SLER_MATERIAL_NODE, NULL);
-    MotoNode *node = (MotoNode *)self;
+    // MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name((MotoNode *)self, name);
-
-    /* params */
-
-    /*
-    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("material", "Material", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_material_param_data_new(NULL));
-    moto_param_data_set_cbs(pdata, NULL, NULL, get_material, NULL);
-    */
 
     return self;
 }
