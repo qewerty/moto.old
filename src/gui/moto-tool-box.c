@@ -105,7 +105,7 @@ GtkWidget *moto_tool_box_new(MotoSystem *system)
 
     if(system)
     {
-        g_object_add_weak_pointer(G_OBJECT(system), & tb->priv->system);
+        g_object_add_weak_pointer(G_OBJECT(system), (gpointer *)(& tb->priv->system));
         tb->priv->system = system;
     }
 
@@ -116,7 +116,7 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 {
     if( ! system && self->priv->system)
     {
-        g_object_remove_weak_pointer(G_OBJECT(system), & self->priv->system);
+        g_object_remove_weak_pointer(G_OBJECT(system), (gpointer *)(& self->priv->system));
         self->priv->system = NULL;
 
         return;
@@ -133,10 +133,10 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
     if(self->priv->system)
     {
-        g_object_remove_weak_pointer(G_OBJECT(system), & self->priv->system);
+        g_object_remove_weak_pointer(G_OBJECT(system), (gpointer *)(& self->priv->system));
     }
 
-    g_object_add_weak_pointer(G_OBJECT(system), & self->priv->system);
+    g_object_add_weak_pointer(G_OBJECT(system), (gpointer *)(& self->priv->system));
     self->priv->system = system;
 }
 

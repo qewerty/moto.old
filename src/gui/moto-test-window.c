@@ -146,6 +146,7 @@ moto_test_window_init(MotoTestWindow *self)
     moto_node_save_to_variation(obj_node, self->priv->v2);
 
     moto_node_restore_from_variation(obj_node, self->priv->v1);
+    moto_node_restore_from_variation(obj_node, self->priv->v2);
 
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);

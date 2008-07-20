@@ -84,11 +84,6 @@ G_DEFINE_TYPE(MotoGridViewNode, moto_grid_view_node, MOTO_TYPE_GEOMETRY_VIEW_NOD
 
 /* methods of class GridViewNode */
 
-static gpointer get_view(MotoParam *param)
-{
-    return moto_param_get_node(param);
-}
-
 MotoGridViewNode *moto_grid_view_node_new(const gchar *name)
 {
     MotoGridViewNode *self = (MotoGridViewNode *)g_object_new(MOTO_TYPE_GRID_VIEW_NODE, NULL);
