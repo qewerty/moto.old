@@ -163,7 +163,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     in = moto_node_get_param(obj_node, "view");
     out = moto_node_get_param(ray_view_node, "view");
-    //moto_param_set_source(in, out);
+    moto_param_set_source(in, out);
 
     in = moto_node_get_param(obj_node, "parent");
     out = moto_node_get_param(root_node, "transform");

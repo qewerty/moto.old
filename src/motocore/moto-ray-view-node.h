@@ -47,7 +47,7 @@ struct _MotoRayViewNodeClass
     MotoGeometryViewNodeClass parent;
 };
 
-GType moto_ray_view_node_storage_get_type(void);
+GType moto_ray_view_node_get_type(void);
 
 #define MOTO_TYPE_RAY_VIEW_NODE (moto_ray_view_node_get_type())
 #define MOTO_RAY_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_RAY_VIEW_NODE, MotoRayViewNode))
