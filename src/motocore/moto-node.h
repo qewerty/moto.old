@@ -235,7 +235,7 @@ guint moto_param_get_id(MotoParam *self);
 GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);
 #define moto_param_value_pointer(p, c_type) ((c_type *)moto_param_get_value_pointer(p))
-#define moto_param_value(p, c_type) (*moto_param_value_ptr(p, c_type))
+#define moto_param_value(p, c_type) (*moto_param_value_pointer(p, c_type))
 
 void moto_param_set_boolean(MotoParam *self, gboolean value);
 void moto_param_set_int(MotoParam *self, gint value);

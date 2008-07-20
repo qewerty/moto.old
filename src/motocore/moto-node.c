@@ -483,12 +483,12 @@ void moto_node_set_source(MotoNode *self, const gchar *in_name,
 }
 
 
-static save_param(MotoParam *p, MotoVariation *v)
+static void save_param(MotoParam *p, MotoVariation *v)
 {
     moto_variation_save_param(v, p);
 }
 
-static restore_param(MotoParam *p, MotoVariation *v)
+static void restore_param(MotoParam *p, MotoVariation *v)
 {
     moto_variation_restore_param(v, p);
 }
@@ -1129,12 +1129,18 @@ void moto_variation_set_parent(MotoVariation *self, MotoVariation *parent)
     self->priv->parent = parent;
 }
 
+static void null_value(GValue *value, GObject *where_the_object_was)
+{
+    g_value_set_object(value, NULL);
+}
+
 void moto_variation_save_param(MotoVariation *self, MotoParam *p)
 {
     GValue none = {0,};
 
     guint id = moto_param_get_id(p);
     GValue *pv = moto_param_get_value(p);
+    GType pt = G_VALUE_TYPE(pv);
     GHashTable *params = self->priv->params;
 
     GValue *v = (GValue *)g_hash_table_lookup(params, &id);
@@ -1142,11 +1148,24 @@ void moto_variation_save_param(MotoVariation *self, MotoParam *p)
     {
         v = g_slice_new(GValue);
         *v = none;
-        g_value_init(v, G_VALUE_TYPE(pv));
+        g_value_init(v, pt);
 
         guint *key = g_slice_new(guint);
         *key = id;
         g_hash_table_insert(params, key, v);
+    }
+    else if(g_type_is_a(pt, G_TYPE_OBJECT))
+    {
+        GObject *o = g_value_get_object(v);
+        if(o)
+            g_object_weak_unref(o, (GWeakNotify)null_value, v);
+    }
+
+    if(g_type_is_a(pt, G_TYPE_OBJECT))
+    {
+        GObject *o = moto_param_value(p, GObject*);
+        if(o)
+            g_object_weak_ref(o, (GWeakNotify)null_value, v);
     }
     g_value_copy(pv, v);
 }
