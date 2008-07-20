@@ -56,6 +56,8 @@ struct _MotoNodePriv
 {
     gboolean disposed;
 
+    guint id;
+
     GString *name;
     MotoWorld *world;
 
@@ -82,6 +84,8 @@ struct _MotoParamPriv
 {
     gboolean disposed;
 
+    guint id;
+
     GValue value;
     GParamSpec *pspec;
     MotoParam *source;
@@ -98,7 +102,7 @@ struct _MotoParamPriv
     /* GList *notes; // ??? */
 };
 
-/* class Node */
+/* class MotoNode */
 
 static GObjectClass *node_parent_class = NULL;
 
@@ -134,6 +138,9 @@ moto_node_init(MotoNode *self)
     self->priv = g_slice_new(MotoNodePriv);
     self->priv->disposed = FALSE;
 
+    static guint id = 0;
+    self->priv->id = ++id;
+
     self->priv->name = g_string_new("");
     self->priv->world = NULL;
 
@@ -161,7 +168,7 @@ moto_node_class_init(MotoNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_OBJECT);
 
-/* methods of class Node */
+/* methods of class MotoNode */
 
 const gchar *moto_node_get_name(MotoNode *self)
 {
@@ -171,6 +178,11 @@ const gchar *moto_node_get_name(MotoNode *self)
 void moto_node_set_name(MotoNode *self, const gchar *name)
 {
     g_string_assign(self->priv->name, name);
+}
+
+guint moto_node_get_id(MotoNode *self)
+{
+    return self->priv->id;
 }
 
 void moto_node_add_param(MotoNode *self, MotoParam *param,
@@ -470,6 +482,27 @@ void moto_node_set_source(MotoNode *self, const gchar *in_name,
     moto_param_set_source(in, out);
 }
 
+
+static save_param(MotoParam *p, MotoVariation *v)
+{
+    moto_variation_save_param(v, p);
+}
+
+static restore_param(MotoParam *p, MotoVariation *v)
+{
+    moto_variation_restore_param(v, p);
+}
+
+void moto_node_save_to_variation(MotoNode *self, MotoVariation *variation)
+{
+    moto_mapped_list_foreach(& self->priv->params, (GFunc)save_param, variation);
+}
+
+void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation)
+{
+    moto_mapped_list_foreach(& self->priv->params, (GFunc)restore_param, variation);
+}
+
 gboolean moto_node_is_hidden(MotoNode *self)
 {
     return self->priv->hidden;
@@ -565,7 +598,7 @@ MotoLibrary *moto_node_get_library(MotoNode *self)
     return moto_world_get_library(w);
 }
 
-/* class NodeFactory */
+/* class MotoNodeFactory */
 
 static GObjectClass *node_factory_parent_class = NULL;
 
@@ -629,6 +662,8 @@ moto_node_factory_class_init(MotoNodeFactoryClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoNodeFactory, moto_node_factory, G_TYPE_OBJECT);
 
+/* methods of class MotoNodeFactory */
+
 MotoNode *
 moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
 {
@@ -670,7 +705,7 @@ static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self)
     return MOTO_TYPE_NODE;
 }
 
-/* class Param */
+/* class MotoParam */
 
 static GObjectClass *param_parent_class = NULL;
 
@@ -705,6 +740,9 @@ moto_param_init(MotoParam *self)
     self->priv = (MotoParamPriv *)g_slice_new(MotoParamPriv);
     self->priv->disposed = FALSE;
 
+    static guint id = 0;
+    self->priv->id = ++id;
+
     self->priv->source = NULL;
     self->priv->dests = NULL;
 
@@ -730,7 +768,7 @@ moto_param_class_init(MotoParamClass *klass)
 
 G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
 
-/* methods of class Param */
+/* methods of class MotoParam */
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, GValue *value, GParamSpec *pspec,
@@ -780,6 +818,11 @@ const gchar *moto_param_get_title(MotoParam *self)
 MotoParamMode moto_param_get_mode(MotoParam *self)
 {
     return self->priv->mode;
+}
+
+guint moto_param_get_id(MotoParam *self)
+{
+    return self->priv->id;
 }
 
 GValue * moto_param_get_value(MotoParam *self)
@@ -991,3 +1034,137 @@ void moto_param_update_dests(MotoParam *self)
     }
 
 }
+
+/* class MotoVariation */
+
+struct _MotoVariationPriv
+{
+    gboolean disposed;
+
+    GString *name;
+    MotoVariation *parent;
+
+    GHashTable *params;
+
+};
+
+static GObjectClass *variation_parent_class = NULL;
+
+static void
+moto_variation_dispose(GObject *obj)
+{
+    MotoVariation *self = (MotoVariation *)obj;
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
+
+    g_string_free(self->priv->name, TRUE);
+    g_hash_table_unref(self->priv->params);
+}
+
+static void
+moto_variation_finalize(GObject *obj)
+{
+    MotoVariation *self = (MotoVariation *)obj;
+
+    g_slice_free(MotoVariationPriv, self->priv);
+
+    variation_parent_class->finalize(obj);
+}
+
+static void destroy_key(gpointer data)
+{
+    g_slice_free(guint, data);
+}
+
+static void destroy_value(gpointer data)
+{
+    g_slice_free(GValue, data);
+}
+
+static void
+moto_variation_init(MotoVariation *self)
+{
+    self->priv = g_slice_new(MotoVariationPriv);
+
+    self->priv->name = g_string_new("");
+    self->priv->parent = NULL;
+
+    self->priv->params = \
+        g_hash_table_new_full(g_int_hash, g_int_equal,
+                              destroy_key, destroy_value);
+}
+
+static void
+moto_variation_class_init(MotoVariationClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass *)klass;
+
+    variation_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_variation_dispose;
+    goclass->finalize   = moto_variation_finalize;
+}
+
+G_DEFINE_TYPE(MotoVariation, moto_variation, G_TYPE_OBJECT);
+
+/* methods of class MotoVariation */
+
+MotoVariation *moto_variation_new(const gchar *name)
+{
+    MotoVariation *self = (MotoVariation *)g_object_new(MOTO_TYPE_VARIATION, NULL);
+
+    g_string_assign(self->priv->name, name);
+
+    return self;
+}
+
+MotoVariation *moto_variation_get_parent(MotoVariation *self)
+{
+    return self->priv->parent;
+}
+
+void moto_variation_set_parent(MotoVariation *self, MotoVariation *parent)
+{
+    self->priv->parent = parent;
+}
+
+void moto_variation_save_param(MotoVariation *self, MotoParam *p)
+{
+    GValue none = {0,};
+
+    guint id = moto_param_get_id(p);
+    GValue *pv = moto_param_get_value(p);
+    GHashTable *params = self->priv->params;
+
+    GValue *v = (GValue *)g_hash_table_lookup(params, &id);
+    if( ! v)
+    {
+        v = g_slice_new(GValue);
+        *v = none;
+        g_value_init(v, G_VALUE_TYPE(pv));
+
+        guint *key = g_slice_new(guint);
+        *key = id;
+        g_hash_table_insert(params, key, v);
+    }
+    g_value_copy(pv, v);
+}
+
+void moto_variation_restore_param(MotoVariation *self, MotoParam *p)
+{
+    guint id = moto_param_get_id(p);
+    GValue *pv = moto_param_get_value(p);
+    GHashTable *params = self->priv->params;
+
+    GValue *v = (GValue *)g_hash_table_lookup(params, &id);
+    if( ! v)
+    {
+        if(self->priv->parent)
+            moto_variation_restore_param(self->priv->parent, p);
+        return;
+    }
+
+    g_value_copy(v, pv);
+}
+

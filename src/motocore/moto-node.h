@@ -65,6 +65,8 @@ GType moto_node_get_type(void);
 const gchar *moto_node_get_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
 
+guint moto_node_get_id(MotoNode *self);
+
 gboolean moto_node_is_valid(MotoNode *self);
 
 void moto_node_add_param(MotoNode *self, MotoParam *param,
@@ -96,6 +98,9 @@ void moto_node_set_source(MotoNode *self, const gchar *in_name,
 
 void moto_node_update_param_dests(MotoNode *self, const gchar *name);
 void moto_node_update_all_param_dests(MotoNode *self);
+
+void moto_node_save_to_variation(MotoNode *self, MotoVariation *variation);
+void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation);
 
 gboolean moto_node_is_hidden(MotoNode *self);
 void moto_node_set_hidden(MotoNode *self, gboolean hidden);
@@ -185,11 +190,13 @@ GType moto_variation_get_type(void);
 #define MOTO_IS_VARIATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_VARIATION))
 #define MOTO_VARIATION_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_VARIATION, MotoVariationClass))
 
-MotoVariation *moto_variation_new();
+MotoVariation *moto_variation_new(const gchar *name);
 
 MotoVariation *moto_variation_get_parent(MotoVariation *self);
+void moto_variation_set_parent(MotoVariation *self, MotoVariation *parent);
 
-const GValue *moto_variation_get_value(MotoVariation *self, const gchar *name);
+void moto_variation_save_param(MotoVariation *self, MotoParam *p);
+void moto_variation_restore_param(MotoVariation *self, MotoParam *p);
 
 /* class MotoParam */
 
@@ -222,6 +229,8 @@ const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 MotoParamMode moto_param_get_mode(MotoParam *self);
+
+guint moto_param_get_id(MotoParam *self);
 
 GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);

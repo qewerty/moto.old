@@ -43,6 +43,9 @@ struct _MotoTestWindowPriv
 
     GtkDrawingArea *area;
 
+    MotoNode *vtest;
+    MotoVariation *v1, *v2;
+
     gboolean disposed;
 };
 
@@ -80,6 +83,10 @@ moto_test_window_init(MotoTestWindow *self)
 {
     self->priv = g_slice_new(MotoTestWindowPriv);
     self->priv->disposed = FALSE;
+
+    self->priv->v1 = moto_variation_new("v1");
+    self->priv->v2 = moto_variation_new("v2");
+    moto_variation_set_parent(self->priv->v2, self->priv->v1);
 
     MotoParam *param;
 
@@ -125,6 +132,9 @@ moto_test_window_init(MotoTestWindow *self)
     moto_node_set_source(obj_node, "parent", root_node, "transform");
     moto_node_set_source(obj_node, "view", view_node, "view");
 
+    self->priv->vtest = obj_node;
+    moto_node_save_to_variation(obj_node, self->priv->v1);
+
     moto_node_set_params(obj_node,
             "tx", 2.5f,
             "ty", 3.1f,
@@ -132,6 +142,10 @@ moto_test_window_init(MotoTestWindow *self)
             "rx", DEG_PER_RAD*45,
             "ry", DEG_PER_RAD*30,
             "rz", DEG_PER_RAD*15);
+
+    moto_node_save_to_variation(obj_node, self->priv->v2);
+
+    moto_node_restore_from_variation(obj_node, self->priv->v1);
 
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
