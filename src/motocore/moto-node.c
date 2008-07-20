@@ -462,6 +462,14 @@ void moto_node_set_params(MotoNode *self, ...)
     }
 }
 
+void moto_node_set_source(MotoNode *self, const gchar *in_name,
+                          MotoNode *other, const gchar *out_name)
+{
+    MotoParam *in  = moto_node_get_param(self, in_name);
+    MotoParam *out = moto_node_get_param(other, out_name);
+    moto_param_set_source(in, out);
+}
+
 gboolean moto_node_is_hidden(MotoNode *self)
 {
     return self->priv->hidden;

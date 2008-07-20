@@ -94,33 +94,21 @@ moto_test_window_init(MotoTestWindow *self)
     param = moto_node_get_param(root_node, "ty");
 
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    MotoParam *in = moto_node_get_param(obj_node, "parent");
-    MotoParam *out = moto_node_get_param(root_node, "transform");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "parent", root_node, "transform");
 
     MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView", NULL);
-
-    in = moto_node_get_param(obj_node, "view");
-    out = moto_node_get_param(grid_view_node, "view");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "view", grid_view_node, "view");
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    in = moto_node_get_param(obj_node, "parent");
-    out = moto_node_get_param(root_node, "transform");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "parent", root_node, "transform");
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
     MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
-
-    in = moto_node_get_param(obj_node, "view");
-    out = moto_node_get_param(axes_view_node, "view");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "view", axes_view_node, "view");
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
-    in = moto_node_get_param(obj_node, "parent");
-    out = moto_node_get_param(root_node, "transform");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
 
@@ -128,26 +116,14 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
 
-    in = moto_node_get_param(obj_node, "view");
-    out = moto_node_get_param(view_node, "view");
-    moto_param_set_source(in, out);
-
-    in = moto_node_get_param(view_node, "mesh");
-    out = moto_node_get_param(cube_node, "mesh");
-    moto_param_set_source(in, out);
-
-    in = moto_node_get_param(obj_node, "material");
-    out = moto_node_get_param(mat_node, "material");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "view", view_node, "view");
+    moto_node_set_source(view_node, "mesh", cube_node, "mesh");
+    moto_node_set_source(obj_node, "material", mat_node, "material");
 
     /* cube instance */
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
-    in = moto_node_get_param(obj_node, "parent");
-    out = moto_node_get_param(root_node, "transform");
-    moto_param_set_source(in, out);
-    in = moto_node_get_param(obj_node, "view");
-    out = moto_node_get_param(view_node, "view");
-    moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "parent", root_node, "transform");
+    moto_node_set_source(obj_node, "view", view_node, "view");
 
     moto_node_set_params(obj_node,
             "tx", 2.5f,
@@ -160,14 +136,8 @@ moto_test_window_init(MotoTestWindow *self)
     /* ray */
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
-
-    in = moto_node_get_param(obj_node, "view");
-    out = moto_node_get_param(ray_view_node, "view");
-    moto_param_set_source(in, out);
-
-    in = moto_node_get_param(obj_node, "parent");
-    out = moto_node_get_param(root_node, "transform");
-    //moto_param_set_source(in, out);
+    moto_node_set_source(obj_node, "view", ray_view_node, "view");
+    moto_node_set_source(obj_node, "parent", root_node, "transform");
 
     /* camera */
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);

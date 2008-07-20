@@ -88,6 +88,9 @@ void moto_node_set_param_object(MotoNode *self, const gchar *name, GObject *valu
 
 void moto_node_set_params(MotoNode *self, ...);
 
+void moto_node_set_source(MotoNode *self, const gchar *in_name,
+                          MotoNode *other, const gchar *out_name);
+
 #define moto_node_param_value_pointer(self, name, c_type) \
     moto_param_value_pointer(moto_node_get_param(self, name), c_type)
 
