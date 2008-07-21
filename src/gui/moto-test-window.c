@@ -146,7 +146,15 @@ moto_test_window_init(MotoTestWindow *self)
     moto_node_save_to_variation(obj_node, self->priv->v2);
 
     moto_node_restore_from_variation(obj_node, self->priv->v1);
+
+    // gfloat tx, ty, tz;
+    // moto_node_get_params(obj_node, "tx", &tx, "ty", &ty, "tz", &tz, NULL);
+    // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
+
     moto_node_restore_from_variation(obj_node, self->priv->v2);
+
+    // moto_node_get_params(obj_node, "tx", &tx, "ty", &ty, "tz", &tz, NULL);
+    // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
 
     // ray 
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);

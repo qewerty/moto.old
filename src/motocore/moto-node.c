@@ -309,7 +309,7 @@ gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_boolean(p);
 }
@@ -320,7 +320,7 @@ gint moto_node_get_param_int(MotoNode *self,        const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_int(p);
 }
@@ -331,7 +331,7 @@ guint moto_node_get_param_uint(MotoNode *self,       const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_uint(p);
 }
@@ -342,7 +342,7 @@ glong moto_node_get_param_long(MotoNode *self,       const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_long(p);
 }
@@ -353,7 +353,7 @@ gulong moto_node_get_param_ulong(MotoNode *self,      const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_ulong(p);
 }
@@ -364,7 +364,7 @@ gint64  moto_node_get_param_int64(MotoNode *self,      const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_int64(p);
 }
@@ -375,7 +375,7 @@ guint64 moto_node_get_param_uint64(MotoNode *self,     const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_uint64(p);
 }
@@ -386,7 +386,7 @@ gfloat moto_node_get_param_float(MotoNode *self,      const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_float(p);
 }
@@ -397,7 +397,7 @@ gdouble moto_node_get_param_double(MotoNode *self,     const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_double(p);
 }
@@ -408,7 +408,7 @@ gpointer moto_node_get_param_pointer(MotoNode *self,    const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_pointer(p);
 }
@@ -419,7 +419,7 @@ gint moto_node_get_param_enum(MotoNode *self,       const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_enum(p);
 }
@@ -430,7 +430,7 @@ GObject *moto_node_get_param_object(MotoNode *self,     const gchar *name)
     if( ! p)
     {
         // TODO: print error
-        return;
+        // return;
     }
     return moto_param_get_object(p);
 }
@@ -576,12 +576,59 @@ void moto_node_get_params(MotoNode *self, ...)
     while(1)
     {
         gchar *pname = va_arg(ap, gchar*);
+        if( ! pname)
+            break;
+
         p = moto_node_get_param(self, pname);
         if( ! p)
         {
             // TODO: print error
             return;
         }
+
+        GValue *v = moto_param_get_value(p);
+        GType ptype = G_VALUE_TYPE(v);
+        switch(ptype)
+        {
+            case G_TYPE_BOOLEAN:
+                (*va_arg(ap, gboolean*)) = g_value_get_boolean(v);
+            break;
+            case G_TYPE_INT:
+                (*va_arg(ap, gint*)) = g_value_get_int(v);
+            break;
+            case G_TYPE_UINT:
+                (*va_arg(ap, guint*)) = g_value_get_uint(v);
+            break;
+            case G_TYPE_LONG:
+                (*va_arg(ap, glong*)) = g_value_get_long(v);
+            break;
+            case G_TYPE_ULONG:
+                (*va_arg(ap, gulong*)) = g_value_get_ulong(v);
+            break;
+            case G_TYPE_INT64:
+                (*va_arg(ap, gint64*)) = g_value_get_int64(v);
+            break;
+            case G_TYPE_UINT64:
+                (*va_arg(ap, guint64*)) = g_value_get_uint64(v);
+            break;
+            case G_TYPE_FLOAT:
+                (*va_arg(ap, gfloat*)) = g_value_get_float(v);
+            break;
+            case G_TYPE_DOUBLE:
+                (*va_arg(ap, gdouble*)) = g_value_get_double(v);
+            break;
+            case G_TYPE_POINTER:
+                (*va_arg(ap, gpointer*)) = g_value_get_pointer(v);
+            break;
+            default:
+                if(g_type_is_a(ptype, G_TYPE_ENUM))
+                {
+                    (*va_arg(ap, gint*)) = g_value_get_enum(v);
+                }
+                else
+                    (*va_arg(ap, GObject**)) = g_value_get_object(v);
+        }
+
     }
 }
 
@@ -594,12 +641,16 @@ void moto_node_set_params(MotoNode *self, ...)
     while(1)
     {
         gchar *pname = va_arg(ap, gchar*);
+        if( ! pname)
+            break;
+
         p = moto_node_get_param(self, pname);
         if( ! p)
         {
             // TODO: print error
             return;
         }
+
         GValue *v = moto_param_get_value(p);
         GType ptype = G_VALUE_TYPE(v);
 
@@ -952,7 +1003,7 @@ gpointer moto_param_get_pointer(MotoParam *self)
 
 gint moto_param_get_enum(MotoParam *self)
 {
-     g_value_get_enum(& self->priv->value);
+     return g_value_get_enum(& self->priv->value);
 }
 
 GObject *moto_param_get_object(MotoParam *self)
