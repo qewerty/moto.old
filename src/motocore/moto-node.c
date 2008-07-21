@@ -911,6 +911,12 @@ void moto_param_unlink_dests(MotoParam *self)
     self->priv->dests = NULL;
 }
 
+void moto_param_unlink(MotoParam *self)
+{
+    moto_param_unlink_source(self);
+    moto_param_unlink_dests(self);
+}
+
 gboolean moto_param_has_dests(MotoParam *self)
 {
     return (g_slist_length(self->priv->dests) > 0);

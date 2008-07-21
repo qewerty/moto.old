@@ -230,6 +230,8 @@ void moto_param_unlink_source(MotoParam *self);
 /* Valid only if mode is OUT or INOUT and does nothing if else. */
 void moto_param_unlink_dests(MotoParam *self);
 
+void moto_param_unlink(MotoParam *self);
+
 gboolean moto_param_has_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */
