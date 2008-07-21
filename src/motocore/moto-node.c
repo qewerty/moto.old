@@ -8,12 +8,14 @@
 
 typedef struct _Domain
 {
+    GArray *types; // Param types allowed in the domain. If NULL any type allowed.
     GSList *params;
 } Domain;
 
 static Domain *domain_new()
 {
     Domain *self = g_slice_new(Domain);
+    self->types = NULL;
     self->params = NULL;
     return self;
 }
@@ -207,7 +209,7 @@ guint moto_node_get_id(MotoNode *self)
     return self->priv->id;
 }
 
-void moto_node_add_param(MotoNode *self, MotoParam *param,
+void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param,
         const gchar *domain, const gchar *group)
 {
     Domain *d = (Domain *)moto_mapped_list_get(& self->priv->pdomains, domain);
@@ -225,8 +227,6 @@ void moto_node_add_params(MotoNode *self, ...)
     va_list ap;
     va_start(ap, self);
 
-    GValue none = {0,};
-
     while(1)
     {
         gchar *pname    = va_arg(ap, gchar*);
@@ -236,7 +236,7 @@ void moto_node_add_params(MotoNode *self, ...)
         GType ptype     = va_arg(ap, GType);
         MotoParamMode pmode = va_arg(ap, MotoParamMode);
 
-        GValue v = none;
+        GValue v = {0,};
         g_value_init(&v, ptype);
 
         switch(ptype)
@@ -496,12 +496,12 @@ void moto_node_set_params(MotoNode *self, ...)
     }
 }
 
-void moto_node_set_source(MotoNode *self, const gchar *in_name,
+void moto_node_link(MotoNode *self, const gchar *in_name,
                           MotoNode *other, const gchar *out_name)
 {
     MotoParam *in  = moto_node_get_param(self, in_name);
     MotoParam *out = moto_node_get_param(other, out_name);
-    moto_param_set_source(in, out);
+    moto_param_link(in, out);
 }
 
 
@@ -831,7 +831,7 @@ exclude_from_dests_on_dest_deleted(gpointer data, GObject *where_the_object_was)
     param->priv->dests = g_slist_remove(param->priv->dests, where_the_object_was);
 }
 
-void moto_param_set_source(MotoParam *self, MotoParam *src)
+void moto_param_link(MotoParam *self, MotoParam *src)
 {
     if( ! src)
     {
@@ -875,7 +875,7 @@ void moto_param_set_source(MotoParam *self, MotoParam *src)
     moto_param_update(self);
 }
 
-void moto_param_clear_source(MotoParam *self)
+void moto_param_unlink_source(MotoParam *self)
 {
 
     if(self->priv->source)
@@ -894,7 +894,7 @@ null_source(gpointer data, gpointer user_data)
     ((MotoParam *)data)->priv->source = NULL;
 }
 
-void moto_param_clear_dests(MotoParam *self)
+void moto_param_unlink_dests(MotoParam *self)
 {
     if(self->priv->mode == MOTO_PARAM_MODE_IN)
     {

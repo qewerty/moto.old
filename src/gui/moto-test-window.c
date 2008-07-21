@@ -101,21 +101,21 @@ moto_test_window_init(MotoTestWindow *self)
     param = moto_node_get_param(root_node, "ty");
 
     MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    moto_node_set_source(obj_node, "parent", root_node, "transform");
+    moto_node_link(obj_node, "parent", root_node, "transform");
 
     MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView", NULL);
-    moto_node_set_source(obj_node, "view", grid_view_node, "view");
+    moto_node_link(obj_node, "view", grid_view_node, "view");
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
-    moto_node_set_source(obj_node, "parent", root_node, "transform");
+    moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
     MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
-    moto_node_set_source(obj_node, "view", axes_view_node, "view");
+    moto_node_link(obj_node, "view", axes_view_node, "view");
 
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
-    moto_node_set_source(obj_node, "parent", root_node, "transform");
+    moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
 
@@ -123,14 +123,14 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
 
-    moto_node_set_source(obj_node, "view", view_node, "view");
-    moto_node_set_source(view_node, "mesh", cube_node, "mesh");
-    moto_node_set_source(obj_node, "material", mat_node, "material");
+    moto_node_link(obj_node, "view", view_node, "view");
+    moto_node_link(view_node, "mesh", cube_node, "mesh");
+    moto_node_link(obj_node, "material", mat_node, "material");
 
     // cube instance
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
-    moto_node_set_source(obj_node, "parent", root_node, "transform");
-    moto_node_set_source(obj_node, "view", view_node, "view");
+    moto_node_link(obj_node, "parent", root_node, "transform");
+    moto_node_link(obj_node, "view", view_node, "view");
 
     self->priv->vtest = obj_node;
     moto_node_save_to_variation(obj_node, self->priv->v1);
@@ -151,8 +151,8 @@ moto_test_window_init(MotoTestWindow *self)
     // ray 
     MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
-    moto_node_set_source(obj_node, "view", ray_view_node, "view");
-    moto_node_set_source(obj_node, "parent", root_node, "transform");
+    moto_node_link(obj_node, "view", ray_view_node, "view");
+    moto_node_link(obj_node, "parent", root_node, "transform");
 
     // camera 
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
