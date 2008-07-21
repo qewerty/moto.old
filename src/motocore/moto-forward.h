@@ -40,11 +40,6 @@ typedef struct _MotoNodeClass MotoNodeClass;
 typedef struct _MotoNodePriv MotoNodePriv;
 typedef void (*MotoNodeUpdateMethod)(MotoNode *self);
 
-typedef struct _MotoNodeFactory MotoNodeFactory;
-typedef struct _MotoNodeFactoryClass MotoNodeFactoryClass;
-typedef struct _MotoNodeFactoryPriv MotoNodeFactoryPriv;
-typedef MotoNode *(*MotoNodeFactoryCreateNodeMethod)(MotoNodeFactory *self, const gchar *name);
-
 typedef struct _MotoVariation MotoVariation;
 typedef struct _MotoVariationClass MotoVariationClass;
 typedef struct _MotoVariationPriv MotoVariationPriv;

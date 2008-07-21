@@ -33,10 +33,6 @@
 
 typedef struct _MotoObjectNodePriv MotoObjectNodePriv;
 
-typedef struct _MotoObjectNodeFactory MotoObjectNodeFactory;
-typedef struct _MotoObjectNodeFactoryClass MotoObjectNodeFactoryClass;
-typedef struct _MotoObjectNodeFactoryPriv MotoObjectNodeFactoryPriv;
-
 typedef const MotoBound *(*MotoObjectNodeGetBoundMethod)(MotoObjectNode *self);
 
 typedef enum
@@ -122,29 +118,6 @@ gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
 gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
-
-/* class MotoNodeFactory */
-
-struct _MotoObjectNodeFactory
-{
-    MotoNodeFactory parent;
-};
-
-struct _MotoObjectNodeFactoryClass
-{
-    MotoNodeFactoryClass parent;
-};
-
-GType moto_object_node_factory_get_type(void);
-
-#define MOTO_TYPE_OBJECT_NODE_FACTORY (moto_object_node_factory_get_type())
-#define MOTO_OBJECT_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_OBJECT_NODE_FACTORY, MotoObjectNodeFactory))
-#define MOTO_OBJECT_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_OBJECT_NODE_FACTORY, MotoObjectNodeFactoryClass))
-#define MOTO_IS_OBJECT_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_OBJECT_NODE_FACTORY))
-#define MOTO_IS_OBJECT_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_OBJECT_NODE_FACTORY))
-#define MOTO_OBJECT_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OBJECT_NODE_FACTORY, MotoObjectNodeFactoryClass))
-
-MotoNodeFactory *moto_object_node_factory_new();
 
 #endif /* MOTO_OBJECT_NODE_H */
 

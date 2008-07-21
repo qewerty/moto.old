@@ -29,10 +29,6 @@ typedef struct _MotoRayViewNode MotoRayViewNode;
 typedef struct _MotoRayViewNodeClass MotoRayViewNodeClass;
 typedef struct _MotoRayViewNodePriv MotoRayViewNodePriv;
 
-typedef struct _MotoRayViewNodeFactory MotoRayViewNodeFactory;
-typedef struct _MotoRayViewNodeFactoryClass MotoRayViewNodeFactoryClass;
-typedef struct _MotoRayViewNodeFactoryPriv MotoRayViewNodeFactoryPriv;
-
 /* class MotoRayViewNode */
 
 struct _MotoRayViewNode
@@ -60,28 +56,5 @@ MotoRayViewNode *moto_ray_view_node_new();
 
 MotoRay *moto_ray_view_node_get_ray(MotoRayViewNode *self);
 void moto_ray_view_node_set_ray(MotoRayViewNode *self, MotoRay *ray);
-
-/* class MotoRayViewNodeFactory */
-
-struct _MotoRayViewNodeFactory
-{
-    MotoNodeFactory parent;
-};
-
-struct _MotoRayViewNodeFactoryClass
-{
-    MotoNodeFactoryClass parent;
-};
-
-GType moto_ray_view_node_factory_get_type(void);
-
-#define MOTO_TYPE_RAY_VIEW_NODE_FACTORY (moto_ray_view_node_factory_get_type())
-#define MOTO_RAY_VIEW_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_RAY_VIEW_NODE_FACTORY, MotoRayViewNodeFactory))
-#define MOTO_RAY_VIEW_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_RAY_VIEW_NODE_FACTORY, MotoRayViewNodeFactoryClass))
-#define MOTO_IS_RAY_VIEW_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_RAY_VIEW_NODE_FACTORY))
-#define MOTO_IS_RAY_VIEW_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_RAY_VIEW_NODE_FACTORY))
-#define MOTO_RAY_VIEW_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_RAY_VIEW_NODE_FACTORY, MotoRayViewNodeFactoryClass))
-
-MotoNodeFactory *moto_ray_view_node_factory_new();
 
 #endif /* MOTO_RAY_VIEW_NODE_H */

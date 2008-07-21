@@ -2,6 +2,5 @@ TODO LIST
 
 * Function moto_node_add_params must correctly proccess any type of GType.
 * Function moto_param_set_cource must correctly detect cycles and node inheritance.
-* Delete all children of MotoNodeFactory. One class MotoNodeFactory can create all types of nodes.
 * Describe node/param updataing algo.
 * Add MotoParamSpec instead of GParamSpec in moto_param_new function.

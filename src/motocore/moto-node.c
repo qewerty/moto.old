@@ -46,10 +46,6 @@ free_domain(Domain *domain, gpointer user_data)
     domain_free(domain);
 }
 
-/* forwards */
-
-static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self);
-
 /* privates */
 
 struct _MotoNodePriv
@@ -71,13 +67,6 @@ struct _MotoNodePriv
 
     /* For exporting optimization. */
     GTimeVal last_modified;
-};
-
-struct _MotoNodeFactoryPriv
-{
-    gboolean disposed;
-
-    GType node_type;
 };
 
 struct _MotoParamPriv
@@ -169,6 +158,39 @@ moto_node_class_init(MotoNodeClass *klass)
 G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_OBJECT);
 
 /* methods of class MotoNode */
+
+MotoNode *moto_create_node(GType type, const gchar *name)
+{
+    if( ! g_type_is_a(type, MOTO_TYPE_NODE))
+    {
+        // TODO: Error
+        return NULL;
+    }
+
+    if(G_TYPE_IS_ABSTRACT(type))
+    {
+        // TODO: Error
+        return NULL;
+    }
+
+    MotoNode *node = g_object_new(type, NULL);
+    moto_node_set_name(node, name);
+    moto_node_update(node);
+
+    return node;
+}
+
+MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name)
+{
+    GType type = g_type_from_name(type_name);
+    if( ! type)
+    {
+        // TODO: Error
+        return NULL;
+    }
+
+    return moto_create_node(type, name);
+}
 
 const gchar *moto_node_get_name(MotoNode *self)
 {
@@ -596,113 +618,6 @@ MotoLibrary *moto_node_get_library(MotoNode *self)
     if( ! w)
         return NULL;
     return moto_world_get_library(w);
-}
-
-/* class MotoNodeFactory */
-
-static GObjectClass *node_factory_parent_class = NULL;
-
-static void
-moto_node_factory_dispose(GObject *obj)
-{
-    /* MotoNodeFactory *self = (MotoNodeFactory *)obj; */
-    node_factory_parent_class->dispose(obj);
-}
-
-static void
-moto_node_factory_finalize(GObject *obj)
-{
-    node_factory_parent_class->finalize(obj);
-}
-
-static void
-moto_node_factory_init(MotoNodeFactory *self)
-{
-    self->priv = (MotoNodeFactoryPriv *)g_slice_new(MotoNodeFactoryPriv);
-
-    self->priv->node_type = G_TYPE_INVALID;
-}
-
-static void
-moto_node_factory_class_init(MotoNodeFactoryClass *klass)
-{
-    GObjectClass *goclass = (GObjectClass *)klass;
-
-    node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
-
-    goclass->dispose    = moto_node_factory_dispose;
-    goclass->finalize   = moto_node_factory_finalize;
-
-    klass->get_node_type    = moto_node_factory_get_node_type_virtual;
-    klass->create_node      = NULL;
-
-    klass->create_node_signal_id = g_signal_newv ("create-node",
-                 G_TYPE_FROM_CLASS (klass),
-                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-                 NULL /* class closure */,
-                 NULL /* accumulator */,
-                 NULL /* accu_data */,
-                 g_cclosure_marshal_VOID__VOID,
-                 G_TYPE_NONE /* return_type */,
-                 0     /* n_params */,
-                 NULL  /* param_types */);
-
-    klass->node_created_signal_id = g_signal_newv ("node-created",
-                 G_TYPE_FROM_CLASS (klass),
-                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-                 NULL /* class closure */,
-                 NULL /* accumulator */,
-                 NULL /* accu_data */,
-                 g_cclosure_marshal_VOID__VOID,
-                 G_TYPE_NONE /* return_type */,
-                 0     /* n_params */,
-                 NULL  /* param_types */);
-
-}
-
-G_DEFINE_ABSTRACT_TYPE(MotoNodeFactory, moto_node_factory, G_TYPE_OBJECT);
-
-/* methods of class MotoNodeFactory */
-
-MotoNode *
-moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name)
-{
-    MotoNodeFactoryClass *klass = MOTO_NODE_FACTORY_GET_CLASS(self);
-
-    g_signal_emit(self, klass->create_node_signal_id, 0, NULL);
-
-    if(G_TYPE_IS_ABSTRACT(self->priv->node_type))
-    {
-        GString *msg = g_string_new("You are trying to create instance of abstract node type (\"");
-        g_string_append(msg, g_type_name(self->priv->node_type));
-        g_string_append(msg, "\"). I won't create it.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
-        return NULL;
-    }
-
-    MotoNode *node = NULL;
-
-    if(klass->create_node)
-        node = klass->create_node(self, name);
-
-    g_signal_emit(self, klass->node_created_signal_id, 0, NULL);
-
-    return node;
-}
-
-GType moto_node_factory_get_node_type(MotoNodeFactory *self)
-{
-    MotoNodeFactoryClass *klass = MOTO_NODE_FACTORY_GET_CLASS(self);
-
-    if(klass->get_node_type)
-        return klass->get_node_type(self);
-    return G_TYPE_INVALID;
-}
-
-static GType moto_node_factory_get_node_type_virtual(MotoNodeFactory *self)
-{
-    return MOTO_TYPE_NODE;
 }
 
 /* class MotoParam */

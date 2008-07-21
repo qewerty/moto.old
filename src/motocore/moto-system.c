@@ -54,15 +54,6 @@ static void unref_gobject(gpointer data, gpointer user_data)
     g_object_unref(G_OBJECT(data));
 }
 
-static gboolean print_node_factory(gpointer data, gpointer user_data)
-{
-    MotoNodeFactory *fac  = (MotoNodeFactory *)data;
-
-    g_print("%s\n", g_type_name(moto_node_factory_get_node_type(fac)));
-
-    return FALSE;
-}
-
 /* class System */
 
 static GObjectClass *system_parent_class = NULL;
@@ -119,6 +110,19 @@ moto_system_class_init(MotoSystemClass *klass)
 
     goclass->dispose    = moto_system_dispose;
     goclass->finalize   = moto_system_finalize;
+
+    /* init node types */
+    MOTO_TYPE_NODE;
+        MOTO_TYPE_OBJECT_NODE;
+        MOTO_TYPE_GEOMETRY_NODE;
+            MOTO_TYPE_CUBE_NODE;
+        MOTO_TYPE_GEOMETRY_VIEW_NODE;
+            MOTO_TYPE_MESH_VIEW_NODE;
+            MOTO_TYPE_GRID_VIEW_NODE;
+            MOTO_TYPE_AXES_VIEW_NODE;
+            MOTO_TYPE_RAY_VIEW_NODE;
+        MOTO_TYPE_MATERIAL_NODE;
+            MOTO_TYPE_SLER_MATERIAL_NODE;
 }
 
 G_DEFINE_TYPE(MotoSystem, moto_system, G_TYPE_OBJECT);
@@ -128,138 +132,6 @@ MotoSystem *moto_system_new()
     MotoSystem *self = (MotoSystem *)g_object_new(MOTO_TYPE_SYSTEM, NULL);
 
     MotoLibrary *lib = self->priv->library;
-
-    moto_library_new_slot(lib, "node", MOTO_TYPE_NODE_FACTORY);
-    //moto_library_new_slot(lib, "image-loader", MOTO_TYPE_IMAGE_LOADER);
-    moto_library_new_slot(lib, "mesh-loader", MOTO_TYPE_MESH_LOADER);
-
-    /* built-in node types */
-
-    MotoNodeFactory *fac;
-
-    fac = moto_object_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_camera_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_sler_material_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_mesh_view_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_ray_view_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_grid_view_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    fac = moto_axes_view_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    /*
-    fac = moto_nurbs_view_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    fac = moto_cube_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    /*
-    fac = moto_sphere_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    fac = moto_mesh_file_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-
-    /*
-    fac = moto_curve_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    /*
-    fac = moto_revolve_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    /*
-    fac = moto_mesh_extrude_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    /*
-    fac = moto_mesh_bevel_node_factory_new();
-    moto_library_new_entry(lib, "node",
-            g_type_name(moto_node_factory_get_node_type(fac)), fac);
-    */
-
-    /* built-in image loaders */
-
-    // MotoImageLoader *image_loader;
-
-#ifdef WITH_MOTO_PNG_IMAGE_LOADER
-    image_loader = moto_png_image_loader_new(); // Portable Network Graphics (*.png)
-    moto_library_new_entry(lib, "image-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
-#endif
-
-#ifdef WITH_MOTO_JPG_IMAGE_LOADER
-    image_loader = moto_jpg_image_loader_new(); // JPEG (*.jpg|*.jpeg)
-    moto_library_new_entry(lib, "image-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
-#endif
-
-#ifdef WITH_MOTO_TIF_IMAGE_LOADER
-    image_loader = moto_tif_image_loader_new(); // TIFF (*.tif|*.tiff)
-    moto_library_new_entry(lib, "image-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
-#endif
-
-#ifdef WITH_MOTO_EXR_IMAGE_LOADER
-    image_loader = moto_exr_image_loader_new(); // ILM OpenEXR HDR Format (*.exr)
-    moto_library_new_entry(lib, "image-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(image_loader)), image_loader);
-#endif
-
-    /* built-in mesh loaders */
-
-    MotoMeshLoader *mesh_loader;
-
-#ifdef WITH_MOTO_MBM_MESH_LOADER
-    mesh_loader = moto_mbm_mesh_loader_new(); // Moto Binary Mesh (*.mbm)
-    moto_library_new_entry(lib, "mesh-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
-#endif
-
-#ifdef WITH_MOTO_WOBJ_MESH_LOADER
-    mesh_loader = moto_wobj_mesh_loader_new(); // Wavefront Object (*.obj)
-    moto_library_new_entry(lib, "mesh-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
-#endif
-
-#ifdef WITH_MOTO_RIB_MESH_LOADER
-    mesh_loader = moto_rib_mesh_loader_new(); // RenderMan Interface Bytestream (*.rib)
-    moto_library_new_entry(lib, "mesh-loader",
-            g_type_name(G_TYPE_FROM_INSTANCE(mesh_loader)), mesh_loader);
-#endif
-
-    // moto_library_foreach(lib, "node", print_node_factory, NULL);
 
     return self;
 }

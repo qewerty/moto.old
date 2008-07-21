@@ -28,10 +28,6 @@ typedef struct _MotoCameraNode MotoCameraNode;
 typedef struct _MotoCameraNodeClass MotoCameraNodeClass;
 typedef struct _MotoCameraNodePriv MotoCameraNodePriv;
 
-typedef struct _MotoCameraNodeFactory MotoCameraNodeFactory;
-typedef struct _MotoCameraNodeFactoryClass MotoCameraNodeFactoryClass;
-typedef struct _MotoCameraNodeFactoryPriv MotoCameraNodeFactoryPriv;
-
 /* class MotoCameraNode */
 
 struct _MotoCameraNode
@@ -57,28 +53,5 @@ GType moto_camera_node_get_type(void);
 
 MotoCameraNode *moto_camera_node_new(const gchar *name);
 void moto_camera_node_apply(MotoCameraNode *self, gint width, gint height);
-
-/* class MotoCameraNodeFactory */
-
-struct _MotoCameraNodeFactory
-{
-    MotoNodeFactory parent;
-};
-
-struct _MotoCameraNodeFactoryClass
-{
-    MotoNodeFactoryClass parent;
-};
-
-GType moto_camera_node_factory_get_type(void);
-
-#define MOTO_TYPE_CAMERA_NODE_FACTORY (moto_camera_node_factory_get_type())
-#define MOTO_CAMERA_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_CAMERA_NODE_FACTORY, MotoCameraNodeFactory))
-#define MOTO_CAMERA_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_CAMERA_NODE_FACTORY, MotoCameraNodeFactoryClass))
-#define MOTO_IS_CAMERA_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_CAMERA_NODE_FACTORY))
-#define MOTO_IS_CAMERA_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_CAMERA_NODE_FACTORY))
-#define MOTO_CAMERA_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_CAMERA_NODE_FACTORY, MotoCameraNodeFactoryClass))
-
-MotoNodeFactory *moto_camera_node_factory_new();
 
 #endif /* MOTO_CAMERA_NODE_H */

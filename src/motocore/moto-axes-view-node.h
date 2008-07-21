@@ -28,10 +28,6 @@ typedef struct _MotoAxesViewNode MotoAxesViewNode;
 typedef struct _MotoAxesViewNodeClass MotoAxesViewNodeClass;
 typedef struct _MotoAxesViewNodePriv MotoAxesViewNodePriv;
 
-typedef struct _MotoAxesViewNodeFactory MotoAxesViewNodeFactory;
-typedef struct _MotoAxesViewNodeFactoryClass MotoAxesViewNodeFactoryClass;
-typedef struct _MotoAxesViewNodeFactoryPriv MotoAxesViewNodeFactoryPriv;
-
 /* class MotoAxesViewNode */
 
 struct _MotoAxesViewNode
@@ -56,28 +52,5 @@ GType moto_axes_view_node_storage_get_type(void);
 #define MOTO_AXES_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_AXES_VIEW_NODE, MotoAxesViewNodeClass))
 
 MotoAxesViewNode *moto_axes_view_node_new(const gchar *name);
-
-/* class MotoAxesViewNodeFactory */
-
-struct _MotoAxesViewNodeFactory
-{
-    MotoNodeFactory parent;
-};
-
-struct _MotoAxesViewNodeFactoryClass
-{
-    MotoNodeFactoryClass parent;
-};
-
-GType moto_axes_view_node_factory_get_type(void);
-
-#define MOTO_TYPE_AXES_VIEW_NODE_FACTORY (moto_axes_view_node_factory_get_type())
-#define MOTO_AXES_VIEW_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_AXES_VIEW_NODE_FACTORY, MotoAxesViewNodeFactory))
-#define MOTO_AXES_VIEW_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_AXES_VIEW_NODE_FACTORY, MotoAxesViewNodeFactoryClass))
-#define MOTO_IS_AXES_VIEW_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_AXES_VIEW_NODE_FACTORY))
-#define MOTO_IS_AXES_VIEW_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_AXES_VIEW_NODE_FACTORY))
-#define MOTO_AXES_VIEW_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_AXES_VIEW_NODE_FACTORY, MotoAxesViewNodeFactoryClass))
-
-MotoNodeFactory *moto_axes_view_node_factory_new();
 
 #endif /* MOTO_AXES_VIEW_NODE_H */

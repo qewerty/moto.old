@@ -96,8 +96,6 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
 
     /* params */
 
-    moto_node_update((MotoNode *)self);
-
     return self;
 }
 
@@ -265,70 +263,3 @@ static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self)
     return cube->priv->bound;
 }
 
-/* class CubeNodeFactory */
-
-static GType moto_cube_node_factory_get_node_type(MotoNodeFactory *self);
-
-MotoNode *
-moto_cube_node_factory_create_node(MotoNodeFactory *self,
-        const gchar *name);
-
-static GObjectClass *cube_node_factory_parent_class = NULL;
-
-static void
-moto_cube_node_factory_dispose(GObject *obj)
-{
-    G_OBJECT_CLASS(cube_node_factory_parent_class)->dispose(obj);
-}
-
-static void
-moto_cube_node_factory_finalize(GObject *obj)
-{
-    cube_node_factory_parent_class->finalize(obj);
-}
-
-static void
-moto_cube_node_factory_init(MotoCubeNodeFactory *self)
-{}
-
-static void
-moto_cube_node_factory_class_init(MotoCubeNodeFactoryClass *klass)
-{
-    GObjectClass *goclass = (GObjectClass *)klass;
-    MotoNodeFactoryClass *nfclass = (MotoNodeFactoryClass *)klass;
-
-    cube_node_factory_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
-
-    goclass->dispose    = moto_cube_node_factory_dispose;
-    goclass->finalize   = moto_cube_node_factory_finalize;
-
-
-    nfclass->get_node_type  = moto_cube_node_factory_get_node_type;
-    nfclass->create_node    = moto_cube_node_factory_create_node;
-}
-
-G_DEFINE_TYPE(MotoCubeNodeFactory, moto_cube_node_factory, MOTO_TYPE_NODE_FACTORY);
-
-/* methods of class CubeNodeFactory */
-
-static MotoNodeFactory *cube_node_factory = NULL;
-
-MotoNodeFactory *moto_cube_node_factory_new()
-{
-    if( ! cube_node_factory)
-        cube_node_factory = \
-            (MotoNodeFactory *)g_object_new(MOTO_TYPE_CUBE_NODE_FACTORY, NULL);
-
-    return cube_node_factory;
-}
-
-static GType moto_cube_node_factory_get_node_type(MotoNodeFactory *self)
-{
-    return MOTO_TYPE_CUBE_NODE;
-}
-
-MotoNode *moto_cube_node_factory_create_node(MotoNodeFactory *self,
-        const gchar *name)
-{
-    return (MotoNode *)moto_cube_node_new(name);
-}

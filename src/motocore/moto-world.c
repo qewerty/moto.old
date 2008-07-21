@@ -215,18 +215,7 @@ MotoNode *moto_world_create_node(MotoWorld *self,
         return NULL;
     }
 
-    MotoNodeFactory *fac = (MotoNodeFactory *)moto_library_get_entry(lib, "node", type_name);
-    if( ! fac)
-    {
-        GString *msg = g_string_new("There is no node type with name \"");
-        g_string_append(msg, type_name);
-        g_string_append(msg, "\" in my library. I can't create it. ");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
-        return NULL;
-    }
-
-    MotoNode *node = moto_node_factory_create_node(fac, node_name);
+    MotoNode *node = moto_create_node_by_name(type_name, node_name);
     moto_world_add_node(self, node);
 
     return node;

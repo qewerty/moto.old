@@ -26,8 +26,6 @@
 
 #include "moto-forward.h"
 
-typedef GType (*MotoNodeFactoryGetNodeTypeMethod)(MotoNodeFactory *self);
-
 typedef enum
 {
     MOTO_PARAM_MODE_IN      = 1,
@@ -61,6 +59,9 @@ GType moto_node_get_type(void);
 #define MOTO_IS_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_NODE))
 #define MOTO_IS_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NODE))
 #define MOTO_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NODE, MotoNodeClass))
+
+MotoNode *moto_create_node(GType type, const gchar *name);
+MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name);
 
 const gchar *moto_node_get_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
@@ -132,40 +133,6 @@ MotoWorld *moto_node_get_world(MotoNode *self);
 void moto_node_set_world(MotoNode *self, MotoWorld *world);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
-
-/* class MotoNodeFactory */
-
-struct _MotoNodeFactory
-{
-    GObject parent;
-
-    MotoNodeFactoryPriv *priv;
-};
-
-struct _MotoNodeFactoryClass
-{
-    GObjectClass parent;
-
-    MotoNodeFactoryGetNodeTypeMethod    get_node_type;
-    MotoNodeFactoryCreateNodeMethod     create_node;
-
-    /* signal */
-    guint create_node_signal_id;
-    guint node_created_signal_id;
-};
-
-GType moto_node_factory_get_type(void);
-
-#define MOTO_TYPE_NODE_FACTORY (moto_node_factory_get_type())
-#define MOTO_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_NODE_FACTORY, MotoNodeFactory))
-#define MOTO_NODE_FACTORY_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_NODE_FACTORY, MotoNodeFactoryClass))
-#define MOTO_IS_NODE_FACTORY(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_NODE_FACTORY))
-#define MOTO_IS_NODE_FACTORY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NODE_FACTORY))
-#define MOTO_NODE_FACTORY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NODE_FACTORY, MotoNodeFactoryClass))
-
-MotoNode *
-moto_node_factory_create_node(MotoNodeFactory *self, const gchar *name);
-GType moto_node_factory_get_node_type(MotoNodeFactory *self);
 
 /* class MotoVariation */
 
