@@ -1,6 +1,12 @@
 TODO LIST
 
+Moto v0.1
+
 * Function moto_node_add_params must correctly proccess any type of GType.
-* Function moto_param_set_cource must correctly detect cycles and node inheritance.
+* Function moto_param_link must correctly detect cycles and node inheritance.
 * Describe node/param updataing algo.
 * Add MotoParamSpec instead of GParamSpec in moto_param_new function.
+* Add functions moto_node_add_dynamic_param[s] and moto_node_add_static_param[s].
+* Implement new mesh structure. Half-edge or other.
+* Implement interpolators and other functions for animating node params. With simple GUI for testing.
+* Create Python bindings for Moto GObject-based library.
