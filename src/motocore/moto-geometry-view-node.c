@@ -33,6 +33,8 @@ GType moto_geom_view_draw_mode_get_type(void)
                 "GEOM_VIEW_DRAW_MODE_SMOOTH", "GEOM_VIEW_DRAW_MODE_SMOOTH"},
             {MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH_TEX,
                 "GEOM_VIEW_DRAW_MODE_SMOOTH_TEX", "GEOM_VIEW_DRAW_MODE_SMOOTH_TEX"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_SHADED,
+                "GEOM_VIEW_DRAW_MODE_SHADED", "GEOM_VIEW_DRAW_MODE_SHADED"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoGeomViewDrawMode", values);
@@ -47,6 +49,8 @@ static GObjectClass *geometry_view_node_parent_class = NULL;
 struct _MotoGeomViewNodePriv
 {
     gboolean disposed;
+
+    MotoGeomViewDrawMode draw_mode;
 
     gboolean prepared;
     MotoGeomViewState *state;
@@ -79,6 +83,8 @@ moto_geom_view_node_init(MotoGeomViewNode *self)
 {
     self->priv = g_slice_new(MotoGeomViewNodePriv);
     self->priv->disposed = FALSE;
+
+    self->priv->draw_mode = MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH;
 
     self->priv->prepared = FALSE;
     self->priv->state = NULL;
