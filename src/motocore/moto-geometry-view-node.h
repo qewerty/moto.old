@@ -47,6 +47,36 @@ typedef void (*MotoGeomViewStateDrawFunc)(MotoGeomViewState *self, MotoGeomViewN
 typedef gboolean (*MotoGeomViewStateSelectFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
+
+/* Drawing modes.
+ *
+ * These modes may be set global for all drawable objects in world
+ * and can be overriden for particular object.
+ *
+ * - Bounding box
+ * - Wireframe
+ * - Textured wireframe (half-transparent)
+ * - Solid shaded
+ *   Textured solid shaded
+ * - Smooth shaded
+ *   Textured smooth shaded
+ *
+ * */
+
+typedef enum
+{
+    MOTO_GEOM_VIEW_DRAW_MODE_BBOX,
+    MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME,
+    MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME_TEX,
+    MOTO_GEOM_VIEW_DRAW_MODE_SOLID,
+    MOTO_GEOM_VIEW_DRAW_MODE_SOLID_TEX,
+    MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH,
+    MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH_TEX
+} MotoGeomViewDrawMode;
+
+GType moto_geom_view_draw_mode_get_type(void);
+#define MOTO_TYPE_GEOM_VIEW_DRAW_MODE (moto_geom_view_draw_mode_get_type())
+
 /* class MotoGeomViewNode */
 
 struct _MotoGeomViewNode

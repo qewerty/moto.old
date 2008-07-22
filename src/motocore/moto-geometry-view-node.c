@@ -11,6 +11,35 @@
 #include "moto-messager.h"
 #include "moto-geometry-view-node.h"
 
+/* enums */
+
+GType moto_geom_view_draw_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        GEnumValue values[] = {
+            {MOTO_GEOM_VIEW_DRAW_MODE_BBOX,
+                "GEOM_VIEW_DRAW_MODE_BBOX", "GEOM_VIEW_DRAW_MODE_BBOX"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME,
+                "GEOM_VIEW_DRAW_MODE_WIREFRAME", "GEOM_VIEW_DRAW_MODE_WIREFRAME"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME_TEX,
+                "GEOM_VIEW_DRAW_MODE_WIREFRAME_TEX", "GEOM_VIEW_DRAW_MODE_WIREFRAME_TEX"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_SOLID,
+                "GEOM_VIEW_DRAW_MODE_SOLID", "GEOM_VIEW_DRAW_MODE_SOLID"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_SOLID_TEX,
+                "GEOM_VIEW_DRAW_MODE_SOLID_TEX", "GEOM_VIEW_DRAW_MODE_SOLID_TEX"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH,
+                "GEOM_VIEW_DRAW_MODE_SMOOTH", "GEOM_VIEW_DRAW_MODE_SMOOTH"},
+            {MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH_TEX,
+                "GEOM_VIEW_DRAW_MODE_SMOOTH_TEX", "GEOM_VIEW_DRAW_MODE_SMOOTH_TEX"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoGeomViewDrawMode", values);
+    }
+    return type;
+}
+
 /* class GeometryViewNode */
 
 static GObjectClass *geometry_view_node_parent_class = NULL;
