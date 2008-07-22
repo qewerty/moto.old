@@ -33,14 +33,14 @@ typedef struct _MotoNurbsViewNodePriv MotoNurbsViewNodePriv;
 
 struct _MotoNurbsViewNode
 {
-    MotoGeometryViewNode parent;
+    MotoGeomViewNode parent;
 
     MotoNurbsViewNodePriv *priv;
 };
 
 struct _MotoNurbsViewNodeClass
 {
-    MotoGeometryViewNodeClass parent;
+    MotoGeomViewNodeClass parent;
 };
 
 GType moto_nurbs_view_node_storage_get_type(void);

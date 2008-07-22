@@ -15,18 +15,18 @@
 
 static GObjectClass *geometry_view_node_parent_class = NULL;
 
-struct _MotoGeometryViewNodePriv
+struct _MotoGeomViewNodePriv
 {
     gboolean disposed;
 
     gboolean prepared;
-    MotoGeometryViewState *state;
+    MotoGeomViewState *state;
 };
 
 static void
-moto_geometry_view_node_dispose(GObject *obj)
+moto_geom_view_node_dispose(GObject *obj)
 {
-    MotoGeometryViewNode *self = (MotoGeometryViewNode *)obj;
+    MotoGeomViewNode *self = (MotoGeomViewNode *)obj;
 
     if(self->priv->disposed)
         return;
@@ -36,19 +36,19 @@ moto_geometry_view_node_dispose(GObject *obj)
 }
 
 static void
-moto_geometry_view_node_finalize(GObject *obj)
+moto_geom_view_node_finalize(GObject *obj)
 {
-    MotoGeometryViewNode *self = (MotoGeometryViewNode *)obj;
+    MotoGeomViewNode *self = (MotoGeomViewNode *)obj;
 
-    g_slice_free(MotoGeometryViewNodePriv, self->priv);
+    g_slice_free(MotoGeomViewNodePriv, self->priv);
 
     geometry_view_node_parent_class->finalize(obj);
 }
 
 static void
-moto_geometry_view_node_init(MotoGeometryViewNode *self)
+moto_geom_view_node_init(MotoGeomViewNode *self)
 {
-    self->priv = g_slice_new(MotoGeometryViewNodePriv);
+    self->priv = g_slice_new(MotoGeomViewNodePriv);
     self->priv->disposed = FALSE;
 
     self->priv->prepared = FALSE;
@@ -56,14 +56,14 @@ moto_geometry_view_node_init(MotoGeometryViewNode *self)
 }
 
 static void
-moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
+moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
     geometry_view_node_parent_class = g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_geometry_view_node_dispose;
-    goclass->finalize   = moto_geometry_view_node_finalize;
+    goclass->dispose    = moto_geom_view_node_dispose;
+    goclass->finalize   = moto_geom_view_node_finalize;
 
     klass->draw = NULL;
     klass->select = NULL;
@@ -117,13 +117,13 @@ moto_geometry_view_node_class_init(MotoGeometryViewNodeClass *klass)
                  NULL  /* param_types */);
 }
 
-G_DEFINE_ABSTRACT_TYPE(MotoGeometryViewNode, moto_geometry_view_node, MOTO_TYPE_NODE);
+G_DEFINE_ABSTRACT_TYPE(MotoGeomViewNode, moto_geom_view_node, MOTO_TYPE_NODE);
 
 /* methods of class GeometryViewNode */
 
-void moto_geometry_view_node_draw(MotoGeometryViewNode *self)
+void moto_geom_view_node_draw(MotoGeomViewNode *self)
 {
-    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
     g_signal_emit(self, klass->before_draw_signal_id, 0, NULL);
 
@@ -133,9 +133,9 @@ void moto_geometry_view_node_draw(MotoGeometryViewNode *self)
     g_signal_emit(self, klass->after_draw_signal_id, 0, NULL);
 }
 
-void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self)
+void moto_geom_view_node_prepare_for_draw(MotoGeomViewNode *self)
 {
-    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
     g_signal_emit(self, klass->before_prepare_for_draw_signal_id, 0, NULL);
 
@@ -145,43 +145,43 @@ void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self)
     g_signal_emit(self, klass->after_prepare_for_draw_signal_id, 0, NULL);
 }
 
-gboolean moto_geometry_view_node_select(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_select(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
-    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
     if(klass->select)
         return klass->select(self, x, y, width, height, ray, tinfo);
     return TRUE;
 }
 
-gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self)
+gboolean moto_geom_view_node_get_prepared(MotoGeomViewNode *self)
 {
     return self->priv->prepared;
 }
 
-void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean status)
+void moto_geom_view_node_set_prepared(MotoGeomViewNode *self, gboolean status)
 {
     self->priv->prepared = status;
 }
 
-MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self)
+MotoGeomViewState *moto_geom_view_node_get_state(MotoGeomViewNode *self)
 {
     return self->priv->state;
 }
 
-void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name)
+void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_name)
 {
-    GSList *state = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self)->states;
+    GSList *state = MOTO_GEOM_VIEW_NODE_GET_CLASS(self)->states;
     for(; state; state = g_slist_next(state))
     {
-        if(g_utf8_collate(moto_geometry_view_state_get_name((MotoGeometryViewState *)state->data), state_name) == 0)
+        if(g_utf8_collate(moto_geom_view_state_get_name((MotoGeomViewState *)state->data), state_name) == 0)
         {
-            MotoGeometryViewState *s = (MotoGeometryViewState *)state->data;
+            MotoGeomViewState *s = (MotoGeomViewState *)state->data;
             if(s != self->priv->state)
             {
                  self->priv->state = s;
-                 moto_geometry_view_node_set_prepared(self, FALSE);
+                 moto_geom_view_node_set_prepared(self, FALSE);
             }
             return;
         }
@@ -194,36 +194,36 @@ void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *
     g_string_free(msg, TRUE);
 }
 
-GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self)
+GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self)
 {
-    return MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self)->states;
+    return MOTO_GEOM_VIEW_NODE_GET_CLASS(self)->states;
 }
 
-MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self)
+MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self)
 {
-    MotoGeometryViewNodeClass *klass = MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(self);
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
     if(klass->get_geometry)
         return klass->get_geometry(self);
     return NULL;
 }
 
-gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
     /* ray is in object space.
      * tinfo contains all transformation info needed for projecting smth into window. */
 
-    return moto_geometry_view_node_select(self, x, y, width, height, ray, tinfo);
+    return moto_geom_view_node_select(self, x, y, width, height, ray, tinfo);
 }
 
-gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_button_release(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height)
 {
     return TRUE;
 }
 
-gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_motion(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height)
 {
     return TRUE;
@@ -233,18 +233,18 @@ gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
 
 static GObjectClass *geometry_view_state_parent_class = NULL;
 
-struct _MotoGeometryViewStatePriv
+struct _MotoGeomViewStatePriv
 {
     GString *name;
     GString *title;
-    MotoGeometryViewStateDrawFunc draw;
-    MotoGeometryViewStateSelectFunc select;
+    MotoGeomViewStateDrawFunc draw;
+    MotoGeomViewStateSelectFunc select;
 };
 
 static void
-moto_geometry_view_state_dispose(GObject *obj)
+moto_geom_view_state_dispose(GObject *obj)
 {
-    MotoGeometryViewState *self = (MotoGeometryViewState *)obj;
+    MotoGeomViewState *self = (MotoGeomViewState *)obj;
 
     g_string_free(self->priv->name, TRUE);
     g_string_free(self->priv->title, TRUE);
@@ -253,19 +253,19 @@ moto_geometry_view_state_dispose(GObject *obj)
 }
 
 static void
-moto_geometry_view_state_finalize(GObject *obj)
+moto_geom_view_state_finalize(GObject *obj)
 {
-    MotoGeometryViewState *self = (MotoGeometryViewState *)obj;
+    MotoGeomViewState *self = (MotoGeomViewState *)obj;
 
-    g_slice_free(MotoGeometryViewStatePriv, self->priv);
+    g_slice_free(MotoGeomViewStatePriv, self->priv);
 
     geometry_view_state_parent_class->finalize(obj);
 }
 
 static void
-moto_geometry_view_state_init(MotoGeometryViewState *self)
+moto_geom_view_state_init(MotoGeomViewState *self)
 {
-    self->priv = g_slice_new(MotoGeometryViewStatePriv);
+    self->priv = g_slice_new(MotoGeomViewStatePriv);
 
     self->priv->name    = g_string_new("");
     self->priv->title   = g_string_new("");
@@ -274,25 +274,25 @@ moto_geometry_view_state_init(MotoGeometryViewState *self)
 }
 
 static void
-moto_geometry_view_state_class_init(MotoGeometryViewStateClass *klass)
+moto_geom_view_state_class_init(MotoGeomViewStateClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
     geometry_view_state_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
 
-    goclass->dispose    = moto_geometry_view_state_dispose;
-    goclass->finalize   = moto_geometry_view_state_finalize;
+    goclass->dispose    = moto_geom_view_state_dispose;
+    goclass->finalize   = moto_geom_view_state_finalize;
 }
 
-G_DEFINE_TYPE(MotoGeometryViewState, moto_geometry_view_state, G_TYPE_OBJECT);
+G_DEFINE_TYPE(MotoGeomViewState, moto_geom_view_state, G_TYPE_OBJECT);
 
 /* methods of class GeometryViewState */
 
-MotoGeometryViewState *
-moto_geometry_view_state_new(const gchar *name, const gchar *title,
-        MotoGeometryViewStateDrawFunc draw, MotoGeometryViewStateSelectFunc select)
+MotoGeomViewState *
+moto_geom_view_state_new(const gchar *name, const gchar *title,
+        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select)
 {
-    MotoGeometryViewState *self = (MotoGeometryViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
+    MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);
@@ -303,23 +303,23 @@ moto_geometry_view_state_new(const gchar *name, const gchar *title,
     return self;
 }
 
-const gchar *moto_geometry_view_state_get_name(MotoGeometryViewState *self)
+const gchar *moto_geom_view_state_get_name(MotoGeomViewState *self)
 {
     return self->priv->name->str;
 }
 
-const gchar *moto_geometry_view_state_get_title(MotoGeometryViewState *self)
+const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self)
 {
     return self->priv->title->str;
 }
 
-void moto_geometry_view_state_draw(MotoGeometryViewState *self, MotoGeometryViewNode *geom)
+void moto_geom_view_state_draw(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     if(self->priv->draw)
         self->priv->draw(self, geom);
 }
 
-gboolean moto_geometry_view_state_select(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
     if(self->priv->select)

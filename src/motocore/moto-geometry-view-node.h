@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_GEOMETRY_VIEW_NODE_H
-#define MOTO_GEOMETRY_VIEW_NODE_H
+#ifndef MOTO_GEOM_VIEW_NODE_H
+#define MOTO_GEOM_VIEW_NODE_H
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -29,41 +29,41 @@
 #include "moto-transform-info.h"
 #include "moto-geometry-node.h"
 
-typedef struct _MotoGeometryViewNode MotoGeometryViewNode;
-typedef struct _MotoGeometryViewNodeClass MotoGeometryViewNodeClass;
-typedef struct _MotoGeometryViewNodePriv MotoGeometryViewNodePriv;
+typedef struct _MotoGeomViewNode MotoGeomViewNode;
+typedef struct _MotoGeomViewNodeClass MotoGeomViewNodeClass;
+typedef struct _MotoGeomViewNodePriv MotoGeomViewNodePriv;
 
-typedef void (*MotoGeometryViewNodeDrawMethod)(MotoGeometryViewNode *self);
-typedef void (*MotoGeometryViewNodePrepareForDrawMethod)(MotoGeometryViewNode *self);
-typedef gboolean (*MotoGeometryViewNodeSelectMethod)(MotoGeometryViewNode *self,
+typedef void (*MotoGeomViewNodeDrawMethod)(MotoGeomViewNode *self);
+typedef void (*MotoGeomViewNodePrepareForDrawMethod)(MotoGeomViewNode *self);
+typedef gboolean (*MotoGeomViewNodeSelectMethod)(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-typedef MotoGeometryNode *(*MotoGeometryViewNodeGetGeometryMethod)(MotoGeometryViewNode *self);
+typedef MotoGeometryNode *(*MotoGeomViewNodeGetGeometryMethod)(MotoGeomViewNode *self);
 
-typedef struct _MotoGeometryViewState MotoGeometryViewState;
-typedef struct _MotoGeometryViewStateClass MotoGeometryViewStateClass;
-typedef struct _MotoGeometryViewStatePriv MotoGeometryViewStatePriv;
+typedef struct _MotoGeomViewState MotoGeomViewState;
+typedef struct _MotoGeomViewStateClass MotoGeomViewStateClass;
+typedef struct _MotoGeomViewStatePriv MotoGeomViewStatePriv;
 
-typedef void (*MotoGeometryViewStateDrawFunc)(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
-typedef gboolean (*MotoGeometryViewStateSelectFunc)(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+typedef void (*MotoGeomViewStateDrawFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
+typedef gboolean (*MotoGeomViewStateSelectFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
-/* class MotoGeometryViewNode */
+/* class MotoGeomViewNode */
 
-struct _MotoGeometryViewNode
+struct _MotoGeomViewNode
 {
     MotoNode parent;
 
-    MotoGeometryViewNodePriv *priv;
+    MotoGeomViewNodePriv *priv;
 };
 
-struct _MotoGeometryViewNodeClass
+struct _MotoGeomViewNodeClass
 {
     MotoNodeClass parent;
 
-    MotoGeometryViewNodeDrawMethod draw;
-    MotoGeometryViewNodePrepareForDrawMethod prepare_for_draw;
-    MotoGeometryViewNodeSelectMethod select;
-    MotoGeometryViewNodeGetGeometryMethod get_geometry;
+    MotoGeomViewNodeDrawMethod draw;
+    MotoGeomViewNodePrepareForDrawMethod prepare_for_draw;
+    MotoGeomViewNodeSelectMethod select;
+    MotoGeomViewNodeGetGeometryMethod get_geometry;
 
     GSList *states;
 
@@ -78,68 +78,68 @@ struct _MotoGeometryViewNodeClass
     guint motion_notify_signal_id;
 };
 
-GType moto_geometry_view_node_get_type(void);
+GType moto_geom_view_node_get_type(void);
 
-#define MOTO_TYPE_GEOMETRY_VIEW_NODE (moto_geometry_view_node_get_type())
-#define MOTO_GEOMETRY_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeometryViewNode))
-#define MOTO_GEOMETRY_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeometryViewNodeClass))
+#define MOTO_TYPE_GEOMETRY_VIEW_NODE (moto_geom_view_node_get_type())
+#define MOTO_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNode))
+#define MOTO_GEOM_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNodeClass))
 #define MOTO_IS_GEOMETRY_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_VIEW_NODE))
 #define MOTO_IS_GEOMETRY_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_VIEW_NODE))
-#define MOTO_GEOMETRY_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeometryViewNodeClass))
+#define MOTO_GEOM_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNodeClass))
 
-void moto_geometry_view_node_draw(MotoGeometryViewNode *self);
-void moto_geometry_view_node_prepare_for_draw(MotoGeometryViewNode *self);
-gboolean moto_geometry_view_node_select(MotoGeometryViewNode *self,
+void moto_geom_view_node_draw(MotoGeomViewNode *self);
+void moto_geom_view_node_prepare_for_draw(MotoGeomViewNode *self);
+gboolean moto_geom_view_node_select(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
-gboolean moto_geometry_view_node_get_prepared(MotoGeometryViewNode *self);
-void moto_geometry_view_node_set_prepared(MotoGeometryViewNode *self, gboolean status);
+gboolean moto_geom_view_node_get_prepared(MotoGeomViewNode *self);
+void moto_geom_view_node_set_prepared(MotoGeomViewNode *self, gboolean status);
 
-MotoGeometryViewState *moto_geometry_view_node_get_state(MotoGeometryViewNode *self);
-void moto_geometry_view_node_set_state(MotoGeometryViewNode *self, const gchar *state_name);
-GSList *moto_geometry_view_node_get_state_list(MotoGeometryViewNode *self);
+MotoGeomViewState *moto_geom_view_node_get_state(MotoGeomViewNode *self);
+void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_name);
+GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self);
 
-MotoGeometryNode *moto_geometry_view_node_get_geometry(MotoGeometryViewNode *self);
+MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self);
 
-gboolean moto_geometry_view_node_process_button_press(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-gboolean moto_geometry_view_node_process_button_release(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_button_release(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height);
-gboolean moto_geometry_view_node_process_motion(MotoGeometryViewNode *self,
+gboolean moto_geom_view_node_process_motion(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height);
 
-/* class MotoGeometryViewState */
+/* class MotoGeomViewState */
 
-struct _MotoGeometryViewState
+struct _MotoGeomViewState
 {
     GObject parent;
 
-    MotoGeometryViewStatePriv *priv;
+    MotoGeomViewStatePriv *priv;
 };
 
-struct _MotoGeometryViewStateClass
+struct _MotoGeomViewStateClass
 {
     GObjectClass parent;
 };
 
-GType moto_geometry_view_state_get_type(void);
+GType moto_geom_view_state_get_type(void);
 
-#define MOTO_TYPE_GEOMETRY_VIEW_STATE (moto_geometry_view_state_get_type())
-#define MOTO_GEOMETRY_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewState))
-#define MOTO_GEOMETRY_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewStateClass))
+#define MOTO_TYPE_GEOMETRY_VIEW_STATE (moto_geom_view_state_get_type())
+#define MOTO_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewState))
+#define MOTO_GEOM_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewStateClass))
 #define MOTO_IS_GEOMETRY_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE))
 #define MOTO_IS_GEOMETRY_VIEW_STATE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_VIEW_STATE))
-#define MOTO_GEOMETRY_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeometryViewStateClass))
+#define MOTO_GEOM_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewStateClass))
 
-MotoGeometryViewState *
-moto_geometry_view_state_new(const gchar *name, const gchar *title,
-        MotoGeometryViewStateDrawFunc draw, MotoGeometryViewStateSelectFunc select);
+MotoGeomViewState *
+moto_geom_view_state_new(const gchar *name, const gchar *title,
+        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select);
 
-const gchar *moto_geometry_view_state_get_name(MotoGeometryViewState *self);
-const gchar *moto_geometry_view_state_get_title(MotoGeometryViewState *self);
+const gchar *moto_geom_view_state_get_name(MotoGeomViewState *self);
+const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self);
 
-void moto_geometry_view_state_draw(MotoGeometryViewState *self, MotoGeometryViewNode *geom);
-gboolean moto_geometry_view_state_select(MotoGeometryViewState *self, MotoGeometryViewNode *geom,
+void moto_geom_view_state_draw(MotoGeomViewState *self, MotoGeomViewNode *geom);
+gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
-#endif /* MOTO_GEOMETRY_VIEW_NODE_H */
+#endif /* MOTO_GEOM_VIEW_NODE_H */

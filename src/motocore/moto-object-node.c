@@ -70,7 +70,7 @@ static GObjectClass *object_node_parent_class = NULL;
 
 struct _MotoObjectNodePriv
 {
-    MotoGeometryViewNode **view_ptr;
+    MotoGeomViewNode **view_ptr;
     MotoMaterialNode **material_ptr;
     MotoCameraNode **camera_ptr;
 
@@ -202,7 +202,7 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->visible_ptr = moto_node_param_value_pointer(node, "visible", gboolean);
 
     self->priv->camera_ptr = moto_node_param_value_pointer(node, "cam", MotoCameraNode*);
-    self->priv->view_ptr = moto_node_param_value_pointer(node, "view", MotoGeometryViewNode*);
+    self->priv->view_ptr = moto_node_param_value_pointer(node, "view", MotoGeomViewNode*);
     self->priv->material_ptr = moto_node_param_value_pointer(node, "material", MotoMaterialNode*);;
 
     /* camera */
@@ -429,8 +429,8 @@ static void calc_global_bound(MotoObjectNode *self)
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
-    MotoGeometryViewNode *gvn = (MotoGeometryViewNode *)moto_param_get_node(s);
-    MotoGeometryNode *gn = moto_geometry_view_node_get_geometry(gvn);
+    MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
+    MotoGeometryNode *gn = moto_geom_view_node_get_geometry(gvn);
     if( ! gn)
         return;
 
@@ -447,8 +447,8 @@ static void calc_local_bound(MotoObjectNode *self)
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
-    MotoGeometryViewNode *gvn = (MotoGeometryViewNode *)moto_param_get_node(s);
-    MotoGeometryNode *gn = moto_geometry_view_node_get_geometry(gvn);
+    MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
+    MotoGeometryNode *gn = moto_geom_view_node_get_geometry(gvn);
     if( ! gn)
         return;
 
@@ -709,7 +709,7 @@ void moto_object_node_draw_full(MotoObjectNode *self,
 
     if(*(self->priv->view_ptr))
     {
-        moto_geometry_view_node_draw(*(self->priv->view_ptr));
+        moto_geom_view_node_draw(*(self->priv->view_ptr));
     }
 
     if(recursive)
@@ -1143,7 +1143,7 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
     MotoTransformInfo *tinfo)
 {
     if(*(self->priv->view_ptr))
-        if(moto_geometry_view_node_process_button_press(*(self->priv->view_ptr),
+        if(moto_geom_view_node_process_button_press(*(self->priv->view_ptr),
                     x, y, width, height, ray, tinfo))
             return TRUE;
 
@@ -1154,7 +1154,7 @@ gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(*(self->priv->view_ptr))
-        if(moto_geometry_view_node_process_button_release(*(self->priv->view_ptr), x, y, width, height))
+        if(moto_geom_view_node_process_button_release(*(self->priv->view_ptr), x, y, width, height))
             return TRUE;
 
     GSList *child = self->priv->children;
@@ -1172,7 +1172,7 @@ gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(*(self->priv->view_ptr))
-        if(moto_geometry_view_node_process_motion(*(self->priv->view_ptr), x, y, width, height))
+        if(moto_geom_view_node_process_motion(*(self->priv->view_ptr), x, y, width, height))
             return TRUE;
 
     GSList *child = self->priv->children;

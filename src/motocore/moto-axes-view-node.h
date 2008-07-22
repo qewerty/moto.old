@@ -32,14 +32,14 @@ typedef struct _MotoAxesViewNodePriv MotoAxesViewNodePriv;
 
 struct _MotoAxesViewNode
 {
-    MotoGeometryViewNode parent;
+    MotoGeomViewNode parent;
 
     MotoAxesViewNodePriv *priv;
 };
 
 struct _MotoAxesViewNodeClass
 {
-    MotoGeometryViewNodeClass parent;
+    MotoGeomViewNodeClass parent;
 };
 
 GType moto_axes_view_node_storage_get_type(void);
