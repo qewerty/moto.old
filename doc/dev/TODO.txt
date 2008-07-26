@@ -9,5 +9,6 @@ Moto v0.1
 * Add functions moto_node_add_dynamic_param[s] and moto_node_add_static_param[s].
 * Implement new mesh structure. Half-edge or other.
 * Face tesselation.
+* Add MotoMeshEditNode.
 * Implement interpolators and other functions for animating node params. With simple GUI for testing.
 * Create Python bindings for Moto GObject-based library.

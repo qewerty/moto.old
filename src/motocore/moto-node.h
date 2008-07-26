@@ -145,6 +145,10 @@ gconstpointer moto_node_get_dump(MotoNode *self, glong *numbytes);
 /* Update node internals. This must not affect on other nodes. */
 void moto_node_update(MotoNode *self);
 
+/* Just moto_node_update if there is no cache or restore state of node from undo/redo cache. */
+void moto_node_undo(MotoNode *self);
+void moto_node_redo(MotoNode *self);
+
 MotoWorld *moto_node_get_world(MotoNode *self);
 void moto_node_set_world(MotoNode *self, MotoWorld *world);
 

@@ -22,48 +22,77 @@
 #ifndef MOTO_MESH_H
 #define MOTO_MESH_H
 
-#include "glib-object.h"
+#include <GL/gl.h>
+#include <glib-object.h>
 
 #include "moto-ray.h"
 
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
-typedef struct _MotoMeshPriv MotoMeshPriv;
 
-typedef struct _MotoMeshVert MotoMeshVert;
-typedef struct _MotoMeshEdge MotoMeshEdge;
+typedef struct _MotoMeshTriplet MotoMeshTriplet;
 
-typedef struct _MotoMeshFace MotoMeshFace;
+typedef struct _MotoMeshVert16 MotoMeshVert16;
+typedef struct _MotoMeshVert32 MotoMeshVert32;
+typedef struct _MotoMeshEdge16 MotoMeshEdge16;
+typedef struct _MotoMeshEdge32 MotoMeshEdge32;
+typedef struct _MotoMeshFace16 MotoMeshFace16;
+typedef struct _MotoMeshFace32 MotoMeshFace32;
+
+typedef struct _MotoHalfEdge16 MotoHalfEdge16;
+typedef struct _MotoHalfEdge32 MotoHalfEdge32;
+
 typedef struct _MotoMeshFaceHole MotoMeshFaceHole;
 typedef struct _MotoTriangle MotoTriangle;
-typedef struct _MotoMeshSubFace MotoMeshSubFace;
 
 typedef struct _MotoMeshVertAttr MotoMeshVertAttr;
 
 typedef struct _MotoMeshSelection MotoMeshSelection;
 
-typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh, MotoMeshVert *vert);
-typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self, MotoMeshEdge *edge);
-typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self, MotoMeshVert *vert);
+typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh,
+        gpointer vert, gpointer user_data);
+typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self,
+        gpointer edge, gpointer user_data);
+typedef void (*MotoMeshForeachFaceFunc)(MotoMesh *self,
+        gpointer face, gpointer user_data);
+/*
+typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self,
+        gpointer vert, gpointer user_data);
+*/
 
 typedef struct _MotoMeshOp MotoMeshOp;
 
 /* class MotoMesh */
 
-struct _MotoMeshVert
+struct _MotoMeshVert16
 {
-    gfloat xyz[3];
-    gfloat normal[3];
+    guint16 half_edge;
 };
 
-struct _MotoMeshEdge
+struct _MotoMeshVert32
 {
-    guint a, b;
+    guint32 half_edge;
 };
 
+struct _MotoMeshTriplet
+{
+    gfloat x, y, z;
+};
+
+struct _MotoMeshEdge16
+{
+    guint16 half_edge;
+};
+
+struct _MotoMeshEdge32
+{
+    guint32 half_edge;
+};
+
+/*
 struct _MotoMeshFaceHole
 {
-    guint verts_num;
+    guint v_num;
     guint *indecies;
     union
     {
@@ -72,12 +101,13 @@ struct _MotoMeshFaceHole
         guint64 *v64;
     };
 };
+*/
 
-void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint verts_num);
+void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint v_num);
 
 struct _MotoTriangle16
 {
-    guint16 a, b, c; // 96bit
+    guint16 a, b, c; // 48bit
 };
 
 struct _MotoTriangle32
@@ -85,69 +115,35 @@ struct _MotoTriangle32
     guint32 a, b, c; // 96bit
 };
 
-struct _MotoMeshFace
+struct _MotoMeshFace16
 {
-    gfloat normal[3];
-    guint verts_num;
-    guint *indecies;
-    union
-    {
-        /* Small meshes use small indecies. ;) */
-        guint16 *v16;
-        guint32 *v32;
-        guint64 *v64; /* Very big meshes. 0_o */
-    };
-
-    guint holes_num;
-    MotoMeshFaceHole *holes;
-
-    /* read-only */
-    guint triangles_num;
-    /*
-    union
-    {
-        MotoTriangle16  *tri16;
-        MotoTriangle132 *tri32;
-    }
-    */
+    guint v_num;
+    guint16 half_edge;
 };
 
-struct _MotoMeshSubFace
+struct _MotoMeshFace32
 {
-    guint verts_num;
-    guint *indecies;
+    guint v_num;
+    guint32 half_edge;
 };
-
-void moto_mesh_face_init(MotoMeshFace *self, guint verts_num, guint holes_num);
-void moto_mesh_face_alloc(MotoMeshFace *self); // TODO: Remove deprecated!
-void moto_mesh_face_free(MotoMeshFace *self);
-void moto_mesh_face_calc_normal(MotoMeshFace *self, MotoMesh *mesh);
-/* Tesselation must be performed after normal is calculated.  */
-void moto_mesh_face_tesselate(MotoMeshFace *self, MotoMesh *mesh);
-// void moto_mesh_face_draw(MotoMeshFace *self);
-gboolean moto_mesh_face_intersect_ray(MotoMeshFace *self,  MotoMesh *mesh, MotoRay *ray, gfloat *dist);
-
-void moto_mesh_face_foreach_vertex(MotoMeshFace *face,
-        MotoMeshFaceForeachVertexFunc func, MotoMesh *mesh);
 
 struct _MotoMeshVertAttr
 {
-    GString *name;
     guint chnum;
     gfloat *data;
 };
 
 struct _MotoMeshSelection
 {
-    guint verts_num;
+    guint v_num;
     guint32 *verts;
-    guint edges_num;
+    guint e_num;
     guint32 *edges;
-    guint faces_num;
+    guint f_num;
     guint32 *faces;
 };
 
-MotoMeshSelection *moto_mesh_selection_new(guint verts_num, guint edges_num, guint faces_num);
+MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
 MotoMeshSelection *moto_mesh_selection_for_mesh(MotoMesh *mesh);
 void moto_mesh_selection_free(MotoMeshSelection *self);
@@ -174,23 +170,79 @@ void moto_mesh_selection_deselect_all(MotoMeshSelection *self);
 
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 
+struct _MotoHalfEdge16
+{
+    guint16 next;
+    guint16 previous;
+    guint16 pair;
+
+    guint16 v_origin;
+    guint16 f_left;
+    guint16 edge;
+};
+
+struct _MotoHalfEdge32
+{
+    guint32 next;
+    guint32 prev;
+    guint32 pair;
+
+    guint32 v_origin;
+    guint32 f_left;
+    guint32 edge;
+};
+
+#define moto_half_edge_pair(self, mesh) (mesh->he_data[self->pair])
+#define moto_half_edge_next(self, mesh) (mesh->he_data[self->next])
+#define moto_half_edge_prev(self, mesh) (mesh->he_data[self->prev])
+#define moto_half_edge_v_orig(self, mesh) (mesh->v_data[self->v_origin])
+#define moto_half_edge_f_left(self, mesh) (mesh->f_data[self->f_left])
+#define moto_half_edge_edge(self, mesh) (mesh->v_data[self->edge])
+
+#define moto_half_edge_v_dest(self, mesh) \
+    (moto_half_edge_origin(& moto_half_edge_pair(self, mesh)), mesh)
+
+#define moto_half_edge_v_next ...
+#define moto_half_edge_v_prev ...
+
 struct _MotoMesh
 {
     GObject parent;
 
-    guint verts_num;
-    MotoMeshVert *verts;
+    /* WARNING! All members are private but opened for performance reasons.
+     *          Don't use them directly! */
 
-    guint edges_num;
-    MotoMeshEdge *edges;
-    guint32 *hard_edge_flags;
+    gboolean b32; // 16bit or 32bit are used for indecies
+    GLenum index_gl_type;
 
-    guint faces_num;
-    MotoMeshFace *faces;
+    // Verts
+    guint v_num;
+    gpointer v_data;
+    MotoMeshTriplet *v_coords;
+    MotoMeshTriplet *v_normals;
+    GData *v_attrs;
 
-    GSList *verts_attrs;
+    // Edges
+    guint e_num;
+    gpointer e_data;
+    gpointer e_verts;
+    guint32 *e_hard_flags;
 
-    MotoMeshPriv *priv;
+    gboolean e_use_creases;
+    gfloat *e_creases;
+
+    // Faces
+    guint f_num;
+    guint f_tess_num;
+    gpointer f_data;
+    gpointer f_verts;
+    gpointer f_tess_verts;
+    MotoMeshTriplet *f_normals;
+    gboolean f_use_hidden;
+    guint32 *f_hidden_flags;
+
+    // Half-edge data
+    gpointer he_data;
 };
 
 struct _MotoMeshClass
@@ -207,101 +259,43 @@ GType moto_mesh_get_type(void);
 #define MOTO_IS_MESH_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESH))
 #define MOTO_MESH_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH, MotoMeshClass))
 
-MotoMesh *moto_mesh_new(guint verts_num, guint edges_num, guint faces_num);
+MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num);
 MotoMesh *moto_mesh_copy(MotoMesh *other);
 
-#define moto_mesh_get_index_size(mesh) (((mesh)->verts_num <= G_MAXUINT16)?1:2)
+#define moto_mesh_get_index_size(mesh) (((mesh)->b32)?4:2)
+
+void moto_mesh_calc_faces_normals(MotoMesh *self);
 
 MotoMeshVertAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
 MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
 void moto_mesh_foreach_vertex(MotoMesh *self,
-        MotoMeshForeachVertexFunc func);
+        MotoMeshForeachVertexFunc func, gpointer user_data);
 void moto_mesh_foreach_edge(MotoMesh *self,
-        MotoMeshForeachEdgeFunc func);
-// void moto_mesh_foreach_face(MotoMesh *self,
-//        MotoMeshForeachFaceFunc func);
+        MotoMeshForeachEdgeFunc func, gpointer user_data);
+void moto_mesh_foreach_face(MotoMesh *self,
+        MotoMeshForeachFaceFunc func, gpointer user_data);
+
+void moto_mesh_foreach_selected_vertex(MotoMesh *self,
+        MotoMeshSelection *selection, MotoMeshForeachVertexFunc func, gpointer user_data);
+void moto_mesh_foreach_selected_edge(MotoMesh *self,
+        MotoMeshSelection *selection, MotoMeshForeachEdgeFunc func, gpointer user_data);
+void moto_mesh_foreach_selected_face(MotoMesh *self,
+        MotoMeshSelection *selection, MotoMeshForeachFaceFunc func, gpointer user_data);
 
 void moto_mesh_tesselate_faces(MotoMesh *self);
 
-/* Euler operators.
- * Adpated from BMesh (http://wiki.blender.org/index.php/BlenderDev/Bmesh).
- * A mesh object remembers information about how many new verts/edges/faces must be created or deleted
- * while perforforming any of these operators. You do not need think about memory for mesh components. */
+void moto_mesh_set_edge_hard(MotoMesh *self, guint32 index);
+void moto_mesh_set_edge_soft(MotoMesh *self, guint32 index);
+void moto_mesh_is_edge_hard(MotoMesh *self, guint32 index);
 
-struct _MotoMeshOp
-{
-    GObject parent;
-};
+void moto_mesh_hide_face(MotoMesh *self, guint32 index);
+void moto_mesh_show_face(MotoMesh *self, guint32 index);
+void moto_mesh_is_face_hidden(MotoMesh *self, guint32 index);
 
-/**
- * moto_mesh_op_empty:
- *
- * Creates new mesh operator which do nothing.
- */
-MotoMeshOp *moto_mesh_op_empty();
+void moto_mesh_update_he_data(MotoMesh *self);
 
-/**
- * moto_mesh_op_combine:
- * @ops: Array of pointers to mesh operators.
- *
- * Creates new mesh operator which perform sequence of other operators in order given in array passed though ops argument.
- *
- * Returns: instance of newly created MotoMeshOp.
- */
-MotoMeshOp *moto_mesh_op_combine(MotoMeshOp *ops);
-
-MotoMesh *moto_mesh_op_perform(MotoMeshOp *self, MotoMesh *mesh, MotoMeshSelection *selection);
-gboolean moto_mesh_op_check(MotoMeshOp *self, MotoMesh *mesh);
-
-/* make face & kill face */
-
-/**
- * moto_mesh_MF:
- * @indecies: The pointer to array of vertex indecies which will be verts of new face.
- *
- * Creates new face from given vertex indecies.
- *
- * Returns: MotoMeshFace instance or NULL if indecies are invalid.
- */
-MotoMeshOp *moto_mesh_op_MF(MotoMesh *self, guint *indecies);
-
-/**
- * moto_mesh_KF:
- * @face_index: The index of the face to delete.
- *
- * Delete the face by given index.
- *
- * Returns: TRUE on succeed or FALSE of operation can not be performed.
- */
-gboolean moto_mesh_KF(MotoMesh *self, guint face_index);
-
-/* make edge & kill edge */
-MotoMeshEdge *moto_mesh_ME(MotoMesh *self, guint v1, guint v2);
-gboolean moto_mesh_KE(MotoMesh *self, MotoMeshEdge *e);
-
-/* make vert & kill vert */
-MotoMeshVert *moto_mesh_MV(MotoMesh *self, MotoMeshEdge *e);
-gboolean moto_mesh_KV(MotoMesh *self, MotoMeshVert *v);
-
-/* slpit edge, make vert & join edge, kill vert */
-MotoMeshVert *moto_mesh_SEMV(MotoMesh *self, MotoMeshEdge *e);
-gboolean moto_mesh_JEKV(MotoMesh *self, MotoMeshEdge *e);
-
-/* slpit face, make edge & join face, kill edge */
-MotoMeshEdge *moto_mesh_SFME(MotoMesh *self,
-        MotoMeshFace *f, MotoMeshVert *v1, MotoMeshVert *v2);
-gboolean moto_mesh_JFKE(MotoMesh *self,
-        MotoMeshFace *f1, MotoMeshFace *f2);
-
-/* Perform previous operators.  */
-void moto_mesh_perform_operators(MotoMesh *self);
-
-/* Check has the mesh unperformed euler operations or not.  */
-gboolean moto_mesh_has_operators(MotoMesh *self);
-
-/* Clear sequence of mesh operators. */
-void moto_mesh_clear_operators(MotoMesh *self);
+void moto_mesh_prepare(MotoMesh *self);
 
 #endif /* MOTO_MESH_H */
 

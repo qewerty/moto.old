@@ -179,148 +179,121 @@ MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self)
     return self->priv->selection;
 }
 
-static void process_vertex(MotoMeshFace *face, MotoMeshVert *vert)
-{
-    glVertex3fv(vert->xyz);
-}
-
 static void draw_mesh_as_object(MotoMesh *mesh)
 {
-    int i;
-    for(i = 0; i < mesh->faces_num; i++)
-    {
-        /* TODO: Temporary solution! =) */
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+    glPushAttrib(GL_ENABLE_BIT);
 
-        MotoMeshFace *face = & mesh->faces[i];
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
-        glNormal3fv(face->normal);
-
-        glBegin(GL_POLYGON);
-
-        moto_mesh_face_foreach_vertex(face, process_vertex, mesh);
-
-        glEnd();
-    }
-}
-
-void draw_vertex(MotoMesh *mesh, MotoMeshVert *vert)
-{
-    glVertex3fv(vert->xyz);
+    glPopAttrib();
+    glPopClientAttrib();
 }
 
 static void draw_mesh_as_verts(MotoMesh *mesh, MotoMeshSelection *selection)
 {
-    glColor4f(1, 1, 1, 0.25);
-    guint i;
-    for(i = 0; i < mesh->faces_num; i++)
-    {
-
-        MotoMeshFace *face = & mesh->faces[i];
-
-        glNormal3fv(face->normal);
-
-        glBegin(GL_POLYGON);
-
-        moto_mesh_face_foreach_vertex(face, process_vertex, mesh);
-
-        glEnd();
-    }
-
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
 
     glDisable(GL_LIGHTING);
+    glColor4f(1, 1, 1, 0.25);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
     glDisable(GL_DEPTH_TEST);
 
-    glColor4f(1, 0, 0, 1);
+    glColor4f(0.2, 0.2, 0.2, 1.0);
+    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+
+    glColor4f(0.9, 0.9, 0.9, 1);
     glPointSize(4);
+
+    glDrawArrays(GL_POINTS, 0, mesh->v_num);
+
+
     glBegin(GL_POINTS);
-
-    MotoMeshVert *vert;
-    for(i = 0; i < mesh->verts_num; i++)
+    glColor3f(0, 1, 0);
+    guint i;
+    for(i = 0; i < mesh->v_num; i++)
     {
-        vert = & mesh->verts[i];
-
-        if(selection && moto_mesh_selection_is_vertex_selected(selection, i))
-            glColor4f(0, 1, 0, 1);
-        else
-            glColor4f(1, 0, 0, 1);
-
-        glVertex3fv(vert->xyz);
+        if(moto_mesh_selection_is_vertex_selected(selection, i))
+            glVertex3fv((GLfloat *)(& mesh->v_coords[i]));
     }
-
     glEnd();
 
     glPopAttrib();
+    glPopClientAttrib();
 }
 
 static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
 {
-    glColor4f(1, 1, 1, 0.25);
-    int i;
-    for(i = 0; i < mesh->faces_num; i++)
-    {
-
-        MotoMeshFace *face = & mesh->faces[i];
-
-        glNormal3fv(face->normal);
-
-        glBegin(GL_POLYGON);
-
-        moto_mesh_face_foreach_vertex(face, process_vertex, mesh);
-
-        glEnd();
-    }
-
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
 
     glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    glColor4f(1, 1, 1, 0.25);
 
-    glColor4f(1, 0, 0, 1);
-    glPointSize(4);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(1.0);
+    glColor4f(0.9, 0.9, 0.9, 1.0);
+
+    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
     glBegin(GL_LINES);
-
-    MotoMeshEdge *edge;
-    for(i = 0; i < mesh->edges_num; i++)
+    glColor3f(0, 1, 0);
+    glLineWidth(2.0);
+    guint i;
+    for(i = 0; i < mesh->e_num; i++)
     {
-        edge = & mesh->edges[i];
-
-        if(selection && moto_mesh_selection_is_edge_selected(selection, i))
-            glColor4f(0, 1, 0, 1);
+        if(mesh->b32)
+        {
+            guint32 *e_verts = (guint32 *)mesh->e_verts;
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2]]));
+                glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2 + 1]]));
+            }
+        }
         else
-            glColor4f(1, 0, 0, 1);
-
-        glVertex3fv(mesh->verts[edge->a].xyz);
-        glVertex3fv(mesh->verts[edge->b].xyz);
+        {
+            guint16 *e_verts = (guint16 *)mesh->e_verts;
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2]]));
+                glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2 + 1]]));
+            }
+        }
     }
-
     glEnd();
 
     glPopAttrib();
+    glPopClientAttrib();
 }
 
 static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
 {
-    int i;
-    for(i = 0; i < mesh->faces_num; i++)
-    {
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+    glPushAttrib(GL_ENABLE_BIT);
 
-        MotoMeshFace *face = & mesh->faces[i];
+    glDisable(GL_LIGHTING);
+    glColor4f(1, 1, 1, 0.25);
 
-        if(selection && moto_mesh_selection_is_face_selected(selection, i))
-            glColor4f(0.5, 1, 0.2, 0.25);
-        else
-            glColor4f(1, 1, 1, 0.25);
+    glEnableClientState(GL_VERTEX_ARRAY);
 
-        glNormal3fv(face->normal);
+    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
 
-        glBegin(GL_POLYGON);
+    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
-        moto_mesh_face_foreach_vertex(face, process_vertex, mesh);
-
-        glEnd();
-    }
+    glPopAttrib();
+    glPopClientAttrib();
 }
 
 static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
@@ -359,7 +332,7 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self)
 
     glEndList();
 
-    // moto_geom_view_node_set_prepared(self, TRUE);
+    moto_geom_view_node_set_prepared(self, TRUE);
 }
 
 static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self,
@@ -427,7 +400,7 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
     }
 
     /* Array of intersected verts. */
-    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->verts_num/10)));
+    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
 
     guint index;
     gfloat dist, dist_tmp;
@@ -436,9 +409,9 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
     gfloat fovy = atan((1/tinfo->proj[5]))*2;
 
     guint i;
-    for(i = 0; i < mesh->verts_num; i++)
+    for(i = 0; i < mesh->v_num; i++)
     {
-        gfloat *xyz = mesh->verts[i].xyz;
+        gfloat *xyz = (gfloat *)(mesh->v_coords + i);
 
         /* perspective compensatioin for sphere radius */
         gfloat p2v[3]; /* Vector from ray origin to vertex. */
@@ -467,7 +440,7 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
         for(i = 0; i < hits->len; i++)
         {
             ii = g_array_index(hits, gint, i);
-            gluProject(mesh->verts[ii].xyz[0], mesh->verts[ii].xyz[1], mesh->verts[ii].xyz[2],
+            gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
                     tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
 
             xx = (x - win_x);
@@ -515,7 +488,7 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
     }
 
     /* Array of intersected verts. */
-    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->verts_num/10)));
+    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
 
     guint index;
     gfloat dist, dist_tmp;
@@ -524,9 +497,9 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
     gfloat fovy = atan((1/tinfo->proj[5]))*2;
 
     guint i;
-    for(i = 0; i < mesh->verts_num; i++)
+    for(i = 0; i < mesh->v_num; i++)
     {
-        gfloat *xyz = mesh->verts[i].xyz;
+        gfloat *xyz = (gfloat *)(mesh->v_coords + i);
 
         /* perspective compensatioin for sphere radius */
         gfloat p2v[3]; /* Vector from ray origin to vertex. */
@@ -555,7 +528,7 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
         for(i = 0; i < hits->len; i++)
         {
             ii = g_array_index(hits, gint, i);
-            gluProject(mesh->verts[ii].xyz[0], mesh->verts[ii].xyz[1], mesh->verts[ii].xyz[2],
+            gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
                     tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
 
             xx = (x - win_x);
@@ -602,6 +575,8 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
         return FALSE;
     }
 
+    /*
+
     guint index;
     guint num = 0;
     gfloat dist, dist_tmp;
@@ -609,7 +584,7 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
 
     MotoMeshFace *face;
     guint i;
-    for(i = 0; i < mesh->faces_num; i++)
+    for(i = 0; i < mesh->f_num; i++)
     {
         face = & mesh->faces[i];
         if( ! moto_mesh_face_intersect_ray(face, mesh, ray, & dist_tmp))
@@ -631,13 +606,14 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
         moto_geom_view_node_set_prepared((MotoGeomViewNode *)mv, FALSE);
         moto_geom_view_node_draw((MotoGeomViewNode *)mv);
     }
+    */
 
     return TRUE;
 }
 
 static void moto_mesh_view_node_update(MotoNode *self)
 {
-    MotoMeshViewNode *gv = (MotoGeomViewNode *)self;
+    MotoGeomViewNode *gv = (MotoGeomViewNode *)self;
     MotoMeshViewNode *mv = (MotoMeshViewNode *)self;
 
     moto_geom_view_node_set_prepared(gv, FALSE);

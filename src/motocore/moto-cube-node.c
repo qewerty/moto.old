@@ -119,103 +119,172 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    mesh->verts[0].xyz[0]   =  hsx;
-    mesh->verts[0].xyz[1]   = -hsy;
-    mesh->verts[0].xyz[2]   = -hsz;
-    mesh->verts[1].xyz[0]   = -hsx;
-    mesh->verts[1].xyz[1]   = -hsy;
-    mesh->verts[1].xyz[2]   = -hsz;
-    mesh->verts[2].xyz[0]   = -hsx;
-    mesh->verts[2].xyz[1]   =  hsy;
-    mesh->verts[2].xyz[2]   = -hsz;
-    mesh->verts[3].xyz[0]   =  hsx;
-    mesh->verts[3].xyz[1]   =  hsy;
-    mesh->verts[3].xyz[2]   = -hsz;
-    mesh->verts[4].xyz[0]   =  hsx;
-    mesh->verts[4].xyz[1]   = -hsy;
-    mesh->verts[4].xyz[2]   =  hsz;
-    mesh->verts[5].xyz[0]   = -hsx;
-    mesh->verts[5].xyz[1]   = -hsy;
-    mesh->verts[5].xyz[2]   =  hsz;
-    mesh->verts[6].xyz[0]   = -hsx;
-    mesh->verts[6].xyz[1]   =  hsy;
-    mesh->verts[6].xyz[2]   =  hsz;
-    mesh->verts[7].xyz[0]   =  hsx;
-    mesh->verts[7].xyz[1]   =  hsy;
-    mesh->verts[7].xyz[2]   =  hsz;
+    mesh->v_coords[0].x =  hsx;
+    mesh->v_coords[0].y = -hsy;
+    mesh->v_coords[0].z = -hsz;
+    mesh->v_coords[1].x = -hsx;
+    mesh->v_coords[1].y = -hsy;
+    mesh->v_coords[1].z = -hsz;
+    mesh->v_coords[2].x = -hsx;
+    mesh->v_coords[2].y =  hsy;
+    mesh->v_coords[2].z = -hsz;
+    mesh->v_coords[3].x =  hsx;
+    mesh->v_coords[3].y =  hsy;
+    mesh->v_coords[3].z = -hsz;
+    mesh->v_coords[4].x =  hsx;
+    mesh->v_coords[4].y = -hsy;
+    mesh->v_coords[4].z =  hsz;
+    mesh->v_coords[5].x = -hsx;
+    mesh->v_coords[5].y = -hsy;
+    mesh->v_coords[5].z =  hsz;
+    mesh->v_coords[6].x = -hsx;
+    mesh->v_coords[6].y =  hsy;
+    mesh->v_coords[6].z =  hsz;
+    mesh->v_coords[7].x =  hsx;
+    mesh->v_coords[7].y =  hsy;
+    mesh->v_coords[7].z =  hsz;
 
-    mesh->faces[0].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[0]);
-    mesh->faces[0].indecies[0] = 0;
-    mesh->faces[0].indecies[1] = 1;
-    mesh->faces[0].indecies[2] = 2;
-    mesh->faces[0].indecies[3] = 3;
-    moto_mesh_face_calc_normal(& mesh->faces[0], mesh);
+    guint f_mem = moto_mesh_get_index_size(mesh) * mesh->f_num * 4;
+    mesh->f_verts = g_try_malloc(f_mem);
 
-    mesh->faces[1].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[1]);
-    mesh->faces[1].indecies[0] = 7;
-    mesh->faces[1].indecies[1] = 6;
-    mesh->faces[1].indecies[2] = 5;
-    mesh->faces[1].indecies[3] = 4;
-    moto_mesh_face_calc_normal(& mesh->faces[1], mesh);
+    if(mesh->b32)
+    {
+        MotoMeshFace32 *f_data = (MotoMeshFace32 *)mesh->f_data;
+        guint32 *f_verts = (guint32 *)mesh->f_verts;
 
-    mesh->faces[2].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[2]);
-    mesh->faces[2].indecies[0] = 4;
-    mesh->faces[2].indecies[1] = 5;
-    mesh->faces[2].indecies[2] = 1;
-    mesh->faces[2].indecies[3] = 0;
-    moto_mesh_face_calc_normal(& mesh->faces[2], mesh);
+        f_data[0].v_num = 4;
+        f_verts[0] = 0;
+        f_verts[1] = 1;
+        f_verts[2] = 2;
+        f_verts[3] = 3;
 
-    mesh->faces[3].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[3]);
-    mesh->faces[3].indecies[0] = 2;
-    mesh->faces[3].indecies[1] = 6;
-    mesh->faces[3].indecies[2] = 7;
-    mesh->faces[3].indecies[3] = 3;
-    moto_mesh_face_calc_normal(& mesh->faces[3], mesh);
+        f_data[1].v_num = 8;
+        f_verts[4] = 7;
+        f_verts[5] = 6;
+        f_verts[6] = 5;
+        f_verts[7] = 4;
 
-    mesh->faces[4].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[4]);
-    mesh->faces[4].indecies[0] = 5;
-    mesh->faces[4].indecies[1] = 6;
-    mesh->faces[4].indecies[2] = 2;
-    mesh->faces[4].indecies[3] = 1;
-    moto_mesh_face_calc_normal(& mesh->faces[4], mesh);
+        f_data[2].v_num = 12;
+        f_verts[8]  = 4;
+        f_verts[9]  = 5;
+        f_verts[10] = 1;
+        f_verts[11] = 0;
 
-    mesh->faces[5].verts_num = 4;
-    moto_mesh_face_alloc(& mesh->faces[5]);
-    mesh->faces[5].indecies[0] = 7;
-    mesh->faces[5].indecies[1] = 4;
-    mesh->faces[5].indecies[2] = 0;
-    mesh->faces[5].indecies[3] = 3;
-    moto_mesh_face_calc_normal(& mesh->faces[5], mesh);
+        f_data[3].v_num = 16;
+        f_verts[12] = 2;
+        f_verts[13] = 6;
+        f_verts[14] = 7;
+        f_verts[15] = 3;
 
-    mesh->edges[0].a    = 0;
-    mesh->edges[0].b    = 1;
-    mesh->edges[1].a    = 1;
-    mesh->edges[1].b    = 2;
-    mesh->edges[2].a    = 2;
-    mesh->edges[2].b    = 3;
-    mesh->edges[3].a    = 3;
-    mesh->edges[3].b    = 0;
-    mesh->edges[4].a    = 4;
-    mesh->edges[4].b    = 5;
-    mesh->edges[5].a    = 5;
-    mesh->edges[5].b    = 6;
-    mesh->edges[6].a    = 6;
-    mesh->edges[6].b    = 7;
-    mesh->edges[7].a    = 7;
-    mesh->edges[7].b    = 4;
-    mesh->edges[8].a    = 0;
-    mesh->edges[8].b    = 4;
-    mesh->edges[9].a    = 1;
-    mesh->edges[9].b    = 5;
-    mesh->edges[10].a   = 2;
-    mesh->edges[10].b   = 6;
-    mesh->edges[11].a   = 3;
-    mesh->edges[11].b   = 7;
+        f_data[4].v_num = 20;
+        f_verts[16] = 5;
+        f_verts[17] = 6;
+        f_verts[18] = 2;
+        f_verts[19] = 1;
+
+        f_data[5].v_num = 24;
+        f_verts[20] = 7;
+        f_verts[21] = 4;
+        f_verts[22] = 0;
+        f_verts[23] = 3;
+
+        guint32 *e_verts = (guint32 *)mesh->e_verts;
+
+        e_verts[0]  = 0;
+        e_verts[1]  = 1;
+        e_verts[2]  = 1;
+        e_verts[3]  = 2;
+        e_verts[4]  = 2;
+        e_verts[5]  = 3;
+        e_verts[6]  = 3;
+        e_verts[7]  = 0;
+        e_verts[8]  = 4;
+        e_verts[9]  = 5;
+        e_verts[10] = 5;
+        e_verts[11] = 6;
+        e_verts[12] = 6;
+        e_verts[13] = 7;
+        e_verts[14] = 7;
+        e_verts[15] = 4;
+        e_verts[16] = 0;
+        e_verts[17] = 4;
+        e_verts[18] = 1;
+        e_verts[19] = 5;
+        e_verts[20] = 2;
+        e_verts[21] = 6;
+        e_verts[22] = 3;
+        e_verts[23] = 7;
+    }
+    else
+    {
+        MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
+        guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+        f_data[0].v_num = 4;
+        f_verts[0] = 0;
+        f_verts[1] = 1;
+        f_verts[2] = 2;
+        f_verts[3] = 3;
+
+        f_data[1].v_num = 8;
+        f_verts[4] = 7;
+        f_verts[5] = 6;
+        f_verts[6] = 5;
+        f_verts[7] = 4;
+
+        f_data[2].v_num = 12;
+        f_verts[8]  = 4;
+        f_verts[9]  = 5;
+        f_verts[10] = 1;
+        f_verts[11] = 0;
+
+        f_data[3].v_num = 16;
+        f_verts[12] = 2;
+        f_verts[13] = 6;
+        f_verts[14] = 7;
+        f_verts[15] = 3;
+
+        f_data[4].v_num = 20;
+        f_verts[16] = 5;
+        f_verts[17] = 6;
+        f_verts[18] = 2;
+        f_verts[19] = 1;
+
+        f_data[5].v_num = 24;
+        f_verts[20] = 7;
+        f_verts[21] = 4;
+        f_verts[22] = 0;
+        f_verts[23] = 3;
+
+        guint16 *e_verts = (guint16 *)mesh->e_verts;
+
+        e_verts[0]  = 0;
+        e_verts[1]  = 1;
+        e_verts[2]  = 1;
+        e_verts[3]  = 2;
+        e_verts[4]  = 2;
+        e_verts[5]  = 3;
+        e_verts[6]  = 3;
+        e_verts[7]  = 0;
+        e_verts[8]  = 4;
+        e_verts[9]  = 5;
+        e_verts[10] = 5;
+        e_verts[11] = 6;
+        e_verts[12] = 6;
+        e_verts[13] = 7;
+        e_verts[14] = 7;
+        e_verts[15] = 4;
+        e_verts[16] = 0;
+        e_verts[17] = 4;
+        e_verts[18] = 1;
+        e_verts[19] = 5;
+        e_verts[20] = 2;
+        e_verts[21] = 6;
+        e_verts[22] = 3;
+        e_verts[23] = 7;
+    }
+
+    moto_mesh_prepare(mesh);
 }
 
 static void moto_cube_node_update(MotoNode *self)

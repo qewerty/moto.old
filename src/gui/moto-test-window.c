@@ -84,6 +84,8 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv = g_slice_new(MotoTestWindowPriv);
     self->priv->disposed = FALSE;
 
+    // Test scene
+
     self->priv->v1 = moto_variation_new("v1");
     self->priv->v2 = moto_variation_new("v2");
     moto_variation_set_parent(self->priv->v2, self->priv->v1);
@@ -167,17 +169,20 @@ moto_test_window_init(MotoTestWindow *self)
     // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
 
+    // Window
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
     GtkWidget *area = (GtkWidget *)self->priv->area;
     GdkGLConfig *gl_config =\
                 gdk_gl_config_new_by_mode((GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
-        if (gl_config == NULL) {
-                g_print("\nNUll: Error - Unable to initialize OpenGL!\n");
-                exit(1);
-        }
+    if( ! gl_config)
+    {
+            g_print("\nNUll: Error - Unable to initialize OpenGL!\n");
+            exit(1);
+    }
     gtk_widget_set_gl_capability(area, gl_config,
                 NULL, TRUE, GDK_GL_RGBA_TYPE);
 
+    // Widgets
     gtk_widget_add_events(GTK_WIDGET(area), GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
             GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
@@ -219,6 +224,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     gtk_window_set_title((GtkWindow *)self, "Moto v0.0");
     gtk_widget_set_size_request((GtkWidget *)self, 640, 480);
+
 }
 
 static void
