@@ -95,7 +95,8 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num)
 {
     MotoMesh *self = (MotoMesh *)g_object_new(MOTO_TYPE_MESH, NULL);
 
-    self->b32 = max(v_num, max(e_num, f_num)) > G_MAXINT16;
+    guint he_num = e_num*2;
+    self->b32 = max(he_num, max(v_num, f_num)) > (G_MAXUINT16 - 1);
     self->index_gl_type = (self->b32) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
 
     guint num, i;
@@ -358,65 +359,340 @@ void moto_mesh_face_free(MotoMeshFace *self)
 /* Newell's method */
 void moto_mesh_calc_faces_normals(MotoMesh *self)
 {
-    guint fi;
-    for(fi = 0; fi < self->f_num; fi++)
+    if(self->b32)
     {
-        self->f_normals[fi].x = 0;
-        self->f_normals[fi].y = 0;
-        self->f_normals[fi].z = 0;
-
-        MotoMeshTriplet *vert, *nvert;
-
-        guint i;
-
-        if(self->b32)
+        guint32 fi;
+        guint32 vi;
+        for(fi = 0; fi < self->f_num; fi++)
         {
+            self->f_normals[fi].x = 0;
+            self->f_normals[fi].y = 0;
+            self->f_normals[fi].z = 0;
+
+            MotoMeshTriplet *vert, *nvert;
+
             MotoMeshFace32 *f_data = (MotoMeshFace32 *)self->f_data;
             guint32 *f_verts = (guint32 *)self->f_verts;
             guint start = (0 == fi) ? 0: f_data[fi-1].v_num;
             guint v_num = f_data[fi].v_num - start;
-            for(i = 0; i < v_num; i++)
+            for(vi = 0; vi < v_num-1; vi++)
             {
-                vert  = & self->v_coords[f_verts[start + i]];
-                nvert = & self->v_coords[f_verts[start + i+1]];
+                vert  = & self->v_coords[f_verts[start + vi]];
+                nvert = & self->v_coords[f_verts[start + vi+1]];
 
                 self->f_normals[fi].x += (vert->y - nvert->y)*(vert->z + nvert->z);
                 self->f_normals[fi].y += (vert->z - nvert->z)*(vert->x + nvert->x);
                 self->f_normals[fi].z += (vert->x - nvert->x)*(vert->y + nvert->y);
             }
+
+            gfloat *normal = (gfloat *)(self->f_normals + fi);
+            gfloat lenbuf;
+            vector3_normalize(normal, lenbuf);
         }
-        else
+    }
+    else
+    {
+        guint16 fi;
+        guint16 vi;
+        for(fi = 0; fi < self->f_num; fi++)
         {
+            self->f_normals[fi].x = 0;
+            self->f_normals[fi].y = 0;
+            self->f_normals[fi].z = 0;
+
+            MotoMeshTriplet *vert, *nvert;
+
             MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
             guint16 *f_verts = (guint16 *)self->f_verts;
             guint start = (0 == fi) ? 0: f_data[fi-1].v_num;
             guint v_num = f_data[fi].v_num - start;
-            for(i = 0; i < v_num; i++)
+            for(vi = 0; vi < v_num-1; vi++)
             {
-                vert  = & self->v_coords[f_verts[start + i]];
-                nvert = & self->v_coords[f_verts[start + i+1]];
+                vert  = & self->v_coords[f_verts[start + vi]];
+                nvert = & self->v_coords[f_verts[start + vi+1]];
 
                 self->f_normals[fi].x += (vert->y - nvert->y)*(vert->z + nvert->z);
                 self->f_normals[fi].y += (vert->z - nvert->z)*(vert->x + nvert->x);
                 self->f_normals[fi].z += (vert->x - nvert->x)*(vert->y + nvert->y);
             }
-        }
 
-        gfloat *normal = (gfloat *)(self->f_normals + fi);
-        gfloat lenbuf;
-        vector3_normalize(normal, lenbuf);
+            gfloat *normal = (gfloat *)(self->f_normals + fi);
+
+            // FIXME: Temporary! Newell's method should be reimplemented.
+            gfloat a[3], b[3];
+            vector3_set(a, self->v_coords[f_verts[start + 1]].x - self->v_coords[f_verts[start + 0]].x,
+                           self->v_coords[f_verts[start + 1]].y - self->v_coords[f_verts[start + 0]].y,
+                           self->v_coords[f_verts[start + 1]].z - self->v_coords[f_verts[start + 0]].z);
+            vector3_set(b, self->v_coords[f_verts[start + 2]].x - self->v_coords[f_verts[start + 1]].x,
+                           self->v_coords[f_verts[start + 2]].y - self->v_coords[f_verts[start + 1]].y,
+                           self->v_coords[f_verts[start + 2]].z - self->v_coords[f_verts[start + 1]].z);
+            vector3_cross(normal, a, b);
+
+            gfloat lenbuf;
+            vector3_normalize(normal, lenbuf);
+        }
+    }
+}
+
+void moto_mesh_calc_verts_normals(MotoMesh *self)
+{
+    if(self->b32)
+    {
+        MotoMeshVert32 *v_data = (MotoMeshVert32 *)self->v_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+
+        guint32 vi;
+        for(vi = 0; vi < self->v_num; vi++)
+        {
+            gfloat *normal = (gfloat *) & self->v_normals[vi];
+            vector3_zero(normal);
+
+            MotoHalfEdge32 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge32 *he      = begin;
+            do
+            {
+                gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
+                vector3_add(normal, fnormal);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+
+            gfloat lenbuf;
+            vector3_normalize(normal, lenbuf);
+        }
+    }
+    else
+    {
+        MotoMeshVert16 *v_data = (MotoMeshVert16 *)self->v_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+
+        guint16 vi;
+        for(vi = 0; vi < self->v_num; vi++)
+        {
+            gfloat *normal = (gfloat *) & self->v_normals[vi];
+            vector3_zero(normal);
+
+            g_print("vi: %d, (faces: ", vi);
+
+            MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge16 *he      = begin;
+            do
+            {
+                g_print("%d, ", he->f_left);
+                gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
+                vector3_add(normal, fnormal);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+            g_print(")\n");
+
+            gfloat lenbuf;
+            vector3_normalize(normal, lenbuf);
+        }
+    }
+}
+
+void moto_mesh_calc_normals(MotoMesh *self)
+{
+    moto_mesh_calc_faces_normals(self);
+    moto_mesh_calc_verts_normals(self);
+}
+
+static guint32 find_edge32(MotoMesh *mesh, guint32 a, guint32 b)
+{
+    guint32 *e_verts  = (guint32*)mesh->e_verts;
+    guint32 i;
+    for(i = 0; i < mesh->e_num*2; i += 2)
+    {
+        if((e_verts[i] == a && e_verts[i+1] == b) || \
+           (e_verts[i+1] == a && e_verts[i] == b))
+            return i / 2;
+    }
+    return G_MAXUINT32;
+}
+
+static guint16 find_edge16(MotoMesh *mesh, guint16 a, guint16 b)
+{
+    guint16 *e_verts  = (guint16*)mesh->e_verts;
+    guint16 i;
+    for(i = 0; i < mesh->e_num*2; i += 2)
+    {
+        if((e_verts[i] == a && e_verts[i+1] == b) || \
+           (e_verts[i+1] == a && e_verts[i] == b))
+            return i / 2;
+    }
+    return G_MAXUINT16;
+}
+
+// he->edge must be already set
+
+static void find_he32(MotoMesh *self, guint32 ei, guint32 *hei1, guint32 *hei2)
+{
+    MotoHalfEdge32 *he_data = (MotoHalfEdge32*)self->he_data;
+
+    guint found = 0;
+    guint32 i;
+    for(i = 0; i < self->e_num*2; i++)
+    {
+        if(he_data[i].edge == ei)
+        {
+            if(0 == found)
+            {
+                *hei1 = i;
+            }
+            else
+            {
+                *hei2 = i;
+                return;
+            }
+            found++;
+        }
+    }
+}
+
+static void find_he16(MotoMesh *self, guint16 ei, guint16 *hei1, guint16 *hei2)
+{
+    MotoHalfEdge16 *he_data = (MotoHalfEdge16*)self->he_data;
+
+    guint found = 0;
+    guint16 i;
+    for(i = 0; i < self->e_num*2; i++)
+    {
+        if(he_data[i].edge == ei)
+        {
+            if(0 == found)
+            {
+                *hei1 = i;
+            }
+            else
+            {
+                *hei2 = i;
+                return;
+            }
+            found++;
+        }
     }
 }
 
 void moto_mesh_update_he_data(MotoMesh *self)
 {
+    if(self->b32)
+    {
+        MotoMeshVert32 *v_data  = (MotoMeshVert32*)self->v_data;
+        MotoMeshEdge32 *e_data  = (MotoMeshEdge32*)self->e_data;
+        MotoMeshFace32 *f_data  = (MotoMeshFace32 *)self->f_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32*)self->he_data;
+        guint32 *f_verts = (guint32 *)self->f_verts;
+        // guint32 *e_verts = (guint32 *)self->e_verts;
 
+        guint32 hei = 0;
+        guint32 fi;
+        for(fi = 0; fi < self->f_num; fi++)
+        {
+            if( ! moto_mesh_is_index_valid(self, fi))
+                continue;
+
+            MotoMeshFace32 *fd = & f_data[fi];
+            fd->half_edge = hei;
+
+            guint32 start = (0 == fi) ? 0: f_data[fi-1].v_num;
+            guint32 v_num = f_data[fi].v_num - start;
+
+            guint32 i;
+            for(i = 0; i < v_num; i++)
+            {
+                guint32 vi  = f_verts[fd->v_num+i];
+                guint32 nvi = f_verts[fd->v_num + ((i < v_num-1)?i+1:0)];
+
+                guint32 ei = find_edge32(self, vi, nvi);
+
+                guint32 hei2 = hei+i;
+                he_data[hei+i].next = (i < v_num-1) ? hei2+1 : hei;
+                // he_data[hei+vi].pair = ???;
+
+                he_data[hei+i].v_origin = vi;
+                he_data[hei+i].f_left = fi;
+                he_data[hei+i].edge = ei;
+
+                v_data[i].half_edge = hei2;
+                e_data[ei].half_edge = hei; // WARNING: Set at least twice!
+
+                hei += v_num;
+            }
+        }
+
+        guint32 hei1, hei2;
+        guint32 ei;
+        for(ei = 0; ei < self->e_num; ei++)
+        {
+            find_he32(self, ei, & hei1, & hei2);
+            he_data[hei1].pair = hei2;
+            he_data[hei2].pair = hei1;
+        }
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16*)self->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)self->e_data;
+        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16*)self->he_data;
+        guint16 *f_verts = (guint16 *)self->f_verts;
+        // guint16 *e_verts = (guint16 *)self->e_verts;
+
+        guint16 hei = 0;
+        guint16 fi;
+        for(fi = 0; fi < self->f_num; fi++)
+        {
+            if( ! moto_mesh_is_index_valid(self, fi))
+                continue;
+
+            MotoMeshFace16 *fd = & f_data[fi];
+            fd->half_edge = hei;
+
+            guint16 start = (0 == fi) ? 0: f_data[fi-1].v_num;
+            guint16 v_num = f_data[fi].v_num - start;
+
+            guint16 i;
+            for(i = 0; i < v_num; i++)
+            {
+                guint16 vi  = f_verts[start+i];
+                guint16 nvi = f_verts[start + ((i < v_num-1)?i+1:0)];
+
+                guint16 ei = find_edge16(self, vi, nvi);
+
+                guint16 hei2 = hei+i;
+                he_data[hei+i].next = (i < v_num-1) ? hei2+1 : hei;
+                // he_data[hei+vi].pair = ???;
+
+                he_data[hei+i].v_origin = vi;
+                he_data[hei+i].f_left = fi;
+                he_data[hei+i].edge = ei;
+
+                v_data[vi].half_edge = hei2;
+                e_data[ei].half_edge = hei2; // WARNING: Set at least twice!
+
+            }
+            hei += v_num;
+        }
+
+        // Setup half edge pairs
+        guint16 hei1, hei2;
+        guint16 ei;
+        for(ei = 0; ei < self->e_num; ei++)
+        {
+            find_he16(self, ei, & hei1, & hei2);
+            he_data[hei1].pair = hei2;
+            he_data[hei2].pair = hei1;
+        }
+    }
 }
 
 void moto_mesh_prepare(MotoMesh *self)
 {
-    moto_mesh_calc_faces_normals(self);
     moto_mesh_update_he_data(self);
+    moto_mesh_calc_normals(self);
     moto_mesh_tesselate_faces(self);
 }
 

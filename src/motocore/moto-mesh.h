@@ -74,6 +74,7 @@ struct _MotoMeshVert32
     guint32 half_edge;
 };
 
+// WARNING: Must be convertable to float*!
 struct _MotoMeshTriplet
 {
     gfloat x, y, z;
@@ -173,7 +174,7 @@ gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 struct _MotoHalfEdge16
 {
     guint16 next;
-    guint16 previous;
+    // guint16 prev;
     guint16 pair;
 
     guint16 v_origin;
@@ -184,7 +185,7 @@ struct _MotoHalfEdge16
 struct _MotoHalfEdge32
 {
     guint32 next;
-    guint32 prev;
+    // guint32 prev;
     guint32 pair;
 
     guint32 v_origin;
@@ -264,7 +265,14 @@ MotoMesh *moto_mesh_copy(MotoMesh *other);
 
 #define moto_mesh_get_index_size(mesh) (((mesh)->b32)?4:2)
 
+#define moto_mesh_max_valid_index(mesh) (((mesh)->b32)?G_MAXUINT32-1:G_MAXUINT16-1)
+#define moto_mesh_is_index_valid(mesh, index) (index <= moto_mesh_max_valid_index(mesh))
+#define moto_mesh_invalid_index(mesh) (((mesh)->b32)?G_MAXUINT32:G_MAXUINT16)
+
 void moto_mesh_calc_faces_normals(MotoMesh *self);
+// WARNING: Call only when he_data are set correctly!
+void moto_mesh_calc_verts_normals(MotoMesh *self);
+void moto_mesh_calc_normals(MotoMesh *self);
 
 MotoMeshVertAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
 MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);

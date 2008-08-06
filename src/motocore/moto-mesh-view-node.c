@@ -184,9 +184,55 @@ static void draw_mesh_as_object(MotoMesh *mesh)
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
 
+    glColor4f(1, 1, 1, 1);
+
+    glShadeModel(GL_SMOOTH);
+
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+    glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
     glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+    glDisable(GL_LIGHTING);
+
+    glBegin(GL_LINES);
+    glColor4f(1, 0, 1, 1);
+    guint16 i;
+    for(i = 0; i < mesh->v_num; i++)
+    {
+        glVertex3fv((gfloat *)( & mesh->v_coords[i]));
+        glVertex3f(mesh->v_coords[i].x + mesh->v_normals[i].x,
+                   mesh->v_coords[i].y + mesh->v_normals[i].y,
+                   mesh->v_coords[i].z + mesh->v_normals[i].z);
+    }
+    for(i = 0; i < mesh->f_num; i++)
+    {
+        gfloat center[3];
+        vector3_zero(center);
+
+        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
+        guint16 *f_verts = (guint16 *)mesh->f_verts;
+        guint16 start = (0 == i) ? 0: f_data[i-1].v_num;
+        guint16 v_num = f_data[i].v_num - start;
+        guint16 sv = f_data[i].v_num - v_num;
+        guint16 j;
+        for(j = 0; j < v_num; j++)
+        {
+            guint16 vi = f_verts[sv+j];
+            center[0] += mesh->v_coords[vi].x;
+            center[1] += mesh->v_coords[vi].y;
+            center[2] += mesh->v_coords[vi].z;
+        }
+        center[0] /= v_num;
+        center[1] /= v_num;
+        center[2] /= v_num;
+        glVertex3fv(center);
+        glVertex3f(center[0] + mesh->f_normals[i].x,
+                   center[1] + mesh->f_normals[i].y,
+                   center[2] + mesh->f_normals[i].z);
+    }
+    glEnd();
 
     glPopAttrib();
     glPopClientAttrib();

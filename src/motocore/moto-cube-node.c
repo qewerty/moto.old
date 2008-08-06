@@ -149,7 +149,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     if(mesh->b32)
     {
-        MotoMeshFace32 *f_data = (MotoMeshFace32 *)mesh->f_data;
+        MotoMeshVert32 *v_data  = (MotoMeshVert32*)mesh->v_data;
+        MotoMeshEdge32 *e_data  = (MotoMeshEdge32*)mesh->e_data;
+        MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32*)mesh->he_data;
         guint32 *f_verts = (guint32 *)mesh->f_verts;
 
         f_data[0].v_num = 4;
@@ -217,7 +220,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     }
     else
     {
-        MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
+        MotoMeshVert16 *v_data  = (MotoMeshVert16*)mesh->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)mesh->e_data;
+        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16*)mesh->he_data;
         guint16 *f_verts = (guint16 *)mesh->f_verts;
 
         f_data[0].v_num = 4;
