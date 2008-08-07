@@ -11,6 +11,10 @@
 #include "moto-messager.h"
 #include "moto-geometry-view-node.h"
 
+/* forwards */
+
+static void moto_geom_view_node_grow_selection_virtual(MotoGeomViewNode *self);
+
 /* enums */
 
 GType moto_geom_view_draw_mode_get_type(void)
@@ -104,6 +108,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
     klass->select = NULL;
     klass->prepare_for_draw = NULL;
     klass->get_geometry = NULL;
+    klass->grow_selection = moto_geom_view_node_grow_selection_virtual;
 
     klass->states = NULL;
 
@@ -243,6 +248,23 @@ MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self)
     return NULL;
 }
 
+static void moto_geom_view_node_grow_selection_virtual(MotoGeomViewNode *self)
+{
+    MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode *)self);
+    if(state)
+        moto_geom_view_state_grow_selection(state, self);
+}
+
+void moto_geom_view_node_grow_selection(MotoGeomViewNode *self)
+{
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
+
+    if(klass->grow_selection)
+        klass->grow_selection(self);
+
+    moto_geom_view_node_set_prepared(self, FALSE);
+}
+
 gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
@@ -274,6 +296,7 @@ struct _MotoGeomViewStatePriv
     GString *title;
     MotoGeomViewStateDrawFunc draw;
     MotoGeomViewStateSelectFunc select;
+    MotoGeomViewStateGrowSelectionFunc grow_selection;
 };
 
 static void
@@ -325,7 +348,8 @@ G_DEFINE_TYPE(MotoGeomViewState, moto_geom_view_state, G_TYPE_OBJECT);
 
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,
-        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select)
+        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
+        MotoGeomViewStateGrowSelectionFunc grow_selection)
 {
     MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
 
@@ -334,6 +358,7 @@ moto_geom_view_state_new(const gchar *name, const gchar *title,
 
     self->priv->draw = draw;
     self->priv->select = select;
+    self->priv->grow_selection = grow_selection;
 
     return self;
 }
@@ -360,5 +385,11 @@ gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *
     if(self->priv->select)
         return self->priv->select(self, geom, x, y, width, height, ray, tinfo);
     return TRUE;
+}
+
+void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    if(self->priv->grow_selection)
+        return self->priv->grow_selection(self, geom);
 }
 

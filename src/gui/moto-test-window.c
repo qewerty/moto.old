@@ -15,6 +15,8 @@
 #include "motocore/moto-object-node.h"
 #include "common/numdef.h"
 
+#include "motocore/moto-geometry-view-node.h"
+
 static MotoTestWindow *twin = NULL;
 
 /* forwards */
@@ -44,6 +46,8 @@ struct _MotoTestWindowPriv
 {
     MotoSystem *system;
     MotoWorld *world;
+
+    MotoGeomViewNode *gv;
 
     GtkDrawingArea *area;
 
@@ -90,7 +94,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
 
     if(0 == g_utf8_collate(event->string, "+"))
     {
-        g_print("ok\n");
+        moto_geom_view_node_grow_selection(self->priv->gv);
+        draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
 }
 
@@ -137,7 +142,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *view_node = self->priv->gv = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
 
@@ -148,7 +153,7 @@ moto_test_window_init(MotoTestWindow *self)
     // cube instance
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
-    moto_node_link(obj_node, "view", view_node, "view");
+    // moto_node_link(obj_node, "view", view_node, "view");
 
     self->priv->vtest = obj_node;
     moto_node_save_to_variation(obj_node, self->priv->v1);

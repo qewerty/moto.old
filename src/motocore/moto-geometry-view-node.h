@@ -38,6 +38,7 @@ typedef void (*MotoGeomViewNodePrepareForDrawMethod)(MotoGeomViewNode *self);
 typedef gboolean (*MotoGeomViewNodeSelectMethod)(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 typedef MotoGeometryNode *(*MotoGeomViewNodeGetGeometryMethod)(MotoGeomViewNode *self);
+typedef void (*MotoGeomViewNodeGrowSelectionMethod)(MotoGeomViewNode *self);
 
 typedef struct _MotoGeomViewState MotoGeomViewState;
 typedef struct _MotoGeomViewStateClass MotoGeomViewStateClass;
@@ -46,6 +47,7 @@ typedef struct _MotoGeomViewStatePriv MotoGeomViewStatePriv;
 typedef void (*MotoGeomViewStateDrawFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
 typedef gboolean (*MotoGeomViewStateSelectFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
+typedef void (*MotoGeomViewStateGrowSelectionFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 
 /* Drawing modes.
@@ -87,6 +89,7 @@ struct _MotoGeomViewNodeClass
     MotoGeomViewNodePrepareForDrawMethod prepare_for_draw;
     MotoGeomViewNodeSelectMethod select;
     MotoGeomViewNodeGetGeometryMethod get_geometry;
+    MotoGeomViewNodeGrowSelectionMethod grow_selection;
 
     GSList *states;
 
@@ -124,6 +127,8 @@ GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self);
 
 MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self);
 
+void moto_geom_view_node_grow_selection(MotoGeomViewNode *self);
+
 gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 gboolean moto_geom_view_node_process_button_release(MotoGeomViewNode *self,
@@ -156,7 +161,8 @@ GType moto_geom_view_state_get_type(void);
 
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,
-        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select);
+        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
+        MotoGeomViewStateGrowSelectionFunc grow_selection);
 
 const gchar *moto_geom_view_state_get_name(MotoGeomViewState *self);
 const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self);
@@ -164,5 +170,7 @@ const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self);
 void moto_geom_view_state_draw(MotoGeomViewState *self, MotoGeomViewNode *geom);
 gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
+
+void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 #endif /* MOTO_GEOM_VIEW_NODE_H */

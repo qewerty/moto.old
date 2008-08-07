@@ -16,6 +16,10 @@ struct _MotoCubeNodePriv
     gfloat *size_y_ptr;
     gfloat *size_z_ptr;
 
+    guint *div_x_ptr;
+    guint *div_y_ptr;
+    guint *div_z_ptr;
+
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
 
@@ -51,15 +55,22 @@ moto_cube_node_init(MotoCubeNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
-            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
-            "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
+            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 4.0f, pspec, "Size", "Size",
+            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 4.0f, pspec, "Size", "Size",
+            "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 4.0f, pspec, "Size", "Size",
+            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_z", "Size Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
     self->priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
     self->priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
     self->priv->size_z_ptr = moto_node_param_value_pointer(node, "size_z", gfloat);
+
+    self->priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
+    self->priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
+    self->priv->div_z_ptr = moto_node_param_value_pointer(node, "div_z", guint);
 
     self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
@@ -106,46 +117,32 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     /* TODO: Temporary solution! */
 
-    MotoMesh *mesh = self->priv->mesh = moto_mesh_new(8, 12, 6);
-
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
-
     gfloat size_x = *(self->priv->size_x_ptr);
     gfloat size_y = *(self->priv->size_y_ptr);
     gfloat size_z = *(self->priv->size_z_ptr);
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
+    g_print("size_x, size_y, size_z: %f, %f, %f\n", size_x, size_y, size_z);
+    g_print("hsx, hsy, hsz: %f, %f, %f\n", hsx, hsy, hsz);
 
-    mesh->v_coords[0].x =  hsx;
-    mesh->v_coords[0].y = -hsy;
-    mesh->v_coords[0].z = -hsz;
-    mesh->v_coords[1].x = -hsx;
-    mesh->v_coords[1].y = -hsy;
-    mesh->v_coords[1].z = -hsz;
-    mesh->v_coords[2].x = -hsx;
-    mesh->v_coords[2].y =  hsy;
-    mesh->v_coords[2].z = -hsz;
-    mesh->v_coords[3].x =  hsx;
-    mesh->v_coords[3].y =  hsy;
-    mesh->v_coords[3].z = -hsz;
-    mesh->v_coords[4].x =  hsx;
-    mesh->v_coords[4].y = -hsy;
-    mesh->v_coords[4].z =  hsz;
-    mesh->v_coords[5].x = -hsx;
-    mesh->v_coords[5].y = -hsy;
-    mesh->v_coords[5].z =  hsz;
-    mesh->v_coords[6].x = -hsx;
-    mesh->v_coords[6].y =  hsy;
-    mesh->v_coords[6].z =  hsz;
-    mesh->v_coords[7].x =  hsx;
-    mesh->v_coords[7].y =  hsy;
-    mesh->v_coords[7].z =  hsz;
+    guint div_x = *(self->priv->div_x_ptr);
+    guint div_y = *(self->priv->div_y_ptr);
+    guint div_z = *(self->priv->div_z_ptr);
+    g_print("div_x, div_y, div_z: %d, %d, %d\n", div_x, div_y, div_z);
+
+    guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
+    guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
+    guint f_num = div_x*div_y*2 + div_x*div_z*2 + div_y*div_z*2;
+    MotoMesh *mesh = self->priv->mesh = moto_mesh_new(v_num, e_num, f_num);
+    g_print("v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     guint f_mem = moto_mesh_get_index_size(mesh) * mesh->f_num * 4;
     mesh->f_verts = g_try_malloc(f_mem);
+
+    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
+    g_value_set_object(moto_param_get_value(pm), mesh);
+    moto_param_update_dests(pm);
 
     if(mesh->b32)
     {
@@ -153,70 +150,8 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         MotoMeshEdge32 *e_data  = (MotoMeshEdge32*)mesh->e_data;
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
         MotoHalfEdge32 *he_data = (MotoHalfEdge32*)mesh->he_data;
-        guint32 *f_verts = (guint32 *)mesh->f_verts;
-
-        f_data[0].v_num = 4;
-        f_verts[0] = 0;
-        f_verts[1] = 1;
-        f_verts[2] = 2;
-        f_verts[3] = 3;
-
-        f_data[1].v_num = 8;
-        f_verts[4] = 7;
-        f_verts[5] = 6;
-        f_verts[6] = 5;
-        f_verts[7] = 4;
-
-        f_data[2].v_num = 12;
-        f_verts[8]  = 4;
-        f_verts[9]  = 5;
-        f_verts[10] = 1;
-        f_verts[11] = 0;
-
-        f_data[3].v_num = 16;
-        f_verts[12] = 2;
-        f_verts[13] = 6;
-        f_verts[14] = 7;
-        f_verts[15] = 3;
-
-        f_data[4].v_num = 20;
-        f_verts[16] = 5;
-        f_verts[17] = 6;
-        f_verts[18] = 2;
-        f_verts[19] = 1;
-
-        f_data[5].v_num = 24;
-        f_verts[20] = 7;
-        f_verts[21] = 4;
-        f_verts[22] = 0;
-        f_verts[23] = 3;
-
         guint32 *e_verts = (guint32 *)mesh->e_verts;
-
-        e_verts[0]  = 0;
-        e_verts[1]  = 1;
-        e_verts[2]  = 1;
-        e_verts[3]  = 2;
-        e_verts[4]  = 2;
-        e_verts[5]  = 3;
-        e_verts[6]  = 3;
-        e_verts[7]  = 0;
-        e_verts[8]  = 4;
-        e_verts[9]  = 5;
-        e_verts[10] = 5;
-        e_verts[11] = 6;
-        e_verts[12] = 6;
-        e_verts[13] = 7;
-        e_verts[14] = 7;
-        e_verts[15] = 4;
-        e_verts[16] = 0;
-        e_verts[17] = 4;
-        e_verts[18] = 1;
-        e_verts[19] = 5;
-        e_verts[20] = 2;
-        e_verts[21] = 6;
-        e_verts[22] = 3;
-        e_verts[23] = 7;
+        guint32 *f_verts = (guint32 *)mesh->f_verts;
     }
     else
     {
@@ -224,71 +159,117 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)mesh->e_data;
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
         MotoHalfEdge16 *he_data = (MotoHalfEdge16*)mesh->he_data;
+        guint16 *e_verts = (guint16 *)mesh->e_verts;
         guint16 *f_verts = (guint16 *)mesh->f_verts;
 
-        f_data[0].v_num = 4;
-        f_verts[0] = 0;
-        f_verts[1] = 1;
-        f_verts[2] = 2;
-        f_verts[3] = 3;
+        guint16 i, j, k, n = 4;
+        for(i = 0; i < f_num; i++)
+        {
+            f_data[i].v_num = n;
+            n += 4;
+        }
 
-        f_data[1].v_num = 8;
-        f_verts[4] = 7;
-        f_verts[5] = 6;
-        f_verts[6] = 5;
-        f_verts[7] = 4;
+        guint16 cube[div_x+1][div_y+1][div_z+1];
 
-        f_data[2].v_num = 12;
-        f_verts[8]  = 4;
-        f_verts[9]  = 5;
-        f_verts[10] = 1;
-        f_verts[11] = 0;
+        guint16 vi = 0, ei = 0, fi = 0;
+        for(i = 0; i < div_x+1; i++)
+            for(j = 0; j < div_y+1; j++)
+                for(k = 0; k < div_z+1; k++)
+                {
+                    if(0 != i && div_x != i)
+                    {
+                        if(( ! (0 == k || div_z == k)) && ( ! (0 == j || div_y == j)))
+                            continue;
+                    }
 
-        f_data[3].v_num = 16;
-        f_verts[12] = 2;
-        f_verts[13] = 6;
-        f_verts[14] = 7;
-        f_verts[15] = 3;
+                    cube[i][j][k] = vi;
+                    // g_print("i, j, k: %d, %d, %d\n", i, j, k);
+                    mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
+                    mesh->v_coords[vi].z = -hsz + size_z/div_z * k;
+                    vi++;
 
-        f_data[4].v_num = 20;
-        f_verts[16] = 5;
-        f_verts[17] = 6;
-        f_verts[18] = 2;
-        f_verts[19] = 1;
+                    if(i != 0 && (j == 0 || j == div_y || k == 0 || k == div_z ))
+                    {
+                        e_verts[ei*2]   = cube[i-1][j][k];
+                        e_verts[ei*2+1] = cube[i][j][k];
+                        // g_print("ei: %d (%d, %d)\n", ei, e_verts[ei*2], e_verts[ei*2+1]);
+                        ei++;
+                    }
+                    if(j != 0 && (i == 0 || i == div_x || k == 0 || k == div_z ))
+                    {
+                        e_verts[ei*2]   = cube[i][j-1][k];
+                        e_verts[ei*2+1] = cube[i][j][k];
+                        // g_print("ei: %d (%d, %d)\n", ei, e_verts[ei*2], e_verts[ei*2+1]);
+                        ei++;
+                    }
+                    if(k != 0 && (i == 0 || i == div_x || j == 0 || j == div_y ))
+                    {
+                        e_verts[ei*2]   = cube[i][j][k-1];
+                        e_verts[ei*2+1] = cube[i][j][k];
+                        // g_print("ei: %d (%d, %d)\n", ei, e_verts[ei*2], e_verts[ei*2+1]);
+                        ei++;
+                    }
 
-        f_data[5].v_num = 24;
-        f_verts[20] = 7;
-        f_verts[21] = 4;
-        f_verts[22] = 0;
-        f_verts[23] = 3;
-
-        guint16 *e_verts = (guint16 *)mesh->e_verts;
-
-        e_verts[0]  = 0;
-        e_verts[1]  = 1;
-        e_verts[2]  = 1;
-        e_verts[3]  = 2;
-        e_verts[4]  = 2;
-        e_verts[5]  = 3;
-        e_verts[6]  = 3;
-        e_verts[7]  = 0;
-        e_verts[8]  = 4;
-        e_verts[9]  = 5;
-        e_verts[10] = 5;
-        e_verts[11] = 6;
-        e_verts[12] = 6;
-        e_verts[13] = 7;
-        e_verts[14] = 7;
-        e_verts[15] = 4;
-        e_verts[16] = 0;
-        e_verts[17] = 4;
-        e_verts[18] = 1;
-        e_verts[19] = 5;
-        e_verts[20] = 2;
-        e_verts[21] = 6;
-        e_verts[22] = 3;
-        e_verts[23] = 7;
+                    // faces
+                    if(i != 0 && j != 0 && (k == 0 || k == div_z))
+                    {
+                        if(0 != k)
+                        {
+                            f_verts[fi*4]   = cube[i-1][j-1][k];
+                            f_verts[fi*4+1] = cube[i][j-1][k];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i-1][j][k];
+                        }
+                        else
+                        {
+                            f_verts[fi*4]   = cube[i-1][j-1][k];
+                            f_verts[fi*4+1] = cube[i-1][j][k];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i][j-1][k];
+                        }
+                        fi++;
+                    }
+                    if(j != 0 && k != 0 && (i == 0 || i == div_x))
+                    {
+                        if(0 != i)
+                        {
+                            f_verts[fi*4]   = cube[i][j-1][k-1];
+                            f_verts[fi*4+1] = cube[i][j][k-1];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i][j-1][k];
+                        }
+                        else
+                        {
+                            f_verts[fi*4]   = cube[i][j-1][k-1];
+                            f_verts[fi*4+1] = cube[i][j-1][k];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i][j][k-1];
+                        }
+                        fi++;
+                    }
+                    if(k != 0 && i != 0 && (j == 0 || j == div_y))
+                    {
+                        if(0 != j)
+                        {
+                            f_verts[fi*4]   = cube[i-1][j][k-1];
+                            f_verts[fi*4+1] = cube[i-1][j][k];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i][j][k-1];
+                        }
+                        else
+                        {
+                            f_verts[fi*4]   = cube[i-1][j][k-1];
+                            f_verts[fi*4+1] = cube[i][j][k-1];
+                            f_verts[fi*4+2] = cube[i][j][k];
+                            f_verts[fi*4+3] = cube[i-1][j][k];
+                        }
+                        fi++;
+                    }
+                }
     }
+
+    g_print("BEFORE\n");
 
     moto_mesh_prepare(mesh);
 }

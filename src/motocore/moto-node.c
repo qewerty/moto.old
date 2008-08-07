@@ -154,6 +154,8 @@ moto_node_class_init(MotoNodeClass *klass)
     goclass->dispose    = moto_node_dispose;
     goclass->finalize   = moto_node_finalize;
 
+    g_datalist_init(& klass->actions);
+
     klass->update = NULL;
 }
 
@@ -192,6 +194,24 @@ MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name)
     }
 
     return moto_create_node(type, name);
+}
+
+void moto_node_do_action(MotoNode *self, const gchar *action_name)
+{
+    MotoNodeActionFunc func = \
+        (MotoNodeActionFunc)g_datalist_get_data(& MOTO_NODE_GET_CLASS(self)->actions, action_name);
+    if( ! func)
+    {
+        // FIXME: Warning?
+        return;
+    }
+
+    func(self);
+}
+
+void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func)
+{
+    g_datalist_set_data(& MOTO_NODE_GET_CLASS(self)->actions, action_name, func);
 }
 
 const gchar *moto_node_get_name(MotoNode *self)

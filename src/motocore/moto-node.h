@@ -28,6 +28,8 @@
 
 G_BEGIN_DECLS
 
+typedef void (*MotoNodeActionFunc)(MotoNode *node);
+
 typedef enum
 {
     MOTO_PARAM_MODE_IN      = 1,
@@ -48,6 +50,8 @@ struct _MotoNodeClass
 {
     GObjectClass parent;
 
+    GData *actions;
+
     MotoNodeUpdateMethod update;
 };
 
@@ -62,6 +66,9 @@ GType moto_node_get_type(void);
 
 MotoNode *moto_create_node(GType type, const gchar *name);
 MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name);
+
+void moto_node_do_action(MotoNode *self, const gchar *action_name);
+void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func);
 
 const gchar *moto_node_get_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
