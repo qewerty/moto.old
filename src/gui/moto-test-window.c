@@ -32,6 +32,10 @@ release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data);
 static gboolean
 mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data);
 
+gboolean on_key_press_event(GtkWidget   *widget,
+                            GdkEventKey *event,
+                            gpointer     user_data);
+
 /* class TestWindow */
 
 static GObjectClass *test_window_parent_class = NULL;
@@ -76,6 +80,18 @@ static void quit(MotoTestWindow *self)
 {
     // g_object_unref(self->priv->world);
     gtk_main_quit();
+}
+
+gboolean on_key_press_event(GtkWidget   *widget,
+                            GdkEventKey *event,
+                            gpointer     user_data)
+{
+    MotoTestWindow *self = (MotoTestWindow *)widget;
+
+    if(0 == g_utf8_collate(event->string, "+"))
+    {
+        g_print("ok\n");
+    }
 }
 
 static void
@@ -203,6 +219,8 @@ moto_test_window_init(MotoTestWindow *self)
                 G_CALLBACK(quit), NULL);
     g_signal_connect(G_OBJECT(self), "destroy",
                 G_CALLBACK(quit), NULL);
+    g_signal_connect(G_OBJECT(self), "key-press-event",
+                G_CALLBACK(on_key_press_event), NULL);
 
     g_signal_connect(G_OBJECT(area), "expose-event",
                 G_CALLBACK(draw), NULL);
@@ -449,3 +467,5 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 
     return TRUE;
 }
+
+

@@ -142,6 +142,10 @@ struct _MotoMeshSelection
     guint32 *edges;
     guint f_num;
     guint32 *faces;
+
+    guint32 selected_v_num;
+    guint32 selected_e_num;
+    guint32 selected_f_num;
 };
 
 MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
@@ -193,7 +197,7 @@ struct _MotoHalfEdge32
     guint32 edge;
 };
 
-#define moto_half_edge_pair(self, mesh) (mesh->he_data[self->pair])
+#define moto_half_edge_pair(self, mesh, t) (((t)mesh->he_data)[self->pair])
 #define moto_half_edge_next(self, mesh) (mesh->he_data[self->next])
 #define moto_half_edge_prev(self, mesh) (mesh->he_data[self->prev])
 #define moto_half_edge_v_orig(self, mesh) (mesh->v_data[self->v_origin])
@@ -304,6 +308,10 @@ void moto_mesh_is_face_hidden(MotoMesh *self, guint32 index);
 void moto_mesh_update_he_data(MotoMesh *self);
 
 void moto_mesh_prepare(MotoMesh *self);
+
+void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection);
+void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection);
+void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection);
 
 #endif /* MOTO_MESH_H */
 

@@ -501,7 +501,13 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
 
         MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
         if(sel)
+        {
             moto_mesh_selection_toggle_vertex_selection(sel, index);
+            if(moto_mesh_selection_is_vertex_selected(sel, index))
+            {
+                moto_mesh_grow_vert_selection(mesh, sel);
+            }
+        }
         moto_geom_view_node_set_prepared((MotoGeomViewNode *)mv, FALSE);
         moto_geom_view_node_draw((MotoGeomViewNode *)mv);
     }
@@ -589,7 +595,13 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
 
         MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
         if(self)
+        {
             moto_mesh_selection_toggle_edge_selection(sel, index);
+            if(moto_mesh_selection_is_edge_selected(sel, index))
+            {
+                moto_mesh_grow_edge_selection(mesh, sel);
+            }
+        }
         moto_geom_view_node_set_prepared((MotoGeomViewNode *)mv, FALSE);
         moto_geom_view_node_draw((MotoGeomViewNode *)mv);
     }

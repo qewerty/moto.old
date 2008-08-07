@@ -473,20 +473,16 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             gfloat *normal = (gfloat *) & self->v_normals[vi];
             vector3_zero(normal);
 
-            g_print("vi: %d, (faces: ", vi);
-
             MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
             MotoHalfEdge16 *he      = begin;
             do
             {
-                g_print("%d, ", he->f_left);
                 gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
                 vector3_add(normal, fnormal);
 
                 he = & he_data[he_data[he->pair].next];
             }
             while(he != begin);
-            g_print(")\n");
 
             gfloat lenbuf;
             vector3_normalize(normal, lenbuf);
@@ -696,6 +692,174 @@ void moto_mesh_prepare(MotoMesh *self)
     moto_mesh_tesselate_faces(self);
 }
 
+void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
+{
+    if(self->b32)
+    {
+        MotoMeshVert32 *v_data  = (MotoMeshVert32 *)self->v_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+
+        guint32 selected[selection->selected_v_num];
+
+        guint32 i, j = 0;
+        for(i = 0; i < self->v_num; i++)
+        {
+            if(moto_mesh_selection_is_vertex_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        for(i = 0; i < selection->selected_v_num; i++)
+        {
+            MotoHalfEdge32 *begin   = & he_data[v_data[selected[i]].half_edge];
+            MotoHalfEdge32 *he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+
+        guint16 selected[selection->selected_v_num];
+
+        guint16 i, j = 0;
+        for(i = 0; i < self->v_num; i++)
+        {
+            if(moto_mesh_selection_is_vertex_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        guint sv_num = selection->selected_v_num;
+        for(i = 0; i < sv_num; i++)
+        {
+            MotoHalfEdge16 *begin   = & he_data[v_data[selected[i]].half_edge];
+            MotoHalfEdge16 *he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+    }
+}
+
+void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
+{
+    if(self->b32)
+    {
+        MotoMeshVert32 *v_data  = (MotoMeshVert32 *)self->v_data;
+        MotoMeshEdge32 *e_data  = (MotoMeshEdge32 *)self->e_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+
+        guint32 selected[selection->selected_e_num];
+
+        guint32 i, j = 0;
+        for(i = 0; i < self->e_num; i++)
+        {
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        guint se_num = selection->selected_e_num;
+        for(i = 0; i < se_num; i++)
+        {
+            guint32 vi = he_data[e_data[selected[i]].half_edge].v_origin;
+
+            MotoHalfEdge32 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge32 *he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_edge(selection, he->edge);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+
+            // pair
+            vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+
+            begin   = & he_data[v_data[vi].half_edge];
+            he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_edge(selection, he->edge);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)self->e_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+
+        guint16 selected[selection->selected_e_num];
+
+        guint16 i, j = 0;
+        for(i = 0; i < self->e_num; i++)
+        {
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        guint se_num = selection->selected_e_num;
+        for(i = 0; i < se_num; i++)
+        {
+            guint16 vi = he_data[e_data[selected[i]].half_edge].v_origin;
+
+            MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge16 *he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_edge(selection, he->edge);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+
+            // pair
+            vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+
+            begin   = & he_data[v_data[vi].half_edge];
+            he      = begin;
+
+            do
+            {
+                moto_mesh_selection_select_edge(selection, he->edge);
+
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+    }
+}
+
+void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
+{}
+
 typedef struct _Vector
 {
     gfloat xyz[3];
@@ -759,6 +923,10 @@ MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num
     for(i = 0; i < num; i++)
         self->faces[i] = 0;
 
+    self->selected_v_num = 0;
+    self->selected_e_num = 0;
+    self->selected_f_num = 0;
+
     return self;
 }
 
@@ -772,6 +940,10 @@ MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other)
     self->v_num = other->v_num;
     self->e_num = other->e_num;
     self->f_num = other->f_num;
+
+    self->selected_v_num = other->selected_v_num;
+    self->selected_e_num = other->selected_e_num;
+    self->selected_f_num = other->selected_f_num;
 
     num = self->v_num/32 + 1;
     self->verts = (guint32 *)g_try_malloc(num * sizeof(guint32));
@@ -811,6 +983,8 @@ void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index)
     if(index > (self->v_num - 1))
         return;
 
+    if( ! moto_mesh_selection_is_vertex_selected(self, index))
+        self->selected_v_num++;
     *(self->verts + (index/32)) |= 1 << (index % 32);
 }
 
@@ -819,6 +993,8 @@ void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index)
     if(index > (self->v_num - 1))
         return;
 
+    if(moto_mesh_selection_is_vertex_selected(self, index))
+        self->selected_v_num--;
     *(self->verts + (index/32)) &= ~(1 << (index % 32));
 }
 
@@ -828,6 +1004,7 @@ void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self)
     guint num = self->v_num/32 + 1;
     for(i = 0; i < num; i++)
         self->verts[i] = 0;
+    self->selected_v_num = 0;
 }
 
 void moto_mesh_selection_toggle_vertex_selection(MotoMeshSelection *self, guint index)
@@ -853,6 +1030,8 @@ void moto_mesh_selection_select_edge(MotoMeshSelection *self, guint index)
     if(index > (self->e_num - 1))
         return;
 
+    if( ! moto_mesh_selection_is_edge_selected(self, index))
+        self->selected_e_num++;
     *(self->edges + (index/32)) |= 1 << (index % 32);
 }
 
@@ -861,6 +1040,8 @@ void moto_mesh_selection_deselect_edge(MotoMeshSelection *self, guint index)
     if(index > (self->e_num - 1))
         return;
 
+    if(moto_mesh_selection_is_edge_selected(self, index))
+        self->selected_e_num--;
     *(self->edges + (index/32)) &= ~(1 << (index % 32));
 }
 
@@ -870,6 +1051,7 @@ void moto_mesh_selection_deselect_all_edges(MotoMeshSelection *self)
     guint num = self->e_num/32 + 1;
     for(i = 0; i < num; i++)
         self->edges[i] = 0;
+    self->selected_e_num = 0;
 }
 
 void moto_mesh_selection_toggle_edge_selection(MotoMeshSelection *self, guint index)
@@ -895,6 +1077,8 @@ void moto_mesh_selection_select_face(MotoMeshSelection *self, guint index)
     if(index > (self->f_num - 1))
         return;
 
+    if( ! moto_mesh_selection_is_face_selected(self, index))
+        self->selected_f_num++;
     *(self->faces + (index/32)) |= 1 << (index % 32);
 }
 
@@ -903,6 +1087,8 @@ void moto_mesh_selection_deselect_face(MotoMeshSelection *self, guint index)
     if(index > (self->f_num - 1))
         return;
 
+    if(moto_mesh_selection_is_face_selected(self, index))
+        self->selected_f_num--;
     *(self->faces + (index/32)) &= ~(1 << (index % 32));
 }
 
@@ -912,6 +1098,7 @@ void moto_mesh_selection_deselect_all_faces(MotoMeshSelection *self)
     guint num = self->f_num/32 + 1;
     for(i = 0; i < num; i++)
         self->faces[i] = 0;
+    self->selected_f_num = 0;
 }
 
 void moto_mesh_selection_toggle_face_selection(MotoMeshSelection *self, guint index)
