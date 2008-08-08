@@ -386,6 +386,17 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             }
 
             gfloat *normal = (gfloat *)(self->f_normals + fi);
+
+            // FIXME: Temporary! Newell's method should be reimplemented.
+            gfloat a[3], b[3];
+            vector3_set(a, self->v_coords[f_verts[start + 1]].x - self->v_coords[f_verts[start + 0]].x,
+                           self->v_coords[f_verts[start + 1]].y - self->v_coords[f_verts[start + 0]].y,
+                           self->v_coords[f_verts[start + 1]].z - self->v_coords[f_verts[start + 0]].z);
+            vector3_set(b, self->v_coords[f_verts[start + 2]].x - self->v_coords[f_verts[start + 1]].x,
+                           self->v_coords[f_verts[start + 2]].y - self->v_coords[f_verts[start + 1]].y,
+                           self->v_coords[f_verts[start + 2]].z - self->v_coords[f_verts[start + 1]].z);
+            vector3_cross(normal, a, b);
+
             gfloat lenbuf;
             vector3_normalize(normal, lenbuf);
         }
@@ -599,8 +610,8 @@ void moto_mesh_update_he_data(MotoMesh *self)
             guint32 i;
             for(i = 0; i < v_num; i++)
             {
-                guint32 vi  = f_verts[fd->v_num+i];
-                guint32 nvi = f_verts[fd->v_num + ((i < v_num-1)?i+1:0)];
+                guint32 vi  = f_verts[start+i];
+                guint32 nvi = f_verts[start + ((i < v_num-1)?i+1:0)];
 
                 guint32 ei = find_edge32(self, vi, nvi);
 
@@ -612,13 +623,14 @@ void moto_mesh_update_he_data(MotoMesh *self)
                 he_data[hei+i].f_left = fi;
                 he_data[hei+i].edge = ei;
 
-                v_data[i].half_edge = hei2;
-                e_data[ei].half_edge = hei; // WARNING: Set at least twice!
+                v_data[vi].half_edge = hei2;
+                e_data[ei].half_edge = hei2; // WARNING: Set at least twice!
 
-                hei += v_num;
             }
+            hei += v_num;
         }
 
+        // Setup half edge pairs
         guint32 hei1, hei2;
         guint32 ei;
         for(ei = 0; ei < self->e_num; ei++)
@@ -694,6 +706,9 @@ void moto_mesh_prepare(MotoMesh *self)
 
 void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
 {
+    if(selection->selected_v_num == self->v_num)
+        return;
+
     if(self->b32)
     {
         MotoMeshVert32 *v_data  = (MotoMeshVert32 *)self->v_data;
@@ -710,7 +725,8 @@ void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
             }
         }
 
-        for(i = 0; i < selection->selected_v_num; i++)
+        guint sv_num = selection->selected_v_num;
+        for(i = 0; i < sv_num; i++)
         {
             MotoHalfEdge32 *begin   = & he_data[v_data[selected[i]].half_edge];
             MotoHalfEdge32 *he      = begin;
@@ -759,6 +775,9 @@ void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
 
 void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 {
+    if(selection->selected_e_num == self->e_num)
+        return;
+
     if(self->b32)
     {
         MotoMeshVert32 *v_data  = (MotoMeshVert32 *)self->v_data;
