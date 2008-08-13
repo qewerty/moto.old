@@ -86,6 +86,25 @@ static void quit(MotoTestWindow *self)
     gtk_main_quit();
 }
 
+static void moto_test_window_create_mesh_cube(MotoTestWindow *self)
+{
+    MotoNode *root_node = (MotoNode *)moto_world_get_root(self->priv->world);
+
+    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
+    moto_node_link(obj_node, "parent", root_node, "transform");
+
+    moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
+
+    MotoNode *view_node = self->priv->gv = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
+    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
+
+    moto_node_link(obj_node, "view", view_node, "view");
+    moto_node_link(view_node, "mesh", cube_node, "mesh");
+    moto_node_link(obj_node, "material", mat_node, "material");
+
+}
+
 gboolean on_key_press_event(GtkWidget   *widget,
                             GdkEventKey *event,
                             gpointer     user_data)
@@ -95,6 +114,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
     if(0 == g_utf8_collate(event->string, "+"))
     {
         moto_geom_view_node_grow_selection(self->priv->gv);
+        draw(self->priv->area, (GdkEventExpose *)event, user_data);
+    }
+    else if(0 == g_utf8_collate(event->string, "a"))
+    {
+        moto_test_window_create_mesh_cube(self);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
 }
@@ -137,19 +161,6 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
     moto_node_link(obj_node, "view", axes_view_node, "view");
 
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = self->priv->gv = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
-    MotoNode *cube_node = moto_world_create_node(self->priv->world, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
-
-    moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", cube_node, "mesh");
-    moto_node_link(obj_node, "material", mat_node, "material");
-
     // cube instance
     obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
@@ -178,12 +189,6 @@ moto_test_window_init(MotoTestWindow *self)
 
     // moto_node_get_params(obj_node, "tx", &tx, "ty", &ty, "tz", &tz, NULL);
     // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
-
-    // ray 
-    MotoNode *ray_view_node = moto_world_create_node(self->priv->world, "MotoRayViewNode", "RayView", NULL);
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "RayObject", NULL);
-    moto_node_link(obj_node, "view", ray_view_node, "view");
-    moto_node_link(obj_node, "parent", root_node, "transform");
 
     // camera 
     MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);

@@ -512,10 +512,6 @@ void moto_world_button_press(MotoWorld *self,
     moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
             intersect_object, & idata);
 
-    // TEMP
-    MotoRayViewNode *rv = (MotoRayViewNode *)moto_world_get_node(self, "RayView");
-    moto_ray_view_node_set_ray(rv, & idata.ray);
-
     if(idata.obj)
     {
         /*

@@ -798,7 +798,7 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
     MotoMesh *mesh = (*(mv->priv->mesh_ptr));
-    if(! mesh)
+    if( ! mesh)
         return;
 
     moto_mesh_grow_face_selection(mesh, mv->priv->selection);
