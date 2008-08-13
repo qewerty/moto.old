@@ -58,9 +58,9 @@ moto_cube_node_init(MotoCubeNode *self)
             "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 127u, pspec, "Divisions", "Divisions",
-            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 127u, pspec, "Divisions", "Divisions",
-            "div_z", "Size Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 127u, pspec, "Divisions", "Divisions",
+            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_z", "Size Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -123,6 +123,11 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
 #define e_y(x, y, z) (e_x_num + e_y_(x, y, z))
 #define e_z(x, y, z) (e_x_num + e_y_num + e_z_(x, y, z))
 
+#define get_v(x, y, z) \
+    ((0 == (x)) ? (y)*(div_z+1) + (z) : ((div_x) == (x)) ? v_num - (div_y+1)*(div_z+1) + (y)*(div_z+1) + (z) : \
+        (div_y-1)*(div_z-1) + (div_y+div_z)*2*(x) + ((0 == (y)) ? (z) : ((div_y) == (y)) ? (div_z-1) + 2*(y) + (z) : \
+            (div_z-1) + 2*(y) + ((z)?1:0) ))
+
 static guint32 get_he(MotoMeshSelection *sel, guint32 ei)
 {
     if( ! moto_mesh_selection_is_edge_selected(sel, ei))
@@ -161,6 +166,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
     guint f_num = div_x*div_y*2 + div_x*div_z*2 + div_y*div_z*2;
+    g_print("v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     if(self->priv->mesh)
     {
@@ -170,9 +176,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     MotoMesh *mesh = self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
     MotoMeshSelection *sel = moto_mesh_selection_for_mesh(mesh);
-
-    g_print("v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
-    g_print("index size: %d\n", moto_mesh_get_index_size(mesh));
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
@@ -194,9 +197,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
             n += 4;
         }
 
-        guint32 verts[div_x+1][div_y+1][div_z+1];
-
-        guint32 vi = 0, ei = 0, fi = 0;
+        guint32 vi = 0, fi = 0;
         for(i = 0; i < div_x+1; i++)
             for(j = 0; j < div_y+1; j++)
                 for(k = 0; k < div_z+1; k++)
@@ -207,141 +208,25 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                             continue;
                     }
 
-                    verts[i][j][k] = vi;
                     mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
                     mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
                     mesh->v_coords[vi].z = -hsz + size_z/div_z * k;
                     vi++;
-
-                    /*
-
-                    if(i != 0 && (j == 0 || j == div_y || k == 0 || k == div_z ))
-                    {
-                        e_verts[ei*2]   = verts[i-1][j][k];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-                    if(j != 0 && (i == 0 || i == div_x || k == 0 || k == div_z ))
-                    {
-                        e_verts[ei*2]   = verts[i][j-1][k];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-                    if(k != 0 && (i == 0 || i == div_x || j == 0 || j == div_y ))
-                    {
-                        e_verts[ei*2]   = verts[i][j][k-1];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-
-                    // faces
-                    if(i != 0 && j != 0 && (k == 0 || k == div_z))
-                    {
-                        if(0 != k)
-                        {
-                            f_verts[fi*4]   = verts[i-1][j-1][k];
-                            f_verts[fi*4+1] = verts[i][j-1][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i-1][j][k];
-
-                            guint32 edif = div_z*(div_y+1) + div_y*(div_z+1);
-                            guint32 hei = fi*4;
-
-                            v_data[verts[i-1][j-1][k]].half_edge = hei;
-                            v_data[verts[i][j-1][k]].half_edge   = hei + 1;
-                            v_data[verts[i][j][k]].half_edge     = hei + 2;
-                            v_data[verts[i-1][j][k]].half_edge   = hei + 3;
-
-                            f_data[fi].half_edge = hei;
-
-                            he_data[hei].v_origin = verts[i-1][j-1][k];
-                            he_data[hei].f_left   = fi;
-                            he_data[hei].next     = hei + 1;
-                            he_data[hei].edge     = ...;
-                            he_data[hei].pair     = ...;
-                            he_data[hei+1].v_origin = verts[i][j-1][k];
-                            he_data[hei+1].f_left = fi;
-                            he_data[hei+1].next   = hei + 2;
-                            he_data[hei+1].edge   = ...;
-                            he_data[hei+1].pair   = ...;
-                            he_data[hei+2].v_origin = verts[i][j][k];
-                            he_data[hei+2].f_left = fi;
-                            he_data[hei+2].next   = hei + 3;
-                            he_data[hei+2].edge   = ...;
-                            he_data[hei+2].pair   = ...;
-                            he_data[hei+3].v_origin = verts[i-1][j][k];
-                            he_data[hei+3].f_left = fi;
-                            he_data[hei+3].next   = hei;
-                            he_data[hei+3].edge   = ...;
-                            he_data[hei+3].pair   = ...;
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i-1][j-1][k];
-                            f_verts[fi*4+1] = verts[i-1][j][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j-1][k];
-                        }
-                        fi++;
-                    }
-                    if(j != 0 && k != 0 && (i == 0 || i == div_x))
-                    {
-                        if(0 != i)
-                        {
-                            f_verts[fi*4]   = verts[i][j-1][k-1];
-                            f_verts[fi*4+1] = verts[i][j][k-1];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j-1][k];
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i][j-1][k-1];
-                            f_verts[fi*4+1] = verts[i][j-1][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j][k-1];
-                        }
-                        fi++;
-                    }
-                    if(k != 0 && i != 0 && (j == 0 || j == div_y))
-                    {
-                        if(0 != j)
-                        {
-                            f_verts[fi*4]   = verts[i-1][j][k-1];
-                            f_verts[fi*4+1] = verts[i-1][j][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j][k-1];
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i-1][j][k-1];
-                            f_verts[fi*4+1] = verts[i][j][k-1];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i-1][j][k];
-                        }
-                        fi++;
-                    }
-                    */
                 }
         fi = 0;
         // x-axis faces
-        // g_print("x-axis faces\n");
         for(i = 0; i < div_y; i++)
             for(j = 0; j < div_z; j++)
             {
-                f_verts[fi*4]   = verts[0][i][j];
-                f_verts[fi*4+1] = verts[0][i][j+1];
-                f_verts[fi*4+2] = verts[0][i+1][j+1];
-                f_verts[fi*4+3] = verts[0][i+1][j];
+                f_verts[fi*4]   = get_v(0, i, j);
+                f_verts[fi*4+1] = get_v(0, i, j+1);
+                f_verts[fi*4+2] = get_v(0, i+1, j+1);
+                f_verts[fi*4+3] = get_v(0, i+1, j);
 
                 guint32 e0 = e_z(0, i, j),
                         e1 = e_y(0, i, j+1),
                         e2 = e_z(0, i+1, j),
                         e3 = e_y(0, i, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -393,10 +278,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_y; i++)
             for(j = 0; j < div_z; j++)
             {
-                guint32 v0 = verts[div_x][i][j],
-                        v1 = verts[div_x][i+1][j],
-                        v2 = verts[div_x][i+1][j+1],
-                        v3 = verts[div_x][i][j+1];
+                guint32 v0 = get_v(div_x, i, j),
+                        v1 = get_v(div_x, i+1, j),
+                        v2 = get_v(div_x, i+1, j+1),
+                        v3 = get_v(div_x, i, j+1);
                 f_verts[fi*4]   = v0;
                 f_verts[fi*4+1] = v1;
                 f_verts[fi*4+2] = v2;
@@ -406,10 +291,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                         e1 = e_z(div_x, i+1, j),
                         e2 = e_y(div_x, i, j+1),
                         e3 = e_z(div_x, i, j);
-                // g_print("---\n");
-                // g_print("v0, v1, v2, v3: %d, %d, %d, %d\n", v0, v1, v2, v3);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = v0;
                 e_verts[e0*2+1] = v1;
@@ -419,8 +300,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 e_verts[e2*2+1] = v3;
                 e_verts[e3*2]   = v3;
                 e_verts[e3*2+1] = v0;
-
-                // g_print("e_verts[e2*2], e_verts[e2*2+1]: %d, %d\n", e_verts[e2*2], e_verts[e2*2+1]);
 
                 guint32 he0 = get_he(sel, e0),
                         he1 = get_he(sel, e1),
@@ -461,14 +340,13 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 fi++;
             }
         // y-axis faces
-        // g_print("y-axis faces\n");
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_z; j++)
             {
-                guint32 v0 = verts[i][0][j],
-                        v1 = verts[i+1][0][j],
-                        v2 = verts[i+1][0][j+1],
-                        v3 = verts[i][0][j+1];
+                guint32 v0 = get_v(i, 0, j),
+                        v1 = get_v(i+1, 0, j),
+                        v2 = get_v(i+1, 0, j+1),
+                        v3 = get_v(i, 0, j+1);
                 f_verts[fi*4]   = v0;
                 f_verts[fi*4+1] = v1;
                 f_verts[fi*4+2] = v2;
@@ -478,8 +356,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                         e1 = e_z(i+1, 0, j),
                         e2 = e_x(i, 0, j+1),
                         e3 = e_z(i, 0, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = v0;
                 e_verts[e0*2+1] = v1;
@@ -531,17 +407,15 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_z; j++)
             {
-                f_verts[fi*4]   = verts[i][div_y][j];
-                f_verts[fi*4+1] = verts[i][div_y][j+1];
-                f_verts[fi*4+2] = verts[i+1][div_y][j+1];
-                f_verts[fi*4+3] = verts[i+1][div_y][j];
+                f_verts[fi*4]   = get_v(i, div_y, j);
+                f_verts[fi*4+1] = get_v(i, div_y, j+1);
+                f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
+                f_verts[fi*4+3] = get_v(i+1, div_y, j);
 
                 guint32 e0 = e_z(i, div_y, j),
                         e1 = e_x(i, div_y, j+1),
                         e2 = e_z(i+1, div_y, j),
                         e3 = e_x(i, div_y, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -591,21 +465,18 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 fi++;
             }
         // z-axis faces
-        // g_print("z-axis faces\n");
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_y; j++)
             {
-                f_verts[fi*4]   = verts[i][j][0];
-                f_verts[fi*4+1] = verts[i][j+1][0];
-                f_verts[fi*4+2] = verts[i+1][j+1][0];
-                f_verts[fi*4+3] = verts[i+1][j][0];
+                f_verts[fi*4]   = get_v(i, j, 0);
+                f_verts[fi*4+1] = get_v(i, j+1, 0);
+                f_verts[fi*4+2] = get_v(i+1, j+1, 0);
+                f_verts[fi*4+3] = get_v(i+1, j, 0);
 
                 guint32 e0 = e_y(i, j, 0),
                         e1 = e_x(i, j+1, 0),
                         e2 = e_y(i+1, j, 0),
                         e3 = e_x(i, j, 0);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -657,17 +528,15 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_y; j++)
             {
-                f_verts[fi*4]   = verts[i][j][div_z];
-                f_verts[fi*4+1] = verts[i+1][j][div_z];
-                f_verts[fi*4+2] = verts[i+1][j+1][div_z];
-                f_verts[fi*4+3] = verts[i][j+1][div_z];
+                f_verts[fi*4]   = get_v(i, j, div_z);
+                f_verts[fi*4+1] = get_v(i+1, j, div_z);
+                f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
+                f_verts[fi*4+3] = get_v(i, j+1, div_z);
 
                 guint32 e0 = e_x(i, j, div_z),
                         e1 = e_y(i+1, j, div_z),
                         e2 = e_x(i, j+1, div_z),
                         e3 = e_y(i, j, div_z);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -733,9 +602,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
             n += 4;
         }
 
-        guint16 verts[div_x+1][div_y+1][div_z+1];
-
-        guint16 vi = 0, ei = 0, fi = 0;
+        guint16 vi = 0, fi = 0;
         for(i = 0; i < div_x+1; i++)
             for(j = 0; j < div_y+1; j++)
                 for(k = 0; k < div_z+1; k++)
@@ -746,141 +613,25 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                             continue;
                     }
 
-                    verts[i][j][k] = vi;
                     mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
                     mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
                     mesh->v_coords[vi].z = -hsz + size_z/div_z * k;
                     vi++;
-
-                    /*
-
-                    if(i != 0 && (j == 0 || j == div_y || k == 0 || k == div_z ))
-                    {
-                        e_verts[ei*2]   = verts[i-1][j][k];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-                    if(j != 0 && (i == 0 || i == div_x || k == 0 || k == div_z ))
-                    {
-                        e_verts[ei*2]   = verts[i][j-1][k];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-                    if(k != 0 && (i == 0 || i == div_x || j == 0 || j == div_y ))
-                    {
-                        e_verts[ei*2]   = verts[i][j][k-1];
-                        e_verts[ei*2+1] = verts[i][j][k];
-
-                        ei++;
-                    }
-
-                    // faces
-                    if(i != 0 && j != 0 && (k == 0 || k == div_z))
-                    {
-                        if(0 != k)
-                        {
-                            f_verts[fi*4]   = verts[i-1][j-1][k];
-                            f_verts[fi*4+1] = verts[i][j-1][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i-1][j][k];
-
-                            guint16 edif = div_z*(div_y+1) + div_y*(div_z+1);
-                            guint16 hei = fi*4;
-
-                            v_data[verts[i-1][j-1][k]].half_edge = hei;
-                            v_data[verts[i][j-1][k]].half_edge   = hei + 1;
-                            v_data[verts[i][j][k]].half_edge     = hei + 2;
-                            v_data[verts[i-1][j][k]].half_edge   = hei + 3;
-
-                            f_data[fi].half_edge = hei;
-
-                            he_data[hei].v_origin = verts[i-1][j-1][k];
-                            he_data[hei].f_left   = fi;
-                            he_data[hei].next     = hei + 1;
-                            he_data[hei].edge     = ...;
-                            he_data[hei].pair     = ...;
-                            he_data[hei+1].v_origin = verts[i][j-1][k];
-                            he_data[hei+1].f_left = fi;
-                            he_data[hei+1].next   = hei + 2;
-                            he_data[hei+1].edge   = ...;
-                            he_data[hei+1].pair   = ...;
-                            he_data[hei+2].v_origin = verts[i][j][k];
-                            he_data[hei+2].f_left = fi;
-                            he_data[hei+2].next   = hei + 3;
-                            he_data[hei+2].edge   = ...;
-                            he_data[hei+2].pair   = ...;
-                            he_data[hei+3].v_origin = verts[i-1][j][k];
-                            he_data[hei+3].f_left = fi;
-                            he_data[hei+3].next   = hei;
-                            he_data[hei+3].edge   = ...;
-                            he_data[hei+3].pair   = ...;
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i-1][j-1][k];
-                            f_verts[fi*4+1] = verts[i-1][j][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j-1][k];
-                        }
-                        fi++;
-                    }
-                    if(j != 0 && k != 0 && (i == 0 || i == div_x))
-                    {
-                        if(0 != i)
-                        {
-                            f_verts[fi*4]   = verts[i][j-1][k-1];
-                            f_verts[fi*4+1] = verts[i][j][k-1];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j-1][k];
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i][j-1][k-1];
-                            f_verts[fi*4+1] = verts[i][j-1][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j][k-1];
-                        }
-                        fi++;
-                    }
-                    if(k != 0 && i != 0 && (j == 0 || j == div_y))
-                    {
-                        if(0 != j)
-                        {
-                            f_verts[fi*4]   = verts[i-1][j][k-1];
-                            f_verts[fi*4+1] = verts[i-1][j][k];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i][j][k-1];
-                        }
-                        else
-                        {
-                            f_verts[fi*4]   = verts[i-1][j][k-1];
-                            f_verts[fi*4+1] = verts[i][j][k-1];
-                            f_verts[fi*4+2] = verts[i][j][k];
-                            f_verts[fi*4+3] = verts[i-1][j][k];
-                        }
-                        fi++;
-                    }
-                    */
                 }
         fi = 0;
         // x-axis faces
-        // g_print("x-axis faces\n");
         for(i = 0; i < div_y; i++)
             for(j = 0; j < div_z; j++)
             {
-                f_verts[fi*4]   = verts[0][i][j];
-                f_verts[fi*4+1] = verts[0][i][j+1];
-                f_verts[fi*4+2] = verts[0][i+1][j+1];
-                f_verts[fi*4+3] = verts[0][i+1][j];
+                f_verts[fi*4]   = get_v(0, i, j);
+                f_verts[fi*4+1] = get_v(0, i, j+1);
+                f_verts[fi*4+2] = get_v(0, i+1, j+1);
+                f_verts[fi*4+3] = get_v(0, i+1, j);
 
                 guint16 e0 = e_z(0, i, j),
                         e1 = e_y(0, i, j+1),
                         e2 = e_z(0, i+1, j),
                         e3 = e_y(0, i, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -932,10 +683,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_y; i++)
             for(j = 0; j < div_z; j++)
             {
-                guint16 v0 = verts[div_x][i][j],
-                        v1 = verts[div_x][i+1][j],
-                        v2 = verts[div_x][i+1][j+1],
-                        v3 = verts[div_x][i][j+1];
+                guint16 v0 = get_v(div_x, i, j),
+                        v1 = get_v(div_x, i+1, j),
+                        v2 = get_v(div_x, i+1, j+1),
+                        v3 = get_v(div_x, i, j+1);
                 f_verts[fi*4]   = v0;
                 f_verts[fi*4+1] = v1;
                 f_verts[fi*4+2] = v2;
@@ -945,10 +696,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                         e1 = e_z(div_x, i+1, j),
                         e2 = e_y(div_x, i, j+1),
                         e3 = e_z(div_x, i, j);
-                // g_print("---\n");
-                // g_print("v0, v1, v2, v3: %d, %d, %d, %d\n", v0, v1, v2, v3);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = v0;
                 e_verts[e0*2+1] = v1;
@@ -958,8 +705,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 e_verts[e2*2+1] = v3;
                 e_verts[e3*2]   = v3;
                 e_verts[e3*2+1] = v0;
-
-                // g_print("e_verts[e2*2], e_verts[e2*2+1]: %d, %d\n", e_verts[e2*2], e_verts[e2*2+1]);
 
                 guint16 he0 = get_he(sel, e0),
                         he1 = get_he(sel, e1),
@@ -1000,14 +745,13 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 fi++;
             }
         // y-axis faces
-        // g_print("y-axis faces\n");
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_z; j++)
             {
-                guint16 v0 = verts[i][0][j],
-                        v1 = verts[i+1][0][j],
-                        v2 = verts[i+1][0][j+1],
-                        v3 = verts[i][0][j+1];
+                guint16 v0 = get_v(i, 0, j),
+                        v1 = get_v(i+1, 0, j),
+                        v2 = get_v(i+1, 0, j+1),
+                        v3 = get_v(i, 0, j+1);
                 f_verts[fi*4]   = v0;
                 f_verts[fi*4+1] = v1;
                 f_verts[fi*4+2] = v2;
@@ -1017,8 +761,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                         e1 = e_z(i+1, 0, j),
                         e2 = e_x(i, 0, j+1),
                         e3 = e_z(i, 0, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = v0;
                 e_verts[e0*2+1] = v1;
@@ -1070,17 +812,15 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_z; j++)
             {
-                f_verts[fi*4]   = verts[i][div_y][j];
-                f_verts[fi*4+1] = verts[i][div_y][j+1];
-                f_verts[fi*4+2] = verts[i+1][div_y][j+1];
-                f_verts[fi*4+3] = verts[i+1][div_y][j];
+                f_verts[fi*4]   = get_v(i, div_y, j);
+                f_verts[fi*4+1] = get_v(i, div_y, j+1);
+                f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
+                f_verts[fi*4+3] = get_v(i+1, div_y, j);
 
                 guint16 e0 = e_z(i, div_y, j),
                         e1 = e_x(i, div_y, j+1),
                         e2 = e_z(i+1, div_y, j),
                         e3 = e_x(i, div_y, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -1130,21 +870,18 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 fi++;
             }
         // z-axis faces
-        // g_print("z-axis faces\n");
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_y; j++)
             {
-                f_verts[fi*4]   = verts[i][j][0];
-                f_verts[fi*4+1] = verts[i][j+1][0];
-                f_verts[fi*4+2] = verts[i+1][j+1][0];
-                f_verts[fi*4+3] = verts[i+1][j][0];
+                f_verts[fi*4]   = get_v(i, j, 0);
+                f_verts[fi*4+1] = get_v(i, j+1, 0);
+                f_verts[fi*4+2] = get_v(i+1, j+1, 0);
+                f_verts[fi*4+3] = get_v(i+1, j, 0);
 
                 guint16 e0 = e_y(i, j, 0),
                         e1 = e_x(i, j+1, 0),
                         e2 = e_y(i+1, j, 0),
                         e3 = e_x(i, j, 0);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -1196,17 +933,15 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_y; j++)
             {
-                f_verts[fi*4]   = verts[i][j][div_z];
-                f_verts[fi*4+1] = verts[i+1][j][div_z];
-                f_verts[fi*4+2] = verts[i+1][j+1][div_z];
-                f_verts[fi*4+3] = verts[i][j+1][div_z];
+                f_verts[fi*4]   = get_v(i, j, div_z);
+                f_verts[fi*4+1] = get_v(i+1, j, div_z);
+                f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
+                f_verts[fi*4+3] = get_v(i, j+1, div_z);
 
                 guint16 e0 = e_x(i, j, div_z),
                         e1 = e_y(i+1, j, div_z),
                         e2 = e_x(i, j+1, div_z),
                         e3 = e_y(i, j, div_z);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
-                // g_print("fi: %d\n", fi);
 
                 e_verts[e0*2]   = f_verts[fi*4];
                 e_verts[e0*2+1] = f_verts[fi*4+1];
@@ -1259,18 +994,15 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     moto_mesh_selection_free(sel);
 
-    g_print("BEFORE moto_mesh_prepare\n");
-
     moto_mesh_prepare(mesh);
 }
-#undef get_he
-
 #undef e_x_num
 #undef e_y_num
 #undef e_z_num
 #undef e_x
 #undef e_y
 #undef e_z
+#undef get_v
 
 static void moto_cube_node_update(MotoNode *self)
 {

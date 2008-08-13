@@ -127,8 +127,22 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
     for(i = 0; i < num; i++)
         self->f_hidden_flags[i] = 0;
 
-    self->he_data = (self->b32) ? g_try_malloc(sizeof(MotoHalfEdge32) * 2*e_num):
-                                  g_try_malloc(sizeof(MotoHalfEdge16) * 2*e_num);
+    self->he_data = (self->b32) ? g_try_malloc(sizeof(MotoHalfEdge32) * he_num):
+                                  g_try_malloc(sizeof(MotoHalfEdge16) * he_num);
+
+    // Fill in half edges with invalid indecies.
+    if(self->b32)
+    {
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+        for(i = 0; i < he_num; i++)
+            he_data[i].pair = he_data[i].next = G_MAXUINT32;
+    }
+    else
+    {
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+        for(i = 0; i < he_num; i++)
+            he_data[i].pair = he_data[i].next = G_MAXUINT16;
+    }
 
     return self;
 }
