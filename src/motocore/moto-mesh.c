@@ -91,7 +91,7 @@ G_DEFINE_TYPE(MotoMesh, moto_mesh, G_TYPE_OBJECT);
 
 /* methods of class Mesh */
 
-MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num)
+MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num)
 {
     MotoMesh *self = (MotoMesh *)g_object_new(MOTO_TYPE_MESH, NULL);
 
@@ -118,6 +118,8 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num)
 
     num = f_num/32 + 1;
     self->f_num = f_num;
+    self->f_verts   = (self->b32) ? g_try_malloc(sizeof(guint32) * f_verts_num):
+                                    g_try_malloc(sizeof(guint16) * f_verts_num);
     self->f_data    = (self->b32) ? g_try_malloc(sizeof(MotoMeshFace32) * f_num):
                                     g_try_malloc(sizeof(MotoMeshFace16) * f_num);
     self->f_normals = (MotoMeshTriplet *)g_try_malloc(sizeof(MotoMeshTriplet) * f_num);
@@ -699,7 +701,7 @@ void moto_mesh_update_he_data(MotoMesh *self)
 
 void moto_mesh_prepare(MotoMesh *self)
 {
-    moto_mesh_update_he_data(self);
+    // moto_mesh_update_he_data(self); // Deprecated (Very slow)! Create he data while mesh construction.
     moto_mesh_calc_normals(self);
     moto_mesh_tesselate_faces(self);
 }
@@ -877,7 +879,56 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 }
 
 void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
-{}
+{
+    if(selection->selected_f_num == self->f_num)
+        return;
+
+    if(self->b32)
+    {
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)self->e_data;
+        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
+        guint16 *f_verts  = (guint16 *)self->f_verts;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+
+        guint16 selected[selection->selected_e_num];
+
+        guint16 i, j = 0;
+        for(i = 0; i < self->f_num; i++)
+        {
+            if(moto_mesh_selection_is_face_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        guint sf_num = selection->selected_f_num;
+        for(i = 0; i < sf_num; i++)
+        {
+            // guint16 vi = he_data[f_data[selected[i]].half_edge].v_origin;
+            guint start = (0 == selected[i]) ? 0: f_data[selected[i]-1].v_num;
+            guint v_num = f_data[selected[i]].v_num - start;
+            for(j = 0; j < v_num; j++)
+            {
+                guint16 vi = f_verts[start + j];
+
+                MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
+                MotoHalfEdge16 *he      = begin;
+
+                do
+                {
+                    moto_mesh_selection_select_face(selection, he->f_left);
+
+                    he = & he_data[he_data[he->pair].next];
+                }
+                while(he != begin);
+            }
+        }
+    }
+}
 
 typedef struct _Vector
 {

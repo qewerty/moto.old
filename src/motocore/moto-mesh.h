@@ -264,7 +264,7 @@ GType moto_mesh_get_type(void);
 #define MOTO_IS_MESH_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESH))
 #define MOTO_MESH_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH, MotoMeshClass))
 
-MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num);
+MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num);
 MotoMesh *moto_mesh_copy(MotoMesh *other);
 
 #define moto_mesh_get_index_size(mesh) (((mesh)->b32)?4:2)

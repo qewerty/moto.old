@@ -27,6 +27,7 @@ static gboolean
 moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom);
+static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static gboolean
@@ -130,7 +131,8 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
                 moto_mesh_view_node_grow_selection_as_edges));
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("faces", "Faces",
-                moto_mesh_view_node_draw_as_faces, moto_mesh_view_node_select_as_faces, NULL));
+                moto_mesh_view_node_draw_as_faces, moto_mesh_view_node_select_as_faces,
+                moto_mesh_view_node_grow_selection_as_faces));
 }
 
 G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOMETRY_VIEW_NODE);
@@ -306,6 +308,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
     glColor3f(0, 1, 0);
     glLineWidth(2.0);
     guint i;
+    /*
     for(i = 0; i < mesh->e_num; i++)
     {
         if(mesh->b32)
@@ -327,6 +330,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
             }
         }
     }
+    */
     glEnd();
 
     glPopAttrib();
@@ -345,7 +349,27 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
 
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
 
-    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+    MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
+    guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+    glColor4f(0, 1, 0, 1);
+    guint i, j;
+    for(i = 0; i < mesh->f_num; i++)
+    {
+        if(moto_mesh_selection_is_face_selected(selection, i))
+        {
+            glBegin(GL_POLYGON);
+            guint start = (0 == i) ? 0: f_data[i-1].v_num;
+            guint v_num = f_data[i].v_num - start;
+            for(j = 0; j < v_num; j++)
+            {
+                glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
+            }
+            glEnd();
+        }
+    }
 
     glPopAttrib();
     glPopClientAttrib();
@@ -614,7 +638,7 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
         }
 
         MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
-        if(self)
+        if(sel)
         {
             moto_mesh_selection_toggle_edge_selection(sel, index);
         }
@@ -651,6 +675,7 @@ static gboolean
 moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
+    /*
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
     MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
     if( ! mesh)
@@ -659,7 +684,6 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
         return FALSE;
     }
 
-    /*
 
     guint index;
     guint num = 0;
@@ -690,9 +714,94 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
         moto_geom_view_node_set_prepared((MotoGeomViewNode *)mv, FALSE);
         moto_geom_view_node_draw((MotoGeomViewNode *)mv);
     }
-    */
 
     return TRUE;
+    */
+
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
+    if( ! mesh)
+    {
+        // g_print("No mesh\n");
+        return FALSE;
+    }
+
+    /* Array of intersected verts. */
+    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
+
+    guint index;
+    gfloat dist, dist_tmp;
+    dist = MACRO;
+    gfloat square_radius = 0.25*0.25;
+    gfloat fovy = atan((1/tinfo->proj[5]))*2;
+
+    guint i;
+    for(i = 0; i < mesh->v_num; i++)
+    {
+        gfloat *xyz = (gfloat *)(mesh->v_coords + i);
+
+        /* perspective compensatioin for sphere radius */
+        gfloat p2v[3]; /* Vector from ray origin to vertex. */
+        vector3_dif(p2v, xyz, ray->pos);
+        gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
+
+        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
+            continue;
+
+        g_array_append_val(hits, i);
+
+        if(dist_tmp < dist)
+        {
+            dist = dist_tmp;
+            index = i;
+        }
+    }
+
+    if(hits->len > 0)
+    {
+        /* Detecting which of intersected verts is nearest to cursor. */
+        GLdouble win_dist,
+                 min_win_dist = MACRO;
+        GLdouble win_x, win_y, win_z, xx, yy;
+        guint i, ii;
+        for(i = 0; i < hits->len; i++)
+        {
+            ii = g_array_index(hits, gint, i);
+            gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
+                    tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
+
+            xx = (x - win_x);
+            yy = (height - y - win_y);
+            win_dist = sqrt(xx*xx + yy*yy);
+            if(win_dist < min_win_dist)
+            {
+                min_win_dist = win_dist;
+                index = ii;
+            }
+        }
+
+        MotoMeshSelection *sel = moto_mesh_view_node_get_selection(mv);
+        if(sel && index < mesh->f_num)
+        {
+            moto_mesh_selection_toggle_face_selection(sel, index);
+
+        }
+        moto_geom_view_node_set_prepared((MotoGeomViewNode *)mv, FALSE);
+        moto_geom_view_node_draw((MotoGeomViewNode *)mv);
+    }
+
+    g_array_free(hits, TRUE);
+    return TRUE;
+}
+
+static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if(! mesh)
+        return;
+
+    moto_mesh_grow_face_selection(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_update(MotoNode *self)
