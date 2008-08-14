@@ -1034,61 +1034,73 @@ GObject *moto_param_get_object(MotoParam *self)
 void moto_param_set_boolean(MotoParam *self, gboolean value)
 {
     g_value_set_boolean(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_int(MotoParam *self, gint value)
 {
     g_value_set_int(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_uint(MotoParam *self, guint value)
 {
     g_value_set_uint(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_long(MotoParam *self, glong value)
 {
     g_value_set_long(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_ulong(MotoParam *self, gulong value)
 {
     g_value_set_ulong(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_int64(MotoParam *self, gint64 value)
 {
     g_value_set_int64(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_uint64(MotoParam *self, guint64 value)
 {
     g_value_set_uint64(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_float(MotoParam *self, gfloat value)
 {
     g_value_set_float(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_double(MotoParam *self, gdouble value)
 {
     g_value_set_double(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_pointer(MotoParam *self, gpointer value)
 {
     g_value_set_pointer(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_enum(MotoParam *self, gint value)
 {
     g_value_set_enum(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 void moto_param_set_object(MotoParam *self, GObject *value)
 {
     g_value_set_object(& self->priv->value, value);
+    moto_param_update(self);
 }
 
 MotoParam *moto_param_get_source(MotoParam *self)

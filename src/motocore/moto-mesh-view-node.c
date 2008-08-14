@@ -158,10 +158,15 @@ static void mesh_param_update(MotoParam *param)
         return;
     }
 
+    g_print("\n");
     if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
     {
-        moto_mesh_selection_free(mv->priv->selection);
+        MotoMeshSelection *old = mv->priv->selection;
         mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        moto_mesh_selection_copy_smth(mv->priv->selection, old);
+
+        moto_mesh_selection_free(old);
+        g_print("new selection\n");
     }
 }
 
@@ -823,8 +828,11 @@ static void moto_mesh_view_node_update(MotoNode *self)
 
     if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
     {
-        moto_mesh_selection_free(mv->priv->selection);
+        MotoMeshSelection *old = mv->priv->selection;
         mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        moto_mesh_selection_copy_smth(mv->priv->selection, old);
+
+        moto_mesh_selection_free(old);
     }
 }
 

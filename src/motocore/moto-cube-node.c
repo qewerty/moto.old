@@ -171,10 +171,17 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     if(self->priv->mesh)
     {
         if(v_num != self->priv->mesh->v_num || e_num != self->priv->mesh->e_num || f_num != self->priv->mesh->f_num)
+        {
             g_object_unref(self->priv->mesh);
+            self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+        }
+    }
+    else
+    {
+        self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
     }
 
-    MotoMesh *mesh = self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+    MotoMesh *mesh = self->priv->mesh;
     MotoMeshSelection *sel = moto_mesh_selection_for_mesh(mesh);
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");

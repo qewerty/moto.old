@@ -150,6 +150,7 @@ struct _MotoMeshSelection
 
 MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
+void moto_mesh_selection_copy_smth(MotoMeshSelection *self, MotoMeshSelection *other);
 MotoMeshSelection *moto_mesh_selection_for_mesh(MotoMesh *mesh);
 void moto_mesh_selection_free(MotoMeshSelection *self);
 
