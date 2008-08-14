@@ -29,7 +29,20 @@ typedef struct _MotoPlaneNode MotoPlaneNode;
 typedef struct _MotoPlaneNodeClass MotoPlaneNodeClass;
 typedef struct _MotoPlaneNodePriv MotoPlaneNodePriv;
 
+typedef enum
+{
+    MOTO_ORIENTATION_PLUS_X,
+    MOTO_ORIENTATION_MINUS_X,
+    MOTO_ORIENTATION_PLUS_Y,
+    MOTO_ORIENTATION_MINUS_Y,
+    MOTO_ORIENTATION_PLUS_Z,
+    MOTO_ORIENTATION_MINUS_Z
+} MotoOrientation;
+
 /* class MotoPlaneNode */
+
+GType moto_orientation_get_type(void);
+#define MOTO_TYPE_ORIENTATION (moto_orientation_get_type())
 
 struct _MotoPlaneNode
 {

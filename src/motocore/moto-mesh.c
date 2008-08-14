@@ -480,10 +480,16 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             MotoHalfEdge32 *he      = begin;
             do
             {
-                gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
-                vector3_add(normal, fnormal);
+                if(moto_mesh_is_index_valid(self, he->f_left))
+                {
+                    gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
+                    vector3_add(normal, fnormal);
+                }
 
-                he = & he_data[he_data[he->pair].next];
+                if(moto_mesh_is_index_valid(self, he->pair) && moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    he = & he_data[he_data[he->pair].next];
+                else
+                    break;
             }
             while(he != begin);
 
@@ -757,9 +763,18 @@ void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
+                if(moto_mesh_is_index_valid(self, he->pair))
+                {
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].v_origin))
+                        moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
 
-                he = & he_data[he_data[he->pair].next];
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                        he = & he_data[he_data[he->pair].next];
+                    else
+                        break;
+                }
+                else
+                    break;
             }
             while(he != begin);
         }
@@ -788,9 +803,18 @@ void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
+                if(moto_mesh_is_index_valid(self, he->pair))
+                {
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].v_origin))
+                        moto_mesh_selection_select_vertex(selection, he_data[he->pair].v_origin);
 
-                he = & he_data[he_data[he->pair].next];
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                        he = & he_data[he_data[he->pair].next];
+                    else
+                        break;
+                }
+                else
+                    break;
             }
             while(he != begin);
         }
@@ -799,7 +823,7 @@ void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
 
 void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
 {
-    if(selection->selected_v_num == self->v_num)
+    if(0 == selection->selected_v_num)
         return;
 
     if(self->b32)
@@ -808,8 +832,6 @@ void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
         MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
 
         guint32 selected[selection->selected_v_num];
-
-        guint32 for_deselection_num = 0;
         guint32 for_deselection[selection->selected_v_num];
 
         guint32 i, j = 0;
@@ -830,19 +852,37 @@ void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                if( ! moto_mesh_selection_is_vertex_selected(selection, he_data[he->pair].v_origin))
+                if(moto_mesh_is_index_valid(self, he->pair))
                 {
-                    for_deselection_num++;
-                    for_deselection[j++] = selected[i];
-                    break;
-                }
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].v_origin))
+                    {
+                        if( ! moto_mesh_selection_is_vertex_selected(selection, he_data[he->pair].v_origin))
+                        {
+                            for_deselection[j++] = selected[i];
+                            break;
+                        }
 
-                he = & he_data[he_data[he->pair].next];
+                        if(moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                        {
+                            he = & he_data[he_data[he->pair].next];
+                        }
+                        else
+                        {
+                            for_deselection[j++] = selected[i];
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        for_deselection[j++] = selected[i];
+                        break;
+                    }
+                }
             }
             while(he != begin);
         }
 
-        for(i = 0; i < for_deselection_num; i++)
+        for(i = 0; i < j; i++)
         {
             moto_mesh_selection_deselect_vertex(selection, for_deselection[i]);
         }
@@ -853,8 +893,6 @@ void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
         MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
 
         guint16 selected[selection->selected_v_num];
-
-        guint16 for_deselection_num = 0;
         guint16 for_deselection[selection->selected_v_num];
 
         guint16 i, j = 0;
@@ -875,19 +913,37 @@ void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                if( ! moto_mesh_selection_is_vertex_selected(selection, he_data[he->pair].v_origin))
+                if(moto_mesh_is_index_valid(self, he->pair))
                 {
-                    for_deselection_num++;
-                    for_deselection[j++] = selected[i];
-                    break;
-                }
+                    if(moto_mesh_is_index_valid(self, he_data[he->pair].v_origin))
+                    {
+                        if( ! moto_mesh_selection_is_vertex_selected(selection, he_data[he->pair].v_origin))
+                        {
+                            for_deselection[j++] = selected[i];
+                            break;
+                        }
 
-                he = & he_data[he_data[he->pair].next];
+                        if(moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                        {
+                            he = & he_data[he_data[he->pair].next];
+                        }
+                        else
+                        {
+                            for_deselection[j++] = selected[i];
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        for_deselection[j++] = selected[i];
+                        break;
+                    }
+                }
             }
             while(he != begin);
         }
 
-        for(i = 0; i < for_deselection_num; i++)
+        for(i = 0; i < j; i++)
         {
             moto_mesh_selection_deselect_vertex(selection, for_deselection[i]);
         }

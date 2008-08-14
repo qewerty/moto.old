@@ -1,6 +1,27 @@
 #include "moto-plane-node.h"
 #include "moto-mesh.h"
 
+/* enums */
+
+GType moto_orientation_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        GEnumValue values[] = {
+            {MOTO_ORIENTATION_PLUS_X, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
+            {MOTO_ORIENTATION_MINUS_X, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
+            {MOTO_ORIENTATION_PLUS_Y, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
+            {MOTO_ORIENTATION_MINUS_Y, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
+            {MOTO_ORIENTATION_PLUS_Z, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
+            {MOTO_ORIENTATION_MINUS_Z, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoOrientation", values);
+    }
+    return type;
+}
+
 /* forwards */
 
 static void moto_plane_node_update(MotoNode *self);
@@ -17,6 +38,8 @@ struct _MotoPlaneNodePriv
 
     guint *div_x_ptr;
     guint *div_y_ptr;
+
+    MotoOrientation *orientation_ptr;
 
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
@@ -54,9 +77,10 @@ moto_plane_node_init(MotoPlaneNode *self)
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 12.0f, pspec, "Size", "Size",
-            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 12.0f, pspec, "Size", "Size",
-            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 5u, pspec, "Divisions", "Divisions",
-            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 5u, pspec, "Divisions", "Divisions",
+            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 6.0f, pspec, "Size", "Size",
+            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_PLUS_X, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -65,6 +89,8 @@ moto_plane_node_init(MotoPlaneNode *self)
 
     self->priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
     self->priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
+
+    self->priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoOrientation);
 
     self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
@@ -145,6 +171,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     guint div_x = *(self->priv->div_x_ptr);
     guint div_y = *(self->priv->div_y_ptr);
 
+    MotoOrientation orientation = *(self->priv->orientation_ptr);
+
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
     guint f_num = div_x*div_y;
@@ -188,16 +216,16 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
         guint32 vi = 0, fi = 0;
         for(i = 0; i < div_x+1; i++)
-            for(i = 0; i < div_x+1; i++)
+            for(j = 0; j < div_y+1; j++)
             {
                 mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
-                mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
-                mesh->v_coords[vi].z = 0;
+                mesh->v_coords[vi].y = 0;
+                mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
                 vi++;
             }
 
         for(i = 0; i < div_x; i++)
-            for(i = 0; i < div_x; i++)
+            for(j = 0; j < div_y; j++)
             {
                 guint32 v0 = get_v(i, j),
                         v1 = get_v(i+1, j),
@@ -280,14 +308,39 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
 
         guint16 vi = 0, fi = 0;
-        for(i = 0; i < div_x+1; i++)
-            for(j = 0; j < div_y+1; j++)
-            {
-                mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
-                mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
-                mesh->v_coords[vi].z = 0;
-                vi++;
-            }
+        if(MOTO_ORIENTATION_PLUS_X == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = 0;
+                    mesh->v_coords[vi].y = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
+                    vi++;
+                }
+        }
+        else if(MOTO_ORIENTATION_PLUS_Y == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].y = 0;
+                    mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
+                    vi++;
+                }
+        }
+        else if(MOTO_ORIENTATION_PLUS_Z == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
+                    mesh->v_coords[vi].z = 0;
+                    vi++;
+                }
+        }
 
         for(i = 0; i < div_x; i++)
             for(j = 0; j < div_x; j++)
@@ -303,8 +356,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                 f_verts[fi*4+3] = v3;
 
                 guint16 e0 = e_x(i, j),
-                        e1 = e_y(i, j+1),
-                        e2 = e_x(i+1, j),
+                        e1 = e_y(i+1, j),
+                        e2 = e_x(i, j+1),
                         e3 = e_y(i, j);
                 // g_print("e0, e1, e2, e3: %u, %u, %u, %u\n", e0, e1, e2, e3);
 
@@ -336,6 +389,11 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                 he_data[he1].pair = get_he_pair(sel, e1);
                 he_data[he2].pair = get_he_pair(sel, e2);
                 he_data[he3].pair = get_he_pair(sel, e3);
+                he_data[he_data[he0].pair].pair = he0;
+                he_data[he_data[he1].pair].pair = he1;
+                he_data[he_data[he2].pair].pair = he2;
+                he_data[he_data[he3].pair].pair = he3;
+
                 he_data[he0].next = he1;
                 he_data[he1].next = he2;
                 he_data[he2].next = he3;
@@ -344,10 +402,18 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                 he_data[he1].v_origin = v1;
                 he_data[he2].v_origin = v2;
                 he_data[he3].v_origin = v3;
+                he_data[he_data[he0].pair].v_origin = v1;
+                he_data[he_data[he1].pair].v_origin = v2;
+                he_data[he_data[he2].pair].v_origin = v3;
+                he_data[he_data[he3].pair].v_origin = v0;
                 he_data[he0].edge = e0;
                 he_data[he1].edge = e1;
                 he_data[he2].edge = e2;
                 he_data[he3].edge = e3;
+                he_data[he_data[he0].pair].edge = e0;
+                he_data[he_data[he1].pair].edge = e1;
+                he_data[he_data[he2].pair].edge = e2;
+                he_data[he_data[he3].pair].edge = e3;
                 he_data[he0].f_left = fi;
                 he_data[he1].f_left = fi;
                 he_data[he2].f_left = fi;
@@ -364,10 +430,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 }
 #undef e_x_num
 #undef e_y_num
-#undef e_z_num
 #undef e_x
 #undef e_y
-#undef e_z
 #undef get_v
 
 static void moto_plane_node_update(MotoNode *self)
