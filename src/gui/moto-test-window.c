@@ -113,9 +113,15 @@ gboolean on_key_press_event(GtkWidget   *widget,
 {
     MotoTestWindow *self = (MotoTestWindow *)widget;
 
-    if(0 == g_utf8_collate(event->string, "+"))
+    if(0 == g_utf8_collate(event->string, "+") || \
+       0 == g_utf8_collate(event->string, "="))
     {
         moto_geom_view_node_grow_selection(self->priv->gv);
+        draw(self->priv->area, (GdkEventExpose *)event, user_data);
+    }
+    else if(0 == g_utf8_collate(event->string, "-"))
+    {
+        moto_geom_view_node_select_less(self->priv->gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "a"))

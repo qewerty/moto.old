@@ -14,6 +14,7 @@
 /* forwards */
 
 static void moto_geom_view_node_grow_selection_virtual(MotoGeomViewNode *self);
+static void moto_geom_view_node_select_less_virtual(MotoGeomViewNode *self);
 
 /* enums */
 
@@ -109,6 +110,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
     klass->prepare_for_draw = NULL;
     klass->get_geometry = NULL;
     klass->grow_selection = moto_geom_view_node_grow_selection_virtual;
+    klass->select_less    = moto_geom_view_node_select_less_virtual;
 
     klass->states = NULL;
 
@@ -255,12 +257,29 @@ static void moto_geom_view_node_grow_selection_virtual(MotoGeomViewNode *self)
         moto_geom_view_state_grow_selection(state, self);
 }
 
+static void moto_geom_view_node_select_less_virtual(MotoGeomViewNode *self)
+{
+    MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode *)self);
+    if(state)
+        moto_geom_view_state_select_less(state, self);
+}
+
 void moto_geom_view_node_grow_selection(MotoGeomViewNode *self)
 {
     MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
     if(klass->grow_selection)
         klass->grow_selection(self);
+
+    moto_geom_view_node_set_prepared(self, FALSE);
+}
+
+void moto_geom_view_node_select_less(MotoGeomViewNode *self)
+{
+    MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
+
+    if(klass->select_less)
+        klass->select_less(self);
 
     moto_geom_view_node_set_prepared(self, FALSE);
 }
@@ -297,6 +316,7 @@ struct _MotoGeomViewStatePriv
     MotoGeomViewStateDrawFunc draw;
     MotoGeomViewStateSelectFunc select;
     MotoGeomViewStateGrowSelectionFunc grow_selection;
+    MotoGeomViewStateSelectLessFunc select_less;
 };
 
 static void
@@ -349,7 +369,8 @@ G_DEFINE_TYPE(MotoGeomViewState, moto_geom_view_state, G_TYPE_OBJECT);
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,
         MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
-        MotoGeomViewStateGrowSelectionFunc grow_selection)
+        MotoGeomViewStateGrowSelectionFunc grow_selection,
+        MotoGeomViewStateSelectLessFunc select_less)
 {
     MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
 
@@ -359,6 +380,7 @@ moto_geom_view_state_new(const gchar *name, const gchar *title,
     self->priv->draw = draw;
     self->priv->select = select;
     self->priv->grow_selection = grow_selection;
+    self->priv->select_less = select_less;
 
     return self;
 }
@@ -393,3 +415,8 @@ void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNo
         return self->priv->grow_selection(self, geom);
 }
 
+void moto_geom_view_state_select_less(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    if(self->priv->select_less)
+        return self->priv->select_less(self, geom);
+}
