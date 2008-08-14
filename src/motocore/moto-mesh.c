@@ -135,13 +135,15 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
     {
         MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
         for(i = 0; i < he_num; i++)
-            he_data[i].pair = he_data[i].next = G_MAXUINT32;
+            he_data[i].pair = he_data[i].next = he_data[i].v_origin = \
+                he_data[i].f_left = he_data[i].edge = G_MAXUINT32;
     }
     else
     {
         MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
         for(i = 0; i < he_num; i++)
-            he_data[i].pair = he_data[i].next = G_MAXUINT16;
+            he_data[i].pair = he_data[i].next = he_data[i].v_origin = \
+                he_data[i].f_left = he_data[i].edge = G_MAXUINT16;
     }
 
     return self;
@@ -504,10 +506,16 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             MotoHalfEdge16 *he      = begin;
             do
             {
-                gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
-                vector3_add(normal, fnormal);
+                if(moto_mesh_is_index_valid(self, he->f_left))
+                {
+                    gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
+                    vector3_add(normal, fnormal);
+                }
 
-                he = & he_data[he_data[he->pair].next];
+                if(moto_mesh_is_index_valid(self, he->pair) && moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    he = & he_data[he_data[he->pair].next];
+                else
+                    break;
             }
             while(he != begin);
 

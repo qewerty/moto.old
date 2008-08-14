@@ -107,6 +107,25 @@ static void moto_test_window_create_mesh_cube(MotoTestWindow *self)
 
 }
 
+static void moto_test_window_create_mesh_plane(MotoTestWindow *self)
+{
+    MotoNode *root_node = (MotoNode *)moto_world_get_root(self->priv->world);
+
+    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "PlaneObject", NULL);
+    moto_node_link(obj_node, "parent", root_node, "transform");
+
+    moto_world_set_object_current(self->priv->world, (MotoObjectNode *)obj_node);
+
+    MotoNode *view_node = self->priv->gv = moto_world_create_node(self->priv->world, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *plane_node = moto_world_create_node(self->priv->world, "MotoPlaneNode", "Plane", NULL);
+    MotoNode *mat_node = moto_world_create_node(self->priv->world, "MotoSlerMaterialNode", "Material1", NULL);
+
+    moto_node_link(obj_node, "view", view_node, "view");
+    moto_node_link(view_node, "mesh", plane_node, "mesh");
+    moto_node_link(obj_node, "material", mat_node, "material");
+
+}
+
 gboolean on_key_press_event(GtkWidget   *widget,
                             GdkEventKey *event,
                             gpointer     user_data)
@@ -122,6 +141,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
     else if(0 == g_utf8_collate(event->string, "-"))
     {
         moto_geom_view_node_select_less(self->priv->gv);
+        draw(self->priv->area, (GdkEventExpose *)event, user_data);
+    }
+    else if(0 == g_utf8_collate(event->string, "s"))
+    {
+        moto_test_window_create_mesh_plane(self);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "a"))

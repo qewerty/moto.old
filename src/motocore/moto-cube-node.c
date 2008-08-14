@@ -58,9 +58,9 @@ moto_cube_node_init(MotoCubeNode *self)
             "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_z", "Size Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_z", "Divisions by Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -166,7 +166,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
     guint f_num = div_x*div_y*2 + div_x*div_z*2 + div_y*div_z*2;
-    g_print("v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
+    g_print("Cube: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     if(self->priv->mesh)
     {
@@ -190,10 +190,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     if(mesh->b32)
     {
-        MotoMeshVert32 *v_data  = (MotoMeshVert32*)mesh->v_data;
-        MotoMeshEdge32 *e_data  = (MotoMeshEdge32*)mesh->e_data;
+        MotoMeshVert32 *v_data  = (MotoMeshVert32 *)mesh->v_data;
+        MotoMeshEdge32 *e_data  = (MotoMeshEdge32 *)mesh->e_data;
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
-        MotoHalfEdge32 *he_data = (MotoHalfEdge32*)mesh->he_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)mesh->he_data;
         guint32 *e_verts = (guint32 *)mesh->e_verts;
         guint32 *f_verts = (guint32 *)mesh->f_verts;
 

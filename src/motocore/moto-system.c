@@ -16,6 +16,7 @@
 #include "moto-grid-view-node.h"
 #include "moto-axes-view-node.h"
 // #include "moto-nurbs-view-node.h"
+#include "moto-plane-node.h"
 #include "moto-cube-node.h"
 // #include "moto-sphere-node.h"
 // #include "moto-curve-node.h"
@@ -116,6 +117,7 @@ moto_system_class_init(MotoSystemClass *klass)
         MOTO_TYPE_OBJECT_NODE;
         MOTO_TYPE_GEOMETRY_NODE;
             MOTO_TYPE_CUBE_NODE;
+            MOTO_TYPE_PLANE_NODE;
         MOTO_TYPE_GEOMETRY_VIEW_NODE;
             MOTO_TYPE_MESH_VIEW_NODE;
             MOTO_TYPE_GRID_VIEW_NODE;
