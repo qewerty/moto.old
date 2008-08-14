@@ -80,7 +80,7 @@ moto_plane_node_init(MotoPlaneNode *self)
             "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 6.0f, pspec, "Size", "Size",
             "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
             "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_PLUS_X, pspec, "Orientation", "Orientation",
+            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_PLUS_Y, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -215,33 +215,58 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
 
         guint32 vi = 0, fi = 0;
-        for(i = 0; i < div_x+1; i++)
-            for(j = 0; j < div_y+1; j++)
-            {
-                mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
-                mesh->v_coords[vi].y = 0;
-                mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
-                vi++;
-            }
+        if(MOTO_ORIENTATION_PLUS_X == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = 0;
+                    mesh->v_coords[vi].y = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
+                    vi++;
+                }
+        }
+        else if(MOTO_ORIENTATION_PLUS_Y == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].y = 0;
+                    mesh->v_coords[vi].z = -hsy + size_y/div_y * j;
+                    vi++;
+                }
+        }
+        else if(MOTO_ORIENTATION_PLUS_Z == orientation)
+        {
+            for(i = 0; i < div_x+1; i++)
+                for(j = 0; j < div_y+1; j++)
+                {
+                    mesh->v_coords[vi].x = -hsx + size_x/div_x * i;
+                    mesh->v_coords[vi].y = -hsy + size_y/div_y * j;
+                    mesh->v_coords[vi].z = 0;
+                    vi++;
+                }
+        }
 
         for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_y; j++)
+            for(j = 0; j < div_x; j++)
             {
                 guint32 v0 = get_v(i, j),
                         v1 = get_v(i+1, j),
                         v2 = get_v(i+1, j+1),
                         v3 = get_v(i, j+1);
-                // g_print("v0, v1, v2, v3: %d, %d, %d, %d\n", v0, v1, v2, v3);
+                // g_print("v0, v1, v2, v3: %u, %u, %u, %u\n", v0, v1, v2, v3);
                 f_verts[fi*4]   = v0;
                 f_verts[fi*4+1] = v1;
                 f_verts[fi*4+2] = v2;
                 f_verts[fi*4+3] = v3;
 
                 guint32 e0 = e_x(i, j),
-                        e1 = e_y(i, j+1),
-                        e2 = e_x(i+1, j),
+                        e1 = e_y(i+1, j),
+                        e2 = e_x(i, j+1),
                         e3 = e_y(i, j);
-                // g_print("e0, e1, e2, e3: %d, %d, %d, %d\n", e0, e1, e2, e3);
+                // g_print("e0, e1, e2, e3: %u, %u, %u, %u\n", e0, e1, e2, e3);
 
                 e_verts[e0*2]   = v0;
                 e_verts[e0*2+1] = v1;
@@ -271,6 +296,11 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                 he_data[he1].pair = get_he_pair(sel, e1);
                 he_data[he2].pair = get_he_pair(sel, e2);
                 he_data[he3].pair = get_he_pair(sel, e3);
+                he_data[he_data[he0].pair].pair = he0;
+                he_data[he_data[he1].pair].pair = he1;
+                he_data[he_data[he2].pair].pair = he2;
+                he_data[he_data[he3].pair].pair = he3;
+
                 he_data[he0].next = he1;
                 he_data[he1].next = he2;
                 he_data[he2].next = he3;
@@ -279,10 +309,18 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                 he_data[he1].v_origin = v1;
                 he_data[he2].v_origin = v2;
                 he_data[he3].v_origin = v3;
+                he_data[he_data[he0].pair].v_origin = v1;
+                he_data[he_data[he1].pair].v_origin = v2;
+                he_data[he_data[he2].pair].v_origin = v3;
+                he_data[he_data[he3].pair].v_origin = v0;
                 he_data[he0].edge = e0;
                 he_data[he1].edge = e1;
                 he_data[he2].edge = e2;
                 he_data[he3].edge = e3;
+                he_data[he_data[he0].pair].edge = e0;
+                he_data[he_data[he1].pair].edge = e1;
+                he_data[he_data[he2].pair].edge = e2;
+                he_data[he_data[he3].pair].edge = e3;
                 he_data[he0].f_left = fi;
                 he_data[he1].f_left = fi;
                 he_data[he2].f_left = fi;
