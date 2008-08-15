@@ -58,9 +58,9 @@ moto_cube_node_init(MotoCubeNode *self)
             "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
             "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_z", "Divisions by Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "div_z", "Divisions by Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 

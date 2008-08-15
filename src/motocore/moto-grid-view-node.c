@@ -98,6 +98,7 @@ static void draw_grid()
 {
     gfloat s;
 
+    /*
     glLineWidth(0.5);
     glColor4f(0.6, 0.6, 0.6, 0.2);
 
@@ -119,9 +120,10 @@ static void draw_grid()
         glVertex3f(10, 0, s);
     }
     glEnd();
+    */
 
-    glLineWidth(2);
-    glColor4f(0.6, 0.6, 0.6, 0.4);
+    glLineWidth(1);
+    glColor4f(0.1, 0.1, 0.1, 1);
 
     glBegin(GL_LINES);
     for(s = -10; s < 10.5; s += 1)
@@ -146,7 +148,7 @@ static void moto_grid_view_node_draw(MotoGeomViewNode *self)
     glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
     glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_LINE_SMOOTH);
+    glDisable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
         moto_grid_view_node_prepare_for_draw(self);

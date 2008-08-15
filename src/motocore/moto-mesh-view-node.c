@@ -268,21 +268,22 @@ static void draw_mesh_as_verts(MotoMesh *mesh, MotoMeshSelection *selection)
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+    glColor4f(0.6, 0.6, 0.6, 1.0);
+    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+
+    glColor4f(1, 0.1, 0.1, 1);
+    glPointSize(2);
 
     glDisable(GL_DEPTH_TEST);
 
-    glColor4f(0.2, 0.2, 0.2, 1.0);
-    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
-
-    glColor4f(0.9, 0.9, 0.9, 1);
-    glPointSize(4);
-
     glDrawArrays(GL_POINTS, 0, mesh->v_num);
 
+    glColor3f(0, 1, 0);
+    glPointSize(3);
 
     glBegin(GL_POINTS);
-    glColor3f(0, 1, 0);
     guint i;
     for(i = 0; i < mesh->v_num; i++)
     {
@@ -317,7 +318,6 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
     glColor3f(0, 1, 0);
     glLineWidth(2.0);
     guint i;
-    /*
     for(i = 0; i < mesh->e_num; i++)
     {
         if(mesh->b32)
@@ -339,7 +339,6 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
             }
         }
     }
-    */
     glEnd();
 
     glPopAttrib();

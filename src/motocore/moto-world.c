@@ -310,7 +310,7 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
-    glClearColor(0.2, 0.2, 0.2, 1);
+    glClearColor(0.3, 0.3, 0.3, 1);
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
