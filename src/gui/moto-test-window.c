@@ -17,6 +17,8 @@
 
 #include "motocore/moto-geometry-view-node.h"
 
+#include "moto-shelf.h"
+
 static MotoTestWindow *twin = NULL;
 
 /* forwards */
@@ -275,6 +277,7 @@ moto_test_window_init(MotoTestWindow *self)
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 
     gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);

@@ -35,7 +35,7 @@ moto_cube_node_dispose(GObject *obj)
     g_object_unref(self->priv->bound);
     g_slice_free(MotoCubeNodePriv, self->priv);
 
-    G_OBJECT_CLASS(cube_node_parent_class)->dispose(obj);
+    cube_node_parent_class->dispose(obj);
 }
 
 static void
