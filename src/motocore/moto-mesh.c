@@ -950,6 +950,13 @@ void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection)
     }
 }
 
+void moto_mesh_select_inverse_verts(MotoMesh *self, MotoMeshSelection *selection)
+{
+    guint i;
+    for(i = 0; i < selection->v_num; i++)
+        moto_mesh_selection_toggle_vertex_selection(selection, i);
+}
+
 void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 {
     if(selection->selected_e_num == self->e_num)
@@ -1053,6 +1060,13 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
     }
 }
 
+void moto_mesh_select_inverse_edges(MotoMesh *self, MotoMeshSelection *selection)
+{
+    guint i;
+    for(i = 0; i < selection->e_num; i++)
+        moto_mesh_selection_toggle_edge_selection(selection, i);
+}
+
 void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
 {
     if(selection->selected_f_num == self->f_num)
@@ -1103,6 +1117,13 @@ void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
             }
         }
     }
+}
+
+void moto_mesh_select_inverse_faces(MotoMesh *self, MotoMeshSelection *selection)
+{
+    guint i;
+    for(i = 0; i < selection->f_num; i++)
+        moto_mesh_selection_toggle_face_selection(selection, i);
 }
 
 typedef struct _Vector

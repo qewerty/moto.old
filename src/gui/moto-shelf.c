@@ -135,6 +135,8 @@ GtkWidget *moto_shelf_new(MotoSystem *system)
     moto_shelf_add_item(self, "Mesh", "Plane", create_mesh_plane);
     moto_shelf_add_item(self, "Mesh", "Cube", create_mesh_cube);
 
+    moto_shelf_add_item(self, "Anim", "BlendShape", NULL);
+
     return (GtkWidget *)self;
 }
 
