@@ -982,7 +982,18 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
         guint se_num = selection->selected_e_num;
         for(i = 0; i < se_num; i++)
         {
-            guint32 vi = he_data[e_data[selected[i]].half_edge].v_origin;
+            guint32 vi;
+            if(moto_mesh_is_index_valid(self, e_data[selected[i]].half_edge))
+            {
+                vi = he_data[e_data[selected[i]].half_edge].v_origin;
+                if( ! moto_mesh_is_index_valid(self, vi))
+                    continue;
+            }
+            else
+                continue;
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+                continue;
 
             MotoHalfEdge32 *begin   = & he_data[v_data[vi].half_edge];
             MotoHalfEdge32 *he      = begin;
@@ -991,12 +1002,19 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
             {
                 moto_mesh_selection_select_edge(selection, he->edge);
 
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    break;
                 he = & he_data[he_data[he->pair].next];
             }
             while(he != begin);
 
             // pair
             vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+            if( ! moto_mesh_is_index_valid(self, vi))
+                continue;
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+                continue;
 
             begin   = & he_data[v_data[vi].half_edge];
             he      = begin;
@@ -1005,6 +1023,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
             {
                 moto_mesh_selection_select_edge(selection, he->edge);
 
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    break;
                 he = & he_data[he_data[he->pair].next];
             }
             while(he != begin);
@@ -1030,7 +1050,18 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
         guint se_num = selection->selected_e_num;
         for(i = 0; i < se_num; i++)
         {
-            guint16 vi = he_data[e_data[selected[i]].half_edge].v_origin;
+            guint16 vi;
+            if(moto_mesh_is_index_valid(self, e_data[selected[i]].half_edge))
+            {
+                vi = he_data[e_data[selected[i]].half_edge].v_origin;
+                if( ! moto_mesh_is_index_valid(self, vi))
+                    continue;
+            }
+            else
+                continue;
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+                continue;
 
             MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
             MotoHalfEdge16 *he      = begin;
@@ -1039,12 +1070,19 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
             {
                 moto_mesh_selection_select_edge(selection, he->edge);
 
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    break;
                 he = & he_data[he_data[he->pair].next];
             }
             while(he != begin);
 
             // pair
             vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+            if( ! moto_mesh_is_index_valid(self, vi))
+                continue;
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+                continue;
 
             begin   = & he_data[v_data[vi].half_edge];
             he      = begin;
@@ -1053,6 +1091,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
             {
                 moto_mesh_selection_select_edge(selection, he->edge);
 
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                    break;
                 he = & he_data[he_data[he->pair].next];
             }
             while(he != begin);

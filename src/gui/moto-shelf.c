@@ -178,6 +178,7 @@ void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *na
     data->func = func;
 
     GtkButton *b = gtk_button_new_with_label(name);
+    gtk_button_set_relief(b, GTK_RELIEF_NONE);
     g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(on_item), data);
     gtk_box_pack_start(tab, b, FALSE, FALSE, 0);
 
