@@ -22,6 +22,8 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 static void moto_mesh_view_node_grow_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom);
+static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom);
+static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static gboolean
@@ -131,7 +133,7 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
             moto_geom_view_state_new("edges", "Edges",
                 moto_mesh_view_node_draw_as_edges, moto_mesh_view_node_select_as_edges,
                 moto_mesh_view_node_grow_selection_as_edges,
-                NULL));
+                moto_mesh_view_node_select_less_as_edges));
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("faces", "Faces",
                 moto_mesh_view_node_draw_as_faces, moto_mesh_view_node_select_as_faces,
@@ -572,7 +574,7 @@ static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, Mo
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
     MotoMesh *mesh = (*(mv->priv->mesh_ptr));
-    if(! mesh)
+    if( ! mesh)
         return;
 
     moto_mesh_select_less_verts(mesh, mv->priv->selection);
@@ -583,7 +585,7 @@ static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomV
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
     MotoMesh *mesh = (*(mv->priv->mesh_ptr));
 
-    if(! mesh)
+    if( ! mesh)
         return;
 
     draw_mesh_as_edges(mesh, mv->priv->selection);
@@ -672,10 +674,20 @@ static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self,
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
     MotoMesh *mesh = (*(mv->priv->mesh_ptr));
-    if(! mesh)
+    if( ! mesh)
         return;
 
     moto_mesh_grow_edge_selection(mesh, mv->priv->selection);
+}
+
+static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if( ! mesh)
+        return;
+
+    moto_mesh_select_less_edges(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)

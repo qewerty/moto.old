@@ -53,4 +53,6 @@ GType moto_test_window_get_type(void);
 
 GtkWindow *moto_test_window_new();
 
+void moto_test_window_redraw_3dview(MotoTestWindow *self);
+
 #endif /* MOTO_TEST_WINDOW_H */

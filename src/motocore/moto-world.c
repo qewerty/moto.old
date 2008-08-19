@@ -73,6 +73,10 @@ struct _MotoWorldPriv
     GMutex *set_root_mutex;
     GMutex *set_camera_mutex;
     GMutex *set_axes_mutex;
+
+    // cache
+    guint prev_width,
+          prev_height;
 };
 
 static void
@@ -137,6 +141,10 @@ moto_world_init(MotoWorld *self)
     self->priv->set_root_mutex              = get_mutex(& self->priv->mutex_factory, "set_root");
     self->priv->set_camera_mutex            = get_mutex(& self->priv->mutex_factory, "set_camera");
     self->priv->set_axes_mutex              = get_mutex(& self->priv->mutex_factory, "set_axes");
+
+    // cache
+    self->priv->prev_width = 640;
+    self->priv->prev_height = 480;
 }
 
 static void
@@ -302,10 +310,19 @@ void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
 gboolean __draw_object(MotoWorld *world, MotoNode *node, gpointer user_data)
 {
     moto_object_node_draw_full((MotoObjectNode *)node, FALSE, TRUE);
+
+    return TRUE;
+}
+
+void moto_world_redraw(MotoWorld *self)
+{
+    moto_world_draw(self, self->priv->prev_width, self->priv->prev_height);
 }
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
+
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);

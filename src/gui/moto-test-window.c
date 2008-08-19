@@ -296,7 +296,7 @@ moto_test_window_init(MotoTestWindow *self)
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 
     gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
-    gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system, (GtkWindow *)self), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
@@ -357,6 +357,13 @@ GtkWindow *moto_test_window_new()
     twin = (MotoTestWindow *)self;
 
     return self;
+}
+
+void moto_test_window_redraw_3dview(MotoTestWindow *self)
+{
+    GdkEvent *event = gdk_event_new(GDK_NOTHING);
+    g_signal_emit_by_name(self->priv->area, "expose-event",  self->priv->area, event, NULL);
+    gdk_event_free(event);
 }
 
 static void init_gl(GtkWidget *widget, gpointer data)

@@ -1,6 +1,8 @@
 #include "motocore/moto-messager.h"
 #include "motocore/moto-world.h"
+
 #include "moto-shelf.h"
+#include "moto-test-window.h"
 
 /* Some items */
 
@@ -77,6 +79,7 @@ struct _MotoShelfPriv
     GData *tabs;
 
     MotoSystem *system;
+    GtkWindow *window;
 };
 
 static void
@@ -108,6 +111,8 @@ moto_shelf_init(MotoShelf *self)
     self->priv->system = NULL;
     g_datalist_init(& self->priv->tabs);
 
+    self->priv->window = NULL;
+
     gtk_notebook_set_tab_border((GtkNotebook *)self, 0);
 }
 
@@ -122,11 +127,12 @@ moto_shelf_class_init(MotoShelfClass *klass)
 
 G_DEFINE_TYPE(MotoShelf, moto_shelf, GTK_TYPE_NOTEBOOK);
 
-GtkWidget *moto_shelf_new(MotoSystem *system)
+GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
 {
     MotoShelf *self = (MotoShelf *)g_object_new(MOTO_TYPE_SHELF, NULL);
 
     self->priv->system = system;
+    self->priv->window = window;
 
     moto_shelf_add_tab(self, "Mesh");
     moto_shelf_add_tab(self, "Model");
@@ -160,10 +166,11 @@ typedef struct _ShelfItemData
 
 static void on_item(GtkButton *button, ShelfItemData *data)
 {
-    if( ! data || ! data->func || ! data->shelf || ! data->system)
+    if( ! data || ! data->func || ! data->shelf || ! data->shelf->priv->window || ! data->system)
         return;
 
     data->func(data->shelf, data->system);
+    moto_test_window_redraw_3dview(data->shelf->priv->window);
 }
 
 void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *name, MotoShelfFunc func)

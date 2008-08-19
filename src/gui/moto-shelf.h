@@ -57,7 +57,7 @@ GType moto_shelf_get_type(void);
 #define MOTO_IS_SHELF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SHELF))
 #define MOTO_SHELF_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHELF, MotoShelfClass))
 
-GtkWidget *moto_shelf_new(MotoSystem *system);
+GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window);
 
 void moto_shelf_add_tab(MotoShelf *self, const gchar *name);
 void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *name, MotoShelfFunc func);

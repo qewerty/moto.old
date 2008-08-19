@@ -1100,6 +1100,217 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
     }
 }
 
+void moto_mesh_select_less_edges(MotoMesh *self, MotoMeshSelection *selection)
+{
+    if(0 == selection->selected_e_num)
+        return;
+
+    if(self->b32)
+    {
+        MotoMeshVert32 *v_data  = (MotoMeshVert32 *)self->v_data;
+        MotoMeshEdge32 *e_data  = (MotoMeshEdge32 *)self->e_data;
+        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+
+        guint32 selected[selection->selected_e_num];
+        guint32 for_deselection[selection->selected_e_num];
+
+        guint32 i, j = 0;
+        for(i = 0; i < self->e_num; i++)
+        {
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        j = 0;
+        guint se_num = selection->selected_e_num;
+        for(i = 0; i < se_num; i++)
+        {
+            guint32 vi;
+            if(moto_mesh_is_index_valid(self, e_data[selected[i]].half_edge))
+            {
+                vi = he_data[e_data[selected[i]].half_edge].v_origin;
+                if( ! moto_mesh_is_index_valid(self, vi))
+                {
+                    for_deselection[j++] = selected[i];
+                    continue;
+                }
+            }
+            else
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            MotoHalfEdge32 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge32 *he      = begin;
+
+            do
+            {
+                if( ! moto_mesh_is_index_valid(self, he->edge) || ! moto_mesh_selection_is_edge_selected(selection, he->edge))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+
+            // pair
+            vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+            if( ! moto_mesh_is_index_valid(self, vi))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            begin   = & he_data[v_data[vi].half_edge];
+            he      = begin;
+
+            do
+            {
+                if( ! moto_mesh_is_index_valid(self, he->edge) || ! moto_mesh_selection_is_edge_selected(selection, he->edge))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+
+        for(i = 0; i < j; i++)
+        {
+            moto_mesh_selection_deselect_edge(selection, for_deselection[i]);
+        }
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)self->e_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+
+        guint16 selected[selection->selected_e_num];
+        guint16 for_deselection[selection->selected_e_num];
+
+        guint16 i, j = 0;
+        for(i = 0; i < self->e_num; i++)
+        {
+            if(moto_mesh_selection_is_edge_selected(selection, i))
+            {
+                selected[j++] = i;
+            }
+        }
+
+        j = 0;
+        guint se_num = selection->selected_e_num;
+        for(i = 0; i < se_num; i++)
+        {
+            guint16 vi;
+            if(moto_mesh_is_index_valid(self, e_data[selected[i]].half_edge))
+            {
+                vi = he_data[e_data[selected[i]].half_edge].v_origin;
+                if( ! moto_mesh_is_index_valid(self, vi))
+                {
+                    for_deselection[j++] = selected[i];
+                    continue;
+                }
+            }
+            else
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
+            MotoHalfEdge16 *he      = begin;
+
+            do
+            {
+                if( ! moto_mesh_is_index_valid(self, he->edge) || ! moto_mesh_selection_is_edge_selected(selection, he->edge))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+
+            // pair
+            vi = he_data[he_data[e_data[selected[i]].half_edge].pair].v_origin;
+            if( ! moto_mesh_is_index_valid(self, vi))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            if( ! moto_mesh_is_index_valid(self, v_data[vi].half_edge))
+            {
+                for_deselection[j++] = selected[i];
+                continue;
+            }
+
+            begin   = & he_data[v_data[vi].half_edge];
+            he      = begin;
+
+            do
+            {
+                if( ! moto_mesh_is_index_valid(self, he->edge) || ! moto_mesh_selection_is_edge_selected(selection, he->edge))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
+                {
+                    for_deselection[j++] = selected[i];
+                    break;
+                }
+                he = & he_data[he_data[he->pair].next];
+            }
+            while(he != begin);
+        }
+
+        for(i = 0; i < j; i++)
+        {
+            moto_mesh_selection_deselect_edge(selection, for_deselection[i]);
+        }
+    }
+}
+
 void moto_mesh_select_inverse_edges(MotoMesh *self, MotoMeshSelection *selection)
 {
     guint i;
@@ -1118,7 +1329,6 @@ void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
     else
     {
         MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
-        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)self->e_data;
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
         guint16 *f_verts  = (guint16 *)self->f_verts;
         MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
