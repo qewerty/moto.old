@@ -145,7 +145,7 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
             moto_geom_view_state_new("faces", "Faces",
                 moto_mesh_view_node_draw_as_faces, moto_mesh_view_node_select_as_faces,
                 moto_mesh_view_node_grow_selection_as_faces,
-                NULL,
+                moto_mesh_view_node_select_less_as_faces,
                 moto_mesh_view_node_invert_selection_as_faces));
 }
 
@@ -860,6 +860,16 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
         return;
 
     moto_mesh_grow_face_selection(mesh, mv->priv->selection);
+}
+
+static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if( ! mesh)
+        return;
+
+    moto_mesh_select_less_faces(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
