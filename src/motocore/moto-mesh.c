@@ -1000,7 +1000,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_edge(selection, he->edge);
+                if(moto_mesh_is_index_valid(self, he->edge))
+                    moto_mesh_selection_select_edge(selection, he->edge);
 
                 if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
                     break;
@@ -1021,7 +1022,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_edge(selection, he->edge);
+                if(moto_mesh_is_index_valid(self, he->edge))
+                    moto_mesh_selection_select_edge(selection, he->edge);
 
                 if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
                     break;
@@ -1068,7 +1070,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_edge(selection, he->edge);
+                if(moto_mesh_is_index_valid(self, he->edge))
+                    moto_mesh_selection_select_edge(selection, he->edge);
 
                 if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
                     break;
@@ -1089,7 +1092,8 @@ void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
 
             do
             {
-                moto_mesh_selection_select_edge(selection, he->edge);
+                if(moto_mesh_is_index_valid(self, he->edge))
+                    moto_mesh_selection_select_edge(selection, he->edge);
 
                 if( ! moto_mesh_is_index_valid(self, he->pair) || ! moto_mesh_is_index_valid(self, he_data[he->pair].next))
                     break;
