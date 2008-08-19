@@ -40,6 +40,7 @@ typedef gboolean (*MotoGeomViewNodeSelectMethod)(MotoGeomViewNode *self,
 typedef MotoGeometryNode *(*MotoGeomViewNodeGetGeometryMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodeGrowSelectionMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodeSelectLessMethod)(MotoGeomViewNode *self);
+typedef void (*MotoGeomViewNodeInvertSelectionMethod)(MotoGeomViewNode *self);
 
 typedef struct _MotoGeomViewState MotoGeomViewState;
 typedef struct _MotoGeomViewStateClass MotoGeomViewStateClass;
@@ -50,6 +51,7 @@ typedef gboolean (*MotoGeomViewStateSelectFunc)(MotoGeomViewState *self, MotoGeo
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 typedef void (*MotoGeomViewStateGrowSelectionFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
 typedef void (*MotoGeomViewStateSelectLessFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
+typedef void (*MotoGeomViewStateInvertSelectionFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 
 /* Drawing modes.
@@ -93,6 +95,7 @@ struct _MotoGeomViewNodeClass
     MotoGeomViewNodeGetGeometryMethod get_geometry;
     MotoGeomViewNodeGrowSelectionMethod grow_selection;
     MotoGeomViewNodeSelectLessMethod select_less;
+    MotoGeomViewNodeInvertSelectionMethod invert_selection;
 
     GSList *states;
 
@@ -132,6 +135,7 @@ MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self);
 
 void moto_geom_view_node_grow_selection(MotoGeomViewNode *self);
 void moto_geom_view_node_select_less(MotoGeomViewNode *self);
+void moto_geom_view_node_invert_selection(MotoGeomViewNode *self);
 
 gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
@@ -167,7 +171,8 @@ MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,
         MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
         MotoGeomViewStateGrowSelectionFunc grow_selection,
-        MotoGeomViewStateSelectLessFunc select_less);
+        MotoGeomViewStateSelectLessFunc select_less,
+        MotoGeomViewStateInvertSelectionFunc invert_selection);
 
 const gchar *moto_geom_view_state_get_name(MotoGeomViewState *self);
 const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self);
@@ -178,5 +183,6 @@ gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *
 
 void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
 void moto_geom_view_state_select_less(MotoGeomViewState *self, MotoGeomViewNode *geom);
+void moto_geom_view_state_invert_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 #endif /* MOTO_GEOM_VIEW_NODE_H */

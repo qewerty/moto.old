@@ -164,6 +164,20 @@ gboolean on_key_press_event(GtkWidget   *widget,
         moto_geom_view_node_select_less(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
+    else if(0 == g_utf8_collate(event->string, "i"))
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return;
+        MotoObjectNode *ob = moto_world_get_current_object(w);
+        if( ! ob)
+            return;
+        MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
+        if( ! gv)
+            return;
+        moto_geom_view_node_invert_selection(gv);
+        draw(self->priv->area, (GdkEventExpose *)event, user_data);
+    }
     else if(0 == g_utf8_collate(event->string, "s"))
     {
         moto_test_window_create_mesh_plane(self);

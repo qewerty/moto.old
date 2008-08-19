@@ -29,8 +29,13 @@ static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomV
 static gboolean
 moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
+
 static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
+
+static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom);
+static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom);
+static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static gboolean
@@ -123,22 +128,25 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
 
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("object", "Object",
-                moto_mesh_view_node_draw_as_object, NULL, NULL, NULL));
+                moto_mesh_view_node_draw_as_object, NULL, NULL, NULL, NULL));
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("verts", "Vertex",
                 moto_mesh_view_node_draw_as_verts, moto_mesh_view_node_select_as_verts,
                 moto_mesh_view_node_grow_selection_as_verts,
-                moto_mesh_view_node_select_less_as_verts));
+                moto_mesh_view_node_select_less_as_verts,
+                moto_mesh_view_node_invert_selection_as_verts));
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("edges", "Edges",
                 moto_mesh_view_node_draw_as_edges, moto_mesh_view_node_select_as_edges,
                 moto_mesh_view_node_grow_selection_as_edges,
-                moto_mesh_view_node_select_less_as_edges));
+                moto_mesh_view_node_select_less_as_edges,
+                moto_mesh_view_node_invert_selection_as_edges));
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("faces", "Faces",
                 moto_mesh_view_node_draw_as_faces, moto_mesh_view_node_select_as_faces,
                 moto_mesh_view_node_grow_selection_as_faces,
-                NULL));
+                NULL,
+                moto_mesh_view_node_invert_selection_as_faces));
 }
 
 G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOMETRY_VIEW_NODE);
@@ -580,6 +588,16 @@ static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, Mo
     moto_mesh_select_less_verts(mesh, mv->priv->selection);
 }
 
+static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if( ! mesh)
+        return;
+
+    moto_mesh_select_inverse_verts(mesh, mv->priv->selection);
+}
+
 static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
@@ -688,6 +706,16 @@ static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, Mo
         return;
 
     moto_mesh_select_less_edges(mesh, mv->priv->selection);
+}
+
+static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if( ! mesh)
+        return;
+
+    moto_mesh_select_inverse_edges(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -832,6 +860,16 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
         return;
 
     moto_mesh_grow_face_selection(mesh, mv->priv->selection);
+}
+
+static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
+    MotoMesh *mesh = (*(mv->priv->mesh_ptr));
+    if( ! mesh)
+        return;
+
+    moto_mesh_select_inverse_faces(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_update(MotoNode *self)
