@@ -29,6 +29,7 @@
 G_BEGIN_DECLS
 
 typedef void (*MotoNodeActionFunc)(MotoNode *node);
+typedef void (*MotoNodeForeachParamFunc)(MotoNode *node, MotoParam *param, gpointer user_data);
 
 typedef enum
 {
@@ -113,6 +114,9 @@ void moto_node_set_param_object(MotoNode *self,     const gchar *name, GObject *
 
 void moto_node_get_params(MotoNode *self, ...);
 void moto_node_set_params(MotoNode *self, ...);
+
+void moto_node_foreach_param(MotoNode *self,
+        MotoNodeForeachParamFunc func, gpointer user_data);
 
 void moto_node_link(MotoNode *self, const gchar *in_name,
                           MotoNode *other, const gchar *out_name);
@@ -230,6 +234,8 @@ GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);
 #define moto_param_value_pointer(p, c_type) ((c_type *)moto_param_get_value_pointer(p))
 #define moto_param_value(p, c_type) (*moto_param_value_pointer(p, c_type))
+
+GType moto_param_get_value_type(MotoParam *self);
 
 gboolean moto_param_get_boolean(MotoParam *self);
 gint     moto_param_get_int(MotoParam *self);

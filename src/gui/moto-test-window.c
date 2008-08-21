@@ -8,6 +8,9 @@
 #include "moto-test-window.h"
 #include "moto-main-menu.h"
 #include "moto-tool-box.h"
+#include "moto-timeline.h"
+#include "moto-message-bar.h"
+#include "moto-param-editor.h"
 
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
@@ -50,6 +53,8 @@ struct _MotoTestWindowPriv
     MotoWorld *world;
 
     MotoGeomViewNode *gv;
+
+    MotoParamEditor *param_editor;
 
     GtkDrawingArea *area;
 
@@ -139,6 +144,66 @@ gboolean on_key_press_event(GtkWidget   *widget,
             return;
         moto_geom_view_node_invert_selection(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
+    }
+}
+
+gboolean redraw_world_idle(gpointer data)
+{
+    MotoTestWindow *tw = (MotoTestWindow *)data;
+    MotoSystem *system = tw->priv->system;
+
+    if( ! system)
+        return FALSE;
+
+    MotoWorld *world = moto_system_get_current_world(system);
+    if( ! world)
+        return FALSE;
+
+    MotoNode *node = (MotoNode *)moto_world_get_current_object(world);
+    if( ! node)
+        return FALSE;
+
+    /*
+    moto_object_node_set_translate((MotoObjectNode *)node,
+            moto_node_get_param_float(node, "tx"),
+            moto_node_get_param_float(node, "ty") + 0.02,
+            moto_node_get_param_float(node, "tz"));
+            */
+
+    moto_test_window_redraw_3dview(tw);
+
+    return FALSE;
+}
+
+static gpointer anim_thread(MotoTestWindow *window)
+{
+    MotoSystem *system = window->priv->system;
+
+    if( ! system)
+        return FALSE;
+
+    MotoWorld *world = moto_system_get_current_world(system);
+    if( ! world)
+        return FALSE;
+
+    while(TRUE)
+    {
+
+        MotoNode *node = (MotoNode *)moto_world_get_current_object(world);
+        if( ! node)
+        {
+            g_usleep(100000);
+            continue;
+        }
+
+        moto_object_node_set_translate((MotoObjectNode *)node,
+            moto_node_get_param_float(node, "tx"),
+            moto_node_get_param_float(node, "ty") + 0.02,
+            moto_node_get_param_float(node, "tz"));
+
+        g_idle_add(redraw_world_idle, window);
+
+        g_usleep(100000);
     }
 }
 
@@ -236,12 +301,16 @@ moto_test_window_init(MotoTestWindow *self)
 
     gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
+    self->priv->param_editor = moto_param_editor_new();
+    gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
 
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 
     gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system, (GtkWindow *)self), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(vbox, moto_timeline_new(self->priv->world), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, moto_message_bar_new(moto_messager_singleton()), FALSE, FALSE, 0);
 
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
 
@@ -273,6 +342,7 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_window_set_title((GtkWindow *)self, "Moto v0.0");
     gtk_widget_set_size_request((GtkWidget *)self, 640, 480);
 
+    g_thread_create((GThreadFunc)anim_thread, self, TRUE, NULL);
 }
 
 static void
@@ -308,6 +378,20 @@ void moto_test_window_redraw_3dview(MotoTestWindow *self)
     GdkEvent *event = gdk_event_new(GDK_NOTHING);
     g_signal_emit_by_name(self->priv->area, "expose-event",  self->priv->area, event, NULL);
     gdk_event_free(event);
+}
+
+void moto_test_window_update_param_editor(MotoTestWindow *self)
+{
+    MotoNode *obj = (MotoNode *)moto_world_get_current_object(self->priv->world);
+    MotoNode *view = (MotoNode *)moto_node_get_param_object(obj, "view");
+
+    MotoParam *p = moto_node_get_param(view, "mesh");
+    if( ! p)
+        return;
+    MotoParam *s = moto_param_get_source(p);
+    if( ! s)
+        return;
+    moto_param_editor_update(self->priv->param_editor, moto_param_get_node(s));
 }
 
 static void init_gl(GtkWidget *widget, gpointer data)

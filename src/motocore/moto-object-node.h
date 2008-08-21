@@ -108,6 +108,8 @@ void moto_object_node_yaw(MotoObjectNode *self, gfloat da);
 void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, gint height);
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order);
 
+void moto_object_node_set_translate(MotoObjectNode *self, gfloat x, gfloat y, gfloat z);
+
 gfloat *moto_object_node_get_matrix(MotoObjectNode *self, gboolean global);
 gfloat *moto_object_node_get_inverse_matrix(MotoObjectNode *self, gboolean global);
 

@@ -10,6 +10,8 @@ struct _MotoMessagerPriv
     guint info_count;
     guint warning_count;
     guint error_count;
+
+    gboolean print_messages;
 };
 
 static void info_inc()
@@ -58,6 +60,8 @@ moto_messager_init(MotoMessager *self)
     self->priv->info_count      = 0;
     self->priv->warning_count   = 0;
     self->priv->error_count     = 0;
+
+    self->priv->print_messages = TRUE;
 }
 
 static void
@@ -70,16 +74,18 @@ moto_messager_class_init(MotoMessagerClass *klass)
     goclass->dispose = moto_messager_dispose;
     goclass->finalize = moto_messager_finalize;
 
+    GType types[] = {G_TYPE_STRING};
+
     klass->info_message_signal_id = g_signal_newv ("info-message",
                  G_TYPE_FROM_CLASS (klass),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 g_cclosure_marshal_VOID__VOID,
+                 g_cclosure_marshal_VOID__STRING,
                  G_TYPE_NONE /* return_type */,
-                 0     /* n_params */,
-                 NULL  /* param_types */);
+                 1     /* n_params */,
+                 types  /* param_types */);
 
     klass->warning_message_signal_id = g_signal_newv ("warning-message",
                  G_TYPE_FROM_CLASS (klass),
@@ -87,10 +93,10 @@ moto_messager_class_init(MotoMessagerClass *klass)
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 g_cclosure_marshal_VOID__VOID,
+                 g_cclosure_marshal_VOID__STRING,
                  G_TYPE_NONE /* return_type */,
-                 0     /* n_params */,
-                 NULL  /* param_types */);
+                 1     /* n_params */,
+                 types  /* param_types */);
 
     klass->error_message_signal_id = g_signal_newv ("error-message",
                  G_TYPE_FROM_CLASS (klass),
@@ -98,10 +104,10 @@ moto_messager_class_init(MotoMessagerClass *klass)
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 g_cclosure_marshal_VOID__VOID,
+                 g_cclosure_marshal_VOID__STRING,
                  G_TYPE_NONE /* return_type */,
-                 0     /* n_params */,
-                 NULL  /* param_types */);
+                 1     /* n_params */,
+                 types  /* param_types */);
 
 }
 
@@ -117,32 +123,50 @@ MotoMessager *moto_messager_singleton()
     return messager;
 }
 
+void moto_messager_set_print_messages(gboolean status)
+{
+    MotoMessager *self = moto_messager_singleton();
+    self->priv->print_messages = status;
+}
+
+gboolean moto_messager_get_print_messages()
+{
+    MotoMessager *self = moto_messager_singleton();
+    return self->priv->print_messages;
+}
+
 void moto_info(const gchar *msg)
 {
-    g_print("Info: %s\n", msg);
+    MotoMessager *self = moto_messager_singleton();
     info_inc();
 
-    MotoMessager *self = moto_messager_singleton();
+    if(self->priv->print_messages)
+        g_print("[Info] %s\n", msg);
+
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->info_message_signal_id, 0, NULL);
+    g_signal_emit(self, klass->info_message_signal_id, 0, msg);
 }
 
 void moto_warning(const gchar *msg)
 {
-    g_print("Warning: %s\n", msg);
+    MotoMessager *self = moto_messager_singleton();
     warning_inc();
 
-    MotoMessager *self = moto_messager_singleton();
+    if(self->priv->print_messages)
+        g_print("[Warning] %s\n", msg);
+
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->warning_message_signal_id, 0, NULL);
+    g_signal_emit(self, klass->warning_message_signal_id, 0, msg);
 }
 
 void moto_error(const gchar *msg)
 {
-    g_print("Error: %s\n", msg);
+    MotoMessager *self = moto_messager_singleton();
     error_inc();
 
-    MotoMessager *self = moto_messager_singleton();
+    if(self->priv->print_messages)
+        g_print("[Error] %s\n", msg);
+
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->error_message_signal_id, 0, NULL);
+    g_signal_emit(self, klass->error_message_signal_id, 0, msg);
 }

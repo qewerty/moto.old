@@ -57,6 +57,8 @@ GType moto_messager_get_type(void);
 #define MOTO_MESSAGER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESSAGER, MotoMessagerClass))
 
 MotoMessager *moto_messager_singleton();
+void moto_messager_set_print_messages(gboolean status);
+gboolean moto_messager_get_print_messages();
 
 void moto_info(const gchar *msg);
 void moto_warning(const gchar *msg);

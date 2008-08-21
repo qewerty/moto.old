@@ -89,7 +89,6 @@ moto_shelf_dispose(GObject *obj)
 
     if(self->priv->disposed)
         return;
-
     self->priv->disposed = TRUE;
 
     shelf_parent_class->dispose(obj);
@@ -121,6 +120,8 @@ moto_shelf_class_init(MotoShelfClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
+    shelf_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
     goclass->dispose    = moto_shelf_dispose;
     goclass->finalize   = moto_shelf_finalize;
 }
@@ -135,13 +136,27 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     self->priv->window = window;
 
     moto_shelf_add_tab(self, "Mesh");
-    moto_shelf_add_tab(self, "Model");
-    moto_shelf_add_tab(self, "Anim");
 
     moto_shelf_add_item(self, "Mesh", "Plane", create_mesh_plane);
     moto_shelf_add_item(self, "Mesh", "Cube", create_mesh_cube);
 
-    moto_shelf_add_item(self, "Anim", "BlendShape", NULL);
+    moto_shelf_add_tab(self, "Poly");
+    moto_shelf_add_item(self, "Poly", "Extrude", create_mesh_cube);
+    moto_shelf_add_item(self, "Poly", "Bevel", create_mesh_cube);
+    moto_shelf_add_item(self, "Poly", "Collapse", create_mesh_cube);
+
+    moto_shelf_add_tab(self, "Anim");
+    moto_shelf_add_item(self, "Anim", "Morph", NULL);
+    moto_shelf_add_item(self, "Anim", "Lattice", NULL);
+
+    moto_shelf_add_tab(self, "Render");
+    moto_shelf_add_item(self, "Render", "Camera", NULL);
+    moto_shelf_add_item(self, "Render", "Light", NULL);
+
+    moto_shelf_add_tab(self, "Deform");
+    moto_shelf_add_item(self, "Deform", "Twist", NULL);
+    moto_shelf_add_item(self, "Deform", "Bend", NULL);
+    moto_shelf_add_item(self, "Deform", "Displace", NULL);
 
     return (GtkWidget *)self;
 }
@@ -171,6 +186,7 @@ static void on_item(GtkButton *button, ShelfItemData *data)
 
     data->func(data->shelf, data->system);
     moto_test_window_redraw_3dview(data->shelf->priv->window);
+    moto_test_window_update_param_editor(data->shelf->priv->window);
 }
 
 void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *name, MotoShelfFunc func)

@@ -78,8 +78,8 @@ moto_plane_node_init(MotoPlaneNode *self)
     moto_node_add_params(node,
             "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 12.0f, pspec, "Size", "Size",
             "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 6.0f, pspec, "Size", "Size",
-            "div_x", "Size X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_y", "Size Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
+            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_PLUS_Y, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);

@@ -61,17 +61,27 @@ moto_tool_box_init(MotoToolBox *self)
 
     self->priv->system = NULL;
 
+    gtk_widget_set_size_request((GtkWidget *)self, 24, 24);
+
     /* gui */
     GtkButton *b = (GtkButton *)gtk_button_new();
+    // gtk_widget_set_size_request((GtkWidget *)b, 24, 24);
     gtk_button_set_relief(b, GTK_RELIEF_NONE);
 
-    GtkWidget *im = gtk_image_new_from_file("./resources/icons/moto-object-selection-mode-icon.png");
+    gchar *filename = g_build_filename("resources", "icons", "moto-object-selection-mode-icon.png", NULL);
+    GtkWidget *im = gtk_image_new_from_file(filename);
+    g_free(filename);
+
     gtk_button_set_image(b, im);
 
     gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
     b = (GtkButton *)gtk_button_new();
+    // gtk_widget_set_size_request((GtkWidget *)b, 24, 24);
 
-    im = gtk_image_new_from_file("./resources/icons/moto-component-selection-mode-icon.png");
+    filename = g_build_filename("resources", "icons", "moto-component-selection-mode-icon.png", NULL);
+    im = gtk_image_new_from_file(filename);
+    g_free(filename);
+
     gtk_button_set_image(b, im);
     gtk_button_set_relief(b, GTK_RELIEF_NONE);
 
@@ -80,7 +90,7 @@ moto_tool_box_init(MotoToolBox *self)
 
     gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
 
-    gtk_widget_set_size_request((GtkWidget *)self, 42, 120);
+    gtk_widget_set_size_request((GtkWidget *)self, 36, 120);
 }
 
 static void

@@ -717,6 +717,25 @@ void moto_node_set_params(MotoNode *self, ...)
     }
 }
 
+typedef struct _NodeParamData
+{
+    MotoNodeForeachParamFunc func;
+    MotoNode *node;
+    gpointer user_data;
+} NodeParamData;
+
+static void call_param_func(MotoParam *param, NodeParamData *data)
+{
+    data->func(data->node, param, data->user_data);
+}
+
+void moto_node_foreach_param(MotoNode *self,
+        MotoNodeForeachParamFunc func, gpointer user_data)
+{
+    NodeParamData data = {func, self, user_data};
+    moto_mapped_list_foreach( & self->priv->params, (GFunc)call_param_func, & data);
+}
+
 void moto_node_link(MotoNode *self, const gchar *in_name,
                           MotoNode *other, const gchar *out_name)
 {
@@ -969,6 +988,11 @@ GValue * moto_param_get_value(MotoParam *self)
 gpointer moto_param_get_value_pointer(MotoParam *self)
 {
     return self->priv->value.data;
+}
+
+GType moto_param_get_value_type(MotoParam *self)
+{
+    return G_VALUE_TYPE( & self->priv->value);
 }
 
 gboolean moto_param_get_boolean(MotoParam *self)

@@ -32,12 +32,21 @@ void print_type_tree(GType type)
     print_type_tree_indent(type, "");
 }
 
+/*
+static gboolean test_idle(gpointer data)
+{
+    g_print("test idle\n");
+}
+*/
+
 int main(int argc, char *argv[])
 {
     g_print("Initializing Moto ...\n");
 
     gtk_init(& argc, & argv);
     g_thread_init(NULL);
+
+    // g_print("s: %s\n", g_find_program_in_path(argv[0]));
 
     GtkWindow *win = moto_test_window_new();
     gtk_widget_show_all((GtkWidget *)win);
@@ -47,6 +56,8 @@ int main(int argc, char *argv[])
     g_print("\nRegistered node types:\n\n");
     print_type_tree(MOTO_TYPE_NODE);
     g_print("\n... OK\n");
+
+    // g_idle_add(test_idle, NULL);
 
     gtk_main();
 
