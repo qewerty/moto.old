@@ -8,13 +8,10 @@ GType moto_orientation_get_type(void)
     static GType type = 0;
     if(0 == type)
     {
-        GEnumValue values[] = {
-            {MOTO_ORIENTATION_PLUS_X, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
-            {MOTO_ORIENTATION_MINUS_X, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
-            {MOTO_ORIENTATION_PLUS_Y, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
-            {MOTO_ORIENTATION_MINUS_Y, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
-            {MOTO_ORIENTATION_PLUS_Z, "MOTO_ORIENTATION_PLUS_X", "MOTO_ORIENTATION_PLUS_X"},
-            {MOTO_ORIENTATION_MINUS_Z, "MOTO_ORIENTATION_MINUS_X", "MOTO_ORIENTATION_MINUS_X"},
+        static GEnumValue values[] = {
+            {MOTO_ORIENTATION_XY, "ORIENTATION_XY", "XY"},
+            {MOTO_ORIENTATION_YZ, "ORIENTATION_YZ", "YZ"},
+            {MOTO_ORIENTATION_ZX, "ORIENTATION_ZX", "ZX"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoOrientation", values);
@@ -76,11 +73,11 @@ moto_plane_node_init(MotoPlaneNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 12.0f, pspec, "Size", "Size",
-            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 6.0f, pspec, "Size", "Size",
-            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 50u, pspec, "Divisions", "Divisions",
-            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_PLUS_Y, pspec, "Orientation", "Orientation",
+            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 10.0f, pspec, "Size", "Size",
+            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 10.0f, pspec, "Size", "Size",
+            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -176,7 +173,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
     guint f_num = div_x*div_y;
-    g_print("Plane: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
+    // g_print("Plane: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     if(self->priv->mesh)
     {
@@ -196,7 +193,6 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
 
     if(mesh->b32)
     {
@@ -215,7 +211,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
 
         guint32 vi = 0, fi = 0;
-        if(MOTO_ORIENTATION_PLUS_X == orientation)
+        if(MOTO_ORIENTATION_YZ == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -226,7 +222,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                     vi++;
                 }
         }
-        else if(MOTO_ORIENTATION_PLUS_Y == orientation)
+        else if(MOTO_ORIENTATION_ZX == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -237,7 +233,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                     vi++;
                 }
         }
-        else if(MOTO_ORIENTATION_PLUS_Z == orientation)
+        else if(MOTO_ORIENTATION_XY == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -346,7 +342,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
 
         guint16 vi = 0, fi = 0;
-        if(MOTO_ORIENTATION_PLUS_X == orientation)
+        if(MOTO_ORIENTATION_YZ == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -357,7 +353,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                     vi++;
                 }
         }
-        else if(MOTO_ORIENTATION_PLUS_Y == orientation)
+        else if(MOTO_ORIENTATION_ZX == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -368,7 +364,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                     vi++;
                 }
         }
-        else if(MOTO_ORIENTATION_PLUS_Z == orientation)
+        else if(MOTO_ORIENTATION_XY == orientation)
         {
             for(i = 0; i < div_x+1; i++)
                 for(j = 0; j < div_y+1; j++)
@@ -465,6 +461,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
     // g_print("BEFORE moto_mesh_prepare\n");
     moto_mesh_prepare(mesh);
+    moto_param_update_dests(pm);
 }
 #undef e_x_num
 #undef e_y_num
@@ -494,9 +491,27 @@ static void calc_bound(MotoPlaneNode *self)
 {
     gfloat size_x = *(self->priv->size_x_ptr);
     gfloat size_y = *(self->priv->size_y_ptr);
-    gfloat hsx = size_x / 2;
-    gfloat hsy = size_y / 2;
-    gfloat hsz = 0.05;
+    MotoOrientation orientation = *(self->priv->orientation_ptr);
+
+    gfloat hsx, hsy, hsz;
+    if(MOTO_ORIENTATION_XY == orientation)
+    {
+        hsx = size_x / 2;
+        hsy = size_y / 2;
+        hsz = 0.05;
+    }
+    else if(MOTO_ORIENTATION_YZ == orientation)
+    {
+        hsx = 0.05;
+        hsy = size_x / 2;
+        hsz = size_y / 2;
+    }
+    else // if(MOTO_ORIENTATION_ZX == orientation)
+    {
+        hsx = size_x / 2;
+        hsy = 0.05;
+        hsz = size_y / 2;
+    }
 
     self->priv->bound->bound[0] = -hsx;
     self->priv->bound->bound[1] =  hsx;

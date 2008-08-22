@@ -31,12 +31,9 @@ typedef struct _MotoPlaneNodePriv MotoPlaneNodePriv;
 
 typedef enum
 {
-    MOTO_ORIENTATION_PLUS_X,
-    MOTO_ORIENTATION_MINUS_X,
-    MOTO_ORIENTATION_PLUS_Y,
-    MOTO_ORIENTATION_MINUS_Y,
-    MOTO_ORIENTATION_PLUS_Z,
-    MOTO_ORIENTATION_MINUS_Z
+    MOTO_ORIENTATION_XY,
+    MOTO_ORIENTATION_YZ,
+    MOTO_ORIENTATION_ZX,
 } MotoOrientation;
 
 /* class MotoPlaneNode */

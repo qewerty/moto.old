@@ -31,13 +31,13 @@ GType moto_transform_order_get_type(void)
     static GType type = 0;
     if(0 == type)
     {
-        GEnumValue values[] = {
-            {MOTO_TRANSFORM_ORDER_TRS, "TRANSFORM_ORDER_TRS", "TRANSFORM_ORDER_TRS"},
-            {MOTO_TRANSFORM_ORDER_TSR, "TRANSFORM_ORDER_TSR", "TRANSFORM_ORDER_TSR"},
-            {MOTO_TRANSFORM_ORDER_RTS, "TRANSFORM_ORDER_RTS", "TRANSFORM_ORDER_RTS"},
-            {MOTO_TRANSFORM_ORDER_RST, "TRANSFORM_ORDER_RST", "TRANSFORM_ORDER_RST"},
-            {MOTO_TRANSFORM_ORDER_STR, "TRANSFORM_ORDER_STR", "TRANSFORM_ORDER_STR"},
-            {MOTO_TRANSFORM_ORDER_SRT, "TRANSFORM_ORDER_SRT", "TRANSFORM_ORDER_SRT"},
+        static GEnumValue values[] = {
+            {MOTO_TRANSFORM_ORDER_TRS, "TRANSFORM_ORDER_TRS", "TRS"},
+            {MOTO_TRANSFORM_ORDER_TSR, "TRANSFORM_ORDER_TSR", "TSR"},
+            {MOTO_TRANSFORM_ORDER_RTS, "TRANSFORM_ORDER_RTS", "RTS"},
+            {MOTO_TRANSFORM_ORDER_RST, "TRANSFORM_ORDER_RST", "RST"},
+            {MOTO_TRANSFORM_ORDER_STR, "TRANSFORM_ORDER_STR", "STR"},
+            {MOTO_TRANSFORM_ORDER_SRT, "TRANSFORM_ORDER_SRT", "SRT"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoTransformOrder", values);
@@ -50,13 +50,13 @@ GType moto_rotate_order_get_type(void)
     static GType type = 0;
     if(0 == type)
     {
-        GEnumValue values[] = {
-            {MOTO_ROTATE_ORDER_XYZ, "ROTATE_ORDER_XYZ", "ROTATE_ORDER_XYZ"},
-            {MOTO_ROTATE_ORDER_XZY, "ROTATE_ORDER_XZY", "ROTATE_ORDER_XZY"},
-            {MOTO_ROTATE_ORDER_YXZ, "ROTATE_ORDER_YXZ", "ROTATE_ORDER_YXZ"},
-            {MOTO_ROTATE_ORDER_YZX, "ROTATE_ORDER_YZX", "ROTATE_ORDER_YZX"},
-            {MOTO_ROTATE_ORDER_ZXY, "ROTATE_ORDER_ZXY", "ROTATE_ORDER_ZXY"},
-            {MOTO_ROTATE_ORDER_ZYX, "ROTATE_ORDER_ZYX", "ROTATE_ORDER_ZYX"},
+        static GEnumValue values[] = {
+            {MOTO_ROTATE_ORDER_XYZ, "MOTO_ROTATE_ORDER_XYZ", "XYZ"},
+            {MOTO_ROTATE_ORDER_XZY, "MOTO_ROTATE_ORDER_XZY", "XZY"},
+            {MOTO_ROTATE_ORDER_YXZ, "MOTO_ROTATE_ORDER_YXZ", "YXZ"},
+            {MOTO_ROTATE_ORDER_YZX, "MOTO_ROTATE_ORDER_YZX", "YZX"},
+            {MOTO_ROTATE_ORDER_ZXY, "MOTO_ROTATE_ORDER_ZXY", "ZXY"},
+            {MOTO_ROTATE_ORDER_ZYX, "MOTO_ROTATE_ORDER_ZYX", "ZYX"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoRotateOrder", values);

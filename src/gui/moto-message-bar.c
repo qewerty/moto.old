@@ -36,7 +36,7 @@ moto_message_bar_init(MotoMessageBar *self)
     self->priv = g_slice_new(MotoMessageBarPriv);
     self->priv->disposed = FALSE;
 
-    gtk_widget_set_size_request((GtkWidget *)self, 100, 24);
+    gtk_widget_set_size_request((GtkWidget *)self, 100, 22);
 
     self->priv->messager = NULL;
 }
@@ -93,7 +93,7 @@ GtkWidget *moto_message_bar_new(MotoMessager *messager)
         moto_messager_set_print_messages(FALSE);
     }
 
-    moto_error("Don't warry. Just test error.");
+    moto_info("OK");
 
     return (GtkWidget *)self;
 }

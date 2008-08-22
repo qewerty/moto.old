@@ -301,7 +301,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
-    self->priv->param_editor = moto_param_editor_new();
+    self->priv->param_editor = moto_param_editor_new(self);
     gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
 
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
@@ -340,9 +340,9 @@ moto_test_window_init(MotoTestWindow *self)
     // g_object_unref(G_OBJECT(grid_view_node));
 
     gtk_window_set_title((GtkWindow *)self, "Moto v0.0");
-    gtk_widget_set_size_request((GtkWidget *)self, 640, 480);
+    gtk_widget_set_size_request((GtkWidget *)self, 800, 480);
 
-    g_thread_create((GThreadFunc)anim_thread, self, TRUE, NULL);
+    // g_thread_create((GThreadFunc)anim_thread, self, TRUE, NULL);
 }
 
 static void
@@ -392,6 +392,10 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
     if( ! s)
         return;
     moto_param_editor_update(self->priv->param_editor, moto_param_get_node(s));
+
+    /*
+    moto_param_editor_update(self->priv->param_editor, obj);
+    */
 }
 
 static void init_gl(GtkWidget *widget, gpointer data)

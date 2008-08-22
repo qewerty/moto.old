@@ -6,6 +6,8 @@
 #include "common/moto-glext.h"
 
 #include "moto-node.h"
+#include "moto-object-node.h"
+#include "moto-plane-node.h"
 
 void print_type_tree_indent(GType type, const gchar *indent)
 {
@@ -39,6 +41,26 @@ static gboolean test_idle(gpointer data)
 }
 */
 
+void print_enum()
+{
+    GType g_type = MOTO_TYPE_ORIENTATION;
+    if(G_TYPE_IS_ENUM(g_type))
+    {
+        GEnumClass *ec = (GEnumClass *)g_type_class_ref(g_type);
+
+        g_print("Values (%u) of enum type %s:\n", ec->n_values, g_type_name(g_type));
+        guint i;
+        for(i = 0; i < ec->n_values; i++)
+        {
+            g_print("\t%s\n", ec->values[i].value_nick);
+        }
+
+        g_type_class_unref(ec);
+        /*
+        */
+    }
+}
+
 int main(int argc, char *argv[])
 {
     g_print("Initializing Moto ...\n");
@@ -52,6 +74,8 @@ int main(int argc, char *argv[])
     gtk_widget_show_all((GtkWidget *)win);
 
     // moto_glext_print_list();
+
+    print_enum();
 
     g_print("\nRegistered node types:\n\n");
     print_type_tree(MOTO_TYPE_NODE);

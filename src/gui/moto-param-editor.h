@@ -27,6 +27,7 @@
 #include <gtk/gtk.h>
 
 #include "motocore/moto-world.h"
+#include "moto-test-window.h"
 
 typedef struct _MotoParamEditor MotoParamEditor;
 typedef struct _MotoParamEditorClass MotoParamEditorClass;
@@ -55,7 +56,7 @@ GType moto_param_editor_get_type(void);
 #define MOTO_IS_PARAM_EDITOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_EDITOR))
 #define MOTO_PARAM_EDITOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_EDITOR, MotoParamEditorClass))
 
-GtkWidget *moto_param_editor_new();
+GtkWidget *moto_param_editor_new(MotoTestWindow *window);
 
 void moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
 

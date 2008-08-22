@@ -9,6 +9,7 @@ struct _MotoParamEditorPriv
     gboolean disposed;
 
     MotoNode *node;
+    MotoTestWindow *window;
     guint num;
 };
 
@@ -37,10 +38,11 @@ moto_param_editor_init(MotoParamEditor *self)
     self->priv = g_slice_new(MotoParamEditorPriv);
     self->priv->disposed = FALSE;
 
-    gtk_widget_set_size_request((GtkWidget *)self, 240, 36);
+    gtk_widget_set_size_request((GtkWidget *)self, 360, 36);
     gtk_table_set_homogeneous((GtkTable *)self, FALSE);
 
     self->priv->node = NULL;
+    self->priv->window = NULL;
     self->priv->num = 0;
 }
 
@@ -57,9 +59,11 @@ moto_param_editor_class_init(MotoParamEditorClass *klass)
 
 G_DEFINE_TYPE(MotoParamEditor, moto_param_editor, GTK_TYPE_TABLE);
 
-GtkWidget *moto_param_editor_new()
+GtkWidget *moto_param_editor_new(MotoTestWindow *window)
 {
     MotoParamEditor *self = (MotoParamEditor *)g_object_new(MOTO_TYPE_PARAM_EDITOR, NULL);
+
+    self->priv->window = window;
 
     return (GtkWidget *)self;
 }
@@ -69,29 +73,92 @@ static void node_delete_notify(MotoParamEditor *pe, GObject *where_the_object_wa
     moto_param_editor_update(pe, NULL);
 }
 
-static GtkWidget *create_widget_for_param(MotoParam *param)
+typedef struct _OnChangedData
+{
+    MotoParam *param;
+    MotoTestWindow *window;
+} OnChangedData;
+
+void on_float_changed(GtkSpinButton *spinbutton,
+                      OnChangedData *data)
+{
+    gfloat value = gtk_spin_button_get_value_as_float(spinbutton);
+    moto_param_set_float(data->param, value);
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+void on_int_changed(GtkSpinButton *spinbutton,
+                    OnChangedData *data)
+{
+    gint value = gtk_spin_button_get_value_as_int(spinbutton);
+    moto_param_set_int(data->param, value);
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+void on_uint_changed(GtkSpinButton *spinbutton,
+                     OnChangedData *data)
+{
+    guint value = gtk_spin_button_get_value_as_int(spinbutton);
+    moto_param_set_uint(data->param, value);
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+void on_boolean_changed(GtkToggleButton *togglebutton,
+                        OnChangedData *data)
+{
+    gboolean value = gtk_toggle_button_get_active(togglebutton);
+    moto_param_set_boolean(data->param, value);
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 {
     GtkWidget *widget = NULL;
+    OnChangedData *data;
     switch(moto_param_get_value_type(param))
     {
         case G_TYPE_INT:
             widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
-            gtk_entry_set_editable((GtkEntry *)widget, TRUE);
             gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_int(param));
+            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+
+            data = g_slice_new(OnChangedData);
+            data->param = param;
+            data->window = pe->priv->window;
+            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
         break;
         case G_TYPE_UINT:
             widget = gtk_spin_button_new_with_range(0, 1000000, 1);
-            gtk_entry_set_editable((GtkEntry *)widget, TRUE);
             gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_uint(param));
+            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+
+            data = g_slice_new(OnChangedData);
+            data->param = param;
+            data->window = pe->priv->window;
+            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_uint_changed), data);
         break;
         case G_TYPE_BOOLEAN:
             widget = gtk_check_button_new();
             gtk_toggle_button_set_active((GtkToggleButton *)widget, moto_param_get_boolean(param));
+
+            data = g_slice_new(OnChangedData);
+            data->param = param;
+            data->window = pe->priv->window;
+            g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolean_changed), data);
         break;
         case G_TYPE_FLOAT:
             widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.01);
-            gtk_entry_set_editable((GtkEntry *)widget, TRUE);
             gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_float(param));
+            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+
+            data = g_slice_new(OnChangedData);
+            data->param = param;
+            data->window = pe->priv->window;
+            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_float_changed), data);
         break;
     }
     return widget;
@@ -111,9 +178,9 @@ static void add_param_widget(MotoNode *node, MotoParam *param, MotoParamEditor *
     gtk_table_attach((GtkTable *)pe,
             label,
             0, 1, pe->priv->num, pe->priv->num + 1,
-            GTK_SHRINK | GTK_FILL, GTK_SHRINK, 4, 0);
+            GTK_SHRINK | GTK_FILL, GTK_SHRINK, 8, 0);
 
-    GtkWidget *pwidget = create_widget_for_param(param);
+    GtkWidget *pwidget = create_widget_for_param(pe, param);
     if(pwidget)
     {
         gtk_table_attach((GtkTable *)pe,

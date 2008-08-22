@@ -37,9 +37,16 @@ INPUTS:
 OUTPUTS:
     Mesh    out_mesh
     NURBS   out_nurbs
+    
+MeshOp(Node)
+============
+INPUTS:
+    Mesh    in_mesh
+OUTPUS:
+    Mesh    out_mesh
 
-Extrude(Node)
-=============
+Extrude(MeshOp)
+===============
 INPUTS:
     float           tx
     float           ty
@@ -51,21 +58,27 @@ INPUTS:
     float           ry
     float           rz
     int             divisions
-    Mesh            in_mesh
 OUTPUTS:
-    Mesh            out_mesh
+    ...
+    
+FuncDeform(MeshOp)
+==================
+INPUTS:
+    float:varying   func
+OUTPUTS:
+    ...
 
 ~GeometryView(Node)
 ===================
 INPUTS:
-    ...
+    RenderGen generator
 OUTPUTS:
     GeometryView    view
 
 MeshView(GeometryView)
 ======================
 INPUTS:
-    ...
+    Mesh in_mesh
 OUTPUTS:
     ...
 
@@ -76,15 +89,51 @@ INPUTS:
 OUTPUTS:
     ...
     
+~RenderGen
+==========
+INPUTS:
+    ...
+OUTPUTS:
+    RenderGen generator
+    
+~RMGen(RenderGen) # RenderMan Geometry Generator
+============
+INPUTS
+    ...
+OUTPUTS:
+    # RMGen   generator
+    
+~PovGen(RenderGen) # PovRay Geometry Generator
+============
+INPUTS
+    ...
+OUTPUTS:
+    # PovGen   generator
+    
+~YafGen(RenderGen) # PovRay Geometry Generator
+============
+INPUTS
+    ...
+OUTPUTS:
+    # YafGen   generator
+    
+~MRGen(RenderGen) # MentalRay Geometry Generator
+============
+INPUTS
+    ...
+OUTPUTS:
+    # MRGen   generator
+    
 ~Transform(Node)
 ================
 INPUTS:
-    Transform   parent
+    Transform       parent
+    GeometryView    view
 OUTPUTS
-    Transform   transform
+    Transform       transform
 
-Object(Transform)
-=================
+EulerObject(Transform)
+======================
 INPUTS:
     float           tx
     float           ty
@@ -97,7 +146,26 @@ INPUTS:
     float           rz
     TransformOrder  translate_order
     RotateOrder     rotate_order
-    GeometryView    view
+OUTPUTS:
+    ...
+    
+QuatObject(Transform)
+=====================
+INPUTS:
+    float qx
+    float qy
+    float qz
+    float qw
+OUTPUTS:
+    ...
+    
+AxisObject(Transform)
+=====================
+INPUTS:
+    float ax
+    float ay
+    float az
+    float aa
 OUTPUTS:
     ...
 
