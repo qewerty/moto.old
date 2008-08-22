@@ -166,19 +166,22 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
     guint f_num = div_x*div_y*2 + div_x*div_z*2 + div_y*div_z*2;
-    g_print("Cube: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
+    // g_print("Cube: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
+    gboolean new_mesh = FALSE;
     if(self->priv->mesh)
     {
         if(v_num != self->priv->mesh->v_num || e_num != self->priv->mesh->e_num || f_num != self->priv->mesh->f_num)
         {
             g_object_unref(self->priv->mesh);
             self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+            new_mesh = TRUE;
         }
     }
     else
     {
         self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+        new_mesh = TRUE;
     }
 
     MotoMesh *mesh = self->priv->mesh;
@@ -186,7 +189,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
 
     if(mesh->b32)
     {
@@ -220,385 +222,388 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                     mesh->v_coords[vi].z = -hsz + size_z/div_z * k;
                     vi++;
                 }
-        fi = 0;
-        // x-axis faces
-        for(i = 0; i < div_y; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                f_verts[fi*4]   = get_v(0, i, j);
-                f_verts[fi*4+1] = get_v(0, i, j+1);
-                f_verts[fi*4+2] = get_v(0, i+1, j+1);
-                f_verts[fi*4+3] = get_v(0, i+1, j);
+        if(new_mesh)
+        {
+            fi = 0;
+            // x-axis faces
+            for(i = 0; i < div_y; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    f_verts[fi*4]   = get_v(0, i, j);
+                    f_verts[fi*4+1] = get_v(0, i, j+1);
+                    f_verts[fi*4+2] = get_v(0, i+1, j+1);
+                    f_verts[fi*4+3] = get_v(0, i+1, j);
 
-                guint32 e0 = e_z(0, i, j),
-                        e1 = e_y(0, i, j+1),
-                        e2 = e_z(0, i+1, j),
-                        e3 = e_y(0, i, j);
+                    guint32 e0 = e_z(0, i, j),
+                            e1 = e_y(0, i, j+1),
+                            e2 = e_z(0, i+1, j),
+                            e3 = e_y(0, i, j);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_y; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                guint32 v0 = get_v(div_x, i, j),
-                        v1 = get_v(div_x, i+1, j),
-                        v2 = get_v(div_x, i+1, j+1),
-                        v3 = get_v(div_x, i, j+1);
-                f_verts[fi*4]   = v0;
-                f_verts[fi*4+1] = v1;
-                f_verts[fi*4+2] = v2;
-                f_verts[fi*4+3] = v3;
+                    fi++;
+                }
+            for(i = 0; i < div_y; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    guint32 v0 = get_v(div_x, i, j),
+                            v1 = get_v(div_x, i+1, j),
+                            v2 = get_v(div_x, i+1, j+1),
+                            v3 = get_v(div_x, i, j+1);
+                    f_verts[fi*4]   = v0;
+                    f_verts[fi*4+1] = v1;
+                    f_verts[fi*4+2] = v2;
+                    f_verts[fi*4+3] = v3;
 
-                guint32 e0 = e_y(div_x, i, j),
-                        e1 = e_z(div_x, i+1, j),
-                        e2 = e_y(div_x, i, j+1),
-                        e3 = e_z(div_x, i, j);
+                    guint32 e0 = e_y(div_x, i, j),
+                            e1 = e_z(div_x, i+1, j),
+                            e2 = e_y(div_x, i, j+1),
+                            e3 = e_z(div_x, i, j);
 
-                e_verts[e0*2]   = v0;
-                e_verts[e0*2+1] = v1;
-                e_verts[e1*2]   = v1;
-                e_verts[e1*2+1] = v2;
-                e_verts[e2*2]   = v2;
-                e_verts[e2*2+1] = v3;
-                e_verts[e3*2]   = v3;
-                e_verts[e3*2+1] = v0;
+                    e_verts[e0*2]   = v0;
+                    e_verts[e0*2+1] = v1;
+                    e_verts[e1*2]   = v1;
+                    e_verts[e1*2+1] = v2;
+                    e_verts[e2*2]   = v2;
+                    e_verts[e2*2+1] = v3;
+                    e_verts[e3*2]   = v3;
+                    e_verts[e3*2+1] = v0;
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        // y-axis faces
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                guint32 v0 = get_v(i, 0, j),
-                        v1 = get_v(i+1, 0, j),
-                        v2 = get_v(i+1, 0, j+1),
-                        v3 = get_v(i, 0, j+1);
-                f_verts[fi*4]   = v0;
-                f_verts[fi*4+1] = v1;
-                f_verts[fi*4+2] = v2;
-                f_verts[fi*4+3] = v3;
+                    fi++;
+                }
+            // y-axis faces
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    guint32 v0 = get_v(i, 0, j),
+                            v1 = get_v(i+1, 0, j),
+                            v2 = get_v(i+1, 0, j+1),
+                            v3 = get_v(i, 0, j+1);
+                    f_verts[fi*4]   = v0;
+                    f_verts[fi*4+1] = v1;
+                    f_verts[fi*4+2] = v2;
+                    f_verts[fi*4+3] = v3;
 
-                guint32 e0 = e_x(i, 0, j),
-                        e1 = e_z(i+1, 0, j),
-                        e2 = e_x(i, 0, j+1),
-                        e3 = e_z(i, 0, j);
+                    guint32 e0 = e_x(i, 0, j),
+                            e1 = e_z(i+1, 0, j),
+                            e2 = e_x(i, 0, j+1),
+                            e3 = e_z(i, 0, j);
 
-                e_verts[e0*2]   = v0;
-                e_verts[e0*2+1] = v1;
-                e_verts[e1*2]   = v1;
-                e_verts[e1*2+1] = v2;
-                e_verts[e2*2]   = v2;
-                e_verts[e2*2+1] = v3;
-                e_verts[e3*2]   = v3;
-                e_verts[e3*2+1] = v0;
+                    e_verts[e0*2]   = v0;
+                    e_verts[e0*2+1] = v1;
+                    e_verts[e1*2]   = v1;
+                    e_verts[e1*2+1] = v2;
+                    e_verts[e2*2]   = v2;
+                    e_verts[e2*2+1] = v3;
+                    e_verts[e3*2]   = v3;
+                    e_verts[e3*2+1] = v0;
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[v0].half_edge = he0;
-                v_data[v1].half_edge = he1;
-                v_data[v2].half_edge = he2;
-                v_data[v3].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[v0].half_edge = he0;
+                    v_data[v1].half_edge = he1;
+                    v_data[v2].half_edge = he2;
+                    v_data[v3].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                f_verts[fi*4]   = get_v(i, div_y, j);
-                f_verts[fi*4+1] = get_v(i, div_y, j+1);
-                f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
-                f_verts[fi*4+3] = get_v(i+1, div_y, j);
+                    fi++;
+                }
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, div_y, j);
+                    f_verts[fi*4+1] = get_v(i, div_y, j+1);
+                    f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
+                    f_verts[fi*4+3] = get_v(i+1, div_y, j);
 
-                guint32 e0 = e_z(i, div_y, j),
-                        e1 = e_x(i, div_y, j+1),
-                        e2 = e_z(i+1, div_y, j),
-                        e3 = e_x(i, div_y, j);
+                    guint32 e0 = e_z(i, div_y, j),
+                            e1 = e_x(i, div_y, j+1),
+                            e2 = e_z(i+1, div_y, j),
+                            e3 = e_x(i, div_y, j);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        // z-axis faces
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_y; j++)
-            {
-                f_verts[fi*4]   = get_v(i, j, 0);
-                f_verts[fi*4+1] = get_v(i, j+1, 0);
-                f_verts[fi*4+2] = get_v(i+1, j+1, 0);
-                f_verts[fi*4+3] = get_v(i+1, j, 0);
+                    fi++;
+                }
+            // z-axis faces
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_y; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, j, 0);
+                    f_verts[fi*4+1] = get_v(i, j+1, 0);
+                    f_verts[fi*4+2] = get_v(i+1, j+1, 0);
+                    f_verts[fi*4+3] = get_v(i+1, j, 0);
 
-                guint32 e0 = e_y(i, j, 0),
-                        e1 = e_x(i, j+1, 0),
-                        e2 = e_y(i+1, j, 0),
-                        e3 = e_x(i, j, 0);
+                    guint32 e0 = e_y(i, j, 0),
+                            e1 = e_x(i, j+1, 0),
+                            e2 = e_y(i+1, j, 0),
+                            e3 = e_x(i, j, 0);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_y; j++)
-            {
-                f_verts[fi*4]   = get_v(i, j, div_z);
-                f_verts[fi*4+1] = get_v(i+1, j, div_z);
-                f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
-                f_verts[fi*4+3] = get_v(i, j+1, div_z);
+                    fi++;
+                }
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_y; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, j, div_z);
+                    f_verts[fi*4+1] = get_v(i+1, j, div_z);
+                    f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
+                    f_verts[fi*4+3] = get_v(i, j+1, div_z);
 
-                guint32 e0 = e_x(i, j, div_z),
-                        e1 = e_y(i+1, j, div_z),
-                        e2 = e_x(i, j+1, div_z),
-                        e3 = e_y(i, j, div_z);
+                    guint32 e0 = e_x(i, j, div_z),
+                            e1 = e_y(i+1, j, div_z),
+                            e2 = e_x(i, j+1, div_z),
+                            e3 = e_y(i, j, div_z);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint32 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint32 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
+                    fi++;
+                }
+        }
     }
     else
     {
-        MotoMeshVert16 *v_data  = (MotoMeshVert16*)mesh->v_data;
-        MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)mesh->e_data;
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)mesh->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)mesh->e_data;
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
-        MotoHalfEdge16 *he_data = (MotoHalfEdge16*)mesh->he_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)mesh->he_data;
         guint16 *e_verts = (guint16 *)mesh->e_verts;
         guint16 *f_verts = (guint16 *)mesh->f_verts;
 
@@ -625,383 +630,387 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                     mesh->v_coords[vi].z = -hsz + size_z/div_z * k;
                     vi++;
                 }
-        fi = 0;
-        // x-axis faces
-        for(i = 0; i < div_y; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                f_verts[fi*4]   = get_v(0, i, j);
-                f_verts[fi*4+1] = get_v(0, i, j+1);
-                f_verts[fi*4+2] = get_v(0, i+1, j+1);
-                f_verts[fi*4+3] = get_v(0, i+1, j);
+        if(new_mesh)
+        {
+            fi = 0;
+            // x-axis faces
+            for(i = 0; i < div_y; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    f_verts[fi*4]   = get_v(0, i, j);
+                    f_verts[fi*4+1] = get_v(0, i, j+1);
+                    f_verts[fi*4+2] = get_v(0, i+1, j+1);
+                    f_verts[fi*4+3] = get_v(0, i+1, j);
 
-                guint16 e0 = e_z(0, i, j),
-                        e1 = e_y(0, i, j+1),
-                        e2 = e_z(0, i+1, j),
-                        e3 = e_y(0, i, j);
+                    guint16 e0 = e_z(0, i, j),
+                            e1 = e_y(0, i, j+1),
+                            e2 = e_z(0, i+1, j),
+                            e3 = e_y(0, i, j);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_y; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                guint16 v0 = get_v(div_x, i, j),
-                        v1 = get_v(div_x, i+1, j),
-                        v2 = get_v(div_x, i+1, j+1),
-                        v3 = get_v(div_x, i, j+1);
-                f_verts[fi*4]   = v0;
-                f_verts[fi*4+1] = v1;
-                f_verts[fi*4+2] = v2;
-                f_verts[fi*4+3] = v3;
+                    fi++;
+                }
+            for(i = 0; i < div_y; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    guint16 v0 = get_v(div_x, i, j),
+                            v1 = get_v(div_x, i+1, j),
+                            v2 = get_v(div_x, i+1, j+1),
+                            v3 = get_v(div_x, i, j+1);
+                    f_verts[fi*4]   = v0;
+                    f_verts[fi*4+1] = v1;
+                    f_verts[fi*4+2] = v2;
+                    f_verts[fi*4+3] = v3;
 
-                guint16 e0 = e_y(div_x, i, j),
-                        e1 = e_z(div_x, i+1, j),
-                        e2 = e_y(div_x, i, j+1),
-                        e3 = e_z(div_x, i, j);
+                    guint16 e0 = e_y(div_x, i, j),
+                            e1 = e_z(div_x, i+1, j),
+                            e2 = e_y(div_x, i, j+1),
+                            e3 = e_z(div_x, i, j);
 
-                e_verts[e0*2]   = v0;
-                e_verts[e0*2+1] = v1;
-                e_verts[e1*2]   = v1;
-                e_verts[e1*2+1] = v2;
-                e_verts[e2*2]   = v2;
-                e_verts[e2*2+1] = v3;
-                e_verts[e3*2]   = v3;
-                e_verts[e3*2+1] = v0;
+                    e_verts[e0*2]   = v0;
+                    e_verts[e0*2+1] = v1;
+                    e_verts[e1*2]   = v1;
+                    e_verts[e1*2+1] = v2;
+                    e_verts[e2*2]   = v2;
+                    e_verts[e2*2+1] = v3;
+                    e_verts[e3*2]   = v3;
+                    e_verts[e3*2+1] = v0;
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        // y-axis faces
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                guint16 v0 = get_v(i, 0, j),
-                        v1 = get_v(i+1, 0, j),
-                        v2 = get_v(i+1, 0, j+1),
-                        v3 = get_v(i, 0, j+1);
-                f_verts[fi*4]   = v0;
-                f_verts[fi*4+1] = v1;
-                f_verts[fi*4+2] = v2;
-                f_verts[fi*4+3] = v3;
+                    fi++;
+                }
+            // y-axis faces
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    guint16 v0 = get_v(i, 0, j),
+                            v1 = get_v(i+1, 0, j),
+                            v2 = get_v(i+1, 0, j+1),
+                            v3 = get_v(i, 0, j+1);
+                    f_verts[fi*4]   = v0;
+                    f_verts[fi*4+1] = v1;
+                    f_verts[fi*4+2] = v2;
+                    f_verts[fi*4+3] = v3;
 
-                guint16 e0 = e_x(i, 0, j),
-                        e1 = e_z(i+1, 0, j),
-                        e2 = e_x(i, 0, j+1),
-                        e3 = e_z(i, 0, j);
+                    guint16 e0 = e_x(i, 0, j),
+                            e1 = e_z(i+1, 0, j),
+                            e2 = e_x(i, 0, j+1),
+                            e3 = e_z(i, 0, j);
 
-                e_verts[e0*2]   = v0;
-                e_verts[e0*2+1] = v1;
-                e_verts[e1*2]   = v1;
-                e_verts[e1*2+1] = v2;
-                e_verts[e2*2]   = v2;
-                e_verts[e2*2+1] = v3;
-                e_verts[e3*2]   = v3;
-                e_verts[e3*2+1] = v0;
+                    e_verts[e0*2]   = v0;
+                    e_verts[e0*2+1] = v1;
+                    e_verts[e1*2]   = v1;
+                    e_verts[e1*2+1] = v2;
+                    e_verts[e2*2]   = v2;
+                    e_verts[e2*2+1] = v3;
+                    e_verts[e3*2]   = v3;
+                    e_verts[e3*2+1] = v0;
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[v0].half_edge = he0;
-                v_data[v1].half_edge = he1;
-                v_data[v2].half_edge = he2;
-                v_data[v3].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[v0].half_edge = he0;
+                    v_data[v1].half_edge = he1;
+                    v_data[v2].half_edge = he2;
+                    v_data[v3].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_z; j++)
-            {
-                f_verts[fi*4]   = get_v(i, div_y, j);
-                f_verts[fi*4+1] = get_v(i, div_y, j+1);
-                f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
-                f_verts[fi*4+3] = get_v(i+1, div_y, j);
+                    fi++;
+                }
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_z; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, div_y, j);
+                    f_verts[fi*4+1] = get_v(i, div_y, j+1);
+                    f_verts[fi*4+2] = get_v(i+1, div_y, j+1);
+                    f_verts[fi*4+3] = get_v(i+1, div_y, j);
 
-                guint16 e0 = e_z(i, div_y, j),
-                        e1 = e_x(i, div_y, j+1),
-                        e2 = e_z(i+1, div_y, j),
-                        e3 = e_x(i, div_y, j);
+                    guint16 e0 = e_z(i, div_y, j),
+                            e1 = e_x(i, div_y, j+1),
+                            e2 = e_z(i+1, div_y, j),
+                            e3 = e_x(i, div_y, j);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        // z-axis faces
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_y; j++)
-            {
-                f_verts[fi*4]   = get_v(i, j, 0);
-                f_verts[fi*4+1] = get_v(i, j+1, 0);
-                f_verts[fi*4+2] = get_v(i+1, j+1, 0);
-                f_verts[fi*4+3] = get_v(i+1, j, 0);
+                    fi++;
+                }
+            // z-axis faces
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_y; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, j, 0);
+                    f_verts[fi*4+1] = get_v(i, j+1, 0);
+                    f_verts[fi*4+2] = get_v(i+1, j+1, 0);
+                    f_verts[fi*4+3] = get_v(i+1, j, 0);
 
-                guint16 e0 = e_y(i, j, 0),
-                        e1 = e_x(i, j+1, 0),
-                        e2 = e_y(i+1, j, 0),
-                        e3 = e_x(i, j, 0);
+                    guint16 e0 = e_y(i, j, 0),
+                            e1 = e_x(i, j+1, 0),
+                            e2 = e_y(i+1, j, 0),
+                            e3 = e_x(i, j, 0);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
-        for(i = 0; i < div_x; i++)
-            for(j = 0; j < div_y; j++)
-            {
-                f_verts[fi*4]   = get_v(i, j, div_z);
-                f_verts[fi*4+1] = get_v(i+1, j, div_z);
-                f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
-                f_verts[fi*4+3] = get_v(i, j+1, div_z);
+                    fi++;
+                }
+            for(i = 0; i < div_x; i++)
+                for(j = 0; j < div_y; j++)
+                {
+                    f_verts[fi*4]   = get_v(i, j, div_z);
+                    f_verts[fi*4+1] = get_v(i+1, j, div_z);
+                    f_verts[fi*4+2] = get_v(i+1, j+1, div_z);
+                    f_verts[fi*4+3] = get_v(i, j+1, div_z);
 
-                guint16 e0 = e_x(i, j, div_z),
-                        e1 = e_y(i+1, j, div_z),
-                        e2 = e_x(i, j+1, div_z),
-                        e3 = e_y(i, j, div_z);
+                    guint16 e0 = e_x(i, j, div_z),
+                            e1 = e_y(i+1, j, div_z),
+                            e2 = e_x(i, j+1, div_z),
+                            e3 = e_y(i, j, div_z);
 
-                e_verts[e0*2]   = f_verts[fi*4];
-                e_verts[e0*2+1] = f_verts[fi*4+1];
-                e_verts[e1*2]   = f_verts[fi*4+1];
-                e_verts[e1*2+1] = f_verts[fi*4+2];
-                e_verts[e2*2]   = f_verts[fi*4+2];
-                e_verts[e2*2+1] = f_verts[fi*4+3];
-                e_verts[e3*2]   = f_verts[fi*4+3];
-                e_verts[e3*2+1] = f_verts[fi*4];
+                    e_verts[e0*2]   = f_verts[fi*4];
+                    e_verts[e0*2+1] = f_verts[fi*4+1];
+                    e_verts[e1*2]   = f_verts[fi*4+1];
+                    e_verts[e1*2+1] = f_verts[fi*4+2];
+                    e_verts[e2*2]   = f_verts[fi*4+2];
+                    e_verts[e2*2+1] = f_verts[fi*4+3];
+                    e_verts[e3*2]   = f_verts[fi*4+3];
+                    e_verts[e3*2+1] = f_verts[fi*4];
 
-                guint16 he0 = get_he(sel, e0),
-                        he1 = get_he(sel, e1),
-                        he2 = get_he(sel, e2),
-                        he3 = get_he(sel, e3);
+                    guint16 he0 = get_he(sel, e0),
+                            he1 = get_he(sel, e1),
+                            he2 = get_he(sel, e2),
+                            he3 = get_he(sel, e3);
 
-                f_data[fi].half_edge = he0;
-                e_data[e0].half_edge = he0;
-                e_data[e1].half_edge = he1;
-                e_data[e2].half_edge = he2;
-                e_data[e3].half_edge = he3;
-                v_data[f_verts[fi*4]].half_edge   = he0;
-                v_data[f_verts[fi*4+1]].half_edge = he1;
-                v_data[f_verts[fi*4+2]].half_edge = he2;
-                v_data[f_verts[fi*4+3]].half_edge = he3;
+                    f_data[fi].half_edge = he0;
+                    e_data[e0].half_edge = he0;
+                    e_data[e1].half_edge = he1;
+                    e_data[e2].half_edge = he2;
+                    e_data[e3].half_edge = he3;
+                    v_data[f_verts[fi*4]].half_edge   = he0;
+                    v_data[f_verts[fi*4+1]].half_edge = he1;
+                    v_data[f_verts[fi*4+2]].half_edge = he2;
+                    v_data[f_verts[fi*4+3]].half_edge = he3;
 
-                he_data[he0].pair = get_he_pair(sel, e0);
-                he_data[he1].pair = get_he_pair(sel, e1);
-                he_data[he2].pair = get_he_pair(sel, e2);
-                he_data[he3].pair = get_he_pair(sel, e3);
-                he_data[he0].next = he1;
-                he_data[he1].next = he2;
-                he_data[he2].next = he3;
-                he_data[he3].next = he0;
-                he_data[he0].v_origin = f_verts[fi*4];
-                he_data[he1].v_origin = f_verts[fi*4+1];
-                he_data[he2].v_origin = f_verts[fi*4+2];
-                he_data[he3].v_origin = f_verts[fi*4+3];
-                he_data[he0].edge = e0;
-                he_data[he1].edge = e1;
-                he_data[he2].edge = e2;
-                he_data[he3].edge = e3;
-                he_data[he0].f_left = fi;
-                he_data[he1].f_left = fi;
-                he_data[he2].f_left = fi;
-                he_data[he3].f_left = fi;
+                    he_data[he0].pair = get_he_pair(sel, e0);
+                    he_data[he1].pair = get_he_pair(sel, e1);
+                    he_data[he2].pair = get_he_pair(sel, e2);
+                    he_data[he3].pair = get_he_pair(sel, e3);
+                    he_data[he0].next = he1;
+                    he_data[he1].next = he2;
+                    he_data[he2].next = he3;
+                    he_data[he3].next = he0;
+                    he_data[he0].v_origin = f_verts[fi*4];
+                    he_data[he1].v_origin = f_verts[fi*4+1];
+                    he_data[he2].v_origin = f_verts[fi*4+2];
+                    he_data[he3].v_origin = f_verts[fi*4+3];
+                    he_data[he0].edge = e0;
+                    he_data[he1].edge = e1;
+                    he_data[he2].edge = e2;
+                    he_data[he3].edge = e3;
+                    he_data[he0].f_left = fi;
+                    he_data[he1].f_left = fi;
+                    he_data[he2].f_left = fi;
+                    he_data[he3].f_left = fi;
 
-                fi++;
-            }
+                    fi++;
+                }
+        }
     }
 
     moto_mesh_selection_free(sel);
 
     moto_mesh_prepare(mesh);
+    moto_param_update_dests(pm);
 }
 #undef e_x_num
 #undef e_y_num
