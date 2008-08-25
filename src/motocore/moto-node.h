@@ -30,6 +30,8 @@ G_BEGIN_DECLS
 
 typedef void (*MotoNodeActionFunc)(MotoNode *node);
 typedef void (*MotoNodeForeachParamFunc)(MotoNode *node, MotoParam *param, gpointer user_data);
+typedef void (*MotoNodeForeachGroupFunc)(MotoNode *node, const gchar *group, gpointer user_data);
+typedef void (*MotoNodeForeachParamInGroupFunc)(MotoNode *node, const gchar *group, MotoParam *param, gpointer user_data);
 
 typedef enum
 {
@@ -117,6 +119,11 @@ void moto_node_set_params(MotoNode *self, ...);
 
 void moto_node_foreach_param(MotoNode *self,
         MotoNodeForeachParamFunc func, gpointer user_data);
+
+void moto_node_foreach_group(MotoNode *self,
+        MotoNodeForeachGroupFunc func, gpointer user_data);
+void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group_name,
+        MotoNodeForeachParamInGroupFunc func, gpointer user_data);
 
 void moto_node_link(MotoNode *self, const gchar *in_name,
                           MotoNode *other, const gchar *out_name);
@@ -208,6 +215,9 @@ struct _MotoParam
 struct _MotoParamClass
 {
     GObjectClass parent;
+
+    guint value_changed_signal_id;
+    guint source_changed_signal_id;
 };
 
 GType moto_param_get_type(void);

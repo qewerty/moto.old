@@ -48,6 +48,46 @@ free_domain(Domain *domain, gpointer user_data)
     domain_free(domain);
 }
 
+typedef struct _Group
+{
+    GString *name;
+    GArray *types; // Param types allowed in the group. If NULL any type allowed.
+    GSList *params;
+} Group;
+
+static Group *group_new(const gchar *name)
+{
+    Group *self = g_slice_new(Group);
+    self->name = g_string_new(name);
+    self->types = NULL;
+    self->params = NULL;
+    return self;
+}
+
+static void group_free(Group *self)
+{
+    g_string_free(self->name, TRUE);
+    g_slist_free(self->params);
+    g_slice_free(Group, self);
+}
+
+static void group_add_param(Group *self, MotoParam *param)
+{
+    self->params = g_slist_append(self->params, param);
+}
+
+static void group_foreach_param(Group *self, GFunc func, gpointer user_data)
+{
+    g_slist_foreach(self->params, func, user_data);
+}
+
+static void
+free_group(Group *group, gpointer user_data)
+{
+    group_free(group);
+}
+
+
 /* privates */
 
 struct _MotoNodePriv
@@ -60,6 +100,7 @@ struct _MotoNodePriv
     MotoWorld *world;
 
     MotoMappedList params;
+    MotoMappedList pgroups;
     MotoMappedList pdomains;
 
     gboolean hidden;
@@ -108,6 +149,7 @@ moto_node_dispose(GObject *obj)
 
     g_string_free(self->priv->name, TRUE);
     moto_mapped_list_free_all(& self->priv->params, unref_gobject);
+    moto_mapped_list_free_all(& self->priv->pgroups, (GFunc)free_group);
     moto_mapped_list_free_all(& self->priv->pdomains, (GFunc)free_domain);
 
     node_parent_class->dispose(obj);
@@ -136,6 +178,7 @@ moto_node_init(MotoNode *self)
     self->priv->world = NULL;
 
     moto_mapped_list_init(& self->priv->params);
+    moto_mapped_list_init(& self->priv->pgroups);
     moto_mapped_list_init(& self->priv->pdomains);
 
     self->priv->hidden = FALSE;
@@ -239,6 +282,15 @@ void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param,
         moto_mapped_list_set(& self->priv->pdomains, domain, d);
     }
     domain_add_param(d, param);
+
+    Group *g = (Group *)moto_mapped_list_get(& self->priv->pgroups, group);
+    if( ! g)
+    {
+        g = group_new(group);
+        moto_mapped_list_set(& self->priv->pgroups, group, g);
+    }
+    group_add_param(g, param);
+
     moto_mapped_list_set(& self->priv->params, moto_param_get_name(param), param);
 }
 
@@ -736,6 +788,39 @@ void moto_node_foreach_param(MotoNode *self,
     moto_mapped_list_foreach( & self->priv->params, (GFunc)call_param_func, & data);
 }
 
+typedef struct _NodeGroupData
+{
+    MotoNodeForeachGroupFunc func;
+    MotoNode *node;
+    gpointer user_data;
+} NodeGroupData;
+
+static void call_group_func(Group *group, NodeGroupData *data)
+{
+    data->func(data->node, group->name->str, data->user_data);
+}
+
+void moto_node_foreach_group(MotoNode *self,
+        MotoNodeForeachGroupFunc func, gpointer user_data)
+{
+    NodeGroupData data = {func, self, user_data};
+    moto_mapped_list_foreach( & self->priv->pgroups, (GFunc)call_group_func, & data);
+}
+
+void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group,
+        MotoNodeForeachParamInGroupFunc func, gpointer user_data)
+{
+    Group *g = moto_mapped_list_get(& self->priv->pgroups, group);
+    if( ! g)
+        return;
+
+    GSList *p = g->params;
+    for(; p; p = g_slist_next(p))
+    {
+        func(self, group, (MotoParam *)p->data, user_data);
+    }
+}
+
 void moto_node_link(MotoNode *self, const gchar *in_name,
                           MotoNode *other, const gchar *out_name)
 {
@@ -919,6 +1004,28 @@ moto_param_class_init(MotoParamClass *klass)
 
     goclass->dispose    = moto_param_dispose;
     goclass->finalize   = moto_param_finalize;
+
+    klass->value_changed_signal_id = g_signal_newv ("value-changed",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
+
+    klass->source_changed_signal_id = g_signal_newv ("source-changed",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
 }
 
 G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
@@ -1058,61 +1165,73 @@ GObject *moto_param_get_object(MotoParam *self)
 void moto_param_set_boolean(MotoParam *self, gboolean value)
 {
     g_value_set_boolean(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_int(MotoParam *self, gint value)
 {
     g_value_set_int(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_uint(MotoParam *self, guint value)
 {
     g_value_set_uint(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_long(MotoParam *self, glong value)
 {
     g_value_set_long(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_ulong(MotoParam *self, gulong value)
 {
     g_value_set_ulong(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_int64(MotoParam *self, gint64 value)
 {
     g_value_set_int64(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_uint64(MotoParam *self, guint64 value)
 {
     g_value_set_uint64(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_float(MotoParam *self, gfloat value)
 {
     g_value_set_float(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_double(MotoParam *self, gdouble value)
 {
     g_value_set_double(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_pointer(MotoParam *self, gpointer value)
 {
     g_value_set_pointer(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_enum(MotoParam *self, gint value)
 {
     g_value_set_enum(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 void moto_param_set_object(MotoParam *self, GObject *value)
 {
     g_value_set_object(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
 MotoParam *moto_param_get_source(MotoParam *self)
@@ -1121,11 +1240,10 @@ MotoParam *moto_param_get_source(MotoParam *self)
 }
 
 static void
-disconnect_on_source_deleted(gpointer data, GObject *where_the_object_was)
+disconnect_on_source_deleted(MotoParam *param, GObject *where_the_object_was)
 {
-    MotoParam *param = (MotoParam *)data;
-
     param->priv->source = NULL;
+    g_signal_emit(param, MOTO_PARAM_GET_CLASS(param)->source_changed_signal_id, 0);
 }
 
 static void
@@ -1171,11 +1289,13 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     if(src == self->priv->source)
         return;
 
-    g_object_weak_ref(G_OBJECT(src), disconnect_on_source_deleted, self);
-    g_object_weak_ref(G_OBJECT(self), exclude_from_dests_on_dest_deleted, src);
+    g_object_weak_ref(G_OBJECT(src), (GWeakNotify)disconnect_on_source_deleted, self);
+    g_object_weak_ref(G_OBJECT(self), (GWeakNotify)exclude_from_dests_on_dest_deleted, src);
 
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
+
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->source_changed_signal_id, 0);
 
     moto_param_update(self);
 }

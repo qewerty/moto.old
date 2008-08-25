@@ -106,13 +106,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return;
+            return TRUE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return;
+            return TRUE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return;
+            return TRUE;
 
         moto_geom_view_node_grow_selection(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
@@ -121,13 +121,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return;
+            return TRUE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return;
+            return TRUE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return;
+            return TRUE;
         moto_geom_view_node_select_less(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
@@ -135,16 +135,48 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return;
+            return TRUE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return;
+            return TRUE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return;
+            return TRUE;
         moto_geom_view_node_invert_selection(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
+    else if(0 == g_utf8_collate(event->string, "z"))
+    {
+        // FIXME: TEMP
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return TRUE;
+        MotoObjectNode *ob = moto_world_get_current_object(w);
+        if( ! ob)
+            return TRUE;
+        MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
+        if( ! gv)
+            return TRUE;
+        MotoParam *p = moto_node_get_param((MotoNode *)gv, "mesh");
+        if( ! p)
+            return TRUE;
+        MotoParam *s = moto_param_get_source(p);
+        if( ! s)
+            return TRUE;
+        MotoNode *node = moto_param_get_node(s);
+
+        MotoParam *dx = moto_node_get_param(node, "div_x");
+        if( ! dx)
+            return;
+
+        moto_param_set_uint(dx, moto_param_get_uint(dx) + 1);
+        moto_node_update(node);
+
+        moto_test_window_redraw_3dview(self);
+    }
+    else
+        return FALSE;
+    return TRUE;
 }
 
 gboolean redraw_world_idle(gpointer data)
@@ -212,6 +244,8 @@ moto_test_window_init(MotoTestWindow *self)
 {
     self->priv = g_slice_new(MotoTestWindowPriv);
     self->priv->disposed = FALSE;
+
+    gtk_window_maximize((GtkWindow *)self);
 
     // Test scene
 
@@ -281,6 +315,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     // Window
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
+    gtk_widget_set_size_request((GtkWidget *)self->priv->area, 360, 240);
     GtkWidget *area = (GtkWidget *)self->priv->area;
     GdkGLConfig *gl_config =\
                 gdk_gl_config_new_by_mode((GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
@@ -300,9 +335,12 @@ moto_test_window_init(MotoTestWindow *self)
     GtkBox *hbox = (GtkBox *)gtk_hbox_new(FALSE, 1);
 
     gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
-    gtk_box_pack_start(hbox, area, TRUE, TRUE, 0);
+    GtkPaned *hp = (GtkPaned *)gtk_hpaned_new();
+    gtk_box_pack_start(hbox, (GtkWidget *)hp, TRUE, TRUE, 0);
+    gtk_paned_pack1(hp, (GtkWidget *)area, TRUE, FALSE);
     self->priv->param_editor = moto_param_editor_new(self);
-    gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
+    gtk_paned_pack2(hp, (GtkWidget *)self->priv->param_editor, FALSE, FALSE);
+    // gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
 
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 

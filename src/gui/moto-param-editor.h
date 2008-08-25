@@ -37,14 +37,14 @@ typedef struct _MotoParamEditorPriv MotoParamEditorPriv;
 
 struct _MotoParamEditor
 {
-    GtkTable parent;
+    GtkVBox parent;
 
     MotoParamEditorPriv *priv;
 };
 
 struct _MotoParamEditorClass
 {
-    GtkTableClass parent;
+    GtkVBoxClass parent;
 };
 
 GType moto_param_editor_get_type(void);
