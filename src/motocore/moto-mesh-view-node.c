@@ -103,6 +103,8 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
             NULL);
 
     self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
+
+    moto_geom_view_node_set_state((MotoGeomViewNode *)self, "verts");
 }
 
 static void
@@ -192,7 +194,6 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 
     moto_node_set_name(node, name);
 
-    moto_geom_view_node_set_state(gv, "object");
 
     return self;
 }

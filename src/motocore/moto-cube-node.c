@@ -85,6 +85,9 @@ moto_cube_node_init(MotoCubeNode *self)
             "side_my", "Side -Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
             "side_pz", "Side +Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
             "side_mz", "Side -Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
+            "bevel",    "Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
+            "bev_abs",  "Absolute Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
+            "bev_size", "Bevel Size",  G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Bevel", "Bevel",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -159,16 +162,19 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     guint div_y = *(self->priv->div_y_ptr);
     guint div_z = *(self->priv->div_z_ptr);
 
-    /*
-    gboolean side_px = *(self->priv->side_px_ptr);
-    */
-
     if(div_x < 1)
         div_x = 1;
     if(div_y < 1)
         div_y = 1;
     if(div_z < 1)
         div_z = 1;
+
+    gboolean side_px = *(self->priv->side_px_ptr);
+    gboolean side_mx = *(self->priv->side_mx_ptr);
+    gboolean side_py = *(self->priv->side_py_ptr);
+    gboolean side_my = *(self->priv->side_my_ptr);
+    gboolean side_pz = *(self->priv->side_pz_ptr);
+    gboolean side_mz = *(self->priv->side_mz_ptr);
 
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
@@ -192,7 +198,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     }
 
     MotoMesh *mesh = self->priv->mesh;
-    MotoMeshSelection *sel = moto_mesh_selection_for_mesh(mesh);
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
@@ -405,8 +410,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
                 }
         }
     }
-
-    moto_mesh_selection_free(sel);
 
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);

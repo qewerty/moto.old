@@ -1,3 +1,7 @@
+#include <stdlib.h>
+
+#include <gio/gio.h>
+
 #include "moto-mesh-file-node.h"
 #include "moto-library.h"
 #include "moto-messager.h"
@@ -7,6 +11,8 @@
 
 static gchar *moto_mesh_file_node_get_filename(MotoMeshFileNode *self);
 static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar *filename);
+
+static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self);
 
 /*
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
@@ -22,13 +28,13 @@ static GObjectClass *mesh_file_node_parent_class = NULL;
 
 struct _MotoMeshFileNodePriv
 {
-    GString *filename;
-    GString **filename_ptr;
-
-    GString *loaded_filename;
+    gchar **filename_ptr;
 
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
+
+    MotoBound *bound;
+    gboolean bound_calculated;
 };
 
 static void
@@ -36,7 +42,6 @@ moto_mesh_file_node_dispose(GObject *obj)
 {
     MotoMeshFileNode *self = (MotoMeshFileNode *)obj;
 
-    g_string_free(self->priv->filename, TRUE);
     g_object_unref((GObject *)self->priv->mesh);
     g_slice_free(MotoMeshFileNodePriv, self->priv);
 
@@ -52,15 +57,25 @@ moto_mesh_file_node_finalize(GObject *obj)
 static void
 moto_mesh_file_node_init(MotoMeshFileNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
+
     self->priv = g_slice_new(MotoMeshFileNodePriv);
 
-    self->priv->filename = g_string_new("");
-    self->priv->filename_ptr = & self->priv->filename;
+    GString *s = g_string_new("./resources/models/monkey.obj");
+    gchar *filename = s->str;
+    g_string_free(s, FALSE);
 
-    self->priv->loaded_filename = g_string_new("");
+    GParamSpec *pspec = NULL; // FIXME: Implement.
+    moto_node_add_params(node,
+            "filename", "Filename", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, filename, pspec, "General", "General",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            NULL);
 
-    self->priv->mesh = NULL;
-    self->priv->mesh_ptr = & self->priv->mesh;
+    self->priv->filename_ptr = moto_node_param_value_pointer(node, "filename", gchar*);
+    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
+
+    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    self->priv->bound_calculated = FALSE;
 }
 
 static void
@@ -68,8 +83,11 @@ moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
+    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
 
     mesh_file_node_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
+
+    gnclass->get_bound = moto_mesh_file_node_get_bound;
 
     goclass->dispose = moto_mesh_file_node_dispose;
     goclass->finalize = moto_mesh_file_node_finalize;
@@ -91,12 +109,12 @@ MotoMeshFileNode *moto_mesh_file_node_new()
 
 static gchar *moto_mesh_file_node_get_filename(MotoMeshFileNode *self)
 {
-    return self->priv->filename->str;
+    return *(self->priv->filename_ptr);
 }
 
 static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar *filename)
 {
-    g_string_assign(self->priv->filename, filename);
+    //g_string_assign(self->priv->filename, filename);
 }
 
 /*
@@ -145,7 +163,7 @@ static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filena
 
     if(tmld.mesh)
     {
-        g_string_assign(self->priv->loaded_filename, tmld.filename);
+        // g_string_assign(self->priv->loaded_filename, tmld.filename);
 
         GString *msg = g_string_new("Mesh \"");
         g_string_append(msg, tmld.filename);
@@ -165,6 +183,160 @@ static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filena
 
 static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 {
+    gchar *filename = *(self->priv->filename_ptr);
+
+    g_print("filename: %s\n", filename);
+
+    GFile *f = g_file_new_for_path(filename);
+    GInputStream *is = g_file_read(f, NULL, NULL);
+
+    GString *data = g_string_new("");
+    gsize count = 256;
+    gsize read_bytes = 0;
+    gchar buffer[256];
+
+    while(read_bytes = g_input_stream_read(is, buffer, count, NULL, NULL))
+    {
+        g_string_append_len(data, buffer, read_bytes);
+        // g_usleep(1000000);
+    }
+
+    g_input_stream_close(is, NULL, NULL);
+
+    guint v_num = 0,
+          e_num = 10000, // FIXME: tmp
+          f_num = 0,
+          f_v_num = 0;
+
+    gulong i;
+    gchar *p = data->str;
+    for(i = 0; i < data->len; i++)
+    {
+        gchar last = data->str[i];
+        if('\n' == last)
+        {
+            if('v' == p[0])
+                v_num++;
+            if('f' == p[0])
+            {
+                f_num++;
+
+                gchar *pp = p+1;
+                do
+                {
+                    if(' ' != *pp)
+                    {
+                        f_v_num++;
+
+                        while(' ' != *pp || '\n' == *pp)
+                        {
+                            if('\n' == *pp)
+                                break;
+                            pp++;
+                        }
+                    }
+                    if('\n' == *pp)
+                        break;
+                    pp++;
+                }
+                while('\n' != *pp);
+            }
+
+            p = data->str + i + 1;
+        }
+    }
+
+    g_print("MeshFile: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
+
+    if(self->priv->mesh)
+    {
+        g_object_unref(self->priv->mesh);
+    }
+    self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
+    MotoMesh *mesh = self->priv->mesh;
+
+    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
+    g_value_set_object(moto_param_get_value(pm), mesh);
+
+
+    MotoMeshFace16 *f_data = (guint16 *)mesh->f_data;
+    guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+    v_num = 0;
+    f_v_num = 0;
+    f_num = 0;
+    p = data->str;
+    guint j = 0, k = 0;
+    for(i = 0; i < data->len; i++)
+    {
+        gchar last = data->str[i];
+        if('\n' == last)
+        {
+            if('v' == p[0])
+            {
+                v_num++;
+                // g_print("v ");
+                gchar *p2 = p+1;
+                do
+                {
+                    if(' ' != *p2)
+                    {
+
+                        ((gfloat *)mesh->v_coords)[j++] = (gfloat)g_strtod(p2, NULL);
+                        // g_print("%f ", ((gfloat *)mesh->v_coords)[j-1]);
+                        while(' ' != *p2 || '\n' == *p2)
+                        {
+                            if('\n' == *p2)
+                                break;
+                            p2++;
+                        }
+                    }
+                    if('\n' == *p2)
+                        break;
+                    p2++;
+                }
+                while('\n' != *p2);
+                // g_print("\n");
+            }
+            if('f' == p[0])
+            {
+                f_num++;
+                // g_print("f ");
+                gchar *p2 = p+1;
+                do
+                {
+                    if(' ' != *p2)
+                    {
+
+                        f_verts[k++] = (guint16)strtoul(p2, NULL, 10)-1;
+                        f_v_num++;
+                        // g_print("%u ", f_verts[k-1]);
+                        while(' ' != *p2 || '\n' == *p2)
+                        {
+                            if('\n' == *p2)
+                                break;
+                            p2++;
+                        }
+                    }
+                    if('\n' == *p2)
+                        break;
+                    p2++;
+                }
+                while('\n' != *p2);
+                f_data[f_num-1].v_num = f_v_num;
+                // g_print("\n");
+            }
+
+            p = data->str + i + 1;
+        }
+    }
+    g_string_free(data, TRUE);
+
+    g_print("MeshFile: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
+    g_print("DONE\n");
+
+    moto_mesh_prepare(mesh);
+    moto_param_update_dests(pm);
 
 }
 
@@ -177,5 +349,56 @@ static void moto_mesh_file_node_update(MotoNode *self)
     param = moto_node_get_param(self, "mesh");
     if(param && 1)//moto_param_has_dests(param)) /* FIXME */
         moto_mesh_file_node_update_mesh(mesh_file);
+}
+
+static void calc_bound(MotoMeshFileNode *self)
+{
+    self->priv->bound->bound[0] = 0;
+    self->priv->bound->bound[1] = 0;
+    self->priv->bound->bound[2] = 0;
+    self->priv->bound->bound[3] = 0;
+    self->priv->bound->bound[4] = 0;
+    self->priv->bound->bound[5] = 0;
+
+    if( ! self->priv->mesh)
+        return;
+
+    MotoMesh *mesh = self->priv->mesh;
+    gfloat min_x = 0, max_x = 0, min_y = 0, max_y = 0, min_z = 0, max_z = 0;
+    guint i;
+    for(i = 0; i < mesh->v_num; i++)
+    {
+        if(mesh->v_coords[i].x < min_x)
+            min_x = mesh->v_coords[i].x;
+        if(mesh->v_coords[i].x > max_x)
+            max_x = mesh->v_coords[i].x;
+
+        if(mesh->v_coords[i].y < min_y)
+            min_y = mesh->v_coords[i].y;
+        if(mesh->v_coords[i].y > max_y)
+            max_y = mesh->v_coords[i].y;
+
+        if(mesh->v_coords[i].z < min_z)
+            min_z = mesh->v_coords[i].z;
+        if(mesh->v_coords[i].z > max_z)
+            max_z = mesh->v_coords[i].z;
+    }
+
+    self->priv->bound->bound[0] = min_x;
+    self->priv->bound->bound[1] = max_y;
+    self->priv->bound->bound[2] = min_y;
+    self->priv->bound->bound[3] = max_y;
+    self->priv->bound->bound[4] = min_z;
+    self->priv->bound->bound[5] = max_z;
+}
+
+static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self)
+{
+    MotoMeshFileNode *mf = (MotoMeshFileNode *)self;
+
+    if( ! mf->priv->bound_calculated)
+        calc_bound(mf);
+
+    return mf->priv->bound;
 }
 

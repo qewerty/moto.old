@@ -68,6 +68,37 @@ static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
     moto_node_link(obj_node, "material", mat_node, "material");
 }
 
+static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
+{
+    if( ! system)
+    {
+        moto_error("MotoShelf has no associated system.");
+        return;
+    }
+
+    MotoWorld *w = moto_system_get_current_world(system);
+    if( ! w)
+    {
+        moto_error("MotoSystem associated with the shelf has no current world.");
+        return;
+    }
+
+    MotoNode *root_node = (MotoNode *)moto_world_get_root(w);
+
+    MotoNode *obj_node = moto_world_create_node(w, "MotoObjectNode", "CubeObject", NULL);
+    moto_node_link(obj_node, "parent", root_node, "transform");
+
+    moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
+
+    MotoNode *view_node = moto_world_create_node(w, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *mf_node = moto_world_create_node(w, "MotoMeshFileNode", "Cube", NULL);
+    MotoNode *mat_node = moto_world_create_node(w, "MotoSlerMaterialNode", "Material1", NULL);
+
+    moto_node_link(obj_node, "view", view_node, "view");
+    moto_node_link(view_node, "mesh", mf_node, "mesh");
+    moto_node_link(obj_node, "material", mat_node, "material");
+}
+
 /* class MotoShelf */
 
 static GObjectClass *shelf_parent_class = NULL;
@@ -139,6 +170,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
 
     moto_shelf_add_item(self, "Mesh", "Plane", create_mesh_plane);
     moto_shelf_add_item(self, "Mesh", "Cube", create_mesh_cube);
+    moto_shelf_add_item(self, "Mesh", "File", create_mesh_file);
 
     moto_shelf_add_tab(self, "Poly");
     moto_shelf_add_item(self, "Poly", "Extrude", create_mesh_cube);

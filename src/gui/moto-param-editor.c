@@ -58,6 +58,9 @@ moto_param_editor_init(MotoParamEditor *self)
 
     gtk_box_pack_end(self->priv->bbox, (GtkWidget *)button_forw, FALSE, FALSE, 0);
     gtk_box_pack_end(self->priv->bbox, (GtkWidget *)button_back, FALSE, FALSE, 0);
+    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "INOUT"), FALSE, FALSE, 0);
+    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "OUT"), FALSE, FALSE, 0);
+    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "IN"), FALSE, FALSE, 0);
 
     gtk_container_add((GtkContainer *)self, (GtkWidget *)self->priv->box);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->menu_bar,  FALSE, FALSE, 0);

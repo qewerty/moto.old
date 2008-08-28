@@ -358,6 +358,9 @@ void moto_node_add_params(MotoNode *self, ...)
             case G_TYPE_DOUBLE:
                 g_value_set_double(&v, va_arg(ap, gdouble));
             break;
+            case G_TYPE_STRING:
+                g_value_set_string(&v, va_arg(ap, gchar*));
+            break;
             case G_TYPE_POINTER:
                 g_value_set_pointer(&v, va_arg(ap, gpointer));
             break;

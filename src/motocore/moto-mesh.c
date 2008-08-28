@@ -893,6 +893,7 @@ guint16 elist_find_edge16(EList *el, EList **found, guint16 *e_verts, guint16 a,
 
 void moto_mesh_update_he_data(MotoMesh *self)
 {
+    el_num = max_el_num = 0;
     if(self->b32)
     {}
     else
@@ -923,6 +924,8 @@ void moto_mesh_update_he_data(MotoMesh *self)
             guint16 first_hei = G_MAXUINT16;
             guint16 prev_hei = G_MAXUINT16;
             guint16 i;
+            // g_print("v_num: %u\n", v_num);
+            // g_print("fi: %u\n", fi);
             for(i = 0; i < v_num; i++)
             {
                 guint16 vi  = f_verts[start+i];
@@ -983,6 +986,8 @@ void moto_mesh_update_he_data(MotoMesh *self)
                     else
                     {
                         ei = elist_find_edge16(head, & found, e_verts, vi, nvi);
+                        // g_print("ei: %u\n", ei);
+                        // g_print("cei: %u\n", cei);
                         if( ! moto_mesh_is_index_valid(self, ei))
                         {
                             guint16 hei  = cei*2;
@@ -1039,6 +1044,7 @@ void moto_mesh_update_he_data(MotoMesh *self)
                 }
             }
         }
+        self->e_num = cei; // FIXME: tmp
 
         elist_remove_all(head);
         // g_free(m);
