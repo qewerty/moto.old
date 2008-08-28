@@ -910,7 +910,6 @@ void moto_mesh_update_he_data(MotoMesh *self)
         EList *head = NULL;
         EList *found = NULL;
 
-        guint finded = 0;
         guint16 cei = 0;
         guint16 fi;
         for(fi = 0; fi < self->f_num; fi++)
@@ -984,7 +983,6 @@ void moto_mesh_update_he_data(MotoMesh *self)
                     else
                     {
                         ei = elist_find_edge16(head, & found, e_verts, vi, nvi);
-                        finded++;
                         if( ! moto_mesh_is_index_valid(self, ei))
                         {
                             guint16 hei  = cei*2;
@@ -1043,8 +1041,6 @@ void moto_mesh_update_he_data(MotoMesh *self)
         }
 
         elist_remove_all(head);
-        g_print("head: %p\n", head);
-        g_print("finded: %u\n", finded);
         // g_free(m);
     }
 }
