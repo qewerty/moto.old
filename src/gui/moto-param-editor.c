@@ -223,6 +223,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             gtk_editable_set_editable((GtkEditable *)widget, TRUE);
             gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
 
+            GParamSpecUInt *ps = (GParamSpecUInt *)moto_param_get_spec(param);
+            if(ps)
+                gtk_spin_button_set_range((GtkSpinButton *)widget, ps->minimum, ps->maximum);
+
             data = g_slice_new(OnChangedData);
             data->param = param;
             data->window = pe->priv->window;

@@ -40,6 +40,9 @@ typedef enum
     MOTO_PARAM_MODE_INOUT   = 3
 } MotoParamMode;
 
+GType moto_param_mode_get_type(void);
+#define MOTO_TYPE_PARAM_MODE (moto_param_mode_get_type())
+
 /* class MotoNode */
 
 struct _MotoNode
@@ -218,6 +221,8 @@ struct _MotoParamClass
 
     guint value_changed_signal_id;
     guint source_changed_signal_id;
+    guint dest_added_signal_id;
+    guint dest_removed_signal_id;
 };
 
 GType moto_param_get_type(void);
@@ -237,6 +242,8 @@ const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 MotoParamMode moto_param_get_mode(MotoParam *self);
+
+GParamSpec *moto_param_get_spec(MotoParam *self);
 
 guint moto_param_get_id(MotoParam *self);
 

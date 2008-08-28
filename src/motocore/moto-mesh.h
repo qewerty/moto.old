@@ -198,12 +198,8 @@ struct _MotoHalfEdge32
     guint32 edge;
 };
 
-#define moto_half_edge_pair(self, mesh, t) (((t)mesh->he_data)[self->pair])
-#define moto_half_edge_next(self, mesh) (mesh->he_data[self->next])
-#define moto_half_edge_prev(self, mesh) (mesh->he_data[self->prev])
-#define moto_half_edge_v_orig(self, mesh) (mesh->v_data[self->v_origin])
-#define moto_half_edge_f_left(self, mesh) (mesh->f_data[self->f_left])
-#define moto_half_edge_edge(self, mesh) (mesh->v_data[self->edge])
+#define moto_half_edge_pair(he) ((he%2) ? (he)-1 : (he)+1)
+#define moto_half_edge_edge(he) ((he%2) ? (he-1)/2 : (he)/2 )
 
 #define moto_half_edge_v_dest(self, mesh) \
     (moto_half_edge_origin(& moto_half_edge_pair(self, mesh)), mesh)
@@ -266,7 +262,8 @@ GType moto_mesh_get_type(void);
 #define MOTO_MESH_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH, MotoMeshClass))
 
 MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num);
-MotoMesh *moto_mesh_copy(MotoMesh *other);
+MotoMesh *moto_mesh_new_copy(MotoMesh *other);
+void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
 #define moto_mesh_get_index_size(mesh) (((mesh)->b32)?4:2)
 

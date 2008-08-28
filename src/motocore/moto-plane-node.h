@@ -36,10 +36,10 @@ typedef enum
     MOTO_ORIENTATION_ZX,
 } MotoOrientation;
 
-/* class MotoPlaneNode */
-
 GType moto_orientation_get_type(void);
 #define MOTO_TYPE_ORIENTATION (moto_orientation_get_type())
+
+/* class MotoPlaneNode */
 
 struct _MotoPlaneNode
 {

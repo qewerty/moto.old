@@ -134,22 +134,32 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
     if(self->b32)
     {
         MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)self->he_data;
+        guint32 *e_verts= (guint32 *)self->e_verts;
         for(i = 0; i < he_num; i++)
             he_data[i].pair = he_data[i].next = he_data[i].v_origin = \
-                he_data[i].f_left = he_data[i].edge = G_MAXUINT32;
+                he_data[i].f_left = he_data[i].edge = e_verts[i] = G_MAXUINT32;
+
+        MotoMeshVert32 *v_data = (MotoMeshVert32 *)self->v_data;
+        for(i = 0; i < v_num; i++)
+            v_data[i].half_edge = G_MAXUINT32;
     }
     else
     {
         MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+        guint16 *e_verts = (guint16 *)self->e_verts;
         for(i = 0; i < he_num; i++)
             he_data[i].pair = he_data[i].next = he_data[i].v_origin = \
-                he_data[i].f_left = he_data[i].edge = G_MAXUINT16;
+                he_data[i].f_left = he_data[i].edge = e_verts[i] = G_MAXUINT16;
+
+        MotoMeshVert16 *v_data = (MotoMeshVert16 *)self->v_data;
+        for(i = 0; i < v_num; i++)
+            v_data[i].half_edge = G_MAXUINT16;
     }
 
     return self;
 }
 
-MotoMesh *moto_mesh_copy(MotoMesh *other)
+MotoMesh *moto_mesh_new_copy(MotoMesh *other)
 {
     /*
     MotoMesh *self = moto_mesh_new(other->v_num, other->e_num, other->f_num);
@@ -182,6 +192,22 @@ MotoMesh *moto_mesh_copy(MotoMesh *other)
     return self;
     */
     return NULL;
+}
+
+void moto_mesh_copy(MotoMesh *self, MotoMesh *other)
+{
+    /*
+    guint min_v = min(self->v_num, other->v_num);
+    guint min_e = min(self->e_num, other->e_num);
+    guint min_f = min(self->f_num, other->f_num);
+
+    guint i;
+    for(i = 0; i < min_v; i++)
+    {
+        self->v_coords[i] = other->v_coords[i];
+        self->v_normals[i] = other->v_normals[i];
+    }
+    */
 }
 
 MotoMeshVertAttr *moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum)
@@ -508,18 +534,21 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             gfloat *normal = (gfloat *) & self->v_normals[vi];
             vector3_zero(normal);
 
-            MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
-            MotoHalfEdge16 *he      = begin;
+            // MotoHalfEdge16 *begin   = & he_data[v_data[vi].half_edge];
+            // MotoHalfEdge16 *he      = begin;
+            guint16 begin   = v_data[vi].half_edge;
+            guint16 he      = begin;
             do
             {
-                if(moto_mesh_is_index_valid(self, he->f_left))
+                if(moto_mesh_is_index_valid(self, he_data[he].f_left))
                 {
-                    gfloat *fnormal = (gfloat *) & self->f_normals[he->f_left];
+                    gfloat *fnormal = (gfloat *) & self->f_normals[he_data[he].f_left];
                     vector3_add(normal, fnormal);
                 }
 
-                if(moto_mesh_is_index_valid(self, he->pair) && moto_mesh_is_index_valid(self, he_data[he->pair].next))
-                    he = & he_data[he_data[he->pair].next];
+                guint16 next = he_data[moto_half_edge_pair(he)].next;
+                if(moto_mesh_is_index_valid(self, next))
+                    he = next;
                 else
                     break;
             }
@@ -613,7 +642,8 @@ static void find_he16(MotoMesh *self, guint16 ei, guint16 *hei1, guint16 *hei2)
     }
 }
 
-void moto_mesh_update_he_data(MotoMesh *self)
+/*
+void moto_mesh_update_he_data_old(MotoMesh *self)
 {
     if(self->b32)
     {
@@ -726,10 +756,303 @@ void moto_mesh_update_he_data(MotoMesh *self)
         }
     }
 }
+*/
+
+static guint seq_sum(guint num)
+{
+    return (num) ? num*(num+1)/2 : 0;
+}
+
+guint16 *create_matrix16(guint num)
+{
+    guint snum = seq_sum(num);
+    guint16 *m = (guint16 *)g_try_malloc(sizeof(guint16)*snum);
+
+    guint i;
+    for(i = 0; i < snum; i++)
+    {
+        m[i] = G_MAXUINT16;
+    }
+
+    return m;
+}
+
+guint32 *create_matrix32(guint num)
+{
+    guint snum = seq_sum(num);
+    guint32 *m = (guint32 *)g_try_malloc(sizeof(guint32)*snum);
+
+    guint32 i;
+    for(i = 0; i < snum; i++)
+        m[i] = G_MAXUINT32;
+
+    return m;
+}
+
+/*
+static guint16 find_edge16(guint16 *m, guint16 a, guint16 b)
+{
+    return m[seq_sum(max(a, b)-1) + min(a, b)];
+}
+
+static void set_edge16(guint16 *m, guint16 a, guint16 b, guint16 ei)
+{
+    m[seq_sum(max(a, b)-1) + min(a, b)] = ei;
+}
+
+static guint32 find_edge32(guint32 *m, guint32 a, guint32 b)
+{
+    return m[seq_sum(max(a, b)-1) + min(a, b)];
+}
+
+static void set_edge32(guint32 *m, guint32 a, guint32 b, guint32 ei)
+{
+    m[seq_sum(max(a, b)-1) + min(a, b)] = ei;
+}
+*/
+
+typedef struct _EList EList;
+
+struct _EList
+{
+    EList *prev;
+    EList *next;
+    guint16 ei;
+};
+
+static guint max_el_num = 0;
+static guint el_num = 0;
+
+static EList *elist_new(guint16 ei, EList *head)
+{
+    EList *el = g_slice_new(EList);
+    el->ei = ei;
+    el->prev = NULL;
+    el->next = head;
+    if(head)
+        head->prev = el;
+
+    el_num++;
+    if(el_num > max_el_num)
+        max_el_num = el_num;
+    return el;
+}
+
+static EList *elist_remove(EList *head, EList *el)
+{
+    if( ! el)
+    {
+        return head;
+    }
+
+    EList *new_head = head;
+    if(el == head)
+        new_head = el->next;
+
+    if(el->prev)
+        el->prev->next = el->next;
+    if(el->next)
+        el->next->prev = el->prev;
+    el_num--;
+    g_slice_free(EList, el);
+
+    return new_head;
+}
+
+static void elist_remove_all(EList *el)
+{
+    EList *tmp;
+    while(el)
+    {
+        tmp = el;
+        el = el->next;
+        g_slice_free(EList, tmp);
+    }
+
+    g_print("num: %u\n", el_num);
+    g_print("max: %u\n", max_el_num);
+}
+
+guint16 elist_find_edge16(EList *el, EList **found, guint16 *e_verts, guint16 a, guint16 b)
+{
+    while(el)
+    {
+        guint16 i = el->ei*2;
+        if((e_verts[i] == a && e_verts[i+1] == b) || \
+           (e_verts[i+1] == a && e_verts[i] == b))
+        {
+            *found = el;
+            return el->ei;
+        }
+
+        el = el->next;
+    }
+    *found = NULL;
+    return G_MAXUINT16;
+}
+
+void moto_mesh_update_he_data(MotoMesh *self)
+{
+    if(self->b32)
+    {}
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16*)self->v_data;
+        MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)self->e_data;
+        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16*)self->he_data;
+        guint16 *e_verts = (guint16*)self->e_verts;
+        guint16 *f_verts = (guint16 *)self->f_verts;
+        // guint16 *e_verts = (guint16 *)self->e_verts;
+
+        // guint16 *m = create_matrix16(self->v_num);
+
+        EList *head = NULL;
+        EList *found = NULL;
+
+        guint finded = 0;
+        guint16 cei = 0;
+        guint16 fi;
+        for(fi = 0; fi < self->f_num; fi++)
+        {
+            if( ! moto_mesh_is_index_valid(self, fi))
+                continue;
+
+            guint16 start = (0 == fi) ? 0: f_data[fi-1].v_num;
+            guint16 v_num = f_data[fi].v_num - start;
+
+            guint16 first_hei = G_MAXUINT16;
+            guint16 prev_hei = G_MAXUINT16;
+            guint16 i;
+            for(i = 0; i < v_num; i++)
+            {
+                guint16 vi  = f_verts[start+i];
+                guint16 nvi = f_verts[start + ((i < v_num-1)?i+1:0)];
+                // guint16 ei  = find_edge16(self, vi, nvi);
+                if( ! moto_mesh_is_index_valid(self, v_data[nvi].half_edge))
+                {
+                    // set_edge16(m, vi, nvi, cei);
+                    guint16 hei  = cei*2;
+                    guint16 pair = hei+1;
+
+                    if(i)
+                    {
+                        he_data[prev_hei].next = hei;
+                        if(v_num-1 == i)
+                            he_data[hei].next = first_hei;
+                    }
+                    else
+                        first_hei = hei;
+
+                    he_data[hei].v_origin = vi;
+                    he_data[hei].f_left = fi;
+                    he_data[hei].edge = cei; // may be removed in future
+                    he_data[hei].pair = pair;
+
+                    he_data[pair].v_origin = nvi;
+                    he_data[pair].edge = cei;
+                    he_data[pair].pair = hei;
+
+                    e_verts[cei*2] = vi;
+                    e_verts[cei*2+1] = nvi;
+                    e_data[cei].half_edge = hei; // may be removed in future
+                    v_data[vi].half_edge = hei;
+                    v_data[nvi].half_edge = pair;
+                    f_data[fi].half_edge = hei;
+
+                    prev_hei = hei;
+                    head = elist_new(cei, head);
+                    cei++;
+                }
+                else
+                {
+                    guint16 ei;
+                    guint16 pair = moto_half_edge_pair(v_data[nvi].half_edge);
+                    if(0)//he_data[pair].v_origin == vi)
+                    {
+                        ei = moto_half_edge_edge(pair);
+                        // g_print("fast\n");
+                    }
+                    /*
+                    else if(moto_mesh_is_index_valid(self, he_data[pair].next) && \
+                            he_data[moto_half_edge_pair(he_data[pair].next)].v_origin == vi)
+                    {
+                        ei = moto_half_edge_edge(he_data[pair].next);
+                        // g_print("fast 2\n");
+                    }
+                    */
+                    else
+                    {
+                        ei = elist_find_edge16(head, & found, e_verts, vi, nvi);
+                        finded++;
+                        if( ! moto_mesh_is_index_valid(self, ei))
+                        {
+                            guint16 hei  = cei*2;
+                            guint16 pair = hei+1;
+
+                            if(i)
+                            {
+                                he_data[prev_hei].next = hei;
+                                if(v_num-1 == i)
+                                    he_data[hei].next = first_hei;
+                            }
+                            else
+                                first_hei = hei;
+
+                            he_data[hei].v_origin = vi;
+                            he_data[hei].f_left = fi;
+                            he_data[hei].edge = cei; // may be removed in future
+                            he_data[hei].pair = pair;
+
+                            he_data[pair].v_origin = nvi;
+                            he_data[pair].edge = cei;
+                            he_data[pair].pair = hei;
+
+                            e_verts[cei*2] = vi;
+                            e_verts[cei*2+1] = nvi;
+                            e_data[cei].half_edge = hei; // may be removed in future
+                            v_data[vi].half_edge = hei;
+                            v_data[nvi].half_edge = pair;
+                            f_data[fi].half_edge = hei;
+
+                            prev_hei = hei;
+                            head = elist_new(cei, head);
+                            cei++;
+                            continue;
+                        }
+                    }
+                    head = elist_remove(head, found);
+                    found = NULL;
+
+                    guint16 hei = ei*2+1;
+
+                    if(i)
+                    {
+                        he_data[prev_hei].next = hei;
+                        if(v_num-1 == i)
+                            he_data[hei].next = first_hei;
+                    }
+                    else
+                        first_hei = hei;
+
+                    he_data[hei].f_left = fi;
+
+                    prev_hei = hei;
+                }
+            }
+        }
+
+        elist_remove_all(head);
+        g_print("head: %p\n", head);
+        g_print("finded: %u\n", finded);
+        // g_free(m);
+    }
+}
 
 void moto_mesh_prepare(MotoMesh *self)
 {
-    // moto_mesh_update_he_data(self); // Deprecated (Very slow)! Create he data while mesh construction.
+    // moto_mesh_update_he_data_old(self); // Deprecated (Very slow)! Create he data while mesh construction.
+    moto_mesh_update_he_data(self); // new
     moto_mesh_calc_normals(self);
     moto_mesh_tesselate_faces(self);
 }

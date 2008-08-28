@@ -70,6 +70,8 @@ static GObjectClass *object_node_parent_class = NULL;
 
 struct _MotoObjectNodePriv
 {
+    gboolean disposed;
+
     MotoGeomViewNode **view_ptr;
     MotoMaterialNode **material_ptr;
     MotoCameraNode **camera_ptr;
@@ -120,9 +122,12 @@ moto_object_node_dispose(GObject *obj)
 {
     MotoObjectNode *self = (MotoObjectNode *)obj;
 
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
+
     g_object_unref(self->priv->local_bound);
     g_object_unref(self->priv->global_bound);
-    g_slice_free(MotoObjectNodePriv, self->priv);
 
     G_OBJECT_CLASS(object_node_parent_class)->dispose(G_OBJECT(self));
 }
@@ -130,6 +135,9 @@ moto_object_node_dispose(GObject *obj)
 static void
 moto_object_node_finalize(GObject *obj)
 {
+    MotoObjectNode *self = (MotoObjectNode *)obj;
+    g_slice_free(MotoObjectNodePriv, self->priv);
+
     object_node_parent_class->finalize(obj);
 }
 
@@ -138,23 +146,16 @@ moto_object_node_init(MotoObjectNode *self)
 {
     MotoNode *node = (MotoNode *)self;
     self->priv = g_slice_new(MotoObjectNodePriv);
+    self->priv->disposed = FALSE;
 
     self->priv->transform_order     = MOTO_TRANSFORM_ORDER_TRS;
     self->priv->rotate_order        = MOTO_ROTATE_ORDER_XYZ;
 
-    self->priv->local_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    self->priv->local_bound  = moto_bound_new(0, 0, 0, 0, 0, 0);
     self->priv->global_bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-
-    /*
-    moto_object_node_set_translate(self, 0, 0, 0);
-    moto_object_node_set_rotate(self, 0, 0, 0);
-    moto_object_node_set_scale(self, 1, 1, 1);
-    */
 
     self->priv->parent = NULL;
     self->priv->children = NULL;
-
-    /* optimizations */
 
     self->priv->inverse_calculated      = FALSE;
     self->priv->local_bound_calculated  = FALSE;
@@ -182,7 +183,7 @@ moto_object_node_init(MotoObjectNode *self)
             "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading", "Shading/Material",
             NULL);
 
-    /* pointers */
+    /* param pointers */
 
     self->priv->tx_ptr = moto_node_param_value_pointer(node, "tx", gfloat);
     self->priv->ty_ptr = moto_node_param_value_pointer(node, "ty", gfloat);
@@ -206,6 +207,7 @@ moto_object_node_init(MotoObjectNode *self)
     self->priv->material_ptr = moto_node_param_value_pointer(node, "material", MotoMaterialNode*);;
 
     /* camera */
+
     self->priv->target[0] = 0;
     self->priv->target[1] = 0;
     self->priv->target[2] = 0;

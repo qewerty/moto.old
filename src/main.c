@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
     // moto_glext_print_list();
 
-    print_enum();
+    // print_enum();
 
     g_print("\nRegistered node types:\n\n");
     print_type_tree(MOTO_TYPE_NODE);

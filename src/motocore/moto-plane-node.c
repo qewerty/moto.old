@@ -136,26 +136,6 @@ MotoPlaneNode *moto_plane_node_new(const gchar *name)
 
 #define get_v(x, y) ((x)*(div_y+1) + (y))
 
-static guint32 get_he(MotoMeshSelection *sel, guint32 ei)
-{
-    if( ! moto_mesh_selection_is_edge_selected(sel, ei))
-    {
-        // moto_mesh_selection_select_edge(sel, ei);
-        return ei*2;
-    }
-    return ei*2 + 1;
-}
-
-static guint32 get_he_pair(MotoMeshSelection *sel, guint32 ei)
-{
-    if( ! moto_mesh_selection_is_edge_selected(sel, ei))
-    {
-        moto_mesh_selection_select_edge(sel, ei);
-        return ei*2+1;
-    }
-    return ei*2;
-}
-
 static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 {
     /* TODO: Temporary solution! */
@@ -167,6 +147,9 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
     guint div_x = *(self->priv->div_x_ptr);
     guint div_y = *(self->priv->div_y_ptr);
+
+    div_x = (div_x < 1) ? 1 : div_x;
+    div_y = (div_y < 1) ? 1 : div_y;
 
     MotoOrientation orientation = *(self->priv->orientation_ptr);
 
@@ -192,18 +175,13 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     }
 
     MotoMesh *mesh = self->priv->mesh;
-    MotoMeshSelection *sel = moto_mesh_selection_for_mesh(mesh);
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
 
     if(mesh->b32)
     {
-        MotoMeshVert32 *v_data  = (MotoMeshVert32 *)mesh->v_data;
-        MotoMeshEdge32 *e_data  = (MotoMeshEdge32 *)mesh->e_data;
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
-        MotoHalfEdge32 *he_data = (MotoHalfEdge32 *)mesh->he_data;
-        guint32 *e_verts = (guint32 *)mesh->e_verts;
         guint32 *f_verts = (guint32 *)mesh->f_verts;
 
         guint32 i, j, n = 4;
@@ -251,81 +229,16 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         if(new_mesh)
         {
             for(i = 0; i < div_x; i++)
-                for(j = 0; j < div_x; j++)
+                for(j = 0; j < div_y; j++)
                 {
                     guint32 v0 = get_v(i, j),
                             v1 = get_v(i+1, j),
                             v2 = get_v(i+1, j+1),
                             v3 = get_v(i, j+1);
-                    // g_print("v0, v1, v2, v3: %u, %u, %u, %u\n", v0, v1, v2, v3);
                     f_verts[fi*4]   = v0;
                     f_verts[fi*4+1] = v1;
                     f_verts[fi*4+2] = v2;
                     f_verts[fi*4+3] = v3;
-
-                    guint32 e0 = e_x(i, j),
-                            e1 = e_y(i+1, j),
-                            e2 = e_x(i, j+1),
-                            e3 = e_y(i, j);
-                    // g_print("e0, e1, e2, e3: %u, %u, %u, %u\n", e0, e1, e2, e3);
-
-                    e_verts[e0*2]   = v0;
-                    e_verts[e0*2+1] = v1;
-                    e_verts[e1*2]   = v1;
-                    e_verts[e1*2+1] = v2;
-                    e_verts[e2*2]   = v2;
-                    e_verts[e2*2+1] = v3;
-                    e_verts[e3*2]   = v3;
-                    e_verts[e3*2+1] = v0;
-
-                    guint32 he0 = get_he(sel, e0),
-                            he1 = get_he(sel, e1),
-                            he2 = get_he(sel, e2),
-                            he3 = get_he(sel, e3);
-
-                    f_data[fi].half_edge = he0;
-                    e_data[e0].half_edge = he0;
-                    e_data[e1].half_edge = he1;
-                    e_data[e2].half_edge = he2;
-                    e_data[e3].half_edge = he3;
-                    v_data[v0].half_edge = he0;
-                    v_data[v1].half_edge = he1;
-                    v_data[v2].half_edge = he2;
-                    v_data[v3].half_edge = he3;
-
-                    he_data[he0].pair = get_he_pair(sel, e0);
-                    he_data[he1].pair = get_he_pair(sel, e1);
-                    he_data[he2].pair = get_he_pair(sel, e2);
-                    he_data[he3].pair = get_he_pair(sel, e3);
-                    he_data[he_data[he0].pair].pair = he0;
-                    he_data[he_data[he1].pair].pair = he1;
-                    he_data[he_data[he2].pair].pair = he2;
-                    he_data[he_data[he3].pair].pair = he3;
-
-                    he_data[he0].next = he1;
-                    he_data[he1].next = he2;
-                    he_data[he2].next = he3;
-                    he_data[he3].next = he0;
-                    he_data[he0].v_origin = v0;
-                    he_data[he1].v_origin = v1;
-                    he_data[he2].v_origin = v2;
-                    he_data[he3].v_origin = v3;
-                    he_data[he_data[he0].pair].v_origin = v1;
-                    he_data[he_data[he1].pair].v_origin = v2;
-                    he_data[he_data[he2].pair].v_origin = v3;
-                    he_data[he_data[he3].pair].v_origin = v0;
-                    he_data[he0].edge = e0;
-                    he_data[he1].edge = e1;
-                    he_data[he2].edge = e2;
-                    he_data[he3].edge = e3;
-                    he_data[he_data[he0].pair].edge = e0;
-                    he_data[he_data[he1].pair].edge = e1;
-                    he_data[he_data[he2].pair].edge = e2;
-                    he_data[he_data[he3].pair].edge = e3;
-                    he_data[he0].f_left = fi;
-                    he_data[he1].f_left = fi;
-                    he_data[he2].f_left = fi;
-                    he_data[he3].f_left = fi;
 
                     fi++;
                 }
@@ -333,11 +246,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     }
     else
     {
-        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)mesh->v_data;
-        MotoMeshEdge16 *e_data  = (MotoMeshEdge16 *)mesh->e_data;
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
-        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)mesh->he_data;
-        guint16 *e_verts = (guint16 *)mesh->e_verts;
         guint16 *f_verts = (guint16 *)mesh->f_verts;
 
         guint16 i, j, n = 4;
@@ -385,90 +294,27 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         if(new_mesh)
         {
             for(i = 0; i < div_x; i++)
-                for(j = 0; j < div_x; j++)
+                for(j = 0; j < div_y; j++)
                 {
                     guint16 v0 = get_v(i, j),
                             v1 = get_v(i+1, j),
                             v2 = get_v(i+1, j+1),
                             v3 = get_v(i, j+1);
-                    // g_print("v0, v1, v2, v3: %u, %u, %u, %u\n", v0, v1, v2, v3);
                     f_verts[fi*4]   = v0;
                     f_verts[fi*4+1] = v1;
                     f_verts[fi*4+2] = v2;
                     f_verts[fi*4+3] = v3;
-
-                    guint16 e0 = e_x(i, j),
-                            e1 = e_y(i+1, j),
-                            e2 = e_x(i, j+1),
-                            e3 = e_y(i, j);
-                    // g_print("e0, e1, e2, e3: %u, %u, %u, %u\n", e0, e1, e2, e3);
-
-                    e_verts[e0*2]   = v0;
-                    e_verts[e0*2+1] = v1;
-                    e_verts[e1*2]   = v1;
-                    e_verts[e1*2+1] = v2;
-                    e_verts[e2*2]   = v2;
-                    e_verts[e2*2+1] = v3;
-                    e_verts[e3*2]   = v3;
-                    e_verts[e3*2+1] = v0;
-
-                    guint16 he0 = get_he(sel, e0),
-                            he1 = get_he(sel, e1),
-                            he2 = get_he(sel, e2),
-                            he3 = get_he(sel, e3);
-
-                    f_data[fi].half_edge = he0;
-                    e_data[e0].half_edge = he0;
-                    e_data[e1].half_edge = he1;
-                    e_data[e2].half_edge = he2;
-                    e_data[e3].half_edge = he3;
-                    v_data[v0].half_edge = he0;
-                    v_data[v1].half_edge = he1;
-                    v_data[v2].half_edge = he2;
-                    v_data[v3].half_edge = he3;
-
-                    he_data[he0].pair = get_he_pair(sel, e0);
-                    he_data[he1].pair = get_he_pair(sel, e1);
-                    he_data[he2].pair = get_he_pair(sel, e2);
-                    he_data[he3].pair = get_he_pair(sel, e3);
-                    he_data[he_data[he0].pair].pair = he0;
-                    he_data[he_data[he1].pair].pair = he1;
-                    he_data[he_data[he2].pair].pair = he2;
-                    he_data[he_data[he3].pair].pair = he3;
-
-                    he_data[he0].next = he1;
-                    he_data[he1].next = he2;
-                    he_data[he2].next = he3;
-                    he_data[he3].next = he0;
-                    he_data[he0].v_origin = v0;
-                    he_data[he1].v_origin = v1;
-                    he_data[he2].v_origin = v2;
-                    he_data[he3].v_origin = v3;
-                    he_data[he_data[he0].pair].v_origin = v1;
-                    he_data[he_data[he1].pair].v_origin = v2;
-                    he_data[he_data[he2].pair].v_origin = v3;
-                    he_data[he_data[he3].pair].v_origin = v0;
-                    he_data[he0].edge = e0;
-                    he_data[he1].edge = e1;
-                    he_data[he2].edge = e2;
-                    he_data[he3].edge = e3;
-                    he_data[he_data[he0].pair].edge = e0;
-                    he_data[he_data[he1].pair].edge = e1;
-                    he_data[he_data[he2].pair].edge = e2;
-                    he_data[he_data[he3].pair].edge = e3;
-                    he_data[he0].f_left = fi;
-                    he_data[he1].f_left = fi;
-                    he_data[he2].f_left = fi;
-                    he_data[he3].f_left = fi;
+                    /*
+                    g_print("v0, v1, v2, v3: %u, %u, %u, %u\n", v0, v1, v2, v3);
+                    if(v0 >= v_num || v1 >= v_num || v2 >= v_num || v3 >= v_num)
+                        g_print("BOOOO-OOOO-OOOM!!!");
+                        */
 
                     fi++;
                 }
         }
     }
 
-    moto_mesh_selection_free(sel);
-
-    // g_print("BEFORE moto_mesh_prepare\n");
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }

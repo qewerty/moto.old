@@ -4,6 +4,24 @@
 #include "moto-world.h"
 #include "moto-messager.h"
 
+/* enums */
+
+GType moto_param_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_PARAM_MODE_IN ,   "PARAM_MODE_IN",    "IN"},
+            {MOTO_PARAM_MODE_OUT,   "PARAM_MODE_OUT",   "OUT"},
+            {MOTO_PARAM_MODE_INOUT, "PARAM_MODE_INPUT", "INOUT"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoParamMode", values);
+    }
+    return type;
+}
+
 /* utils */
 
 typedef struct _Domain
@@ -360,6 +378,8 @@ void moto_node_add_params(MotoNode *self, ...)
 
         moto_node_add_param(self, p, domain, group);
     }
+
+    va_end(ap);
 }
 
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name)
@@ -702,6 +722,8 @@ void moto_node_get_params(MotoNode *self, ...)
         }
 
     }
+
+    va_end(ap);
 }
 
 void moto_node_set_params(MotoNode *self, ...)
@@ -767,6 +789,8 @@ void moto_node_set_params(MotoNode *self, ...)
                     g_value_set_object(v, va_arg(ap, gpointer));
         }
     }
+
+    va_end(ap);
 }
 
 typedef struct _NodeParamData
@@ -991,6 +1015,8 @@ moto_param_init(MotoParam *self)
 
     self->priv->mode = MOTO_PARAM_MODE_IN;
 
+    self->priv->pspec = NULL;
+
     self->priv->hidden = FALSE;
     g_get_current_time(& self->priv->last_modified);
 }
@@ -1026,6 +1052,28 @@ moto_param_class_init(MotoParamClass *klass)
                  G_TYPE_NONE /* return_type */,
                  0     /* n_params */,
                  NULL  /* param_types */);
+
+    klass->dest_added_signal_id = g_signal_newv ("dest-added",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
+
+    klass->dest_removed_signal_id = g_signal_newv ("dest-removed",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
 }
 
 G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
@@ -1048,6 +1096,8 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
     GValue none = {0, };
 
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
+
+    self->priv->pspec = pspec;
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);
@@ -1080,6 +1130,11 @@ const gchar *moto_param_get_title(MotoParam *self)
 MotoParamMode moto_param_get_mode(MotoParam *self)
 {
     return self->priv->mode;
+}
+
+GParamSpec *moto_param_get_spec(MotoParam *self)
+{
+    return self->priv->pspec;
 }
 
 guint moto_param_get_id(MotoParam *self)
@@ -1252,6 +1307,7 @@ exclude_from_dests_on_dest_deleted(gpointer data, GObject *where_the_object_was)
     MotoParam *param = (MotoParam *)data;
 
     param->priv->dests = g_slist_remove(param->priv->dests, where_the_object_was);
+    g_signal_emit(param, MOTO_PARAM_GET_CLASS(param)->dest_removed_signal_id, 0);
 }
 
 void moto_param_link(MotoParam *self, MotoParam *src)
@@ -1294,10 +1350,12 @@ void moto_param_link(MotoParam *self, MotoParam *src)
 
     self->priv->source = src;
     src->priv->dests = g_slist_append(src->priv->dests, self);
+    g_signal_emit(src, MOTO_PARAM_GET_CLASS(src)->dest_added_signal_id, 0);
+
+    moto_node_update(moto_param_get_node(src));
+    moto_param_update(self);
 
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->source_changed_signal_id, 0);
-
-    moto_param_update(self);
 }
 
 void moto_param_unlink_source(MotoParam *self)
@@ -1309,6 +1367,7 @@ void moto_param_unlink_source(MotoParam *self)
         g_object_weak_unref(G_OBJECT(self), exclude_from_dests_on_dest_deleted, self->priv->source);
 
         self->priv->source->priv->dests = g_slist_remove(self->priv->source->priv->dests, self);
+        g_signal_emit(self->priv->source, MOTO_PARAM_GET_CLASS(self->priv->source)->dest_removed_signal_id, 0);
     }
     self->priv->source = NULL;
 }
@@ -1374,10 +1433,7 @@ void moto_param_update_dests(MotoParam *self)
 
     GSList *dest = self->priv->dests;
     for(; dest; dest = g_slist_next(dest))
-    {
-        MotoParam *param = (MotoParam *)dest->data;
-        moto_param_update(param);
-    }
+        moto_param_update((MotoParam *)dest->data);
 
 }
 
