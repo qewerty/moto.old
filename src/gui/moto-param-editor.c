@@ -114,8 +114,8 @@ static void node_delete_notify(MotoParamEditor *pe, GObject *where_the_object_wa
 
 static void widget_delete_notify(OnChangedData *data, GObject *where_the_object_was)
 {
-    // g_print("widget_delete_notify\n");
-    g_signal_handler_disconnect(data->param, data->param_handler_id);
+    if(data->param_handler_id)
+        g_signal_handler_disconnect(data->param, data->param_handler_id);
     g_slice_free(OnChangedData, data);
 }
 
@@ -292,7 +292,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             data->widget = widget;
             g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
             data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
-            // data->param_handler_id = \
+            data->param_handler_id = 0;
             //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
         break;
     }

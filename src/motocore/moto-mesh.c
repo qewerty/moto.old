@@ -506,17 +506,18 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             guint16 he      = begin;
             do
             {
-                if(moto_mesh_is_index_valid(self, he) && moto_mesh_is_index_valid(self, he_data[he].f_left))
+                if(moto_mesh_is_index_valid(self, he))
                 {
-                    gfloat *fnormal = (gfloat *) & self->f_normals[he_data[he].f_left];
-                    vector3_add(normal, fnormal);
+                    if(moto_mesh_is_index_valid(self, he_data[he].f_left))
+                    {
+                        gfloat *fnormal = (gfloat *) & self->f_normals[he_data[he].f_left];
+                        vector3_add(normal, fnormal);
+                    }
                 }
                 else
                     break;
 
                 guint16 next = he_data[moto_half_edge_pair(he)].next;
-                if( ! moto_mesh_is_index_valid(self, next))
-                    break;
                 he = next;
             }
             while(he != begin);
@@ -524,11 +525,11 @@ void moto_mesh_calc_verts_normals(MotoMesh *self)
             gfloat len = vector3_length(normal);
             if(len)
             {
-                vector3_normalize(normal, len);
+              vector3_normalize(normal, len);
             }
             else
             {
-                vector3_set(normal, 0, 1, 0); // fake normal for null vector
+              vector3_set(normal, 0, 1, 0); // fake normal for null vector
             }
         }
     }
@@ -539,59 +540,6 @@ void moto_mesh_calc_normals(MotoMesh *self)
     moto_mesh_calc_faces_normals(self);
     moto_mesh_calc_verts_normals(self);
 }
-
-static guint seq_sum(guint num)
-{
-    return (num) ? num*(num+1)/2 : 0;
-}
-
-guint16 *create_matrix16(guint num)
-{
-    guint snum = seq_sum(num);
-    guint16 *m = (guint16 *)g_try_malloc(sizeof(guint16)*snum);
-
-    guint i;
-    for(i = 0; i < snum; i++)
-    {
-        m[i] = G_MAXUINT16;
-    }
-
-    return m;
-}
-
-guint32 *create_matrix32(guint num)
-{
-    guint snum = seq_sum(num);
-    guint32 *m = (guint32 *)g_try_malloc(sizeof(guint32)*snum);
-
-    guint32 i;
-    for(i = 0; i < snum; i++)
-        m[i] = G_MAXUINT32;
-
-    return m;
-}
-
-/*
-static guint16 find_edge16(guint16 *m, guint16 a, guint16 b)
-{
-    return m[seq_sum(max(a, b)-1) + min(a, b)];
-}
-
-static void set_edge16(guint16 *m, guint16 a, guint16 b, guint16 ei)
-{
-    m[seq_sum(max(a, b)-1) + min(a, b)] = ei;
-}
-
-static guint32 find_edge32(guint32 *m, guint32 a, guint32 b)
-{
-    return m[seq_sum(max(a, b)-1) + min(a, b)];
-}
-
-static void set_edge32(guint32 *m, guint32 a, guint32 b, guint32 ei)
-{
-    m[seq_sum(max(a, b)-1) + min(a, b)] = ei;
-}
-*/
 
 typedef struct _EList EList;
 

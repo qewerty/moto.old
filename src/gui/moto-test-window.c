@@ -174,6 +174,20 @@ gboolean on_key_press_event(GtkWidget   *widget,
 
         moto_test_window_redraw_3dview(self);
     }
+    else if(65289 == event->keyval)
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return FALSE;
+        MotoObjectNode *ob = moto_world_get_current_object(w);
+        if( ! ob)
+            return FALSE;
+        MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
+        if( ! gv)
+            return FALSE;
+        moto_geom_view_node_goto_next_state(gv);
+        moto_test_window_redraw_3dview(self);
+    }
 
     return FALSE;
 }

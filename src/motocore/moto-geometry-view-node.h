@@ -130,6 +130,7 @@ void moto_geom_view_node_set_prepared(MotoGeomViewNode *self, gboolean status);
 MotoGeomViewState *moto_geom_view_node_get_state(MotoGeomViewNode *self);
 void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_name);
 GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self);
+void moto_geom_view_node_goto_next_state(MotoGeomViewNode *self);
 
 MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self);
 

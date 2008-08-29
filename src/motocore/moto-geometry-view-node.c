@@ -243,6 +243,21 @@ GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self)
     return MOTO_GEOM_VIEW_NODE_GET_CLASS(self)->states;
 }
 
+void moto_geom_view_node_goto_next_state(MotoGeomViewNode *self)
+{
+    GSList *li = moto_geom_view_node_get_state_list(self);
+    if( ! li)
+        return;
+
+    GSList *s = g_slist_find(li, moto_geom_view_node_get_state(self));
+    if(s)
+    {
+        s = g_slist_next(s);
+        moto_geom_view_node_set_state(self,
+            moto_geom_view_state_get_name((MotoGeomViewState *)((s) ? s->data : li->data)));
+    }
+}
+
 MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self)
 {
     MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
