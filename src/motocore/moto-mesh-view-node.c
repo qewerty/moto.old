@@ -272,27 +272,23 @@ static void draw_mesh_as_object(MotoMesh *mesh)
 static void draw_mesh_as_verts(MotoMesh *mesh, MotoMeshSelection *selection)
 {
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-    glPushAttrib(GL_ENABLE_BIT);
+    glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_LIGHTING);
-    glColor4f(1, 1, 1, 0.25);
-
     glEnableClientState(GL_VERTEX_ARRAY);
+    glDepthFunc(GL_LEQUAL);
+
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
     glColor4f(0.6, 0.6, 0.6, 1.0);
     glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
     glColor4f(1, 0.1, 0.1, 1);
-    glPointSize(2);
-
-    glDisable(GL_DEPTH_TEST);
-
+    glPointSize(3);
     glDrawArrays(GL_POINTS, 0, mesh->v_num);
 
     glColor3f(0, 1, 0);
-    glPointSize(3);
+    glPointSize(4);
 
     glBegin(GL_POINTS);
     guint i;
@@ -317,7 +313,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
     glDisable(GL_DEPTH_TEST);
     glLineWidth(1.0);
@@ -361,17 +357,30 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
 
-    glDisable(GL_LIGHTING);
-    glColor4f(1, 1, 1, 0.25);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glColor3f(1, 1, 1);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-
+    glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+    glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
 
-    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2.0, 1.0);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+    glPolygonOffset(1.5, 1.0);
+    // glEnable(GL_POLYGON_OFFSET_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
     MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
     guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+    glDisable(GL_LIGHTING);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glColor4f(0, 1, 0, 1);
     guint i, j;
@@ -389,6 +398,13 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
             glEnd();
         }
     }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glColor3f(0.2, 0.2, 0.2);
+    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+    glDisable(GL_POLYGON_OFFSET_LINE);
 
     glPopAttrib();
     glPopClientAttrib();

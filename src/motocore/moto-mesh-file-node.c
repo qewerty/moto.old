@@ -61,10 +61,7 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
 
     self->priv = g_slice_new(MotoMeshFileNodePriv);
 
-    GString *s = g_string_new("./resources/models/monkey.obj");
-    gchar *filename = s->str;
-    g_string_free(s, FALSE);
-
+    gchar *filename = "./resources/models/monkey.obj";
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "filename", "Filename", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, filename, pspec, "General", "General",
@@ -189,6 +186,8 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 
     GFile *f = g_file_new_for_path(filename);
     GInputStream *is = g_file_read(f, NULL, NULL);
+    if( ! is)
+        return;
 
     GString *data = g_string_new("");
     gsize count = 256;
@@ -204,7 +203,7 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
     g_input_stream_close(is, NULL, NULL);
 
     guint v_num = 0,
-          e_num = 10000, // FIXME: tmp
+          e_num = 30000, // FIXME: tmp
           f_num = 0,
           f_v_num = 0;
 
@@ -257,7 +256,6 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
-
 
     MotoMeshFace16 *f_data = (guint16 *)mesh->f_data;
     guint16 *f_verts = (guint16 *)mesh->f_verts;

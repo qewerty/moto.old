@@ -179,23 +179,17 @@ gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 struct _MotoHalfEdge16
 {
     guint16 next;
-    // guint16 prev;
-    guint16 pair;
+    guint16 prev;
 
-    guint16 v_origin;
     guint16 f_left;
-    guint16 edge;
 };
 
 struct _MotoHalfEdge32
 {
     guint32 next;
-    // guint32 prev;
-    guint32 pair;
+    guint32 prev;
 
-    guint32 v_origin;
     guint32 f_left;
-    guint32 edge;
 };
 
 #define moto_half_edge_pair(he) ((he%2) ? (he)-1 : (he)+1)

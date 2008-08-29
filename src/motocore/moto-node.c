@@ -1205,6 +1205,11 @@ gdouble moto_param_get_double(MotoParam *self)
     return g_value_get_double(& self->priv->value);
 }
 
+const gchar *moto_param_get_string(MotoParam *self)
+{
+    return g_value_get_string(& self->priv->value);
+}
+
 gpointer moto_param_get_pointer(MotoParam *self)
 {
     return g_value_get_pointer(& self->priv->value);
@@ -1271,6 +1276,12 @@ void moto_param_set_float(MotoParam *self, gfloat value)
 void moto_param_set_double(MotoParam *self, gdouble value)
 {
     g_value_set_double(& self->priv->value, value);
+    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+}
+
+void moto_param_set_string(MotoParam *self, const gchar *value)
+{
+    g_value_set_string(& self->priv->value, value);
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 

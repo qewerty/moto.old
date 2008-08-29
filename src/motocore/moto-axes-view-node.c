@@ -100,6 +100,7 @@ MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
 static void draw_axes(MotoAxesViewNode *self)
 {
     GLint slices = 8;
+    GLint len = 5;
     GLUquadric *q = self->priv->quadric;
 
     glLineWidth(1);
@@ -107,38 +108,44 @@ static void draw_axes(MotoAxesViewNode *self)
     glColor4f(1, 0, 0, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(1, 0, 0);
+    glVertex3f(len, 0, 0);
     glEnd();
 
+    /*
     glPushMatrix();
     glTranslatef(1, 0, 0);
     glRotatef(90, 0, 1, 0);
     gluCylinder(q, 0.02, 0, 0.06, slices, 1);
     glPopMatrix();
+    */
 
     glColor4f(0, 1, 0, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(0, 1, 0);
+    glVertex3f(0, len, 0);
     glEnd();
 
+    /*
     glPushMatrix();
     glTranslatef(0, 1, 0);
     glRotatef(-90, 1, 0, 0);
     gluCylinder(q, 0.02, 0, 0.06, slices, 1);
     glPopMatrix();
+    */
 
     glColor4f(0, 0, 1, 1);
     glBegin(GL_LINES);
     glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, 1);
+    glVertex3f(0, 0, len);
     glEnd();
 
+    /*
     glPushMatrix();
     glTranslatef(0, 0, 1);
     // glRotatef(90, 0, 1, 0);
     gluCylinder(q, 0.02, 0, 0.06, slices, 1);
     glPopMatrix();
+    */
 
 }
 
@@ -148,10 +155,12 @@ static void moto_axes_view_node_draw(MotoGeomViewNode *self)
 
     glPushAttrib(GL_ENABLE_BIT);
 
+    glEnable(GL_DEPTH_TEST);
+
     glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
     glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_LINE_SMOOTH);
+    // glEnable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
         moto_axes_view_node_prepare_for_draw(self);

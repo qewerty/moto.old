@@ -106,13 +106,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return TRUE;
+            return FALSE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return TRUE;
+            return FALSE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return TRUE;
+            return FALSE;
 
         moto_geom_view_node_grow_selection(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
@@ -121,13 +121,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return TRUE;
+            return FALSE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return TRUE;
+            return FALSE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return TRUE;
+            return FALSE;
         moto_geom_view_node_select_less(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
@@ -135,13 +135,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return TRUE;
+            return FALSE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return TRUE;
+            return FALSE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return TRUE;
+            return FALSE;
         moto_geom_view_node_invert_selection(gv);
         draw(self->priv->area, (GdkEventExpose *)event, user_data);
     }
@@ -150,33 +150,32 @@ gboolean on_key_press_event(GtkWidget   *widget,
         // FIXME: TEMP
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
-            return TRUE;
+            return FALSE;
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
-            return TRUE;
+            return FALSE;
         MotoGeomViewNode *gv = moto_node_get_param_object((MotoNode *)ob, "view");
         if( ! gv)
-            return TRUE;
+            return FALSE;
         MotoParam *p = moto_node_get_param((MotoNode *)gv, "mesh");
         if( ! p)
-            return TRUE;
+            return FALSE;
         MotoParam *s = moto_param_get_source(p);
         if( ! s)
-            return TRUE;
+            return FALSE;
         MotoNode *node = moto_param_get_node(s);
 
         MotoParam *dx = moto_node_get_param(node, "div_x");
         if( ! dx)
-            return;
+            return FALSE;
 
         moto_param_set_uint(dx, moto_param_get_uint(dx) + 1);
         moto_node_update(node);
 
         moto_test_window_redraw_3dview(self);
     }
-    else
-        return FALSE;
-    return TRUE;
+
+    return FALSE;
 }
 
 gboolean redraw_world_idle(gpointer data)
@@ -339,7 +338,11 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_box_pack_start(hbox, (GtkWidget *)hp, TRUE, TRUE, 0);
     gtk_paned_pack1(hp, (GtkWidget *)area, TRUE, FALSE);
     self->priv->param_editor = moto_param_editor_new(self);
-    gtk_paned_pack2(hp, (GtkWidget *)self->priv->param_editor, FALSE, FALSE);
+    GtkScrolledWindow *sw = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request((GtkWidget *)sw, 320, 36);
+    gtk_scrolled_window_set_policy(sw, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_add_with_viewport(sw, (GtkWidget *)self->priv->param_editor);
+    gtk_paned_pack2(hp, (GtkWidget *)sw, FALSE, FALSE);
     // gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
 
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
@@ -495,7 +498,8 @@ MotoRotateOrder ro = MOTO_ROTATE_ORDER_XYZ;
 static gboolean
 press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-    if(!GTK_WIDGET_REALIZED(widget)) return FALSE;
+    if( ! GTK_WIDGET_REALIZED(widget))
+        return FALSE;
 
     MotoWorld *world = twin->priv->world;
     MotoObjectNode *cam = moto_world_get_camera(world);
@@ -521,6 +525,8 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
                 moto_object_node_set_rotate_order(cam, ro);
                 draw(widget, (GdkEventExpose *)event, data);
             }
+            if( ! event->state)
+                moto_world_button_press(world, event->x, event->y, width, height);
         break;
         case 2:
             if(event->state & GDK_MOD1_MASK)
@@ -531,8 +537,6 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
                 zoom = TRUE;
         break;
     }
-
-    moto_world_button_press(world, event->x, event->y, width, height);
 
     draw(widget, (GdkEventExpose *)event, data);
     return TRUE;

@@ -68,7 +68,7 @@ moto_param_editor_init(MotoParamEditor *self)
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)gtk_hseparator_new(),  FALSE, FALSE, 0);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->gbox,     TRUE, TRUE, 4);
 
-    gtk_widget_set_size_request((GtkWidget *)self, 320, 36);
+    // gtk_widget_set_size_request((GtkWidget *)self, 300, 36);
 
     self->priv->node = NULL;
     self->priv->window = NULL;
@@ -199,6 +199,19 @@ void on_boolean_param_changed(MotoParam *param, OnChangedData *data)
     g_signal_handler_unblock(data->widget, data->handler_id);
 }
 
+void on_string_changed(GtkEditable *editable,
+                        OnChangedData *data)
+{
+    const gchar* value = gtk_entry_get_text((GtkEntry *)editable);
+
+    g_signal_handler_block(editable, data->handler_id);
+    moto_param_set_string(data->param, value);
+    g_signal_handler_unblock(editable, data->handler_id);
+
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
 static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 {
     GtkWidget *widget = NULL;
@@ -268,6 +281,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             data->param_handler_id = \
                 g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
         break;
+        case G_TYPE_STRING:
+            widget = gtk_entry_new();
+            gtk_entry_set_text((GtkEntry *)widget, moto_param_get_string(param));
+            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+
+            data = g_slice_new(OnChangedData);
+            data->param = param;
+            data->window = pe->priv->window;
+            data->widget = widget;
+            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+            data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
+            // data->param_handler_id = \
+            //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+        break;
     }
     return widget;
 }
@@ -286,7 +313,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
     gtk_table_attach((GtkTable *)data->table,
             label,
             0, 1, data->pe->priv->num, data->pe->priv->num + 1,
-            GTK_SHRINK, GTK_SHRINK, 8, 1);
+            GTK_FILL, GTK_SHRINK, 8, 1);
 
     GtkWidget *pwidget = create_widget_for_param(data->pe, param);
     if(pwidget)
