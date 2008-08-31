@@ -411,6 +411,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         }
     }
 
+    self->priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }
@@ -456,7 +457,10 @@ static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self)
     MotoCubeNode *cube = (MotoCubeNode *)self;
 
     if( ! cube->priv->bound_calculated)
+    {
         calc_bound(cube);
+        cube->priv->bound_calculated = TRUE;
+    }
 
     return cube->priv->bound;
 }

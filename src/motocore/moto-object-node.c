@@ -13,7 +13,7 @@
 #include "common/numdef.h"
 #include "common/print-array.h"
 
-/* forward */
+/* forwards */
 
 static void moto_object_node_calc_transform(MotoObjectNode *self);
 static void moto_object_node_calc_inverse_transform(MotoObjectNode *self);
@@ -21,6 +21,8 @@ static void moto_object_node_calc_inverse_transform(MotoObjectNode *self);
 void moto_object_node_set_translate(MotoObjectNode *self, gfloat x, gfloat y, gfloat z);
 void moto_object_node_set_rotate(MotoObjectNode *self, gfloat x, gfloat y, gfloat z);
 void moto_object_node_set_scale(MotoObjectNode *self, gfloat x, gfloat y, gfloat z);
+
+static void moto_object_node_update(MotoNode *self);
 
 // static void moto_object_node_convert_camera_transform(MotoObjectNode *self);
 
@@ -174,7 +176,7 @@ moto_object_node_init(MotoObjectNode *self)
             "sx", "Scale X",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             "sy", "Scale Y",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
             "sz", "Scale Z",     G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Transform", "Transform/Scale",
-            "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_TRS, pspec,   "Transform", "Transform/Misc",
+            "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec,   "Transform", "Transform/Misc",
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec,   "Transform", "Transform/Misc",
             "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
@@ -217,8 +219,11 @@ static void
 moto_object_node_class_init(MotoObjectNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
+    MotoNodeClass *nclass = MOTO_NODE_CLASS(klass);
 
     object_node_parent_class = (GObjectClass *)(g_type_class_peek_parent(klass));
+
+    nclass->update = moto_object_node_update;
 
     goclass->dispose = moto_object_node_dispose;
     goclass->finalize = moto_object_node_finalize;
@@ -1138,6 +1143,17 @@ gboolean moto_object_node_get_visible(MotoObjectNode *self)
 void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
 {
     g_value_set_boolean(moto_node_get_param_value((MotoNode *)self, "visible"), visible);
+}
+
+static void moto_object_node_update(MotoNode *self)
+{
+    MotoObjectNode *obj = (MotoObjectNode *)self;
+
+    obj->priv->translate_calculated    = FALSE;
+    obj->priv->rotate_calculated       = FALSE;
+    obj->priv->scale_calculated        = FALSE;
+    obj->priv->transform_calculated    = FALSE;
+    obj->priv->inverse_calculated      = FALSE;
 }
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,

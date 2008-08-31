@@ -27,9 +27,13 @@
 #include "moto-forward.h"
 #include "moto-axes-view-node.h"
 
+G_BEGIN_DECLS
+
 typedef gboolean (MotoWorldForeachNodeFunc)(MotoWorld *world, MotoNode *node, gpointer user_data);
 
-G_BEGIN_DECLS
+typedef struct _MotoWorldManipulator MotoWorldManipulator;
+typedef struct _MotoWorldManipulatorClass MotoWorldManipulatorClass;
+typedef struct _MotoWorldManipulatorPriv MotoWorldManipulatorPriv;
 
 /* class MotoWorld */
 
@@ -272,6 +276,45 @@ void moto_world_button_release(MotoWorld *self,
     gint x, gint y, gint width, gint height);
 void moto_world_motion_notify(MotoWorld *self,
     gint x, gint y, gint width, gint height);
+
+/* MotoWorldManipulator */
+
+struct _MotoWorldManipulator
+{
+    /*< private >*/
+    GObject parent;
+
+    MotoWorldManipulatorPriv *priv;
+};
+
+struct _MotoWorldManipulatorClass
+{
+    GObjectClass parent;
+
+    guint draw_signal_id;
+    guint button_press_signal_id;
+    guint button_release_signal_id;
+    guint motion_notify_signal_id;
+};
+
+GType moto_world_manipualtor_get_type(void) G_GNUC_CONST;
+
+#define MOTO_TYPE_WORLD_MANIPULATOR (moto_world_manipulator_get_type())
+#define MOTO_WORLD_MANIPULATOR(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_WORLD_MANIPULATOR, MotoWorldManipulator))
+#define MOTO_WORLD_MANIPULATOR_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_WORLD_MANIPULATOR, MotoWorldManipulatorClass))
+#define MOTO_IS_WORLD_MANIPULATOR(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_WORLD_MANIPULATOR))
+#define MOTO_IS_WORLD_MANIPULATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_WORLD_MANIPULATOR))
+#define MOTO_WORLD_MANIPULATOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_WORLD_MANIPULATOR, MotoWorldManipulatorClass))
+
+MotoWorldManipulator *moto_world_manipulator_new();
+void moto_world_manipulator_draw(MotoWorldManipulator *self, MotoWorld *world);
+
+gboolean moto_world_manipulator_button_press(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height);
+void moto_world_manipulator_button_release(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height);
+void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height);
 
 G_END_DECLS
 

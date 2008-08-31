@@ -315,6 +315,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
     }
 
+    self->priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }
@@ -349,23 +350,23 @@ static void calc_bound(MotoPlaneNode *self)
     MotoOrientation orientation = *(self->priv->orientation_ptr);
 
     gfloat hsx, hsy, hsz;
-    if(MOTO_ORIENTATION_XY == orientation)
+    switch(orientation)
     {
-        hsx = size_x / 2;
-        hsy = size_y / 2;
-        hsz = 0.05;
-    }
-    else if(MOTO_ORIENTATION_YZ == orientation)
-    {
-        hsx = 0.05;
-        hsy = size_x / 2;
-        hsz = size_y / 2;
-    }
-    else // if(MOTO_ORIENTATION_ZX == orientation)
-    {
-        hsx = size_x / 2;
-        hsy = 0.05;
-        hsz = size_y / 2;
+        case MOTO_ORIENTATION_XY:
+            hsx = size_x / 2;
+            hsy = size_y / 2;
+            hsz = 0.05;
+        break;
+        case MOTO_ORIENTATION_YZ:
+            hsx = 0.05;
+            hsy = size_x / 2;
+            hsz = size_y / 2;
+        break;
+        case MOTO_ORIENTATION_ZX:
+            hsx = size_x / 2;
+            hsy = 0.05;
+            hsz = size_y / 2;
+        break;
     }
 
     self->priv->bound->bound[0] = -hsx;
@@ -381,7 +382,10 @@ static MotoBound *moto_plane_node_get_bound(MotoGeometryNode *self)
     MotoPlaneNode *plane = (MotoPlaneNode *)self;
 
     if( ! plane->priv->bound_calculated)
+    {
         calc_bound(plane);
+        plane->priv->bound_calculated = TRUE;
+    }
 
     return plane->priv->bound;
 }

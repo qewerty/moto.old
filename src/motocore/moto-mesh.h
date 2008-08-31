@@ -301,6 +301,8 @@ void moto_mesh_update_he_data(MotoMesh *self);
 
 void moto_mesh_prepare(MotoMesh *self);
 
+gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
+
 void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_inverse_verts(MotoMesh *self, MotoMeshSelection *selection);

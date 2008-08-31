@@ -1,3 +1,4 @@
+#include "motocore/moto-filename.h"
 #include "moto-param-editor.h"
 
 /* forwards */
@@ -212,89 +213,156 @@ void on_string_changed(GtkEditable *editable,
     moto_test_window_redraw_3dview(data->window);
 }
 
+typedef struct _FilenameDialogData
+{
+    GtkEntry *entry;
+} FilenameDialogData;
+
+void on_filename_dialog_response(GtkDialog *dialog, gint response_id, FilenameDialogData *data)
+{
+    if(GTK_RESPONSE_OK == response_id)
+    {
+        gtk_entry_set_text(data->entry,
+                gtk_file_chooser_get_filename((GtkFileChooser *)dialog));
+    }
+
+    gtk_object_destroy((GtkObject *)dialog);
+}
+
+void on_filename_clicked(GtkButton *button, gpointer user_data)
+{
+    GtkFileChooserDialog *dialog = \
+        (GtkFileChooserDialog *)gtk_file_chooser_dialog_new("Select a file",
+                NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                GTK_STOCK_OPEN, GTK_RESPONSE_OK,
+                NULL);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(on_filename_dialog_response), user_data);
+
+    gtk_widget_show_all((GtkWidget *)dialog);
+}
+
+void destroy_filename_data(gpointer data, GClosure *closure)
+{
+    g_slice_free(FilenameDialogData, data);
+}
+
 static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 {
     GtkWidget *widget = NULL;
     OnChangedData *data;
-    switch(moto_param_get_value_type(param))
+    GType ptype = moto_param_get_value_type(param);
+    if(G_TYPE_INT == ptype)
     {
-        case G_TYPE_INT:
-            widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
-            gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_int(param));
-            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
-            gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
+        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_int(param));
+        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+        gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
 
-            data = g_slice_new(OnChangedData);
-            data->param = param;
-            data->window = pe->priv->window;
-            data->widget = widget;
-            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-            data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
-            data->param_handler_id = \
-                g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_int_param_changed), data);
-        break;
-        case G_TYPE_UINT:
-            widget = gtk_spin_button_new_with_range(0, 1000000, 1);
-            gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_uint(param));
-            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
-            gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
+        data->param_handler_id = \
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_int_param_changed), data);
+    }
+    else if(G_TYPE_UINT == ptype)
+    {
+        widget = gtk_spin_button_new_with_range(0, 1000000, 1);
+        gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_uint(param));
+        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+        gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
 
-            GParamSpecUInt *ps = (GParamSpecUInt *)moto_param_get_spec(param);
-            if(ps)
-                gtk_spin_button_set_range((GtkSpinButton *)widget, ps->minimum, ps->maximum);
+        GParamSpecUInt *ps = (GParamSpecUInt *)moto_param_get_spec(param);
+        if(ps)
+            gtk_spin_button_set_range((GtkSpinButton *)widget, ps->minimum, ps->maximum);
 
-            data = g_slice_new(OnChangedData);
-            data->param = param;
-            data->window = pe->priv->window;
-            data->widget = widget;
-            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-            data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_uint_changed), data);
-            data->param_handler_id = \
-                g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_uint_param_changed), data);
-        break;
-        case G_TYPE_BOOLEAN:
-            widget = gtk_check_button_new();
-            gtk_toggle_button_set_active((GtkToggleButton *)widget, moto_param_get_boolean(param));
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_uint_changed), data);
+        data->param_handler_id = \
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_uint_param_changed), data);
+    }
+    else if(G_TYPE_BOOLEAN == ptype)
+    {
+        widget = gtk_check_button_new();
+        gtk_toggle_button_set_active((GtkToggleButton *)widget, moto_param_get_boolean(param));
 
-            data = g_slice_new(OnChangedData);
-            data->param = param;
-            data->window = pe->priv->window;
-            data->widget = widget;
-            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-            data->handler_id = g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolean_changed), data);
-            data->param_handler_id = \
-                g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
-        break;
-        case G_TYPE_FLOAT:
-            widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.01);
-            gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_float(param));
-            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
-            gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
-            gtk_spin_button_set_digits((GtkSpinButton *)widget, 3);
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolean_changed), data);
+        data->param_handler_id = \
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+    }
+    else if(G_TYPE_FLOAT == ptype)
+    {
+        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.01);
+        gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_float(param));
+        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+        gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
+        gtk_spin_button_set_digits((GtkSpinButton *)widget, 3);
 
-            data = g_slice_new(OnChangedData);
-            data->param = param;
-            data->window = pe->priv->window;
-            data->widget = widget;
-            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-            data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_float_changed), data);
-            data->param_handler_id = \
-                g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
-        break;
-        case G_TYPE_STRING:
-            widget = gtk_entry_new();
-            gtk_entry_set_text((GtkEntry *)widget, moto_param_get_string(param));
-            gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_float_changed), data);
+        data->param_handler_id = \
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+    }
+    else if(G_TYPE_STRING == ptype)
+    {
+        widget = gtk_entry_new();
+        gtk_entry_set_text((GtkEntry *)widget, moto_param_get_string(param));
+        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
 
-            data = g_slice_new(OnChangedData);
-            data->param = param;
-            data->window = pe->priv->window;
-            data->widget = widget;
-            g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-            data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
-            data->param_handler_id = 0;
-            //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
-        break;
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
+        data->param_handler_id = 0;
+        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+    }
+    else if(MOTO_TYPE_FILENAME == ptype)
+    {
+        widget = gtk_hbox_new(FALSE, 0);
+        GtkWidget *entry  = gtk_entry_new();
+        GtkWidget *button = gtk_button_new();
+
+        FilenameDialogData *fdd = g_slice_new(FilenameDialogData);
+        fdd->entry = (GtkEntry *)entry;
+        g_signal_connect_data(button, "clicked", G_CALLBACK(on_filename_clicked), fdd, 
+                destroy_filename_data, G_CONNECT_AFTER);
+
+        GtkWidget *im = gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_MENU);
+        gtk_button_set_image((GtkButton *)button, im);
+
+        gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
+        gtk_box_pack_start((GtkBox *)widget, button, FALSE, FALSE, 0);
+
+        gtk_entry_set_text((GtkEntry *)entry, moto_param_get_string(param));
+        gtk_editable_set_editable((GtkEditable *)entry, TRUE);
+
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = entry;
+        g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(on_string_changed), data);
+        data->param_handler_id = 0;
+        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
     }
     return widget;
 }

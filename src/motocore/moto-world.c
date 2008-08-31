@@ -5,6 +5,7 @@
 #include "common/matrix.h"
 
 #include "moto-factory.h"
+#include "moto-marshal.h"
 
 #include "moto-world.h"
 #include "moto-node.h"
@@ -74,6 +75,8 @@ struct _MotoWorldPriv
     GMutex *set_camera_mutex;
     GMutex *set_axes_mutex;
 
+    MotoWorldManipulator *manipulator;
+
     // cache
     guint prev_width,
           prev_height;
@@ -100,12 +103,22 @@ moto_world_finalize(GObject *obj)
     world_parent_class->finalize(obj);
 }
 
+static gboolean
+test_manip_button_press(MotoWorldManipulator *manip, MotoWorld *world,
+        gint x, gint y, gint width, gint height, gpointer user_data)
+{
+    return FALSE;
+}
+
 static void
 moto_world_init(MotoWorld *self)
 {
     self->priv = g_slice_new(MotoWorldPriv);
 
     self->priv->library = NULL;
+    self->priv->manipulator = moto_world_manipulator_new();
+
+    g_signal_connect(self->priv->manipulator, "button-press", G_CALLBACK(test_manip_button_press), NULL);
 
     self->priv->name = g_string_new("");
     self->priv->filename = g_string_new("");
@@ -363,6 +376,9 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         glClear(GL_DEPTH_BUFFER_BIT);
         moto_object_node_draw(self->priv->global_axes);
     }
+
+    if(self->priv->manipulator)
+        moto_world_manipulator_draw(self->priv->manipulator, self);
 }
 
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)
@@ -462,15 +478,12 @@ void moto_world_update(MotoWorld *self)
 void moto_world_button_press(MotoWorld *self,
     gint x, gint y, gint width, gint height)
 {
-    /*
     if(self->priv->manipulator)
     {
-        moto_world_manipulator_process_button_press(self->priv->manipulator,
-                x, y, width, height);
-
-        return;
+        if(moto_world_manipulator_button_press(self->priv->manipulator, self,
+                x, y, width, height))
+            return;
     }
-    */
 
     /* detect intersection */
 
@@ -552,15 +565,13 @@ void moto_world_button_press(MotoWorld *self,
 void moto_world_process_button_release(MotoWorld *self,
     gint x, gint y, gint width, gint height)
 {
-    /*
     if(self->priv->manipulator)
     {
-        moto_world_manipulator_process_button_release(self->priv->manipulator,
+        moto_world_manipulator_button_release(self->priv->manipulator, self,
                 x, y, width, height);
 
         return;
     }
-    */
 
     if(self->priv->root)
         moto_object_node_button_release(self->priv->root, x, y, width, height);
@@ -569,16 +580,148 @@ void moto_world_process_button_release(MotoWorld *self,
 void moto_world_process_motion(MotoWorld *self,
     gint x, gint y, gint width, gint height)
 {
-    /*
     if(self->priv->manipulator)
     {
-        moto_world_manipulator_process_motion(self->priv->manipulator,
+        moto_world_manipulator_motion_notify(self->priv->manipulator, self,
                 x, y, width, height);
 
         return;
     }
-    */
 
     if(self->priv->root)
         moto_object_node_motion(self->priv->root, x, y, width, height);
+}
+
+/* MotoWorldManipulator */
+
+static GObjectClass *world_manipulator_parent_class = NULL;
+
+struct _MotoWorldManipulatorPriv
+{
+    gboolean disposed;
+};
+
+static void
+moto_world_manipulator_dispose(GObject *obj)
+{
+    MotoWorldManipulator *self = (MotoWorldManipulator *)obj;
+
+    if(self->priv->disposed)
+        return;
+    self->priv->disposed = TRUE;
+
+    world_manipulator_parent_class->dispose(obj);
+}
+
+static void
+moto_world_manipulator_finalize(GObject *obj)
+{
+    MotoWorldManipulator *self = (MotoWorldManipulator *)obj;
+    g_slice_free(MotoWorldManipulatorPriv, self->priv);
+
+    world_manipulator_parent_class->finalize(obj);
+}
+
+static void
+moto_world_manipulator_init(MotoWorldManipulator *self)
+{
+    self->priv = g_slice_new(MotoWorldManipulatorPriv);
+    self->priv->disposed = FALSE;
+}
+
+static void
+moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
+{
+    GObjectClass *goclass = (GObjectClass*)klass;
+
+    world_manipulator_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    goclass->dispose    = moto_world_manipulator_dispose;
+    goclass->finalize   = moto_world_manipulator_finalize;
+
+    GType draw_signal_types[] = {MOTO_TYPE_WORLD};
+    klass->draw_signal_id = g_signal_newv ("draw",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__OBJECT,
+                 G_TYPE_NONE /* return_type */,
+                 1     /* n_params */,
+                 draw_signal_types  /* param_types */);
+
+    GType button_press_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    klass->button_press_signal_id = g_signal_newv ("button-press",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 moto_cclosure_marshal_BOOLEAN__OBJECT_INT_INT_INT_INT,
+                 G_TYPE_BOOLEAN /* return_type */,
+                 5     /* n_params */,
+                 button_press_signal_types  /* param_types */);
+
+    GType button_release_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    klass->button_release_signal_id = g_signal_newv ("button-release",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT,
+                 G_TYPE_NONE /* return_type */,
+                 5     /* n_params */,
+                 button_release_signal_types /* param_types */);
+
+    GType motion_notify_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    klass->motion_notify_signal_id = g_signal_newv ("motion-notify",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT,
+                 G_TYPE_NONE /* return_type */,
+                 5     /* n_params */,
+                 motion_notify_signal_types  /* param_types */);
+}
+
+G_DEFINE_TYPE(MotoWorldManipulator, moto_world_manipulator, G_TYPE_OBJECT);
+
+MotoWorldManipulator *moto_world_manipulator_new()
+{
+    MotoWorldManipulator *self = \
+        (MotoWorldManipulator *)g_object_new(MOTO_TYPE_WORLD_MANIPULATOR, NULL);
+
+    return self;
+}
+
+void moto_world_manipulator_draw(MotoWorldManipulator *self, MotoWorld *world)
+{
+    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->draw_signal_id, 0, world);
+}
+
+gboolean moto_world_manipulator_button_press(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height)
+{
+    gboolean return_value = FALSE;
+    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->button_press_signal_id, 0,
+            world, x, y, width, height, & return_value);
+    return return_value;
+}
+
+void moto_world_manipulator_button_release(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height)
+{
+    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->button_release_signal_id, 0,
+            world, x, y, width, height);
+}
+
+void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld *world,
+        gint x, gint y, gint width, gint height)
+{
+    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->motion_notify_signal_id, 0,
+            world, x, y, width, height);
 }

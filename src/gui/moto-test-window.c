@@ -447,10 +447,7 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
     if( ! s)
         return;
     moto_param_editor_update(self->priv->param_editor, moto_param_get_node(s));
-
-    /*
-    moto_param_editor_update(self->priv->param_editor, obj);
-    */
+    // moto_param_editor_update(self->priv->param_editor, obj);
 }
 
 static void init_gl(GtkWidget *widget, gpointer data)
@@ -507,7 +504,6 @@ static gboolean zoom = FALSE;
 static gboolean roll = FALSE;
 static gdouble prev_x = 0;
 static gdouble prev_y = 0;
-MotoRotateOrder ro = MOTO_ROTATE_ORDER_XYZ;
 
 static gboolean
 press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
@@ -529,16 +525,6 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
         case 1:
             if(event->state & GDK_MOD1_MASK)
                 roll = TRUE;
-
-            if(event->state & GDK_CONTROL_MASK)
-            {
-                if(ro == MOTO_ROTATE_ORDER_XYZ)
-                    ro = MOTO_ROTATE_ORDER_YZX;
-                else
-                    ro = MOTO_ROTATE_ORDER_XYZ;
-                moto_object_node_set_rotate_order(cam, ro);
-                draw(widget, (GdkEventExpose *)event, data);
-            }
             if( ! event->state)
                 moto_world_button_press(world, event->x, event->y, width, height);
         break;
@@ -574,9 +560,19 @@ release_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
     return TRUE;
 }
 
+static guint motion_ticks = 0;
 static gboolean
 mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
+    if( ! event->state)
+        return TRUE;
+
+    motion_ticks++;
+    if(motion_ticks > 1)
+        motion_ticks = 0;
+    else
+        return TRUE;
+
     GdkGLContext *gl_context = gtk_widget_get_gl_context(widget);
     GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
 

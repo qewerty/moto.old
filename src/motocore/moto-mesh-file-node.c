@@ -2,6 +2,7 @@
 
 #include <gio/gio.h>
 
+#include "moto-filename.h"
 #include "moto-mesh-file-node.h"
 #include "moto-library.h"
 #include "moto-messager.h"
@@ -61,10 +62,9 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
 
     self->priv = g_slice_new(MotoMeshFileNodePriv);
 
-    gchar *filename = "./resources/models/monkey.obj";
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "filename", "Filename", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, filename, pspec, "General", "General",
+            "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General", "General",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
@@ -333,6 +333,7 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
     g_print("MeshFile: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
     g_print("DONE\n");
 
+    self->priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 

@@ -1,5 +1,6 @@
 #include "common/moto-mapped-list.h"
 
+#include "moto-filename.h"
 #include "moto-node.h"
 #include "moto-world.h"
 #include "moto-messager.h"
@@ -368,6 +369,10 @@ void moto_node_add_params(MotoNode *self, ...)
                 if(g_type_is_a(ptype, G_TYPE_ENUM))
                 {
                     g_value_set_enum(&v, va_arg(ap, gint));
+                }
+                else if(MOTO_TYPE_FILENAME == ptype)
+                {
+                    g_value_set_string(&v, va_arg(ap, gchar*));
                 }
                 else
                     g_value_set_object(&v, va_arg(ap, gpointer));
