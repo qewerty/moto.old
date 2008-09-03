@@ -210,7 +210,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         guint32 i, j, k, n = 4;
         for(i = 0; i < f_num; i++)
         {
-            f_data[i].v_num = n;
+            f_data[i].v_offset = n;
             n += 4;
         }
 
@@ -314,7 +314,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         guint16 i, j, k, n = 4;
         for(i = 0; i < f_num; i++)
         {
-            f_data[i].v_num = n;
+            f_data[i].v_offset = n;
             n += 4;
         }
 

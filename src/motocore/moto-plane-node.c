@@ -187,7 +187,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         guint32 i, j, n = 4;
         for(i = 0; i < f_num; i++)
         {
-            f_data[i].v_num = n;
+            f_data[i].v_offset = n;
             n += 4;
         }
 
@@ -252,7 +252,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         guint16 i, j, n = 4;
         for(i = 0; i < f_num; i++)
         {
-            f_data[i].v_num = n;
+            f_data[i].v_offset = n;
             n += 4;
         }
 

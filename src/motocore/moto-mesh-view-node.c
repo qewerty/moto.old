@@ -169,7 +169,7 @@ static void mesh_param_update(MotoParam *param)
 
     if( ! mv->priv->selection)
     {
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
 
         return;
     }
@@ -178,7 +178,7 @@ static void mesh_param_update(MotoParam *param)
     if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
     {
         MotoMeshSelection *old = mv->priv->selection;
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
         moto_mesh_selection_copy_smth(mv->priv->selection, old);
 
         moto_mesh_selection_free(old);
@@ -190,10 +190,9 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 {
     MotoMeshViewNode *self = (MotoMeshViewNode *)g_object_new(MOTO_TYPE_MESH_VIEW_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
-    MotoGeomViewNode *gv = (MotoGeomViewNode *)self;
+    // MotoGeomViewNode *gv = (MotoGeomViewNode *)self;
 
     moto_node_set_name(node, name);
-
 
     return self;
 }
@@ -389,8 +388,8 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
         if(moto_mesh_selection_is_face_selected(selection, i))
         {
             glBegin(GL_POLYGON);
-            guint start = (0 == i) ? 0: f_data[i-1].v_num;
-            guint v_num = f_data[i].v_num - start;
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
             for(j = 0; j < v_num; j++)
             {
                 glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
@@ -477,10 +476,12 @@ static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeomViewNode *self
     return (MotoGeometryNode *)moto_param_get_node(s);
 }
 
-static MotoGeometryNode *moto_mesh_view_node_grow_selection(MotoGeomViewNode *self)
+/*
+static void moto_mesh_view_node_grow_selection(MotoGeomViewNode *self)
 {
     
 }
+*/
 
 /* states */
 
@@ -831,7 +832,7 @@ static void moto_mesh_view_node_update(MotoNode *self)
 
     if( ! mv->priv->selection)
     {
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
 
         return;
     }
@@ -839,7 +840,7 @@ static void moto_mesh_view_node_update(MotoNode *self)
     if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
     {
         MotoMeshSelection *old = mv->priv->selection;
-        mv->priv->selection = moto_mesh_selection_for_mesh((*(mv->priv->mesh_ptr)));
+        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
         moto_mesh_selection_copy_smth(mv->priv->selection, old);
 
         moto_mesh_selection_free(old);

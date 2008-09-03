@@ -106,25 +106,15 @@ struct _MotoMeshFaceHole
 
 void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint v_num);
 
-struct _MotoTriangle16
-{
-    guint16 a, b, c; // 48bit
-};
-
-struct _MotoTriangle32
-{
-    guint32 a, b, c; // 96bit
-};
-
 struct _MotoMeshFace16
 {
-    guint v_num;
+    guint16 v_offset;
     guint16 half_edge;
 };
 
 struct _MotoMeshFace32
 {
-    guint v_num;
+    guint32 v_offset;
     guint32 half_edge;
 };
 
@@ -151,7 +141,7 @@ struct _MotoMeshSelection
 MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
 MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
 void moto_mesh_selection_copy_smth(MotoMeshSelection *self, MotoMeshSelection *other);
-MotoMeshSelection *moto_mesh_selection_for_mesh(MotoMesh *mesh);
+MotoMeshSelection *moto_mesh_selection_new_for_mesh(MotoMesh *mesh);
 void moto_mesh_selection_free(MotoMeshSelection *self);
 
 void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
@@ -203,10 +193,10 @@ struct _MotoHalfEdge32
 
 struct _MotoMesh
 {
-    GObject parent;
-
     /* WARNING! All members are private but opened for performance reasons.
      *          Don't use them directly! */
+
+    GObject parent;
 
     gboolean b32; // 16bit or 32bit are used for indecies
     GLenum index_gl_type;
@@ -220,7 +210,7 @@ struct _MotoMesh
 
     // Edges
     guint e_num;
-    gpointer e_data;
+    gpointer e_data; // FIXME: Remove?
     gpointer e_verts;
     guint32 *e_hard_flags;
 
@@ -232,6 +222,7 @@ struct _MotoMesh
     guint f_tess_num;
     gpointer f_data;
     gpointer f_verts;
+    gboolean tesselated;
     gpointer f_tess_verts;
     MotoMeshTriplet *f_normals;
     gboolean f_use_hidden;
@@ -270,6 +261,8 @@ void moto_mesh_calc_faces_normals(MotoMesh *self);
 void moto_mesh_calc_verts_normals(MotoMesh *self);
 void moto_mesh_calc_normals(MotoMesh *self);
 
+gboolean moto_mesh_set_face(MotoMesh *self, guint32 fi, guint32 v_offset, guint32 *f_verts);
+
 MotoMeshVertAttr * moto_mesh_add_attr(MotoMesh *self, const gchar *attr_name, guint chnum);
 MotoMeshVertAttr *moto_mesh_get_attr(MotoMesh *self, const gchar *attr_name);
 
@@ -297,9 +290,9 @@ void moto_mesh_hide_face(MotoMesh *self, guint32 index);
 void moto_mesh_show_face(MotoMesh *self, guint32 index);
 void moto_mesh_is_face_hidden(MotoMesh *self, guint32 index);
 
-void moto_mesh_update_he_data(MotoMesh *self);
+gboolean moto_mesh_update_he_data(MotoMesh *self);
 
-void moto_mesh_prepare(MotoMesh *self);
+gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
 
