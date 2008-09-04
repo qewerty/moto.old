@@ -18,7 +18,7 @@
 // #include "moto-nurbs-view-node.h"
 #include "moto-plane-node.h"
 #include "moto-cube-node.h"
-// #include "moto-sphere-node.h"
+#include "moto-sphere-node.h"
 // #include "moto-curve-node.h"
 #include "moto-mesh-file-node.h"
 // #include "moto-revolve-node.h"
@@ -116,8 +116,9 @@ moto_system_class_init(MotoSystemClass *klass)
     MOTO_TYPE_NODE;
         MOTO_TYPE_OBJECT_NODE;
         MOTO_TYPE_GEOMETRY_NODE;
-            MOTO_TYPE_CUBE_NODE;
             MOTO_TYPE_PLANE_NODE;
+            MOTO_TYPE_CUBE_NODE;
+            MOTO_TYPE_SPHERE_NODE;
             MOTO_TYPE_MESH_FILE_NODE;
         MOTO_TYPE_GEOMETRY_VIEW_NODE;
             MOTO_TYPE_MESH_VIEW_NODE;

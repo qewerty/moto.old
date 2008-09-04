@@ -138,8 +138,6 @@ MotoPlaneNode *moto_plane_node_new(const gchar *name)
 
 static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 {
-    /* TODO: Temporary solution! */
-
     gfloat size_x = *(self->priv->size_x_ptr);
     gfloat size_y = *(self->priv->size_y_ptr);
     gfloat hsx = size_x / 2;
@@ -175,9 +173,6 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     }
 
     MotoMesh *mesh = self->priv->mesh;
-
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
 
     if(mesh->b32)
     {
@@ -317,6 +312,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
     self->priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
+    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
+    g_value_set_object(moto_param_get_value(pm), mesh);
     moto_param_update_dests(pm);
 }
 #undef e_x_num

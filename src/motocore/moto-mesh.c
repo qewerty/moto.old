@@ -344,20 +344,35 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     }
     else
     {
+        MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
         guint16 *f_verts = (guint16 *)self->f_verts;
         guint16 *f_tess_verts = (guint16 *)self->f_tess_verts;
         for(i = 0; i < self->f_num; i++)
         {
-            guint16 *f  = f_verts + i*4;
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
+
+            guint16 *f  = f_verts + start;
             guint16 *tf = f_tess_verts + i*6;
+            if(3 == v_num)
+            {
+                tf[0] = f[0];
+                tf[1] = f[1];
+                tf[2] = f[2];
+                tf[3] = f[0];
+                tf[4] = f[1];
+                tf[5] = f[2];
+            }
+            else
+            {
+                tf[0] = f[0];
+                tf[1] = f[1];
+                tf[2] = f[2];
 
-            tf[0] = f[0];
-            tf[1] = f[1];
-            tf[2] = f[2];
-
-            tf[3] = f[0];
-            tf[4] = f[2];
-            tf[5] = f[3];
+                tf[3] = f[0];
+                tf[4] = f[2];
+                tf[5] = f[3];
+            }
 
             self->f_tess_num += 2;
         }
