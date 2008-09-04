@@ -165,7 +165,96 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
 
     new_mesh = TRUE;
     if(mesh->b32)
-    {}
+    {
+        MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
+        guint32 *f_verts = (guint32 *)mesh->f_verts;
+
+        guint32 i, j, v_offset = 0;
+
+        guint32 vi = 0, fi = 0;
+        if(MOTO_AXIS_Y == orientation)
+        {
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].z = -radius_z;
+            vi++;
+            for(i = 1; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    gfloat u = (PI2*j)/cols;
+                    gfloat v = (PI*i)/rows - (PI_HALF-(PI_HALF/rows));
+                    gfloat us = sin(u);
+                    gfloat uc = cos(u);
+                    gfloat vs = sin(v);
+                    gfloat vc = cos(v);
+
+                    mesh->v_coords[vi].x = vc*uc*radius_x;
+                    mesh->v_coords[vi].y = vc*us*radius_y;
+                    mesh->v_coords[vi].z = vs*radius_z;
+
+                    vi++;
+                }
+            }
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].z = radius_z;
+            vi++;
+        }
+        g_print("vi: %u\n", vi);
+
+        if(new_mesh)
+        {
+            for(i = 0; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    if(0 == i)
+                    {
+                        guint32 jj = (j == cols-1) ? 0 : j+1;
+                        guint32 v0 = get_v(i, j),
+                                v2 = get_v(i+1, j),
+                                v1 = get_v(i+1, jj);
+                        f_verts[v_offset]   = v0;
+                        f_verts[v_offset+1] = v1;
+                        f_verts[v_offset+2] = v2;
+
+                        v_offset += 3;
+                    }
+                    else if(rows-2 == i)
+                    {
+                        guint32 jj = (j == cols-1) ? 0 : j+1;
+                        guint32 v0 = get_v(i, j),
+                                v2 = get_v(i, jj),
+                                v1 = get_v(i+1, jj);
+                        f_verts[v_offset]   = v0;
+                        f_verts[v_offset+1] = v1;
+                        f_verts[v_offset+2] = v2;
+
+                        v_offset += 3;
+                    }
+                    else
+                    {
+                        guint32 jj = (j == cols-1) ? 0 : j+1;
+                        guint32 v0 = get_v(i, j),
+                                v3 = get_v(i+1, j),
+                                v2 = get_v(i+1, jj),
+                                v1 = get_v(i, jj);
+                        f_verts[v_offset]   = v0;
+                        f_verts[v_offset+1] = v1;
+                        f_verts[v_offset+2] = v2;
+                        f_verts[v_offset+3] = v3;
+
+                        v_offset += 4;
+                    }
+
+                    f_data[fi].v_offset = v_offset;
+                    fi++;
+                }
+            }
+        }
+        g_print("fi: %u\n", fi);
+    }
     else
     {
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)mesh->f_data;
