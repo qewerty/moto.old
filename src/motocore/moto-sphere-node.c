@@ -116,13 +116,6 @@ MotoSphereNode *moto_sphere_node_new(const gchar *name)
     return self;
 }
 
-#define e_x_num (div_x*(div_y+1))
-#define e_y_num (div_y*(div_x+1))
-
-#define e_x(x, y) ((y)*(div_x) + (x))
-#define e_y_(x, y) ((x)*(div_y) + (y))
-#define e_y(x, y) (e_x_num + e_y_(x, y))
-
 #define get_v(r, c) ((r) ? (((r) != (rows-1)) ? ((r)-1)*cols + (c) + 1 : v_num-1) : 0)
 
 static void moto_sphere_node_update_mesh(MotoSphereNode *self)
@@ -162,8 +155,6 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     }
 
     MotoMesh *mesh = self->priv->mesh;
-
-    new_mesh = TRUE;
 
     guint32 i, j, v_offset = 0;
     guint32 vi = 0, fi = 0;
@@ -305,10 +296,6 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     g_value_set_object(moto_param_get_value(pm), mesh);
     moto_param_update_dests(pm);
 }
-#undef e_x_num
-#undef e_y_num
-#undef e_x
-#undef e_y
 #undef get_v
 
 static void moto_sphere_node_update(MotoNode *self)
