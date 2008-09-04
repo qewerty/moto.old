@@ -172,7 +172,65 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
         guint32 i, j, v_offset = 0;
 
         guint32 vi = 0, fi = 0;
-        if(MOTO_AXIS_Y == orientation)
+        if(MOTO_AXIS_X == orientation)
+        {
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].x = radius_z;
+            vi++;
+            for(i = 1; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    gfloat u = (PI2*j)/cols;
+                    gfloat v = (PI*i)/rows - (PI_HALF-(PI_HALF/rows));
+                    gfloat us = sin(u);
+                    gfloat uc = cos(u);
+                    gfloat vs = sin(v);
+                    gfloat vc = cos(v);
+
+                    mesh->v_coords[vi].z = -vc*uc*radius_x;
+                    mesh->v_coords[vi].y = -vc*us*radius_y;
+                    mesh->v_coords[vi].x = -vs*radius_z;
+
+                    vi++;
+                }
+            }
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].x = -radius_z;
+            vi++;
+        }
+        else if(MOTO_AXIS_Y == orientation)
+        {
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = radius_z;
+            vi++;
+            for(i = 1; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    gfloat u = (PI2*j)/cols;
+                    gfloat v = (PI*i)/rows - (PI_HALF-(PI_HALF/rows));
+                    gfloat us = sin(u);
+                    gfloat uc = cos(u);
+                    gfloat vs = sin(v);
+                    gfloat vc = cos(v);
+
+                    mesh->v_coords[vi].x = -vc*uc*radius_x;
+                    mesh->v_coords[vi].z = -vc*us*radius_y;
+                    mesh->v_coords[vi].y = -vs*radius_z;
+
+                    vi++;
+                }
+            }
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = -radius_z;
+            vi++;
+        }
+        else if(MOTO_AXIS_Z == orientation)
         {
             mesh->v_coords[vi].x = 0;
             mesh->v_coords[vi].y = 0;
@@ -201,7 +259,6 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
             mesh->v_coords[vi].z = radius_z;
             vi++;
         }
-        g_print("vi: %u\n", vi);
 
         if(new_mesh)
         {
@@ -213,8 +270,8 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
                     {
                         guint32 jj = (j == cols-1) ? 0 : j+1;
                         guint32 v0 = get_v(i, j),
-                                v2 = get_v(i+1, j),
-                                v1 = get_v(i+1, jj);
+                                v1 = get_v(i+1, jj),
+                                v2 = get_v(i+1, j);
                         f_verts[v_offset]   = v0;
                         f_verts[v_offset+1] = v1;
                         f_verts[v_offset+2] = v2;
@@ -224,9 +281,9 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
                     else if(rows-2 == i)
                     {
                         guint32 jj = (j == cols-1) ? 0 : j+1;
-                        guint32 v0 = get_v(i, j),
-                                v2 = get_v(i, jj),
-                                v1 = get_v(i+1, jj);
+                        guint32 v0 = get_v(i, jj),
+                                v1 = get_v(i+1, jj),
+                                v2 = get_v(i, j);
                         f_verts[v_offset]   = v0;
                         f_verts[v_offset+1] = v1;
                         f_verts[v_offset+2] = v2;
@@ -263,7 +320,65 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
         guint16 i, j, v_offset = 0;
 
         guint16 vi = 0, fi = 0;
-        if(MOTO_AXIS_Y == orientation)
+        if(MOTO_AXIS_X == orientation)
+        {
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].x = radius_z;
+            vi++;
+            for(i = 1; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    gfloat u = (PI2*j)/cols;
+                    gfloat v = (PI*i)/rows - (PI_HALF-(PI_HALF/rows));
+                    gfloat us = sin(u);
+                    gfloat uc = cos(u);
+                    gfloat vs = sin(v);
+                    gfloat vc = cos(v);
+
+                    mesh->v_coords[vi].z = -vc*uc*radius_x;
+                    mesh->v_coords[vi].y = -vc*us*radius_y;
+                    mesh->v_coords[vi].x = -vs*radius_z;
+
+                    vi++;
+                }
+            }
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = 0;
+            mesh->v_coords[vi].x = -radius_z;
+            vi++;
+        }
+        else if(MOTO_AXIS_Y == orientation)
+        {
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = radius_z;
+            vi++;
+            for(i = 1; i < rows-1; i++)
+            {
+                for(j = 0; j < cols; j++)
+                {
+                    gfloat u = (PI2*j)/cols;
+                    gfloat v = (PI*i)/rows - (PI_HALF-(PI_HALF/rows));
+                    gfloat us = sin(u);
+                    gfloat uc = cos(u);
+                    gfloat vs = sin(v);
+                    gfloat vc = cos(v);
+
+                    mesh->v_coords[vi].x = -vc*uc*radius_x;
+                    mesh->v_coords[vi].z = -vc*us*radius_y;
+                    mesh->v_coords[vi].y = -vs*radius_z;
+
+                    vi++;
+                }
+            }
+            mesh->v_coords[vi].x = 0;
+            mesh->v_coords[vi].z = 0;
+            mesh->v_coords[vi].y = -radius_z;
+            vi++;
+        }
+        else if(MOTO_AXIS_Z == orientation)
         {
             mesh->v_coords[vi].x = 0;
             mesh->v_coords[vi].y = 0;
@@ -292,7 +407,6 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
             mesh->v_coords[vi].z = radius_z;
             vi++;
         }
-        g_print("vi: %u\n", vi);
 
         if(new_mesh)
         {
@@ -304,8 +418,8 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
                     {
                         guint16 jj = (j == cols-1) ? 0 : j+1;
                         guint16 v0 = get_v(i, j),
-                                v2 = get_v(i+1, j),
-                                v1 = get_v(i+1, jj);
+                                v1 = get_v(i+1, jj),
+                                v2 = get_v(i+1, j);
                         f_verts[v_offset]   = v0;
                         f_verts[v_offset+1] = v1;
                         f_verts[v_offset+2] = v2;
@@ -315,9 +429,9 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
                     else if(rows-2 == i)
                     {
                         guint16 jj = (j == cols-1) ? 0 : j+1;
-                        guint16 v0 = get_v(i, j),
-                                v2 = get_v(i, jj),
-                                v1 = get_v(i+1, jj);
+                        guint16 v0 = get_v(i, jj),
+                                v1 = get_v(i+1, jj),
+                                v2 = get_v(i, j);
                         f_verts[v_offset]   = v0;
                         f_verts[v_offset+1] = v1;
                         f_verts[v_offset+2] = v2;
