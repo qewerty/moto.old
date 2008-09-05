@@ -304,9 +304,9 @@ moto_test_window_init(MotoTestWindow *self)
             "tx", 2.5f,
             "ty", 3.1f,
             "tz", -1.5f,
-            "rx", DEG_PER_RAD*45,
-            "ry", DEG_PER_RAD*30,
-            "rz", DEG_PER_RAD*15);
+            "rx", 45.f,
+            "ry", 30.f,
+            "rz", 15.f);
 
     moto_node_save_to_variation(obj_node, self->priv->v2);
 

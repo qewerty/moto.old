@@ -545,48 +545,52 @@ static void moto_object_node_calc_rotate(MotoObjectNode *self)
 
     gfloat tmp[16], tmp2[16];
 
+    gfloat rx = (*(self->priv->rx_ptr))*RAD_PER_DEG;
+    gfloat ry = (*(self->priv->ry_ptr))*RAD_PER_DEG;
+    gfloat rz = (*(self->priv->rz_ptr))*RAD_PER_DEG;
+
     switch(self->priv->rotate_order)
     {
      case MOTO_ROTATE_ORDER_XYZ:
-        matrix44_rotate_x(tmp, (*(self->priv->rx_ptr)));
-        matrix44_rotate_y(self->priv->rotate_matrix, (*(self->priv->ry_ptr)));
+        matrix44_rotate_x(tmp, rx);
+        matrix44_rotate_y(self->priv->rotate_matrix, ry);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_z(tmp, (*(self->priv->rz_ptr)));
+        matrix44_rotate_z(tmp, rz);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_XZY:
-        matrix44_rotate_x(tmp, (*(self->priv->rx_ptr)));
-        matrix44_rotate_z(self->priv->rotate_matrix, (*(self->priv->rz_ptr)));
+        matrix44_rotate_x(tmp, rx);
+        matrix44_rotate_z(self->priv->rotate_matrix, rz);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_y(tmp, (*(self->priv->ry_ptr)));
+        matrix44_rotate_y(tmp, ry);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_YXZ:
-        matrix44_rotate_y(tmp, (*(self->priv->ry_ptr)));
-        matrix44_rotate_x(self->priv->rotate_matrix, (*(self->priv->rx_ptr)));
+        matrix44_rotate_y(tmp, ry);
+        matrix44_rotate_x(self->priv->rotate_matrix, rx);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_z(tmp, (*(self->priv->rz_ptr)));
+        matrix44_rotate_z(tmp, rz);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_YZX:
-        matrix44_rotate_y(tmp, (*(self->priv->ry_ptr)));
-        matrix44_rotate_z(self->priv->rotate_matrix, (*(self->priv->rz_ptr)));
+        matrix44_rotate_y(tmp, ry);
+        matrix44_rotate_z(self->priv->rotate_matrix, rz);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_x(tmp, (*(self->priv->rx_ptr)));
+        matrix44_rotate_x(tmp, rx);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_ZXY:
-        matrix44_rotate_z(tmp, (*(self->priv->rz_ptr)));
-        matrix44_rotate_x(self->priv->rotate_matrix, (*(self->priv->rx_ptr)));
+        matrix44_rotate_z(tmp, rz);
+        matrix44_rotate_x(self->priv->rotate_matrix, rx);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_y(tmp, (*(self->priv->ry_ptr)));
+        matrix44_rotate_y(tmp, ry);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
      case MOTO_ROTATE_ORDER_ZYX:
-        matrix44_rotate_z(tmp, (*(self->priv->rz_ptr)));
-        matrix44_rotate_y(self->priv->rotate_matrix, (*(self->priv->ry_ptr)));
+        matrix44_rotate_z(tmp, rz);
+        matrix44_rotate_y(self->priv->rotate_matrix, ry);
         matrix44_mult(tmp2, tmp, self->priv->rotate_matrix);
-        matrix44_rotate_x(tmp, (*(self->priv->rx_ptr)));
+        matrix44_rotate_x(tmp, rx);
         matrix44_mult(self->priv->rotate_matrix, tmp2, tmp);
      break;
     }
@@ -655,34 +659,34 @@ static void moto_object_node_calc_transform(MotoObjectNode *self)
 #define rotate(rotate_order) switch(rotate_order)\
 {\
  case MOTO_ROTATE_ORDER_XYZ:\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
  break;\
  case MOTO_ROTATE_ORDER_XZY:\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
  break;\
  case MOTO_ROTATE_ORDER_YXZ:\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
  break;\
  case MOTO_ROTATE_ORDER_YZX:\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
  break;\
  case MOTO_ROTATE_ORDER_ZXY:\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
  break;\
  case MOTO_ROTATE_ORDER_ZYX:\
-    glRotatef((*(self->priv->rz_ptr))*DEG_PER_RAD, 0, 0, 1);\
-    glRotatef((*(self->priv->ry_ptr))*DEG_PER_RAD, 0, 1, 0);\
-    glRotatef((*(self->priv->rx_ptr))*DEG_PER_RAD, 1, 0, 0);\
+    glRotatef((*(self->priv->rz_ptr)), 0, 0, 1);\
+    glRotatef((*(self->priv->ry_ptr)), 0, 1, 0);\
+    glRotatef((*(self->priv->rx_ptr)), 1, 0, 0);\
     break;\
 }
 
@@ -911,6 +915,9 @@ void moto_object_node_tumble_h(MotoObjectNode *self, gfloat da)
         break;
     }
 
+    euler[0] *= DEG_PER_RAD;
+    euler[1] *= DEG_PER_RAD;
+    euler[2] *= DEG_PER_RAD;
     moto_object_node_set_rotate_array(self, euler);
 }
 
@@ -1023,11 +1030,16 @@ void moto_object_node_tumble_v(MotoObjectNode *self, gfloat da)
         break;
     }
 
+    euler[0] *= DEG_PER_RAD;
+    euler[1] *= DEG_PER_RAD;
+    euler[2] *= DEG_PER_RAD;
     moto_object_node_set_rotate_array(self, euler);
 }
 
 void moto_object_node_roll(MotoObjectNode *self, gfloat da)
 {
+    da *= RAD_PER_DEG;
+
     gfloat ax[] = {1, 0, 0};
     gfloat ay[] = {0, 1, 0};
     gfloat az[] = {0, 0, 1};
@@ -1041,8 +1053,8 @@ void moto_object_node_roll(MotoObjectNode *self, gfloat da)
     vector3_transform(v, matrix, ay);
     vector3_transform(n, matrix, az);
 
-    gfloat c = cos(RAD_PER_DEG*da);
-    gfloat s = sin(RAD_PER_DEG*da);
+    gfloat c = cos(da);
+    gfloat s = sin(da);
 
     vector3_copy(t, u);
     vector3_set(u, c*t[0] - s*v[0], c*t[1] - s*v[1], c*t[2] - s*v[2]);
@@ -1095,6 +1107,9 @@ void moto_object_node_roll(MotoObjectNode *self, gfloat da)
         break;
     }
 
+    euler[0] *= DEG_PER_RAD;
+    euler[1] *= DEG_PER_RAD;
+    euler[2] *= DEG_PER_RAD;
     moto_object_node_set_rotate_array(self, euler);
 }
 
