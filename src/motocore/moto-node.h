@@ -48,8 +48,6 @@ GType moto_param_mode_get_type(void);
 struct _MotoNode
 {
     GObject parent;
-
-    MotoNodePriv *priv;
 };
 
 struct _MotoNodeClass
@@ -180,8 +178,6 @@ MotoLibrary *moto_node_get_library(MotoNode *self);
 struct _MotoVariation
 {
     GObject parent;
-
-    MotoVariationPriv *priv;
 };
 
 struct _MotoVariationClass
@@ -211,8 +207,6 @@ void moto_variation_restore_param(MotoVariation *self, MotoParam *p);
 struct _MotoParam
 {
     GObject parent;
-
-    MotoParamPriv *priv;
 };
 
 struct _MotoParamClass

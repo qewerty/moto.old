@@ -37,16 +37,13 @@ typedef struct _MotoObjectNodeClass MotoObjectNodeClass;
 
 typedef struct _MotoNode MotoNode;
 typedef struct _MotoNodeClass MotoNodeClass;
-typedef struct _MotoNodePriv MotoNodePriv;
 typedef void (*MotoNodeUpdateMethod)(MotoNode *self);
 
 typedef struct _MotoVariation MotoVariation;
 typedef struct _MotoVariationClass MotoVariationClass;
-typedef struct _MotoVariationPriv MotoVariationPriv;
 
 typedef struct _MotoParam MotoParam;
 typedef struct _MotoParamClass MotoParamClass;
-typedef struct _MotoParamPriv MotoParamPriv;
 
 typedef struct _MotoManipulator MotoManipulator;
 typedef struct _MotoManipulatorClass MotoManipulatorClass;
