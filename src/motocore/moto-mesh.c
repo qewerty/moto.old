@@ -119,8 +119,8 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
     self->v_num = v_num;
     self->v_data    = (self->b32) ? g_try_malloc(sizeof(MotoMeshVert32) * v_num):
                                     g_try_malloc(sizeof(MotoMeshVert16) * v_num);
-    self->v_coords  = (MotoMeshTriplet *)g_try_malloc(sizeof(MotoMeshTriplet) * v_num);
-    self->v_normals = (MotoMeshTriplet *)g_try_malloc(sizeof(MotoMeshTriplet) * v_num);
+    self->v_coords  = (MotoVector *)g_try_malloc(sizeof(MotoVector) * v_num);
+    self->v_normals = (MotoVector *)g_try_malloc(sizeof(MotoVector) * v_num);
 
     num = f_num/32 + 1;
     self->f_num = f_num;
@@ -128,7 +128,7 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
                                     g_try_malloc(sizeof(guint16) * f_verts_num);
     self->f_data    = (self->b32) ? g_try_malloc(sizeof(MotoMeshFace32) * f_num):
                                     g_try_malloc(sizeof(MotoMeshFace16) * f_num);
-    self->f_normals = (MotoMeshTriplet *)g_try_malloc(sizeof(MotoMeshTriplet) * f_num);
+    self->f_normals = (MotoVector *)g_try_malloc(sizeof(MotoVector) * f_num);
     /*
     self->f_use_hidden = TRUE;
     self->f_hidden_flags  = (guint32 *)g_try_malloc(sizeof(guint32) * num);
@@ -437,7 +437,7 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             self->f_normals[fi].y = 0;
             self->f_normals[fi].z = 0;
 
-            MotoMeshTriplet *vert, *nvert;
+            MotoVector *vert, *nvert;
 
             MotoMeshFace32 *f_data = (MotoMeshFace32 *)self->f_data;
             guint32 *f_verts = (guint32 *)self->f_verts;
@@ -479,7 +479,7 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             self->f_normals[fi].y = 0;
             self->f_normals[fi].z = 0;
 
-            MotoMeshTriplet *vert, *nvert;
+            MotoVector *vert, *nvert;
 
             MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
             guint16 *f_verts = (guint16 *)self->f_verts;
@@ -1098,7 +1098,7 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
     {
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)self->f_data;
         guint32 *f_tess_verts  = (guint32 *)self->f_tess_verts;
-        MotoMeshTriplet *v_coords  = (MotoMeshTriplet *)self->v_coords;
+        MotoVector *v_coords  = (MotoVector *)self->v_coords;
 
         guint32 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
         guint32 v_num = f_data[fi].v_offset - start;
@@ -1119,7 +1119,7 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
     {
         MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
         guint16 *f_tess_verts  = (guint16 *)self->f_tess_verts;
-        MotoMeshTriplet *v_coords  = (MotoMeshTriplet *)self->v_coords;
+        MotoVector *v_coords  = (MotoVector *)self->v_coords;
 
         guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
         guint16 v_num = f_data[fi].v_offset - start;

@@ -30,7 +30,7 @@
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
 
-typedef struct _MotoMeshTriplet MotoMeshTriplet;
+typedef struct _MotoVector MotoVector;
 
 typedef struct _MotoMeshVert16 MotoMeshVert16;
 typedef struct _MotoMeshVert32 MotoMeshVert32;
@@ -75,7 +75,7 @@ struct _MotoMeshVert32
 };
 
 // WARNING: Must be convertable to float*!
-struct _MotoMeshTriplet
+struct _MotoVector
 {
     gfloat x, y, z;
 };
@@ -204,8 +204,8 @@ struct _MotoMesh
     // Verts
     guint v_num;
     gpointer v_data;
-    MotoMeshTriplet *v_coords;
-    MotoMeshTriplet *v_normals;
+    MotoVector *v_coords;
+    MotoVector *v_normals;
     GData *v_attrs;
 
     // Edges
@@ -224,7 +224,7 @@ struct _MotoMesh
     gpointer f_verts;
     gboolean tesselated;
     gpointer f_tess_verts;
-    MotoMeshTriplet *f_normals;
+    MotoVector *f_normals;
     gboolean f_use_hidden;
     guint32 *f_hidden_flags;
 

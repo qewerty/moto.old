@@ -313,11 +313,6 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                     f_verts[fi*4+1] = v1;
                     f_verts[fi*4+2] = v2;
                     f_verts[fi*4+3] = v3;
-                    /*
-                    g_print("v0, v1, v2, v3: %u, %u, %u, %u\n", v0, v1, v2, v3);
-                    if(v0 >= v_num || v1 >= v_num || v2 >= v_num || v3 >= v_num)
-                        g_print("BOOOO-OOOO-OOOM!!!");
-                        */
 
                     fi++;
                 }
