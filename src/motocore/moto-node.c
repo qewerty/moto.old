@@ -1533,7 +1533,6 @@ void moto_param_update_dests(MotoParam *self)
     GSList *dest = priv->dests;
     for(; dest; dest = g_slist_next(dest))
         moto_param_update((MotoParam *)dest->data);
-
 }
 
 /* class MotoVariation */
@@ -1544,7 +1543,6 @@ struct _MotoVariationPriv
     MotoVariation *parent;
 
     GHashTable *params;
-
 };
 
 #define MOTO_VARIATION_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_VARIATION, MotoVariationPriv)

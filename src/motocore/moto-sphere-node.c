@@ -12,10 +12,16 @@ static MotoBound *moto_sphere_node_get_bound(MotoGeometryNode *self);
 
 /* class SphereNode */
 
+typedef struct _MotoSphereNodePriv MotoSphereNodePriv;
+
+#define MOTO_SPHERE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_SPHERE_NODE, MotoSphereNodePriv)
+
 static GObjectClass *sphere_node_parent_class = NULL;
 
 struct _MotoSphereNodePriv
 {
+    gboolean disposed;
+
     gfloat *radius_x_ptr;
     gfloat *radius_y_ptr;
     gfloat *radius_z_ptr;
@@ -35,12 +41,16 @@ struct _MotoSphereNodePriv
 static void
 moto_sphere_node_dispose(GObject *obj)
 {
-    MotoSphereNode *self = (MotoSphereNode *)obj;
+    MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(obj);
 
-    g_object_unref(self->priv->bound);
-    g_slice_free(MotoSphereNodePriv, self->priv);
+    if(priv->disposed)
+        return;
+    priv->disposed = TRUE;
 
-    G_OBJECT_CLASS(sphere_node_parent_class)->dispose(obj);
+    g_object_unref(priv->bound);
+    g_object_unref(priv->mesh);
+
+    sphere_node_parent_class->dispose(obj);
 }
 
 static void
@@ -54,9 +64,10 @@ moto_sphere_node_init(MotoSphereNode *self)
 {
     MotoNode *node = (MotoNode *)self;
 
-    self->priv = g_slice_new(MotoSphereNodePriv);
+    MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
+    priv->disposed = FALSE;
 
-    self->priv->mesh = NULL;
+    priv->mesh = NULL;
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
@@ -66,22 +77,22 @@ moto_sphere_node_init(MotoSphereNode *self)
             "rows", "Rows",     G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
             "cols", "Columns",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Y, pspec, "Orientation", "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
-    self->priv->radius_x_ptr = moto_node_param_value_pointer(node, "radius_x", gfloat);
-    self->priv->radius_y_ptr = moto_node_param_value_pointer(node, "radius_y", gfloat);
-    self->priv->radius_z_ptr = moto_node_param_value_pointer(node, "radius_z", gfloat);
+    priv->radius_x_ptr = moto_node_param_value_pointer(node, "radius_x", gfloat);
+    priv->radius_y_ptr = moto_node_param_value_pointer(node, "radius_y", gfloat);
+    priv->radius_z_ptr = moto_node_param_value_pointer(node, "radius_z", gfloat);
 
-    self->priv->rows_ptr = moto_node_param_value_pointer(node, "rows", guint);
-    self->priv->cols_ptr = moto_node_param_value_pointer(node, "cols", guint);
+    priv->rows_ptr = moto_node_param_value_pointer(node, "rows", guint);
+    priv->cols_ptr = moto_node_param_value_pointer(node, "cols", guint);
 
-    self->priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoAxis);
+    priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoAxis);
 
-    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
+    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
-    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-    self->priv->bound_calculated = FALSE;
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    priv->bound_calculated = FALSE;
 }
 
 static void
@@ -99,6 +110,8 @@ moto_sphere_node_class_init(MotoSphereNodeClass *klass)
     goclass->finalize   = moto_sphere_node_finalize;
 
     nclass->update = moto_sphere_node_update;
+
+    g_type_class_add_private(klass, sizeof(MotoSphereNodePriv));
 }
 
 G_DEFINE_TYPE(MotoSphereNode, moto_sphere_node, MOTO_TYPE_GEOMETRY_NODE);
@@ -120,17 +133,19 @@ MotoSphereNode *moto_sphere_node_new(const gchar *name)
 
 static void moto_sphere_node_update_mesh(MotoSphereNode *self)
 {
-    gfloat radius_x = *(self->priv->radius_x_ptr);
-    gfloat radius_y = *(self->priv->radius_y_ptr);
-    gfloat radius_z = *(self->priv->radius_z_ptr);
+    MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
 
-    guint rows = *(self->priv->rows_ptr);
-    guint cols = *(self->priv->cols_ptr);
+    gfloat radius_x = *(priv->radius_x_ptr);
+    gfloat radius_y = *(priv->radius_y_ptr);
+    gfloat radius_z = *(priv->radius_z_ptr);
+
+    guint rows = *(priv->rows_ptr);
+    guint cols = *(priv->cols_ptr);
 
     rows = (rows < 3) ? 3 : rows;
     cols = (cols < 3) ? 3 : cols;
 
-    MotoAxis orientation = *(self->priv->orientation_ptr);
+    MotoAxis orientation = *(priv->orientation_ptr);
 
     guint v_num = (rows-2)*cols + 2;
     guint e_num = (rows-2)*cols + (rows-1)*cols;
@@ -139,22 +154,22 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     g_print("Sphere: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
-    if(self->priv->mesh)
+    if(priv->mesh)
     {
-        if(v_num != self->priv->mesh->v_num || e_num != self->priv->mesh->e_num || f_num != self->priv->mesh->f_num)
+        if(v_num != priv->mesh->v_num || e_num != priv->mesh->e_num || f_num != priv->mesh->f_num)
         {
-            g_object_unref(self->priv->mesh);
-            self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
+            g_object_unref(priv->mesh);
+            priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
             new_mesh = TRUE;
         }
     }
     else
     {
-        self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
+        priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
         new_mesh = TRUE;
     }
 
-    MotoMesh *mesh = self->priv->mesh;
+    MotoMesh *mesh = priv->mesh;
 
     guint32 i, j, v_offset = 0;
     guint32 vi = 0, fi = 0;
@@ -290,7 +305,7 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
         }
     }
 
-    self->priv->bound_calculated = FALSE;
+    priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
@@ -318,10 +333,12 @@ static void moto_sphere_node_update(MotoNode *self)
 
 static void calc_bound(MotoSphereNode *self)
 {
-    gfloat radius_x = *(self->priv->radius_x_ptr);
-    gfloat radius_y = *(self->priv->radius_y_ptr);
-    gfloat radius_z = *(self->priv->radius_z_ptr);
-    MotoAxis orientation = *(self->priv->orientation_ptr);
+    MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
+
+    gfloat radius_x = *(priv->radius_x_ptr);
+    gfloat radius_y = *(priv->radius_y_ptr);
+    gfloat radius_z = *(priv->radius_z_ptr);
+    MotoAxis orientation = *(priv->orientation_ptr);
 
     gfloat rsx, rsy, rsz;
     switch(orientation)
@@ -343,25 +360,25 @@ static void calc_bound(MotoSphereNode *self)
         break;
     }
 
-    self->priv->bound->bound[0] = -rsx;
-    self->priv->bound->bound[1] =  rsx;
-    self->priv->bound->bound[2] = -rsy;
-    self->priv->bound->bound[3] =  rsy;
-    self->priv->bound->bound[4] = -rsz;
-    self->priv->bound->bound[5] =  rsz;
+    priv->bound->bound[0] = -rsx;
+    priv->bound->bound[1] =  rsx;
+    priv->bound->bound[2] = -rsy;
+    priv->bound->bound[3] =  rsy;
+    priv->bound->bound[4] = -rsz;
+    priv->bound->bound[5] =  rsz;
 }
 
 static MotoBound *moto_sphere_node_get_bound(MotoGeometryNode *self)
 {
-    MotoSphereNode *sphere = (MotoSphereNode *)self;
+    MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
 
-    if( ! sphere->priv->bound_calculated)
+    if( ! priv->bound_calculated)
     {
-        calc_bound(sphere);
-        sphere->priv->bound_calculated = TRUE;
+        calc_bound((MotoSphereNode *)self);
+        priv->bound_calculated = TRUE;
     }
 
-    return sphere->priv->bound;
+    return priv->bound;
 }
 
 

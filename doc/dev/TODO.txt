@@ -14,3 +14,4 @@ Moto v0.1
 * Implement interpolators and other functions for animating node params. With simple GUI for testing.
 * Move all selection functions from moto_mesh_* to moto_mesh_selection_*
 * Create Python bindings for Moto GObject-based library.
+* Migrate all private structs to g_type_class_add_private and coresponding macros.

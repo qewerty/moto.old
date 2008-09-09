@@ -26,15 +26,12 @@
 
 typedef struct _MotoSphereNode MotoSphereNode;
 typedef struct _MotoSphereNodeClass MotoSphereNodeClass;
-typedef struct _MotoSphereNodePriv MotoSphereNodePriv;
 
 /* class MotoSphereNode */
 
 struct _MotoSphereNode
 {
     MotoGeometryNode parent;
-
-    MotoSphereNodePriv *priv;
 };
 
 struct _MotoSphereNodeClass
