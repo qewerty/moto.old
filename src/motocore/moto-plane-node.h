@@ -26,7 +26,6 @@
 
 typedef struct _MotoPlaneNode MotoPlaneNode;
 typedef struct _MotoPlaneNodeClass MotoPlaneNodeClass;
-typedef struct _MotoPlaneNodePriv MotoPlaneNodePriv;
 
 typedef enum
 {
@@ -43,8 +42,6 @@ GType moto_orientation_get_type(void);
 struct _MotoPlaneNode
 {
     MotoGeometryNode parent;
-
-    MotoPlaneNodePriv *priv;
 };
 
 struct _MotoPlaneNodeClass

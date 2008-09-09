@@ -26,10 +26,16 @@ static MotoBound *moto_plane_node_get_bound(MotoGeometryNode *self);
 
 /* class PlaneNode */
 
+typedef struct _MotoPlaneNodePriv MotoPlaneNodePriv;
+
+#define MOTO_PLANE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_PLANE_NODE, MotoPlaneNodePriv)
+
 static GObjectClass *plane_node_parent_class = NULL;
 
 struct _MotoPlaneNodePriv
 {
+    gboolean disposed;
+
     gfloat *size_x_ptr;
     gfloat *size_y_ptr;
 
@@ -48,10 +54,14 @@ struct _MotoPlaneNodePriv
 static void
 moto_plane_node_dispose(GObject *obj)
 {
-    MotoPlaneNode *self = (MotoPlaneNode *)obj;
+    MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(obj);
 
-    g_object_unref(self->priv->bound);
-    g_slice_free(MotoPlaneNodePriv, self->priv);
+    if(priv->disposed)
+        return;
+    priv->disposed = TRUE;
+
+    g_object_unref(priv->mesh);
+    g_object_unref(priv->bound);
 
     G_OBJECT_CLASS(plane_node_parent_class)->dispose(obj);
 }
@@ -66,10 +76,10 @@ static void
 moto_plane_node_init(MotoPlaneNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
+    priv->disposed = FALSE;
 
-    self->priv = g_slice_new(MotoPlaneNodePriv);
-
-    self->priv->mesh = NULL;
+    priv->mesh = NULL;
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
@@ -78,21 +88,21 @@ moto_plane_node_init(MotoPlaneNode *self)
             "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
             "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation", "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
-    self->priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
-    self->priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
+    priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
+    priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
 
-    self->priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
-    self->priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
+    priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
+    priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
 
-    self->priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoOrientation);
+    priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoOrientation);
 
-    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
+    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
-    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-    self->priv->bound_calculated = FALSE;
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    priv->bound_calculated = FALSE;
 }
 
 static void
@@ -110,6 +120,8 @@ moto_plane_node_class_init(MotoPlaneNodeClass *klass)
     goclass->finalize   = moto_plane_node_finalize;
 
     nclass->update = moto_plane_node_update;
+
+    g_type_class_add_private(klass, sizeof(MotoPlaneNodePriv));
 }
 
 G_DEFINE_TYPE(MotoPlaneNode, moto_plane_node, MOTO_TYPE_GEOMETRY_NODE);
@@ -138,18 +150,20 @@ MotoPlaneNode *moto_plane_node_new(const gchar *name)
 
 static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 {
-    gfloat size_x = *(self->priv->size_x_ptr);
-    gfloat size_y = *(self->priv->size_y_ptr);
+    MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
+
+    gfloat size_x = *(priv->size_x_ptr);
+    gfloat size_y = *(priv->size_y_ptr);
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
 
-    guint div_x = *(self->priv->div_x_ptr);
-    guint div_y = *(self->priv->div_y_ptr);
+    guint div_x = *(priv->div_x_ptr);
+    guint div_y = *(priv->div_y_ptr);
 
     div_x = (div_x < 1) ? 1 : div_x;
     div_y = (div_y < 1) ? 1 : div_y;
 
-    MotoOrientation orientation = *(self->priv->orientation_ptr);
+    MotoOrientation orientation = *(priv->orientation_ptr);
 
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
@@ -157,22 +171,22 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     g_print("Plane: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
-    if(self->priv->mesh)
+    if(priv->mesh)
     {
-        if(v_num != self->priv->mesh->v_num || e_num != self->priv->mesh->e_num || f_num != self->priv->mesh->f_num)
+        if(v_num != priv->mesh->v_num || e_num != priv->mesh->e_num || f_num != priv->mesh->f_num)
         {
-            g_object_unref(self->priv->mesh);
-            self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+            g_object_unref(priv->mesh);
+            priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
             new_mesh = TRUE;
         }
     }
     else
     {
-        self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+        priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
         new_mesh = TRUE;
     }
 
-    MotoMesh *mesh = self->priv->mesh;
+    MotoMesh *mesh = priv->mesh;
 
     if(mesh->b32)
     {
@@ -310,7 +324,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
         }
     }
 
-    self->priv->bound_calculated = FALSE;
+    priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
@@ -324,13 +338,11 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
 static void moto_plane_node_update(MotoNode *self)
 {
-    MotoPlaneNode *plane = (MotoPlaneNode *)self;
-
     MotoParam *param;
 
     param = moto_node_get_param(self, "mesh");
     if(param && 1)//moto_param_has_dests(param))
-        moto_plane_node_update_mesh(plane);
+        moto_plane_node_update_mesh((MotoPlaneNode *)self);
 
     /* TODO: Implement NURBS objects =) */
     /*
@@ -342,9 +354,11 @@ static void moto_plane_node_update(MotoNode *self)
 
 static void calc_bound(MotoPlaneNode *self)
 {
-    gfloat size_x = *(self->priv->size_x_ptr);
-    gfloat size_y = *(self->priv->size_y_ptr);
-    MotoOrientation orientation = *(self->priv->orientation_ptr);
+    MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
+
+    gfloat size_x = *(priv->size_x_ptr);
+    gfloat size_y = *(priv->size_y_ptr);
+    MotoOrientation orientation = *(priv->orientation_ptr);
 
     gfloat hsx, hsy, hsz;
     switch(orientation)
@@ -366,24 +380,24 @@ static void calc_bound(MotoPlaneNode *self)
         break;
     }
 
-    self->priv->bound->bound[0] = -hsx;
-    self->priv->bound->bound[1] =  hsx;
-    self->priv->bound->bound[2] = -hsy;
-    self->priv->bound->bound[3] =  hsy;
-    self->priv->bound->bound[4] = -hsz;
-    self->priv->bound->bound[5] =  hsz;
+    priv->bound->bound[0] = -hsx;
+    priv->bound->bound[1] =  hsx;
+    priv->bound->bound[2] = -hsy;
+    priv->bound->bound[3] =  hsy;
+    priv->bound->bound[4] = -hsz;
+    priv->bound->bound[5] =  hsz;
 }
 
 static MotoBound *moto_plane_node_get_bound(MotoGeometryNode *self)
 {
-    MotoPlaneNode *plane = (MotoPlaneNode *)self;
+    MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 
-    if( ! plane->priv->bound_calculated)
+    if( ! priv->bound_calculated)
     {
-        calc_bound(plane);
-        plane->priv->bound_calculated = TRUE;
+        calc_bound((MotoPlaneNode *)self);
+        priv->bound_calculated = TRUE;
     }
 
-    return plane->priv->bound;
+    return priv->bound;
 }
 
