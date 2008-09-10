@@ -1,11 +1,17 @@
 #include <string.h>
 
 #include "moto-mesh.h"
+#include "moto-point-cloud.h"
 #include "moto-edge-list.h"
 #include "moto-messager.h"
 #include "common/matrix.h"
 
-/* class Mesh */
+/* forwards */
+
+static void
+moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
+
+/* MotoMesh */
 
 static GObjectClass *mesh_parent_class = NULL;
 
@@ -96,7 +102,9 @@ moto_mesh_class_init(MotoMeshClass *klass)
     goclass->finalize   = moto_mesh_finalize;
 }
 
-G_DEFINE_TYPE(MotoMesh, moto_mesh, G_TYPE_OBJECT);
+G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, G_TYPE_OBJECT,
+                        G_IMPLEMENT_INTERFACE (MOTO_TYPE_POINT_CLOUD,
+                                               moto_mesh_point_cloud_init));
 
 /* methods of class Mesh */
 
@@ -2225,4 +2233,28 @@ gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh)
     return TRUE;
 }
 
+/* PointCloudIface implementation for MotoMesh */
 
+static void
+moto_mesh_foreach_point(MotoPointCloud *self,
+    MotoPointCloudForeachPointFunc func, gpointer user_data)
+{
+    MotoMesh *mesh = MOTO_MESH(self);
+
+    guint32 i;
+    for(i = 0; i < mesh->v_num; i++)
+        func(self, (gfloat *)(mesh->v_coords + i), (gfloat *)(mesh->v_normals + i), user_data);
+}
+
+static MotoPointCloud*
+moto_mesh_copy_for_point_cloud(MotoPointCloud *self)
+{
+    return MOTO_POINT_CLOUD(moto_mesh_new_copy(MOTO_MESH(self)));
+}
+
+static void
+moto_mesh_point_cloud_init(MotoPointCloudIface *iface)
+{
+    iface->foreach_point    = moto_mesh_foreach_point;
+    iface->copy             = moto_mesh_copy_for_point_cloud;
+}

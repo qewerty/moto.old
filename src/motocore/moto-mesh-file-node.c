@@ -7,6 +7,7 @@
 #include "moto-library.h"
 #include "moto-messager.h"
 #include "moto-mesh-loader.h"
+#include "common/matrix.h"
 
 /* forwards */
 
@@ -332,6 +333,7 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
         // FIXME: Error while preparing mesh.
         return;
     }
+
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
     moto_param_update_dests(pm);

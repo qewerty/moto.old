@@ -8,6 +8,10 @@ static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self);
 
 /* class CubeNode */
 
+typedef struct _MotoCubeNodePriv MotoCubeNodePriv;
+
+#define MOTO_CUBE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_CUBE_NODE, MotoCubeNodePriv)
+
 static GObjectClass *cube_node_parent_class = NULL;
 
 struct _MotoCubeNodePriv
@@ -39,15 +43,14 @@ struct _MotoCubeNodePriv
 static void
 moto_cube_node_dispose(GObject *obj)
 {
-    MotoCubeNode *self = (MotoCubeNode *)obj;
+    MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(obj);
 
-    if(self->priv->disposed)
+    if(priv->disposed)
         return;
-    self->priv->disposed = TRUE;
+    priv->disposed = TRUE;
 
-    if(self->priv->mesh)
-        g_object_unref(self->priv->mesh);
-    g_object_unref(self->priv->bound);
+    if(priv->mesh)
+        g_object_unref(priv->mesh);
 
     cube_node_parent_class->dispose(obj);
 }
@@ -55,9 +58,6 @@ moto_cube_node_dispose(GObject *obj)
 static void
 moto_cube_node_finalize(GObject *obj)
 {
-    MotoCubeNode *self = (MotoCubeNode *)obj;
-    g_slice_free(MotoCubeNodePriv, self->priv);
-
     cube_node_parent_class->finalize(obj);
 }
 
@@ -66,10 +66,10 @@ moto_cube_node_init(MotoCubeNode *self)
 {
     MotoNode *node = (MotoNode *)self;
 
-    self->priv = g_slice_new(MotoCubeNodePriv);
-    self->priv->disposed = FALSE;
+    MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
+    priv->disposed = FALSE;
 
-    self->priv->mesh = NULL;
+    priv->mesh = NULL;
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
@@ -88,28 +88,28 @@ moto_cube_node_init(MotoCubeNode *self)
             "bevel",    "Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
             "bev_abs",  "Absolute Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
             "bev_size", "Bevel Size",  G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Bevel", "Bevel",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
-    self->priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
-    self->priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
-    self->priv->size_z_ptr = moto_node_param_value_pointer(node, "size_z", gfloat);
+    priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
+    priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
+    priv->size_z_ptr = moto_node_param_value_pointer(node, "size_z", gfloat);
 
-    self->priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
-    self->priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
-    self->priv->div_z_ptr = moto_node_param_value_pointer(node, "div_z", guint);
+    priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
+    priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
+    priv->div_z_ptr = moto_node_param_value_pointer(node, "div_z", guint);
 
-    self->priv->side_px_ptr = moto_node_param_value_pointer(node, "side_px", gboolean);
-    self->priv->side_mx_ptr = moto_node_param_value_pointer(node, "side_mx", gboolean);
-    self->priv->side_py_ptr = moto_node_param_value_pointer(node, "side_py", gboolean);
-    self->priv->side_my_ptr = moto_node_param_value_pointer(node, "side_my", gboolean);
-    self->priv->side_pz_ptr = moto_node_param_value_pointer(node, "side_pz", gboolean);
-    self->priv->side_mz_ptr = moto_node_param_value_pointer(node, "side_mz", gboolean);
+    priv->side_px_ptr = moto_node_param_value_pointer(node, "side_px", gboolean);
+    priv->side_mx_ptr = moto_node_param_value_pointer(node, "side_mx", gboolean);
+    priv->side_py_ptr = moto_node_param_value_pointer(node, "side_py", gboolean);
+    priv->side_my_ptr = moto_node_param_value_pointer(node, "side_my", gboolean);
+    priv->side_pz_ptr = moto_node_param_value_pointer(node, "side_pz", gboolean);
+    priv->side_mz_ptr = moto_node_param_value_pointer(node, "side_mz", gboolean);
 
-    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
+    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
-    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-    self->priv->bound_calculated = FALSE;
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    priv->bound_calculated = FALSE;
 }
 
 static void
@@ -127,6 +127,8 @@ moto_cube_node_class_init(MotoCubeNodeClass *klass)
     goclass->finalize   = moto_cube_node_finalize;
 
     nclass->update = moto_cube_node_update;
+
+    g_type_class_add_private(klass, sizeof(MotoCubeNodePriv));
 }
 
 G_DEFINE_TYPE(MotoCubeNode, moto_cube_node, MOTO_TYPE_GEOMETRY_NODE);
@@ -151,16 +153,18 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
 
 static void moto_cube_node_update_mesh(MotoCubeNode *self)
 {
-    gfloat size_x = *(self->priv->size_x_ptr);
-    gfloat size_y = *(self->priv->size_y_ptr);
-    gfloat size_z = *(self->priv->size_z_ptr);
+    MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
+
+    gfloat size_x = *(priv->size_x_ptr);
+    gfloat size_y = *(priv->size_y_ptr);
+    gfloat size_z = *(priv->size_z_ptr);
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    guint div_x = *(self->priv->div_x_ptr);
-    guint div_y = *(self->priv->div_y_ptr);
-    guint div_z = *(self->priv->div_z_ptr);
+    guint div_x = *(priv->div_x_ptr);
+    guint div_y = *(priv->div_y_ptr);
+    guint div_z = *(priv->div_z_ptr);
 
     if(div_x < 1)
         div_x = 1;
@@ -169,12 +173,12 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     if(div_z < 1)
         div_z = 1;
 
-    gboolean side_px = *(self->priv->side_px_ptr);
-    gboolean side_mx = *(self->priv->side_mx_ptr);
-    gboolean side_py = *(self->priv->side_py_ptr);
-    gboolean side_my = *(self->priv->side_my_ptr);
-    gboolean side_pz = *(self->priv->side_pz_ptr);
-    gboolean side_mz = *(self->priv->side_mz_ptr);
+    gboolean side_px = *(priv->side_px_ptr);
+    gboolean side_mx = *(priv->side_mx_ptr);
+    gboolean side_py = *(priv->side_py_ptr);
+    gboolean side_my = *(priv->side_my_ptr);
+    gboolean side_pz = *(priv->side_pz_ptr);
+    gboolean side_mz = *(priv->side_mz_ptr);
 
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
@@ -182,22 +186,22 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     g_print("Cube: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
-    if(self->priv->mesh)
+    if(priv->mesh)
     {
-        if(v_num != self->priv->mesh->v_num || e_num != self->priv->mesh->e_num || f_num != self->priv->mesh->f_num)
+        if(v_num != priv->mesh->v_num || e_num != priv->mesh->e_num || f_num != priv->mesh->f_num)
         {
-            g_object_unref(self->priv->mesh);
-            self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+            g_object_unref(priv->mesh);
+            priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
             new_mesh = TRUE;
         }
     }
     else
     {
-        self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+        priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
         new_mesh = TRUE;
     }
 
-    MotoMesh *mesh = self->priv->mesh;
+    MotoMesh *mesh = priv->mesh;
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
@@ -411,7 +415,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         }
     }
 
-    self->priv->bound_calculated = FALSE;
+    priv->bound_calculated = FALSE;
     moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }
@@ -437,31 +441,33 @@ static void moto_cube_node_update(MotoNode *self)
 
 static void calc_bound(MotoCubeNode *self)
 {
-    gfloat size_x = *(self->priv->size_x_ptr);
-    gfloat size_y = *(self->priv->size_y_ptr);
-    gfloat size_z = *(self->priv->size_z_ptr);
+    MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
+
+    gfloat size_x = *(priv->size_x_ptr);
+    gfloat size_y = *(priv->size_y_ptr);
+    gfloat size_z = *(priv->size_z_ptr);
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    self->priv->bound->bound[0] = -hsx;
-    self->priv->bound->bound[1] =  hsx;
-    self->priv->bound->bound[2] = -hsy;
-    self->priv->bound->bound[3] =  hsy;
-    self->priv->bound->bound[4] = -hsz;
-    self->priv->bound->bound[5] =  hsz;
+    priv->bound->bound[0] = -hsx;
+    priv->bound->bound[1] =  hsx;
+    priv->bound->bound[2] = -hsy;
+    priv->bound->bound[3] =  hsy;
+    priv->bound->bound[4] = -hsz;
+    priv->bound->bound[5] =  hsz;
 }
 
 static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self)
 {
-    MotoCubeNode *cube = (MotoCubeNode *)self;
+    MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 
-    if( ! cube->priv->bound_calculated)
+    if( ! priv->bound_calculated)
     {
-        calc_bound(cube);
-        cube->priv->bound_calculated = TRUE;
+        calc_bound((MotoCubeNode *)self);
+        priv->bound_calculated = TRUE;
     }
 
-    return cube->priv->bound;
+    return priv->bound;
 }
 
