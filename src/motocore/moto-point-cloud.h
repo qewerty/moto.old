@@ -33,14 +33,12 @@ typedef void (*MotoPointCloudForeachPointFunc)(MotoPointCloud *ptc,
         gfloat point[3], gfloat normal[3], gpointer user_data);
 typedef void (*MotoPointCloudForeachPointMethod)(MotoPointCloud *self,
         MotoPointCloudForeachPointFunc func, gpointer user_data);
-typedef MotoPointCloud *(*MotoPointCloudCopyMethod)(MotoPointCloud *self);
 
 struct _MotoPointCloudIface
 {
     GTypeInterface parent;
 
     MotoPointCloudForeachPointMethod foreach_point;
-    MotoPointCloudCopyMethod         copy;
 };
 
 #define MOTO_TYPE_POINT_CLOUD           (moto_point_cloud_get_type())
@@ -51,7 +49,6 @@ struct _MotoPointCloudIface
 GType moto_point_cloud_get_type(void) G_GNUC_CONST;
 
 void moto_point_cloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachPointFunc func, gpointer user_data);
-MotoPointCloud *moto_point_cloud_copy(MotoPointCloud *self);
 
 G_END_DECLS
 
