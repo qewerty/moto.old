@@ -1,5 +1,7 @@
+#include <limits.h>
 #include <string.h>
 
+#include "common/numdef.h"
 #include "moto-bitmask.h"
 
 static MotoBitmask*
@@ -38,19 +40,15 @@ MotoBitmask *moto_bitmask_new_copy(MotoBitmask *self)
 {
     MotoBitmask *copy = moto_bitmask_new_uninitialized(self->bits_num);
 
-    memcpy(copy->bits, self->bits, self->bits_num*4);
+    moto_bitmask_copy(copy, self);
 
     return copy;
 }
 
 void moto_bitmask_copy(MotoBitmask *self, MotoBitmask *other)
 {
-    // TODO
-}
-
-void moto_bitmask_copy_smth(MotoBitmask *self, MotoBitmask *other)
-{
-    // TODO
+    guint32 num = min(self->bits_num, other->bits_num);
+    memcpy(self->bits, other->bits, num*4);
 }
 
 gboolean moto_bitmask_is_set(MotoBitmask *self, guint32 index)
@@ -71,6 +69,11 @@ void moto_bitmask_set(MotoBitmask *self, guint32 index)
     *(self->bits + (index/32)) |= 1 << (index % 32);
 }
 
+void moto_bitmask_set_all(MotoBitmask *self)
+{
+    memset(self->bits, UCHAR_MAX, self->bits_num*4);
+}
+
 void moto_bitmask_unset(MotoBitmask *self, guint32 index)
 {
     if(index >= self->bits_num)
@@ -81,12 +84,35 @@ void moto_bitmask_unset(MotoBitmask *self, guint32 index)
     *(self->bits + (index/32)) &= ~(1 << (index % 32));
 }
 
+void moto_bitmask_unset_all(MotoBitmask *self)
+{
+    memset(self->bits, 0, self->bits_num*4);
+}
+
 void moto_bitmask_toggle(MotoBitmask *self, guint32 index)
 {
     if(moto_bitmask_is_set(self, index))
         moto_bitmask_unset_fast(self, index);
     else
         moto_bitmask_set(self, index);
+}
+
+void moto_bitmask_inverse(MotoBitmask *self)
+{
+    guint32 num = self->bits_num/32 + 1;
+    guint32 i;
+    for(i = 0; i < num; i++)
+        self->bits[i] = ~ self->bits[i];
+}
+
+guint32 moto_bitmask_get_bits_num(MotoBitmask *self)
+{
+    return self->bits_num;
+}
+
+guint32 moto_bitmask_get_set_num(MotoBitmask *self)
+{
+    return self->set_num;
 }
 
 gboolean moto_bitmask_is_set_fast(MotoBitmask *self, guint32 index)

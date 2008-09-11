@@ -39,12 +39,17 @@ void moto_bitmask_free(MotoBitmask *self);
 
 MotoBitmask *moto_bitmask_new_copy(MotoBitmask *self);
 void moto_bitmask_copy(MotoBitmask *self, MotoBitmask *other);
-void moto_bitmask_copy_smth(MotoBitmask *self, MotoBitmask *other);
 
 gboolean moto_bitmask_is_set(MotoBitmask *self, guint32 index);
 void moto_bitmask_set(MotoBitmask *self, guint32 index);
+void moto_bitmask_set_all(MotoBitmask *self);
 void moto_bitmask_unset(MotoBitmask *self, guint32 index);
+void moto_bitmask_unset_all(MotoBitmask *self);
 void moto_bitmask_toggle(MotoBitmask *self, guint32 index);
+void moto_bitmask_inverse(MotoBitmask *self);
+
+guint32 moto_bitmask_get_bits_num(MotoBitmask *self);
+guint32 moto_bitmask_get_set_num(MotoBitmask *self);
 
 gboolean moto_bitmask_is_set_fast(MotoBitmask *self, guint32 index);
 void moto_bitmask_set_fast(MotoBitmask *self, guint32 index);

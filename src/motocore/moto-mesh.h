@@ -26,6 +26,7 @@
 #include <glib-object.h>
 
 #include "moto-ray.h"
+#include "moto-bitmask.h"
 
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
@@ -126,16 +127,9 @@ struct _MotoMeshVertAttr
 
 struct _MotoMeshSelection
 {
-    guint v_num;
-    guint32 *verts;
-    guint e_num;
-    guint32 *edges;
-    guint f_num;
-    guint32 *faces;
-
-    guint32 selected_v_num;
-    guint32 selected_e_num;
-    guint32 selected_f_num;
+    MotoBitmask *verts;
+    MotoBitmask *edges;
+    MotoBitmask *faces;
 };
 
 MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
@@ -143,6 +137,18 @@ MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
 void moto_mesh_selection_copy_smth(MotoMeshSelection *self, MotoMeshSelection *other);
 MotoMeshSelection *moto_mesh_selection_new_for_mesh(MotoMesh *mesh);
 void moto_mesh_selection_free(MotoMeshSelection *self);
+
+guint32 moto_mesh_selection_get_v_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_e_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_f_num(MotoMeshSelection *self);
+
+guint32 moto_mesh_selection_get_selected_v_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
+
+guint32 moto_mesh_selection_get_selected_v_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
+guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
 
 void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
 void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index);
@@ -219,16 +225,22 @@ struct _MotoMesh
 
     // Faces
     guint f_num;
-    guint f_tess_num;
+    guint f_v_num;
     gpointer f_data;
     gpointer f_verts;
+
+    guint f_tess_num;
     gboolean tesselated;
     gpointer f_tess_verts;
+
+    gboolean f_use_normals;
     MotoVector *f_normals;
+
     gboolean f_use_hidden;
     guint32 *f_hidden_flags;
 
     // Half-edge data
+    gboolean he_calculated;
     gpointer he_data;
 };
 
@@ -250,14 +262,31 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
 MotoMesh *moto_mesh_new_copy(MotoMesh *other);
 void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
+/**
+ * moto_mesh_clear_e_data:
+ * @self: a #MotoMesh.
+ *
+ * Clears all edge data to invalid values.
+ */
+void moto_mesh_clear_e_data(MotoMesh *self);
+
+/**
+ * moto_mesh_clear_he_data:
+ * @self: a #MotoMesh.
+ *
+ * Clears all half-edge data to invalid values.
+ */
+void moto_mesh_clear_he_data(MotoMesh *self);
+
 #define moto_mesh_get_index_size(mesh) (((mesh)->b32)?4:2)
 
 #define moto_mesh_max_valid_index(mesh) (((mesh)->b32)?G_MAXUINT32-1:G_MAXUINT16-1)
 #define moto_mesh_is_index_valid(mesh, index) (index <= moto_mesh_max_valid_index(mesh))
 #define moto_mesh_invalid_index(mesh) (((mesh)->b32)?G_MAXUINT32:G_MAXUINT16)
 
+#define moto_mesh_get_f_v_num(mesh) (mesh->f_v_num)
+
 void moto_mesh_calc_faces_normals(MotoMesh *self);
-// WARNING: Call only when he_data are set correctly!
 void moto_mesh_calc_verts_normals(MotoMesh *self);
 void moto_mesh_calc_normals(MotoMesh *self);
 
