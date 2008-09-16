@@ -286,6 +286,8 @@ void moto_mesh_clear_he_data(MotoMesh *self);
 
 #define moto_mesh_get_f_v_num(mesh) (mesh->f_v_num)
 
+gboolean moto_mesh_has_edge(MotoMesh *self, guint32 v1, guint32 v2);
+
 void moto_mesh_calc_faces_normals(MotoMesh *self);
 void moto_mesh_calc_verts_normals(MotoMesh *self);
 void moto_mesh_calc_normals(MotoMesh *self);

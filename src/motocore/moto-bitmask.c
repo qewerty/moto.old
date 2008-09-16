@@ -47,7 +47,7 @@ MotoBitmask *moto_bitmask_new_copy(MotoBitmask *self)
 
 void moto_bitmask_copy(MotoBitmask *self, MotoBitmask *other)
 {
-    guint32 num = min(self->bits_num, other->bits_num);
+    guint32 num = min(self->bits_num, other->bits_num) / 32 + 1;
     memcpy(self->bits, other->bits, num*4);
 }
 

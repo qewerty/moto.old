@@ -155,37 +155,6 @@ G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOMETRY_VIEW_NOD
 
 /* methods of class MeshViewNode */
 
-static void mesh_param_update(MotoParam *param)
-{
-    MotoGeomViewNode *gv = (MotoGeomViewNode *)moto_param_get_node(param);
-    MotoMeshViewNode *mv = (MotoMeshViewNode *)gv;
-
-    // (*(mv->priv->mesh_ptr)) = *(MotoMesh **)p;
-
-    moto_geom_view_node_set_prepared(gv, FALSE);
-
-    if( ! (*(mv->priv->mesh_ptr)))
-        return;
-
-    if( ! mv->priv->selection)
-    {
-        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
-
-        return;
-    }
-
-    g_print("\n");
-    if( ! moto_mesh_selection_is_valid(mv->priv->selection, (*(mv->priv->mesh_ptr))))
-    {
-        MotoMeshSelection *old = mv->priv->selection;
-        mv->priv->selection = moto_mesh_selection_new_for_mesh((*(mv->priv->mesh_ptr)));
-        moto_mesh_selection_copy_smth(mv->priv->selection, old);
-
-        moto_mesh_selection_free(old);
-        g_print("new selection\n");
-    }
-}
-
 MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 {
     MotoMeshViewNode *self = (MotoMeshViewNode *)g_object_new(MOTO_TYPE_MESH_VIEW_NODE, NULL);

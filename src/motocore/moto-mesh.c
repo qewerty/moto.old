@@ -448,6 +448,64 @@ void moto_mesh_face_free(MotoMeshFace *self)
 }
 */
 
+gboolean moto_mesh_has_edge(MotoMesh *self, guint32 v1, guint32 v2)
+{
+    if(self->b32)
+    {
+    }
+    else
+    {
+        MotoMeshVert16 *v_data  = (MotoMeshVert16 *)self->v_data;
+        MotoHalfEdge16 *he_data = (MotoHalfEdge16 *)self->he_data;
+        guint16 *e_verts = (guint16 *)self->e_verts;
+
+        guint16 he = v_data[v1].half_edge;
+        if( ! moto_mesh_is_index_valid(self, he))
+            return FALSE;
+
+        gboolean broken = FALSE;
+        guint16 begin = he;
+        do
+        {
+            guint16 pair = moto_half_edge_pair(he);
+            guint16 vi = e_verts[pair];
+            if(vi == v2)
+                return TRUE;
+
+            guint16 next = he_data[pair].next;
+            if( ! moto_mesh_is_index_valid(self, next))
+            {
+                broken = TRUE;
+                break;
+            }
+            he = next;
+        }
+        while(he != begin);
+
+        if(broken)
+        {
+            he = he_data[v_data[v1].half_edge].prev;
+            if( ! moto_mesh_is_index_valid(self, he))
+                return FALSE;
+
+            begin = he;
+            do
+            {
+                guint16 pair = moto_half_edge_pair(he);
+                guint16 vi = e_verts[he];
+                if(vi == v2)
+                    return TRUE;
+
+                guint16 prev = he_data[pair].prev;
+                if( ! moto_mesh_is_index_valid(self, prev))
+                    break;
+                he = prev;
+            }
+            while(he != begin);
+        }
+    }
+}
+
 /* Newell's method */
 void moto_mesh_calc_faces_normals(MotoMesh *self)
 {
