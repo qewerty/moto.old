@@ -22,7 +22,7 @@
 #ifndef MOTO_GEOM_VIEW_NODE_H
 #define MOTO_GEOM_VIEW_NODE_H
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
 
 #include "moto-ray.h"

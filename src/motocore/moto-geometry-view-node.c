@@ -1,7 +1,4 @@
-#include <GL/gl.h>
-
-// TEMP
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
 
 #include "moto-mesh-view-node.h"

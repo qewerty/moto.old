@@ -22,7 +22,7 @@
 #ifndef MOTO_MESH_H
 #define MOTO_MESH_H
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <glib-object.h>
 
 #include "moto-ray.h"

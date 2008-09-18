@@ -4,14 +4,14 @@
     #define GLX_GLXEXT_LEGACY
 #endif
 
+#include <GL/glew.h>
 #include <GL/gl.h>
-#include <GL/glext.h>
+#include <GL/glu.h>
 
 #ifdef _WIN32
-    #include <wglext.h>
+    #include <GL/wglew.h>
 #else
-    #include <GL/glx.h>
-    #include <GL/glxext.h>
+    #include <GL/glxew.h>
 #endif
 
 #include <glib.h>

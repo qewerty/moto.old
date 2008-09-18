@@ -1,8 +1,4 @@
-#include <GL/gl.h>
-
-// TEMP
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 
 #include "common/numdef.h"
 #include "common/matrix.h"

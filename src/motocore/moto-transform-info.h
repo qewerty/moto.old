@@ -22,7 +22,7 @@
 #ifndef MOTO_TRANSFORM_INFO_H
 #define MOTO_TRANSFORM_INFO_H
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 typedef struct _MotoTransformInfo MotoTransformInfo;
 

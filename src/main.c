@@ -1,5 +1,4 @@
-#include <GL/gl.h>
-#include <gtk/gtk.h>
+#include "common/moto-glext.h"
 
 #include "moto.h"
 #include "gui/moto-test-window.h"
