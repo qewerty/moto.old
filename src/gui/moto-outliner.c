@@ -47,8 +47,7 @@ moto_outliner_init(MotoOutliner *self)
 
     priv->world = NULL;
 
-    priv->ls = (GtkListStore *)gtk_list_store_new(2, G_TYPE_STRING, MOTO_TYPE_NODE);
-    g_object_ref_sink(priv->ls);
+    priv->ls = (GtkListStore *)gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, MOTO_TYPE_NODE);
 
     priv->tv = (GtkTreeView *)gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->ls));
     g_object_ref_sink(priv->tv);
@@ -58,6 +57,13 @@ moto_outliner_init(MotoOutliner *self)
                                                 "Name",
                                                 renderer,
                                                 "text", 0,
+                                                NULL);
+
+    // renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_insert_column_with_attributes(priv->tv, -1,
+                                                "Type",
+                                                renderer,
+                                                "text", 1,
                                                 NULL);
 
     gtk_box_pack_start(GTK_BOX(self), GTK_WIDGET(priv->tv), TRUE, TRUE, 0);
@@ -94,20 +100,15 @@ GtkWidget *moto_outliner_new(MotoWorld *world)
 }
 
 static gboolean
-append_node(MotoWorld *world, MotoNode *node, MotoOutlinerPriv *priv)
+__append_node(MotoWorld *world, MotoNode *node, MotoOutlinerPriv *priv)
 {
     GtkTreeIter iter;
 
     gtk_list_store_append(priv->ls, & iter);
-
-    GString *text = g_string_new("");
-    g_string_printf(text, "%s (%s)", moto_node_get_name(node), g_type_name(G_TYPE_FROM_INSTANCE(node)));
-
     gtk_list_store_set(priv->ls, & iter,
-            0, text->str,
-            1, node, -1);
-
-    g_string_free(text, TRUE);
+            0, moto_node_get_name(node),
+            1, g_type_name(G_TYPE_FROM_INSTANCE(node)),
+            2, node, -1);
 
     return TRUE;
 }
@@ -116,9 +117,10 @@ void moto_outliner_update(MotoOutliner *self)
 {
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
+    gtk_list_store_clear(priv->ls);
+
     if( ! priv->world)
         return;
 
-    gtk_list_store_clear(priv->ls);
-    moto_world_foreach_node(priv->world, MOTO_TYPE_NODE, append_node, priv);
+    moto_world_foreach_node(priv->world, MOTO_TYPE_NODE, __append_node, priv);
 }
