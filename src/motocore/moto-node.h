@@ -173,34 +173,6 @@ void moto_node_set_world(MotoNode *self, MotoWorld *world);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
 
-/* class MotoVariation */
-
-struct _MotoVariation
-{
-    GObject parent;
-};
-
-struct _MotoVariationClass
-{
-    GObjectClass parent;
-};
-
-GType moto_variation_get_type(void);
-
-#define MOTO_TYPE_VARIATION (moto_variation_get_type())
-#define MOTO_VARIATION(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_VARIATION, MotoVariation))
-#define MOTO_VARIATION_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_VARIATION, MotoVariationClass))
-#define MOTO_IS_VARIATION(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_VARIATION))
-#define MOTO_IS_VARIATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_VARIATION))
-#define MOTO_VARIATION_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_VARIATION, MotoVariationClass))
-
-MotoVariation *moto_variation_new(const gchar *name);
-
-MotoVariation *moto_variation_get_parent(MotoVariation *self);
-void moto_variation_set_parent(MotoVariation *self, MotoVariation *parent);
-
-void moto_variation_save_param(MotoVariation *self, MotoParam *p);
-void moto_variation_restore_param(MotoVariation *self, MotoParam *p);
 
 /* class MotoParam */
 

@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-typedef gboolean (MotoWorldForeachNodeFunc)(MotoWorld *world, MotoNode *node, gpointer user_data);
+typedef gboolean (*MotoWorldForeachNodeFunc)(MotoWorld *world, MotoNode *node, gpointer user_data);
 
 typedef struct _MotoWorldManipulator MotoWorldManipulator;
 typedef struct _MotoWorldManipulatorClass MotoWorldManipulatorClass;

@@ -67,7 +67,6 @@ moto_mesh_finalize(GObject *obj)
 static void
 moto_mesh_init(MotoMesh *self)
 {
-
     self->v_num     = 0;
     self->v_data    = NULL;
     self->v_coords  = NULL;
@@ -91,6 +90,7 @@ moto_mesh_init(MotoMesh *self)
     self->f_use_hidden = FALSE;
     self->f_hidden_flags = NULL;
 
+    self->he_calculated = FALSE;
     self->he_data = NULL;
 }
 
@@ -106,10 +106,10 @@ moto_mesh_class_init(MotoMeshClass *klass)
 }
 
 G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, G_TYPE_OBJECT,
-                        G_IMPLEMENT_INTERFACE (MOTO_TYPE_COPYABLE,
-                                               moto_mesh_copyable_init);
-                        G_IMPLEMENT_INTERFACE (MOTO_TYPE_POINT_CLOUD,
-                                               moto_mesh_point_cloud_init));
+                        G_IMPLEMENT_INTERFACE(MOTO_TYPE_COPYABLE,
+                                              moto_mesh_copyable_init);
+                        G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINT_CLOUD,
+                                              moto_mesh_point_cloud_init));
 
 /* methods of class Mesh */
 
@@ -970,6 +970,9 @@ static gboolean moto_mesh_calc_e_data(MotoMesh *self)
 
 gboolean moto_mesh_update_he_data(MotoMesh *self)
 {
+    if(self->he_calculated)
+        return TRUE;
+
     if( ! self->v_num || ! self->f_num)
         return FALSE;
 
@@ -1160,6 +1163,7 @@ gboolean moto_mesh_update_he_data(MotoMesh *self)
             moto_edge_list16_remove_all(v_edges[i]);
     }
 
+    self->he_calculated = TRUE;
     return TRUE;
 }
 

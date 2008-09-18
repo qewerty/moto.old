@@ -16,6 +16,7 @@
 #include "motocore/moto-world.h"
 #include "motocore/moto-system.h"
 #include "motocore/moto-node.h"
+#include "motocore/moto-variation.h"
 #include "motocore/moto-object-node.h"
 #include "common/numdef.h"
 

@@ -18,5 +18,8 @@
 
 void moto_glext_print_list(void);
 void moto_glext_print_info(void);
-gboolean moto_glext_is_supported(const gchar *name);
 void moto_glext_init(void);
+gboolean moto_glext_is_supported(const gchar *name);
+
+gboolean moto_glext_is_glsl_supported();
+gboolean moto_glext_is_vbo_supported();

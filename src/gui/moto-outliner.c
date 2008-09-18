@@ -122,5 +122,6 @@ void moto_outliner_update(MotoOutliner *self)
     if( ! priv->world)
         return;
 
-    moto_world_foreach_node(priv->world, MOTO_TYPE_NODE, __append_node, priv);
+    moto_world_foreach_node(priv->world, MOTO_TYPE_NODE,
+            (MotoWorldForeachNodeFunc)__append_node, priv);
 }
