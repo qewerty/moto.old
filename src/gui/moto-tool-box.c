@@ -1,8 +1,7 @@
 #include "stdlib.h"
 #include "math.h"
 
-#include <GL/glew.h>
-#include <gtk/gtkgl.h>
+#include <common/moto-gl.h>
 
 #include "moto-test-window.h"
 #include "moto-tool-box.h"

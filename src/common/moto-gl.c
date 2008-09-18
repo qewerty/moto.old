@@ -2,11 +2,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "moto-glext.h"
+#include "moto-gl.h"
 
 #define INDENT "    "
 
-void moto_glext_print_list(void)
+void moto_gl_print_list(void)
 {
     const gchar *extensions = (const gchar *)glGetString(GL_EXTENSIONS);
 
@@ -34,7 +34,7 @@ void moto_glext_print_list(void)
     }
 }
 
-gboolean moto_glext_is_supported(const gchar *name)
+gboolean moto_gl_is_supported(const gchar *name)
 {
     const gchar *extensions = (const gchar *)glGetString(GL_EXTENSIONS);
     const gchar *start = extensions;

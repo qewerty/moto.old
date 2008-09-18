@@ -16,10 +16,10 @@
 
 #include <glib.h>
 
-void moto_glext_print_list(void);
-void moto_glext_print_info(void);
-void moto_glext_init(void);
-gboolean moto_glext_is_supported(const gchar *name);
+void moto_gl_print_list(void);
+void moto_gl_print_info(void);
+void moto_gl_init(void);
+gboolean moto_gl_is_supported(const gchar *name);
 
-gboolean moto_glext_is_glsl_supported();
-gboolean moto_glext_is_vbo_supported();
+gboolean moto_gl_is_glsl_supported();
+gboolean moto_gl_is_vbo_supported();

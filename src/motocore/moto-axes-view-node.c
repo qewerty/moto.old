@@ -1,7 +1,6 @@
 #include "math.h"
 
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include "common/moto-gl.h"
 
 #include "moto-axes-view-node.h"
 

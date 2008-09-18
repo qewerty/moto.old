@@ -1,8 +1,7 @@
-#include "common/moto-glext.h"
+#include "common/moto-gl.h"
 
 #include "moto.h"
 #include "gui/moto-test-window.h"
-#include "common/moto-glext.h"
 
 #include "moto-node.h"
 #include "moto-object-node.h"
