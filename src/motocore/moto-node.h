@@ -155,7 +155,7 @@ MotoManipulator *moto_node_get_first_manipulator(MotoNode *self);
 MotoManipulator *moto_node_get_next_manipulator(MotoNode *self, MotoManipulator *manip);
 
 void moto_node_set_tag(MotoNode *self, const gchar *tag);
-void moto_node_del_tag(MotoNode *self, const gchar *tag);
+void moto_node_del_tag(MotoNode *self, const gchar *tag); 
 gboolean moto_node_has_tag(MotoNode *self, const gchar *tag);
 
 /* Get dump for saving. */
@@ -173,6 +173,9 @@ void moto_node_set_world(MotoNode *self, MotoWorld *world);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
 
+/* Returns TRUE if node changes during animation or FALSE otherwise.
+ * Used for optimization. */
+gboolean moto_node_is_animated(MotoNode *self);
 
 /* class MotoParam */
 

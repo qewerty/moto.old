@@ -465,6 +465,8 @@ static void init_gl(GtkWidget *widget, gpointer data)
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return;
 
+    moto_gl_init();
+
     gdk_gl_drawable_gl_end(gl_drawable);
 }
 

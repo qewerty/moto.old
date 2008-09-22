@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -5,6 +6,20 @@
 #include "moto-gl.h"
 
 #define INDENT "    "
+
+void moto_gl_init(void)
+{
+    static gboolean inited = FALSE;
+    if( ! inited)
+    {
+        if(glewInit() != GLEW_OK)
+        {
+            printf("[Error] Can't initialize GLEW!\n");
+            exit(-1);
+        }
+        inited = TRUE;
+    }
+}
 
 void moto_gl_print_list(void)
 {
@@ -49,4 +64,14 @@ gboolean moto_gl_is_supported(const gchar *name)
     }
 
     return FALSE;
+}
+
+gboolean moto_gl_is_glsl_supported()
+{
+    return GLEW_ARB_shader_objects;
+}
+
+gboolean moto_gl_is_vbo_supported()
+{
+    return GLEW_ARB_vertex_buffer_object;
 }
