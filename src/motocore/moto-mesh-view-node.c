@@ -562,7 +562,7 @@ static void moto_mesh_view_node_grow_selection_as_verts(MotoGeomViewState *self,
     if(! mesh)
         return;
 
-    moto_mesh_select_more_verts(mesh, mv->priv->selection);
+    moto_mesh_selection_select_more_verts(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -572,7 +572,7 @@ static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, Mo
     if( ! mesh)
         return;
 
-    moto_mesh_select_less_verts(mesh, mv->priv->selection);
+    moto_mesh_selection_select_less_verts(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -582,7 +582,7 @@ static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *sel
     if( ! mesh)
         return;
 
-    moto_mesh_select_inverse_verts(mesh, mv->priv->selection);
+    moto_mesh_selection_select_inverse_verts(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -682,7 +682,7 @@ static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self,
     if( ! mesh)
         return;
 
-    moto_mesh_select_more_edges(mesh, mv->priv->selection);
+    moto_mesh_selection_select_more_edges(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -692,7 +692,7 @@ static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, Mo
     if( ! mesh)
         return;
 
-    moto_mesh_select_less_edges(mesh, mv->priv->selection);
+    moto_mesh_selection_select_less_edges(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -702,7 +702,7 @@ static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *sel
     if( ! mesh)
         return;
 
-    moto_mesh_select_inverse_edges(mesh, mv->priv->selection);
+    moto_mesh_selection_select_inverse_edges(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -766,7 +766,7 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
     if( ! mesh)
         return;
 
-    moto_mesh_select_more_faces(mesh, mv->priv->selection);
+    moto_mesh_selection_select_more_faces(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -776,7 +776,7 @@ static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, Mo
     if( ! mesh)
         return;
 
-    moto_mesh_select_less_faces(mesh, mv->priv->selection);
+    moto_mesh_selection_select_less_faces(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -786,7 +786,7 @@ static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *sel
     if( ! mesh)
         return;
 
-    moto_mesh_select_inverse_faces(mesh, mv->priv->selection);
+    moto_mesh_selection_select_inverse_faces(mv->priv->selection, mesh);
 }
 
 static void moto_mesh_view_node_update(MotoNode *self)

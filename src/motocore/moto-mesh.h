@@ -172,6 +172,18 @@ void moto_mesh_selection_deselect_all(MotoMeshSelection *self);
 
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
 
+void moto_mesh_selection_select_more_verts(MotoMeshSelection *self, MotoMesh *mesh);
+void moto_mesh_selection_select_less_verts(MotoMeshSelection *self, MotoMesh*mesh);
+void moto_mesh_selection_select_inverse_verts(MotoMeshSelection *self, MotoMesh*mesh);
+
+void moto_mesh_selection_select_more_edges(MotoMeshSelection *self, MotoMesh*mesh);
+void moto_mesh_selection_select_less_edges(MotoMeshSelection *self, MotoMesh*mesh);
+void moto_mesh_selection_select_inverse_edges(MotoMeshSelection *self, MotoMesh*mesh);
+
+void moto_mesh_selection_select_more_faces(MotoMeshSelection *self, MotoMesh *mesh);
+void moto_mesh_selection_select_less_faces(MotoMeshSelection *self, MotoMesh *mesh);
+void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh *mesh);
+
 struct _MotoHalfEdge16
 {
     guint16 next;
@@ -326,18 +338,6 @@ gboolean moto_mesh_update_he_data(MotoMesh *self);
 gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
-
-void moto_mesh_select_more_verts(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_inverse_verts(MotoMesh *self, MotoMeshSelection *selection);
-
-void moto_mesh_select_more_edges(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_less_edges(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_inverse_edges(MotoMesh *self, MotoMeshSelection *selection);
-
-void moto_mesh_select_more_faces(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_less_faces(MotoMesh *self, MotoMeshSelection *selection);
-void moto_mesh_select_inverse_faces(MotoMesh *self, MotoMeshSelection *selection);
 
 #endif /* MOTO_MESH_H */
 
