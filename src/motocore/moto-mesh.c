@@ -1225,7 +1225,7 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
     return FALSE;
 }
 
-void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection)
+void moto_mesh_select_more_verts(MotoMesh *self, MotoMeshSelection *selection)
 {
     if(moto_mesh_selection_get_selected_v_num(selection) == self->v_num)
         return;
@@ -1437,7 +1437,7 @@ void moto_mesh_select_inverse_verts(MotoMesh *self, MotoMeshSelection *selection
     moto_bitmask_inverse(selection->verts);
 }
 
-void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection)
+void moto_mesh_select_more_edges(MotoMesh *self, MotoMeshSelection *selection)
 {
     if(moto_mesh_selection_get_selected_e_num(selection) == self->e_num)
         return;
@@ -1808,7 +1808,7 @@ void moto_mesh_select_inverse_edges(MotoMesh *self, MotoMeshSelection *selection
     moto_bitmask_inverse(selection->edges);
 }
 
-void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection)
+void moto_mesh_select_more_faces(MotoMesh *self, MotoMeshSelection *selection)
 {
     if(moto_mesh_selection_get_selected_f_num(selection) == self->f_num)
         return;

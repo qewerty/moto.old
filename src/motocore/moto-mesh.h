@@ -327,15 +327,15 @@ gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
 
-void moto_mesh_grow_vert_selection(MotoMesh *self, MotoMeshSelection *selection);
+void moto_mesh_select_more_verts(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_less_verts(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_inverse_verts(MotoMesh *self, MotoMeshSelection *selection);
 
-void moto_mesh_grow_edge_selection(MotoMesh *self, MotoMeshSelection *selection);
+void moto_mesh_select_more_edges(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_less_edges(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_inverse_edges(MotoMesh *self, MotoMeshSelection *selection);
 
-void moto_mesh_grow_face_selection(MotoMesh *self, MotoMeshSelection *selection);
+void moto_mesh_select_more_faces(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_less_faces(MotoMesh *self, MotoMeshSelection *selection);
 void moto_mesh_select_inverse_faces(MotoMesh *self, MotoMeshSelection *selection);
 

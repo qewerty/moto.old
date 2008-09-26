@@ -562,7 +562,7 @@ static void moto_mesh_view_node_grow_selection_as_verts(MotoGeomViewState *self,
     if(! mesh)
         return;
 
-    moto_mesh_grow_vert_selection(mesh, mv->priv->selection);
+    moto_mesh_select_more_verts(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -682,7 +682,7 @@ static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self,
     if( ! mesh)
         return;
 
-    moto_mesh_grow_edge_selection(mesh, mv->priv->selection);
+    moto_mesh_select_more_edges(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -766,7 +766,7 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
     if( ! mesh)
         return;
 
-    moto_mesh_grow_face_selection(mesh, mv->priv->selection);
+    moto_mesh_select_more_faces(mesh, mv->priv->selection);
 }
 
 static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
