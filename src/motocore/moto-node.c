@@ -387,8 +387,14 @@ void moto_node_add_params(MotoNode *self, ...)
                 }
                 else
                 {
-                    //moto_error("", );
-                    // Error
+                    moto_error("moto_node_add_params: type (%s) is not supported for parameters of moto nodes.", g_type_name(ptype));
+
+                    // pop all data of param with invalid type
+                    va_arg(ap, GParamSpec*);
+                    va_arg(ap, gchar*);
+                    va_arg(ap, gchar*);
+
+                    continue;
                 }
         }
 
@@ -875,10 +881,22 @@ void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group,
 }
 
 void moto_node_link(MotoNode *self, const gchar *in_name,
-                          MotoNode *other, const gchar *out_name)
+                    MotoNode *other, const gchar *out_name)
 {
     MotoParam *in  = moto_node_get_param(self, in_name);
+    if( ! in)
+    {
+        moto_error("Node '%s' hasn't input with name '%s'", moto_node_get_name(self), in_name);
+        return;
+    }
+
     MotoParam *out = moto_node_get_param(other, out_name);
+    if( ! out)
+    {
+        moto_error("Node '%s' hasn't output with name '%s'", moto_node_get_name(other), out_name);
+        return;
+    }
+
     moto_param_link(in, out);
 }
 
