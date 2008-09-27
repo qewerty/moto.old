@@ -377,12 +377,19 @@ void moto_node_add_params(MotoNode *self, ...)
                 {
                     g_value_set_enum(&v, va_arg(ap, gint));
                 }
-                else if(MOTO_TYPE_FILENAME == ptype)
+                else if(ptype == MOTO_TYPE_FILENAME)
                 {
                     g_value_set_string(&v, va_arg(ap, gchar*));
                 }
-                else
+                else if(g_type_is_a(ptype, G_TYPE_OBJECT))
+                {
                     g_value_set_object(&v, va_arg(ap, gpointer));
+                }
+                else
+                {
+                    //moto_error("", );
+                    // Error
+                }
         }
 
         GParamSpec *pspec = va_arg(ap, GParamSpec*);

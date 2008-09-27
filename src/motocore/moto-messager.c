@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 #include "moto-messager.h"
 
 /* class Messager */
@@ -135,38 +137,62 @@ gboolean moto_messager_get_print_messages()
     return self->priv->print_messages;
 }
 
-void moto_info(const gchar *msg)
+void moto_info(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
     info_inc();
 
+    va_list ap;
+    va_start(ap, format);
+    GString *msg = g_string_new("");
+    g_string_vprintf(msg, format, ap);
+    va_end(ap);
+
     if(self->priv->print_messages)
-        g_print("[Info] %s\n", msg);
+        g_print("[Info] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->info_message_signal_id, 0, msg);
+    g_signal_emit(self, klass->info_message_signal_id, 0, msg->str);
+
+    g_string_free(msg, TRUE);
 }
 
-void moto_warning(const gchar *msg)
+void moto_warning(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
     warning_inc();
 
+    va_list ap;
+    va_start(ap, format);
+    GString *msg = g_string_new("");
+    g_string_vprintf(msg, format, ap);
+    va_end(ap);
+
     if(self->priv->print_messages)
-        g_print("[Warning] %s\n", msg);
+        g_print("[Warning] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->warning_message_signal_id, 0, msg);
+    g_signal_emit(self, klass->warning_message_signal_id, 0, msg->str);
+
+    g_string_free(msg, TRUE);
 }
 
-void moto_error(const gchar *msg)
+void moto_error(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
     error_inc();
 
+    va_list ap;
+    va_start(ap, format);
+    GString *msg = g_string_new("");
+    g_string_vprintf(msg, format, ap);
+    va_end(ap);
+
     if(self->priv->print_messages)
-        g_print("[Error] %s\n", msg);
+        g_print("[Error] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
-    g_signal_emit(self, klass->error_message_signal_id, 0, msg);
+    g_signal_emit(self, klass->error_message_signal_id, 0, msg->str);
+
+    g_string_free(msg, TRUE);
 }
