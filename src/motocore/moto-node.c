@@ -1463,7 +1463,7 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(src);
 
     MotoNode *self_node = moto_param_get_node(self);
-    MotoNode *src_node = moto_param_get_node(src);
+    MotoNode *src_node  = moto_param_get_node(src);
 
     if(moto_node_depends_on(src_node, self_node))
     {
@@ -1485,11 +1485,9 @@ void moto_param_link(MotoParam *self, MotoParam *src)
         return;
     }
 
-    /* TODO: Type checking! */
-
+    /* Type checking. */
     GType self_type = moto_param_get_value_type(self);
     GType src_type = moto_param_get_value_type(src);
-
     if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
     {
         if( ! g_type_is_a(src_type, self_type))
@@ -1497,7 +1495,7 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     }
     else
     {
-        if(g_type_is_a(src_type, G_TYPE_OBJECT))
+        if(g_type_is_a(src_type, G_TYPE_OBJECT) || g_type_is_a(src_type, G_TYPE_INTERFACE))
             return;
         if( ! g_value_type_transformable(src_type, self_type))
             return;
