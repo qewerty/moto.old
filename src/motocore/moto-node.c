@@ -883,6 +883,9 @@ void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group,
 void moto_node_link(MotoNode *self, const gchar *in_name,
                     MotoNode *other, const gchar *out_name)
 {
+    g_return_if_fail(self);
+    g_return_if_fail(other);
+
     MotoParam *in  = moto_node_get_param(self, in_name);
     if( ! in)
     {
@@ -1423,9 +1426,7 @@ void moto_param_link(MotoParam *self, MotoParam *src)
 {
     if( ! src)
     {
-        GString *msg = g_string_new("You are trying to connect nothing (None|NULL). I won't connect it.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("You are trying to connect nothing (None|NULL). I won't connect it.");
         return;
     }
 
@@ -1434,21 +1435,13 @@ void moto_param_link(MotoParam *self, MotoParam *src)
 
     if( ! (src_priv->mode & MOTO_PARAM_MODE_OUT))
     {
-        GString *msg = g_string_new("You are trying to connect source that has no output (\"");
-        g_string_append(msg, moto_param_get_name(src));
-        g_string_append(msg, "\"). I won't connect it.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("You are trying to connect source that has no output '%s'. I won't connect it", moto_param_get_name(src));
         return;
     }
 
     if( ! (priv->mode & MOTO_PARAM_MODE_IN))
     {
-        GString *msg = g_string_new("You are trying to connect source to output parameter (\"");
-        g_string_append(msg, moto_param_get_name(self));
-        g_string_append(msg, "\"). I won't connect it.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("You are trying to connect source to output parameter '%s'. I won't connect it", moto_param_get_name(self));
         return;
     }
 
