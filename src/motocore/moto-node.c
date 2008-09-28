@@ -145,6 +145,13 @@ struct _MotoParamPriv
     MotoParam *source;
     GSList *dests;
 
+    /* Used for determing which IN params this OUT depends on.
+     * Only for params with MOTO_PARAM_MODE_OUT flag. */
+    GPtrArray *depends_on_params;
+
+    gboolean use_expession;
+    GString *expression;
+
     GString *name;
     GString *title;
     MotoNode *node;
@@ -1044,7 +1051,7 @@ gboolean moto_node_depends_on(MotoNode *self, MotoNode *other)
     for(; p; p = g_slist_next(p))
     {
         MotoParam *param = (MotoParam *)p->data;
-        if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_IN)
+        if( ! (moto_param_get_mode(param) & MOTO_PARAM_MODE_IN))
             continue;
         MotoParam *src = moto_param_get_source(param);
         if( ! src)
@@ -1052,6 +1059,21 @@ gboolean moto_node_depends_on(MotoNode *self, MotoNode *other)
 
         MotoNode *node = moto_param_get_node(src);
         if(moto_node_depends_on(node, other))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+gboolean moto_node_is_animated(MotoNode *self)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    GSList *p = priv->params.sl;
+    for(; p; p = g_slist_next(p))
+    {
+        MotoParam *param = (MotoParam *)p->data;
+        if(moto_param_is_animated(param))
             return TRUE;
     }
 
@@ -1072,8 +1094,13 @@ moto_param_dispose(GObject *obj)
         return;
     priv->disposed = TRUE;
 
+    // TODO: Free priv->pspec! At the moment MotoParamSpec is not implemented.
+
     g_string_free(priv->name, TRUE);
     g_string_free(priv->title, TRUE);
+
+    g_ptr_array_free(priv->depends_on_params, TRUE);
+    g_string_free(priv->expression, TRUE);
 
     param_parent_class->dispose(obj);
 }
@@ -1095,6 +1122,11 @@ moto_param_init(MotoParam *self)
 
     priv->source = NULL;
     priv->dests = NULL;
+
+    priv->depends_on_params = NULL;
+
+    priv->use_expession = FALSE;
+    priv->expression = g_string_new("");
 
     priv->name = g_string_new("");
     priv->title = g_string_new("");
@@ -1572,21 +1604,69 @@ gboolean moto_param_is_valid(MotoParam *self)
     return MOTO_IS_NODE(moto_param_get_node(self));
 }
 
+gboolean moto_param_is_animated(MotoParam *self)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+
+    if(priv->mode & MOTO_PARAM_MODE_IN)
+    {
+        /* Evaluation order: value, source, expression (can use value and source).
+         * If expresion is invalid source is used if it's not NULL else value of param. */
+        if(priv->use_expession)
+        {
+            return TRUE;
+        }
+        else if(priv->source)
+        {
+            return moto_param_is_animated(priv->source);
+        }
+    }
+    if(priv->mode & MOTO_PARAM_MODE_OUT)
+    {
+        if(priv->depends_on_params)
+        {
+            guint i;
+            for(i = 0; i < priv->depends_on_params->len; i++)
+            {
+                MotoParam *dp = (MotoParam *)g_ptr_array_index(priv->depends_on_params, i);
+                if(moto_param_is_animated(dp))
+                    return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 MotoNode *moto_param_get_node(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     return priv->node;
 }
 
+gboolean moto_param_eval_expression(MotoParam *self)
+{
+    return FALSE;
+}
+
 void moto_param_update(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    if( ! priv->source)
-        return;
 
-    MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(priv->source);
+    gboolean use_source = TRUE;
 
-    g_value_transform(& src_priv->value, & priv->value);
+    if(priv->use_expession)
+    {
+        use_source = FALSE;
+        if( ! moto_param_eval_expression(self))
+            use_source = TRUE;
+    }
+
+    if(use_source && priv->source)
+    {
+        MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(priv->source);
+        g_value_transform(& src_priv->value, & priv->value);
+    }
 
     moto_node_update(moto_param_get_node(self));
 }

@@ -253,6 +253,8 @@ void moto_param_set_pointer(MotoParam *self,    gpointer    value);
 void moto_param_set_enum(MotoParam *self,       gint        value);
 void moto_param_set_object(MotoParam *self,     GObject    *value);
 
+gboolean moto_param_eval_expression(MotoParam *self);
+
 void moto_param_update(MotoParam *self);
 void moto_param_update_dests(MotoParam *self);
 
@@ -271,6 +273,8 @@ gboolean moto_param_has_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */
 gboolean moto_param_is_valid(MotoParam *self);
+
+gboolean moto_param_is_animated(MotoParam *self);
 
 G_END_DECLS
 
