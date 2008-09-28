@@ -1033,6 +1033,31 @@ MotoLibrary *moto_node_get_library(MotoNode *self)
     return moto_world_get_library(w);
 }
 
+gboolean moto_node_depends_on(MotoNode *self, MotoNode *other)
+{
+    if(self == other)
+        return TRUE;
+
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    GSList *p = priv->params.sl;
+    for(; p; p = g_slist_next(p))
+    {
+        MotoParam *param = (MotoParam *)p->data;
+        if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_IN)
+            continue;
+        MotoParam *src = moto_param_get_source(param);
+        if( ! src)
+            continue;
+
+        MotoNode *node = moto_param_get_node(src);
+        if(moto_node_depends_on(node, other))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* class MotoParam */
 
 static GObjectClass *param_parent_class = NULL;
@@ -1437,6 +1462,17 @@ void moto_param_link(MotoParam *self, MotoParam *src)
 
     MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(src);
 
+    MotoNode *self_node = moto_param_get_node(self);
+    MotoNode *src_node = moto_param_get_node(src);
+
+    if(moto_node_depends_on(src_node, self_node))
+    {
+        moto_error("Connection of '%s.%s'->'%s.%s' makes a cycle. I won't connect it",
+                moto_node_get_name(src_node), moto_param_get_name(src),
+                moto_node_get_name(self_node), moto_param_get_name(self));
+        return;
+    }
+
     if( ! (src_priv->mode & MOTO_PARAM_MODE_OUT))
     {
         moto_error("You are trying to connect source that has no output '%s'. I won't connect it", moto_param_get_name(src));
@@ -1450,6 +1486,22 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     }
 
     /* TODO: Type checking! */
+
+    GType self_type = moto_param_get_value_type(self);
+    GType src_type = moto_param_get_value_type(src);
+
+    if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
+    {
+        if( ! g_type_is_a(src_type, self_type))
+            return;
+    }
+    else
+    {
+        if(g_type_is_a(src_type, G_TYPE_OBJECT))
+            return;
+        if( ! g_value_type_transformable(src_type, self_type))
+            return;
+    }
 
     g_object_weak_ref(G_OBJECT(src), (GWeakNotify)disconnect_on_source_deleted, self);
     g_object_weak_ref(G_OBJECT(self), (GWeakNotify)exclude_from_dests_on_dest_deleted, src);

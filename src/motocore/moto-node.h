@@ -173,6 +173,8 @@ void moto_node_set_world(MotoNode *self, MotoWorld *world);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
 
+gboolean moto_node_depends_on(MotoNode *self, MotoNode *other);
+
 /* Returns TRUE if node changes during animation or FALSE otherwise.
  * Used for optimization. */
 gboolean moto_node_is_animated(MotoNode *self);
