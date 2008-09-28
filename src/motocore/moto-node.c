@@ -1424,13 +1424,17 @@ exclude_from_dests_on_dest_deleted(gpointer data, GObject *where_the_object_was)
 
 void moto_param_link(MotoParam *self, MotoParam *src)
 {
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+
+    if(src == priv->source)
+        return;
+
     if( ! src)
     {
-        moto_error("You are trying to connect nothing (None|NULL). I won't connect it.");
+        moto_param_unlink_source(self);
         return;
     }
 
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(src);
 
     if( ! (src_priv->mode & MOTO_PARAM_MODE_OUT))
@@ -1446,9 +1450,6 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     }
 
     /* TODO: Type checking! */
-
-    if(src == priv->source)
-        return;
 
     g_object_weak_ref(G_OBJECT(src), (GWeakNotify)disconnect_on_source_deleted, self);
     g_object_weak_ref(G_OBJECT(self), (GWeakNotify)exclude_from_dests_on_dest_deleted, src);
