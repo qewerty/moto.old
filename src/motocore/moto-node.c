@@ -1644,7 +1644,7 @@ MotoNode *moto_param_get_node(MotoParam *self)
     return priv->node;
 }
 
-gboolean moto_param_eval_expression(MotoParam *self)
+gboolean moto_param_eval(MotoParam *self)
 {
     return FALSE;
 }
@@ -1658,7 +1658,7 @@ void moto_param_update(MotoParam *self)
     if(priv->use_expession)
     {
         use_source = FALSE;
-        if( ! moto_param_eval_expression(self))
+        if( ! moto_param_eval(self))
             use_source = TRUE;
     }
 

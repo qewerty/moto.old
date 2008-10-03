@@ -334,8 +334,6 @@ void moto_world_redraw(MotoWorld *self)
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
-
-
     glDisable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
