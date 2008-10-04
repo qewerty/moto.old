@@ -787,42 +787,66 @@ void moto_node_set_params(MotoNode *self, ...)
         switch(ptype)
         {
             case G_TYPE_BOOLEAN:
+            {
                 g_value_set_boolean(v, va_arg(ap, gboolean));
+            }
             break;
             case G_TYPE_INT:
+            {
                 g_value_set_int(v, va_arg(ap, gint));
+            }
             break;
             case G_TYPE_UINT:
+            {
                 g_value_set_uint(v, va_arg(ap, guint));
+            }
             break;
             case G_TYPE_LONG:
+            {
                 g_value_set_long(v, va_arg(ap, glong));
+            }
             break;
             case G_TYPE_ULONG:
+            {
                 g_value_set_ulong(v, va_arg(ap, gulong));
+            }
             break;
             case G_TYPE_INT64:
+            {
                 g_value_set_int64(v, va_arg(ap, gint64));
+            }
             break;
             case G_TYPE_UINT64:
+            {
                 g_value_set_uint64(v, va_arg(ap, guint64));
+            }
             break;
             case G_TYPE_FLOAT:
+            {
                 g_value_set_float(v, (gfloat)va_arg(ap, gdouble));
+            }
             break;
             case G_TYPE_DOUBLE:
+            {
                 g_value_set_double(v, va_arg(ap, gdouble));
+            }
             break;
             case G_TYPE_POINTER:
+            {
                 g_value_set_pointer(v, va_arg(ap, gpointer));
+            }
             break;
             default:
+            {
                 if(g_type_is_a(ptype, G_TYPE_ENUM))
                 {
                     g_value_set_enum(v, va_arg(ap, gint));
                 }
                 else
+                {
                     g_value_set_object(v, va_arg(ap, gpointer));
+                }
+            }
         }
     }
 

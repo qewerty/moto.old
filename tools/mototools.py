@@ -7,6 +7,6 @@ def create_options(filename, args):
         ('CFLAGS', 'C-compiler flags', ''),
         ('CPPFLAGS', 'Defines', ''),
         ('LIBS', 'Libs to link with', ''),
-        ('PKG_CONFIG', 'On posix just pkg-config call', ''),
+        ('PKG_CONFIG', 'On posix just pkg-config call, on windows should be empty', ''),
         )
     return opts
