@@ -67,9 +67,9 @@ struct _MotoSystemPriv
     GSList *worlds;
     MotoWorld *current_world;
 
-    GMutex *add_world_mutex;
-    GMutex *delete_world_mutex;
-    GMutex *set_world_current_mutex;
+    GMutex *world_list_mutex;
+    GMutex *current_world_mutex;
+    GMutex *library_mutex;
 };
 
 static void
@@ -77,6 +77,7 @@ moto_system_dispose(GObject *obj)
 {
     MotoSystem *self = (MotoSystem *)obj;
 
+    // FIXME: Not thread-safe access to self->priv->worlds!!!
     g_slist_foreach(self->priv->worlds, unref_gobject, NULL);
     g_slist_free(self->priv->worlds);
     g_object_unref(self->priv->library);
@@ -98,9 +99,9 @@ moto_system_init(MotoSystem *self)
 
     self->priv->library = moto_library_new();
 
-    self->priv->add_world_mutex         = g_mutex_new();
-    self->priv->delete_world_mutex      = g_mutex_new();
-    self->priv->set_world_current_mutex = g_mutex_new();
+    self->priv->world_list_mutex    = g_mutex_new();
+    self->priv->current_world_mutex = g_mutex_new();
+    self->priv->library_mutex       = g_mutex_new();
 }
 
 static void
@@ -138,34 +139,43 @@ MotoSystem *moto_system_new()
 {
     MotoSystem *self = (MotoSystem *)g_object_new(MOTO_TYPE_SYSTEM, NULL);
 
+    g_mutex_lock(self->priv->library_mutex);
     MotoLibrary *lib = self->priv->library;
+    g_mutex_unlock(self->priv->library_mutex);
 
     return self;
 }
 
 MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name)
 {
+    g_mutex_lock(self->priv->world_list_mutex);
+    MotoWorld *world = NULL;
     GSList *w = self->priv->worlds;
     for(; w; w = g_slist_next(w))
+    {
         if(g_utf8_collate(moto_world_get_name((MotoWorld *)w->data), name) == 0)
-            return (MotoWorld *)w->data;
-    return NULL;
+        {
+            world = (MotoWorld *)w->data;
+            break;
+        }
+    }
+    g_mutex_unlock(self->priv->world_list_mutex);
+    return world;
 }
 
 MotoWorld *moto_system_get_current_world(MotoSystem *self)
 {
-    return self->priv->current_world;
+    g_mutex_lock(self->priv->current_world_mutex);
+    MotoWorld *world = self->priv->current_world;
+    g_mutex_unlock(self->priv->current_world_mutex);
+    return world;
 }
 
 void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current)
 {
     if(moto_system_get_world(self, moto_world_get_name(world)))
     {
-        GString *msg = g_string_new("");
-        g_string_printf(msg, "World \"%s\" is already in the system. I won't add it again.",
-            moto_world_get_name(world));
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("World \"%s\" is already in the system. I won't add it again.", moto_world_get_name(world));
 
         /* If set_current is TRUE, world will be set as current in any case. */
         if(set_current)
@@ -174,10 +184,10 @@ void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_curr
         return;
     }
 
-    g_mutex_lock(self->priv->add_world_mutex);
+    g_mutex_lock(self->priv->world_list_mutex);
     g_object_ref(G_OBJECT(world));
     self->priv->worlds = g_slist_append(self->priv->worlds, world);
-    g_mutex_unlock(self->priv->add_world_mutex);
+    g_mutex_unlock(self->priv->world_list_mutex);
 
     if(set_current)
         moto_system_set_world_current(self, world);
@@ -185,25 +195,24 @@ void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_curr
 
 void moto_system_delete_world(MotoSystem *self, MotoWorld *world)
 {
+    g_mutex_lock(self->priv->world_list_mutex);
     if( ! g_slist_find(self->priv->worlds, world))
     {
-        GString *msg = g_string_new("");
-        g_string_printf(msg, "World \"%s\" is not in the system. Nothing to delete.",
-            moto_world_get_name(world));
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("World \"%s\" is not in the system. Nothing to delete.", moto_world_get_name(world));
+
+        g_mutex_unlock(self->priv->world_list_mutex);
         return;
     }
 
-    g_mutex_lock(self->priv->delete_world_mutex);
     self->priv->worlds = g_slist_remove(self->priv->worlds, world);
     g_object_unref(G_OBJECT(world));
-    g_mutex_unlock(self->priv->delete_world_mutex);
+    g_mutex_unlock(self->priv->world_list_mutex);
 }
 
 void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name)
 {
     MotoWorld *world = moto_system_get_world(self, world_name);
+
     if( ! world)
     {
         GString *msg = g_string_new("");
@@ -218,26 +227,24 @@ void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name)
 
 void moto_system_set_world_current(MotoSystem *self, MotoWorld *world)
 {
-    GSList *w = self->priv->worlds;
-    for(; w; w = g_slist_next(w))
+    g_mutex_lock(self->priv->world_list_mutex);
+    if( ! g_slist_find(self->priv->worlds, world))
     {
-        if(w->data == world)
-        {
-            g_mutex_lock(self->priv->set_world_current_mutex);
-            self->priv->current_world = world;
-            g_mutex_unlock(self->priv->set_world_current_mutex);
-            return;
-        }
+        g_mutex_unlock(self->priv->world_list_mutex);
+        moto_warning("World \"%s\" is not in the system. I won't set it current.", moto_world_get_name(world));
+        return;
     }
+    g_mutex_unlock(self->priv->world_list_mutex);
 
-    GString *msg = g_string_new("World \"");
-    g_string_append(msg, moto_world_get_name(world));
-    g_string_append(msg, "\" is not in the system. I won't set it current.");
-    moto_warning(msg->str);
-    g_string_free(msg, TRUE);
+    g_mutex_lock(self->priv->current_world_mutex);
+    self->priv->current_world = world;
+    g_mutex_unlock(self->priv->current_world_mutex);
 }
 
 MotoLibrary *moto_system_get_library(MotoSystem *self)
 {
-    return self->priv->library;
+    g_mutex_lock(self->priv->library_mutex);
+    MotoLibrary *lib = self->priv->library;
+    g_mutex_unlock(self->priv->library_mutex);
+    return lib;
 }
