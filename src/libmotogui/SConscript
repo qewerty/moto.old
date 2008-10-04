@@ -1,0 +1,2 @@
+Import('env')
+env.SharedLibrary('../lib/libmotogui.so', Glob('*.c'))

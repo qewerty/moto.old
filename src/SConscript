@@ -1,0 +1,8 @@
+Import('env')
+env.SConscript(['libmotoutil/SConscript',
+                'libmoto/SConscript',
+                'libmotogui/SConscript'])
+
+env.Program('$MOTO_GUI', 'moto-gui.c',
+            LIBS=['moto', 'motoutil', 'motogui'],
+            LIBPATH='./lib')
