@@ -1,2 +1,2 @@
 Import('env')
-env.SharedLibrary('../lib/libmotoutil.so', Glob('*.c'))
+env.SharedLibrary('../lib/motoutil', Glob('*.c'))
