@@ -2,6 +2,9 @@ import sys, os
 from tools.mototools import create_options
 from tools import msg
 
+SourceSignatures('MD5')
+TargetSignatures('content')
+
 platform = sys.platform
 
 config = ARGUMENTS.get('config', 'config/%s-release.py' % platform)
@@ -29,4 +32,6 @@ if pkg_config:
 Help(opts.GenerateHelpText(env))
 
 env.SConscript('src/SConscript',
-               build_dir=build_dir)
+        build_dir=build_dir)
+
+

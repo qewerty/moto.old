@@ -1,5 +1,8 @@
 MOTO_GUI = 'moto-gui'
 
+CC  = 'gcc'
+CXX = 'g++'
+
 CFLAGS = ['-O0', '-g', '-pipe', '-Wall']
 LIBS    = ['GL', 'GLU', 'GLEW']
 
