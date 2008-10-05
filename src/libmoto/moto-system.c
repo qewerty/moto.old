@@ -37,15 +37,15 @@
 
 /* mesh loaders*/
 
-#ifdef WITH_MOTO_MBM_MESH_LOADER
+#ifdef MOTO_MBM_MESH_LOADER
 #include "moto-mbm-mesh-loader.h"
 #endif
 
-#ifdef WITH_MOTO_WOBJ_MESH_LOADER
+#ifdef MOTO_WOBJ_MESH_LOADER
 #include "moto-wobj-mesh-loader.h"
 #endif
 
-#ifdef WITH_MOTO_RIB_MESH_LOADER
+#ifdef MOTO_RIB_MESH_LOADER
 #include "moto-rib-mesh-loader.h"
 #endif
 
@@ -203,10 +203,10 @@ void moto_system_delete_world(MotoSystem *self, MotoWorld *world)
         g_mutex_unlock(self->priv->world_list_mutex);
         return;
     }
-
     self->priv->worlds = g_slist_remove(self->priv->worlds, world);
-    g_object_unref(G_OBJECT(world));
     g_mutex_unlock(self->priv->world_list_mutex);
+
+    g_object_unref(G_OBJECT(world));
 }
 
 void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name)
@@ -215,10 +215,7 @@ void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name)
 
     if( ! world)
     {
-        GString *msg = g_string_new("");
-        g_string_printf(msg, "System has no world with name \"%s\". Nothing to delete.", world_name);
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("System has no world with name \"%s\". Nothing to delete.", world_name);
         return;
     }
 
