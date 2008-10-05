@@ -22,6 +22,7 @@ cpppath = ['..']
 
 opts = create_options(config, ARGUMENTS)
 env = Environment(options = opts,
+                  ENV = {'PATH': os.environ['PATH']},
                   CPPPATH=cpppath)
 Export('env')
 
@@ -32,6 +33,4 @@ if pkg_config:
 Help(opts.GenerateHelpText(env))
 
 env.SConscript('src/SConscript',
-        build_dir=build_dir)
-
-
+               build_dir=build_dir)
