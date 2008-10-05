@@ -7,7 +7,7 @@ TargetSignatures('content')
 
 platform = sys.platform
 
-config = ARGUMENTS.get('config', 'config/%s-release.py' % platform)
+config = ARGUMENTS.get('config', 'config/%s.py' % platform)
 if not os.path.exists(config):
     msg.error('Config file "%s" does not exist.' % config)
     sys.exit(-1)
