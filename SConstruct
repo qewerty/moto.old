@@ -34,3 +34,21 @@ Help(opts.GenerateHelpText(env))
 
 env.SConscript('src/SConscript',
                build_dir=build_dir)
+
+def make_tags(target, source, env):
+    if env['PLATFORM'] is not 'posix':
+        # TODO: print smth
+        return
+
+    filename = '.pkg-config~'
+    os.system(pkg_config + ' > "%s"' % filename)
+    f = file(filename)
+    includes = f.read().replace('-I', '').split(' ')
+    f.close()
+
+    cmd = 'ctags-exuberant -R src %s' % \
+        (' '.join([i for i in includes if os.path.exists(i)]))
+    print cmd
+    os.system(cmd)
+
+env.Command('tags', None, make_tags)
