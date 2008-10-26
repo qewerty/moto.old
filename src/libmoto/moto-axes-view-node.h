@@ -42,7 +42,7 @@ struct _MotoAxesViewNodeClass
     MotoGeomViewNodeClass parent;
 };
 
-GType moto_axes_view_node_storage_get_type(void);
+GType moto_axes_view_node_get_type(void);
 
 #define MOTO_TYPE_AXES_VIEW_NODE (moto_axes_view_node_get_type())
 #define MOTO_AXES_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_AXES_VIEW_NODE, MotoAxesViewNode))

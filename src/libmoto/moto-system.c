@@ -139,7 +139,7 @@ MotoSystem *moto_system_new()
     MotoSystem *self = (MotoSystem *)g_object_new(MOTO_TYPE_SYSTEM, NULL);
 
     g_mutex_lock(self->priv->library_mutex);
-    MotoLibrary *lib = self->priv->library;
+    // MotoLibrary *lib = self->priv->library;
     g_mutex_unlock(self->priv->library_mutex);
 
     return self;

@@ -45,6 +45,7 @@ def make_tags(target, source, env):
     f = file(filename)
     includes = f.read().replace('-I', '').split(' ')
     f.close()
+    os.unlink(filename)
 
     cmd = 'ctags-exuberant -R src %s' % \
         (' '.join([i for i in includes if os.path.exists(i)]))
