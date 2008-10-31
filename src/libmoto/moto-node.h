@@ -543,7 +543,7 @@ void moto_param_set_2x2dcv(MotoParam *self, const gdouble *v);
 
 void moto_param_set_3x3d(MotoParam *self, gdouble v00, gdouble v01, gdouble v02,
                                           gdouble v10, gdouble v11, gdouble v12,
-                                          gdouble v12, gdouble v21, gdouble v22);
+                                          gdouble v20, gdouble v21, gdouble v22);
 void moto_param_set_3x3dv(MotoParam *self, const gdouble *v);
 
 void moto_param_set_4x4d(MotoParam *self, gdouble v00, gdouble v01, gdouble v02, gdouble v03,

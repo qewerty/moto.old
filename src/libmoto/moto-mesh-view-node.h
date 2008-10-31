@@ -27,15 +27,12 @@
 
 typedef struct _MotoMeshViewNode MotoMeshViewNode;
 typedef struct _MotoMeshViewNodeClass MotoMeshViewNodeClass;
-typedef struct _MotoMeshViewNodePriv MotoMeshViewNodePriv;
 
 /* class MotoMeshViewNode */
 
 struct _MotoMeshViewNode
 {
     MotoGeomViewNode parent;
-
-    MotoMeshViewNodePriv *priv;
 };
 
 struct _MotoMeshViewNodeClass
