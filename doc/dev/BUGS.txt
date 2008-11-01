@@ -1,0 +1,4 @@
+LIST OF BUGS
+
+ - MotoPlaneNode half edge structure may be incorrect. Try select vertex on
+   an angle of plane and select more with '+'.
