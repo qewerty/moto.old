@@ -223,10 +223,11 @@ void on_filename_dialog_response(GtkDialog *dialog, gint response_id, FilenameDi
     if(GTK_RESPONSE_OK == response_id)
     {
         gtk_entry_set_text(data->entry,
-                gtk_file_chooser_get_filename((GtkFileChooser *)dialog));
+                gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
     }
 
-    gtk_object_destroy((GtkObject *)dialog);
+    // gtk_object_destroy((GtkObject *)dialog);
+    gtk_widget_hide(GTK_WIDGET(dialog));
 }
 
 void on_filename_clicked(GtkButton *button, gpointer user_data)
