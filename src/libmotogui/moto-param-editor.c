@@ -231,12 +231,15 @@ void on_filename_dialog_response(GtkDialog *dialog, gint response_id, FilenameDi
 
 void on_filename_clicked(GtkButton *button, gpointer user_data)
 {
-    GtkFileChooserDialog *dialog = \
-        (GtkFileChooserDialog *)gtk_file_chooser_dialog_new("Select a file",
-                NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
-                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                GTK_STOCK_OPEN, GTK_RESPONSE_OK,
-                NULL);
+    static GtkFileChooserDialog *dialog = NULL;
+    if( ! dialog)
+    {
+        dialog = (GtkFileChooserDialog *)gtk_file_chooser_dialog_new("Select a file",
+                    NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                    GTK_STOCK_OPEN, GTK_RESPONSE_OK,
+                    NULL);
+    }
 
     g_signal_connect(dialog, "response", G_CALLBACK(on_filename_dialog_response), user_data);
 
