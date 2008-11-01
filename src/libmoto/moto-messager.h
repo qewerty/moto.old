@@ -60,8 +60,8 @@ MotoMessager *moto_messager_singleton();
 void moto_messager_set_print_messages(gboolean status);
 gboolean moto_messager_get_print_messages();
 
-void moto_info(const gchar *format, ...);
-void moto_warning(const gchar *format, ...);
-void moto_error(const gchar *format, ...);
+void moto_info(const gchar *format, ...)  __attribute__((format(printf, 1, 2)));
+void moto_warning(const gchar *format, ...)  __attribute__((format(printf, 1, 2)));
+void moto_error(const gchar *format, ...)  __attribute__((format(printf, 1, 2)));
 
 #endif /* MOTO_MESSAGER_H */
