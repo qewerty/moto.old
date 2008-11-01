@@ -53,6 +53,8 @@
 
 static void unref_gobject(gpointer data, gpointer user_data)
 {
+    g_print("unref_gobject\n");
+    g_object_unref(G_OBJECT(data));
     g_object_unref(G_OBJECT(data));
 }
 
@@ -75,6 +77,7 @@ struct _MotoSystemPriv
 static void
 moto_system_dispose(GObject *obj)
 {
+    g_print("moto_system_dispose\n");
     MotoSystem *self = (MotoSystem *)obj;
 
     // FIXME: Not thread-safe access to self->priv->worlds!!!

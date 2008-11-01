@@ -81,6 +81,7 @@ moto_mesh_view_node_dispose(GObject *obj)
         return;
     priv->disposed = TRUE;
 
+    g_print("moto_mesh_view_node_dispose\n");
     glDeleteLists(priv->dlist, 1);
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode *)obj);
 
@@ -193,7 +194,7 @@ MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self)
     return priv->selection;
 }
 
-static void draw_mesh_as_object(MotoMeshViewNodePriv *priv, MotoMesh *mesh)
+inline static void draw_mesh_as_object(MotoMeshViewNodePriv *priv, MotoMesh *mesh)
 {
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
@@ -251,7 +252,7 @@ static void draw_mesh_as_object(MotoMeshViewNodePriv *priv, MotoMesh *mesh)
     glPopClientAttrib();
 }
 
-static void draw_mesh_as_verts(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoMeshSelection *selection)
+inline static void draw_mesh_as_verts(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT);
@@ -323,7 +324,7 @@ static void draw_mesh_as_verts(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoM
     glPopClientAttrib();
 }
 
-static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
+inline static void draw_mesh_as_edges(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
@@ -332,15 +333,54 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
     glColor4f(1, 1, 1, 0.25);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-    // glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
-    glDisable(GL_DEPTH_TEST);
-    glLineWidth(1.0);
-    glColor4f(0.9, 0.9, 0.9, 1.0);
 
-    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+    gboolean force_arrays = FALSE;
+    if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
+    {
+        g_print("Initializng VBO for 'edge' drawing mode ... ");
+        if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
+        {
+            glGenBuffersARB(VBUF_NUMBER, priv->vbufs);
 
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_coords,  GL_STATIC_DRAW_ARB);
+
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                    moto_mesh_get_index_size(mesh) * mesh->e_num * 2,
+                    mesh->e_verts, GL_STATIC_DRAW_ARB);
+
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+        }
+        g_print("OK\n");
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
+        glDisable(GL_DEPTH_TEST);
+        glLineWidth(1.0);
+        glColor4f(0.9, 0.9, 0.9, 1.0);
+
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+        glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, 0);
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    }
+    else // vertex arrays
+    {
+        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+
+        glDisable(GL_DEPTH_TEST);
+        glLineWidth(1.0);
+        glColor4f(0.9, 0.9, 0.9, 1.0);
+
+        glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+    }
+
+    // Drawing selected edges.
     glBegin(GL_LINES);
     glColor3f(0, 1, 0);
     glLineWidth(2.0);
@@ -372,7 +412,7 @@ static void draw_mesh_as_edges(MotoMesh *mesh, MotoMeshSelection *selection)
     glPopClientAttrib();
 }
 
-static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
+inline static void draw_mesh_as_faces(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
@@ -383,18 +423,56 @@ static void draw_mesh_as_faces(MotoMesh *mesh, MotoMeshSelection *selection)
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-    glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
 
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(2.0, 1.0);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    gboolean force_arrays = FALSE;
+    if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
+    {
+        g_print("Initializng VBO for 'face' drawing mode ... ");
+        if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
+        {
+            glGenBuffersARB(VBUF_NUMBER, priv->vbufs);
+
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_coords,  GL_STATIC_DRAW_ARB);
+
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_normals, GL_STATIC_DRAW_ARB);
+
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                    moto_mesh_get_index_size(mesh) * mesh->f_num * 3 * 2,
+                    mesh->f_tess_verts, GL_STATIC_DRAW_ARB);
+
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+        }
+        g_print("OK\n");
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
+        glNormalPointer(GL_FLOAT, 0, 0);
+
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+        glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, 0);
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+    }
+    else
+    {
+        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+        glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
+
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(2.0, 1.0);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+    }
 
     glPolygonOffset(1.5, 1.0);
-    // glEnable(GL_POLYGON_OFFSET_LINE);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
 
     MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
     guint16 *f_verts = (guint16 *)mesh->f_verts;
@@ -646,7 +724,7 @@ static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomV
     if( ! mesh)
         return;
 
-    draw_mesh_as_edges(mesh, priv->selection);
+    draw_mesh_as_edges(priv, mesh, priv->selection);
 }
 
 static gboolean
@@ -765,7 +843,7 @@ static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomV
     if(! mesh)
         return;
 
-    draw_mesh_as_faces(mesh, geom_priv->selection);
+    draw_mesh_as_faces(geom_priv, mesh, geom_priv->selection);
 }
 
 static gboolean

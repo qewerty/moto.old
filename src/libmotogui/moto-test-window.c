@@ -69,6 +69,7 @@ struct _MotoTestWindowPriv
 static void
 moto_test_window_dispose(GObject *obj)
 {
+    g_print("moto_test_window_dispose\n");
     MotoTestWindow *self = (MotoTestWindow *)obj;
 
     if(self->priv->disposed)
@@ -83,6 +84,7 @@ moto_test_window_dispose(GObject *obj)
 static void
 moto_test_window_finalize(GObject *obj)
 {
+    g_print("moto_test_window_finalize\n");
     MotoTestWindow *self = (MotoTestWindow *)obj;
     g_slice_free(MotoTestWindowPriv, self->priv);
 
@@ -91,7 +93,7 @@ moto_test_window_finalize(GObject *obj)
 
 static void quit(MotoTestWindow *self)
 {
-    // g_object_unref(self->priv->world);
+    g_print("quit\n");
     gtk_main_quit();
 }
 

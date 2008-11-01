@@ -19,6 +19,14 @@
 #include "moto-transform-info.h"
 #include "moto-time-node.h"
 
+/* utils */
+
+static void unref_gobject(gpointer data, gpointer user_data)
+{
+    g_object_unref(G_OBJECT(data));
+}
+
+
 /* class World */
 
 /* for mutex factory */
@@ -83,11 +91,16 @@ struct _MotoWorldPriv
 static void
 moto_world_dispose(GObject *obj)
 {
+    g_print("moto_world_dispose\n");
     MotoWorld *self = (MotoWorld *)obj;
 
     g_timer_destroy(self->priv->timer);
 
     moto_factory_free_all(& self->priv->mutex_factory);
+
+    g_slist_foreach(self->priv->nodes, unref_gobject, NULL);
+    g_slist_free(self->priv->nodes);
+    g_slist_free(self->priv->selected_nodes);
 
     g_string_free(self->priv->filename, TRUE);
     g_slice_free(MotoWorldPriv, self->priv);

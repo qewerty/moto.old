@@ -50,6 +50,7 @@ moto_outliner_init(MotoOutliner *self)
     priv->ls = (GtkListStore *)gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, MOTO_TYPE_NODE);
 
     priv->tv = (GtkTreeView *)gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->ls));
+    gtk_tree_view_set_rules_hint(priv->tv, TRUE);
     g_object_ref_sink(priv->tv);
 
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
