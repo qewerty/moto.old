@@ -66,9 +66,9 @@ gboolean moto_gl_is_supported(const gchar *name)
     return FALSE;
 }
 
-gboolean moto_gl_is_glsl_supported()
+gboolean moto_gl_is_glsl_100_supported()
 {
-    return GLEW_ARB_shader_objects;
+    return GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader && GLEW_ARB_shading_language_100;
 }
 
 gboolean moto_gl_is_vbo_supported()
