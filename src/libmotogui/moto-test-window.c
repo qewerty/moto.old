@@ -69,7 +69,6 @@ struct _MotoTestWindowPriv
 static void
 moto_test_window_dispose(GObject *obj)
 {
-    g_print("moto_test_window_dispose\n");
     MotoTestWindow *self = (MotoTestWindow *)obj;
 
     if(self->priv->disposed)
@@ -84,7 +83,6 @@ moto_test_window_dispose(GObject *obj)
 static void
 moto_test_window_finalize(GObject *obj)
 {
-    g_print("moto_test_window_finalize\n");
     MotoTestWindow *self = (MotoTestWindow *)obj;
     g_slice_free(MotoTestWindowPriv, self->priv);
 
@@ -93,7 +91,6 @@ moto_test_window_finalize(GObject *obj)
 
 static void quit(MotoTestWindow *self)
 {
-    g_print("quit\n");
     gtk_main_quit();
 }
 
@@ -362,7 +359,7 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_scrolled_window_set_policy(sw, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_add_with_viewport(sw, (GtkWidget *)self->priv->param_editor);
     GtkPaned *vp = (GtkPaned *)gtk_vpaned_new();
-    gtk_paned_pack1(vp, (GtkWidget *)sw, FALSE, FALSE);
+    gtk_paned_pack1(vp, (GtkWidget *)sw, TRUE, FALSE);
     gtk_paned_pack2(vp, (GtkWidget *)moto_outliner_new(self->priv->world), FALSE, FALSE);
     gtk_paned_pack2(hp, (GtkWidget *)vp, FALSE, FALSE);
     // gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
