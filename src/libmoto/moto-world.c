@@ -91,7 +91,6 @@ struct _MotoWorldPriv
 static void
 moto_world_dispose(GObject *obj)
 {
-    g_print("moto_world_dispose\n");
     MotoWorld *self = (MotoWorld *)obj;
 
     g_timer_destroy(self->priv->timer);
