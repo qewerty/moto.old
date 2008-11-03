@@ -431,7 +431,7 @@ GValue *moto_node_get_param_value(MotoNode *self, const gchar *name)
     return moto_param_get_value(p);
 }
 
-gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name)
+gboolean moto_node_get_param_boolean(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -442,7 +442,7 @@ gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name)
     return moto_param_get_boolean(p);
 }
 
-gint moto_node_get_param_int(MotoNode *self,        const gchar *name)
+gint moto_node_get_param_int(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -453,7 +453,7 @@ gint moto_node_get_param_int(MotoNode *self,        const gchar *name)
     return moto_param_get_int(p);
 }
 
-guint moto_node_get_param_uint(MotoNode *self,       const gchar *name)
+guint moto_node_get_param_uint(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -464,7 +464,7 @@ guint moto_node_get_param_uint(MotoNode *self,       const gchar *name)
     return moto_param_get_uint(p);
 }
 
-glong moto_node_get_param_long(MotoNode *self,       const gchar *name)
+glong moto_node_get_param_long(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -475,7 +475,7 @@ glong moto_node_get_param_long(MotoNode *self,       const gchar *name)
     return moto_param_get_long(p);
 }
 
-gulong moto_node_get_param_ulong(MotoNode *self,      const gchar *name)
+gulong moto_node_get_param_ulong(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -486,7 +486,7 @@ gulong moto_node_get_param_ulong(MotoNode *self,      const gchar *name)
     return moto_param_get_ulong(p);
 }
 
-gint64  moto_node_get_param_int64(MotoNode *self,      const gchar *name)
+gint64  moto_node_get_param_int64(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -497,7 +497,7 @@ gint64  moto_node_get_param_int64(MotoNode *self,      const gchar *name)
     return moto_param_get_int64(p);
 }
 
-guint64 moto_node_get_param_uint64(MotoNode *self,     const gchar *name)
+guint64 moto_node_get_param_uint64(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -508,7 +508,7 @@ guint64 moto_node_get_param_uint64(MotoNode *self,     const gchar *name)
     return moto_param_get_uint64(p);
 }
 
-gfloat moto_node_get_param_float(MotoNode *self,      const gchar *name)
+gfloat moto_node_get_param_float(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -519,7 +519,7 @@ gfloat moto_node_get_param_float(MotoNode *self,      const gchar *name)
     return moto_param_get_float(p);
 }
 
-gdouble moto_node_get_param_double(MotoNode *self,     const gchar *name)
+gdouble moto_node_get_param_double(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -530,18 +530,18 @@ gdouble moto_node_get_param_double(MotoNode *self,     const gchar *name)
     return moto_param_get_double(p);
 }
 
-gpointer moto_node_get_param_pointer(MotoNode *self,    const gchar *name)
+gpointer moto_node_get_param_pointer(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
         // TODO: print error
-        // return;
+        return NULL;
     }
     return moto_param_get_pointer(p);
 }
 
-gint moto_node_get_param_enum(MotoNode *self,       const gchar *name)
+gint moto_node_get_param_enum(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -552,13 +552,13 @@ gint moto_node_get_param_enum(MotoNode *self,       const gchar *name)
     return moto_param_get_enum(p);
 }
 
-GObject *moto_node_get_param_object(MotoNode *self,     const gchar *name)
+GObject *moto_node_get_param_object(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
         // TODO: print error
-        // return;
+        return NULL;
     }
     return moto_param_get_object(p);
 }
