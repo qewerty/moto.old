@@ -24,6 +24,8 @@
 
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 typedef struct _MotoBitmask MotoBitmask;
 
 struct _MotoBitmask
@@ -55,5 +57,7 @@ gboolean moto_bitmask_is_set_fast(MotoBitmask *self, guint32 index);
 void moto_bitmask_set_fast(MotoBitmask *self, guint32 index);
 void moto_bitmask_unset_fast(MotoBitmask *self, guint32 index);
 void moto_bitmask_toggle_fast(MotoBitmask *self, guint32 index);
+
+G_END_DECLS
 
 #endif /* MOTO_BITMASK_H */

@@ -7,7 +7,7 @@
 #define DWORDS_NUM(bits_num) (((bits_num) >> 5) + 1)
 #define BYTES_NUM(bits_num)  (DWORDS_NUM(bits_num) << 4)
 
-static MotoBitmask*
+inline static MotoBitmask*
 moto_bitmask_new_uninitialized(guint32 bits_num)
 {
     MotoBitmask* self = g_slice_new(MotoBitmask);
@@ -48,6 +48,9 @@ void moto_bitmask_free(MotoBitmask *self)
 MotoBitmask *moto_bitmask_new_copy(MotoBitmask *self)
 {
     MotoBitmask* copy = moto_bitmask_new_uninitialized(self->bits_num);
+    if( ! copy)
+        return NULL;
+
     moto_bitmask_copy(copy, self);
     return copy;
 }
