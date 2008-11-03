@@ -11,14 +11,14 @@ inline static MotoBitmask*
 moto_bitmask_new_uninitialized(guint32 bits_num)
 {
     MotoBitmask* self = g_slice_new(MotoBitmask);
-    if( ! self)
+    if(G_UNLIKELY( ! self))
         return NULL;
 
     self->bits_num = bits_num;
     self->set_num = 0;
 
     self->bits = (guint32*)g_try_malloc(BYTES_NUM(bits_num));
-    if( ! self->bits)
+    if(G_UNLIKELY( ! self->bits))
     {
         g_slice_free(MotoBitmask, self);
         return NULL;
@@ -31,7 +31,7 @@ MotoBitmask*
 moto_bitmask_new(guint32 bits_num)
 {
     MotoBitmask* self = moto_bitmask_new_uninitialized(bits_num);
-    if( ! self)
+    if(G_UNLIKELY( ! self))
         return NULL;
 
     memset(self->bits, 0, BYTES_NUM(bits_num));
@@ -48,7 +48,7 @@ void moto_bitmask_free(MotoBitmask *self)
 MotoBitmask *moto_bitmask_new_copy(MotoBitmask *self)
 {
     MotoBitmask* copy = moto_bitmask_new_uninitialized(self->bits_num);
-    if( ! copy)
+    if(G_UNLIKELY( ! copy))
         return NULL;
 
     moto_bitmask_copy(copy, self);
@@ -62,7 +62,7 @@ void moto_bitmask_copy(MotoBitmask *self, MotoBitmask *other)
 
 gboolean moto_bitmask_is_set(MotoBitmask *self, guint32 index)
 {
-    if(index >= self->bits_num)
+    if(G_UNLIKELY(index >= self->bits_num))
         return FALSE;
 
     return *(self->bits + (index/32)) & (1 << (index % 32));
@@ -70,7 +70,7 @@ gboolean moto_bitmask_is_set(MotoBitmask *self, guint32 index)
 
 void moto_bitmask_set(MotoBitmask *self, guint32 index)
 {
-    if(index >= self->bits_num)
+    if(G_UNLIKELY(index >= self->bits_num))
         return;
 
     if( ! moto_bitmask_is_set_fast(self, index))
@@ -86,7 +86,7 @@ void moto_bitmask_set_all(MotoBitmask *self)
 
 void moto_bitmask_unset(MotoBitmask *self, guint32 index)
 {
-    if(index >= self->bits_num)
+    if(G_UNLIKELY(index >= self->bits_num))
         return;
 
     if(moto_bitmask_is_set_fast(self, index))
