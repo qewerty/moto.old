@@ -4,10 +4,16 @@
 
 /* class Messager */
 
+typedef struct _MotoMessagerPriv MotoMessagerPriv;
+
+#define MOTO_MESSAGER_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_MESSAGER, MotoMessagerPriv)
+
 static GObjectClass *messager_parent_class = NULL;
 
 struct _MotoMessagerPriv
 {
+    gboolean disposed;
+
     guint msg_count;
     guint info_count;
     guint warning_count;
@@ -18,31 +24,35 @@ struct _MotoMessagerPriv
 
 static void info_inc()
 {
-    MotoMessager *msger = moto_messager_singleton();
-    msger->priv->msg_count++;
-    msger->priv->info_count++;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
+    priv->msg_count++;
+    priv->info_count++;
 }
 
 static void warning_inc()
 {
-    MotoMessager *msger = moto_messager_singleton();
-    msger->priv->msg_count++;
-    msger->priv->warning_count++;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
+    priv->msg_count++;
+    priv->warning_count++;
 }
 
 static void error_inc()
 {
-    MotoMessager *msger = moto_messager_singleton();
-    msger->priv->msg_count++;
-    msger->priv->error_count++;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
+    priv->msg_count++;
+    priv->error_count++;
 }
 
 static void
 moto_messager_dispose(GObject *obj)
 {
-    MotoMessager *self = (MotoMessager *)obj;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(obj);
 
-    g_slice_free(MotoMessagerPriv, self->priv);
+    if(priv->disposed)
+        return;
+    priv->disposed = TRUE;
+
+    g_slice_free(MotoMessagerPriv, priv);
 
     messager_parent_class->dispose(obj);
 }
@@ -56,19 +66,21 @@ moto_messager_finalize(GObject *obj)
 static void
 moto_messager_init(MotoMessager *self)
 {
-    self->priv = g_slice_new(MotoMessagerPriv);
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
 
-    self->priv->msg_count       = 0;
-    self->priv->info_count      = 0;
-    self->priv->warning_count   = 0;
-    self->priv->error_count     = 0;
+    priv->msg_count       = 0;
+    priv->info_count      = 0;
+    priv->warning_count   = 0;
+    priv->error_count     = 0;
 
-    self->priv->print_messages = TRUE;
+    priv->print_messages = TRUE;
 }
 
 static void
 moto_messager_class_init(MotoMessagerClass *klass)
 {
+    g_type_class_add_private(klass, sizeof(MotoMessagerPriv));
+
     GObjectClass *goclass = (GObjectClass *)klass;
 
     messager_parent_class = g_type_class_peek_parent(klass);
@@ -128,18 +140,21 @@ MotoMessager *moto_messager_singleton()
 void moto_messager_set_print_messages(gboolean status)
 {
     MotoMessager *self = moto_messager_singleton();
-    self->priv->print_messages = status;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
+    priv->print_messages = status;
 }
 
 gboolean moto_messager_get_print_messages()
 {
     MotoMessager *self = moto_messager_singleton();
-    return self->priv->print_messages;
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
+    return priv->print_messages;
 }
 
 void moto_info(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
     info_inc();
 
     va_list ap;
@@ -148,7 +163,7 @@ void moto_info(const gchar *format, ...)
     g_string_vprintf(msg, format, ap);
     va_end(ap);
 
-    if(self->priv->print_messages)
+    if(priv->print_messages)
         g_print("[Info] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
@@ -160,6 +175,7 @@ void moto_info(const gchar *format, ...)
 void moto_warning(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
     warning_inc();
 
     va_list ap;
@@ -168,7 +184,7 @@ void moto_warning(const gchar *format, ...)
     g_string_vprintf(msg, format, ap);
     va_end(ap);
 
-    if(self->priv->print_messages)
+    if(priv->print_messages)
         g_print("[Warning] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
@@ -180,6 +196,7 @@ void moto_warning(const gchar *format, ...)
 void moto_error(const gchar *format, ...)
 {
     MotoMessager *self = moto_messager_singleton();
+    MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(self);
     error_inc();
 
     va_list ap;
@@ -188,7 +205,7 @@ void moto_error(const gchar *format, ...)
     g_string_vprintf(msg, format, ap);
     va_end(ap);
 
-    if(self->priv->print_messages)
+    if(priv->print_messages)
         g_print("[Error] %s\n", msg->str);
 
     MotoMessagerClass *klass = MOTO_MESSAGER_GET_CLASS(self);
