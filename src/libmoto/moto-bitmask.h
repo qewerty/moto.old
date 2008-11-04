@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_BITMASK_H
-#define MOTO_BITMASK_H
+#ifndef __MOTO_BITMASK_H__
+#define __MOTO_BITMASK_H__
 
 #include <glib.h>
 
@@ -65,4 +65,4 @@ guint16* moto_bitmask_create_array_16(MotoBitmask* self);
 
 G_END_DECLS
 
-#endif /* MOTO_BITMASK_H */
+#endif /* __MOTO_BITMASK_H__ */

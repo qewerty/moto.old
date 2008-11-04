@@ -63,14 +63,14 @@ void moto_bitmask_copy(MotoBitmask *self, MotoBitmask *other)
 
 void moto_bitmask_copy_smth(MotoBitmask *self, MotoBitmask *other)
 {
-    if(self->bits_num == other->bits_num)
+    if(G_UNLIKELY(self->bits_num == other->bits_num))
     {
         moto_bitmask_copy(self, other);
     }
     else
     {
-        guint min_bits_num = min(self->bits_num, other->bits_num);
-        guint full_bytes_num = BYTES_NUM(min_bits_num) - 4;
+        guint min_bits_num   = min(self->bits_num, other->bits_num);
+        guint full_bytes_num = BYTES_NUM(min_bits_num) - sizeof(guint32);
         guint full_bits_num  = full_bytes_num << 3;
 
         memcpy(self->bits, other->bits, full_bytes_num);
