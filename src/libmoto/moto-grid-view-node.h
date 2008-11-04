@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_GRID_VIEW_NODE_H
-#define MOTO_GRID_VIEW_NODE_H
+#ifndef __MOTO_GRID_VIEW_NODE_H__
+#define __MOTO_GRID_VIEW_NODE_H__
 
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoGridViewNode MotoGridViewNode;
 typedef struct _MotoGridViewNodeClass MotoGridViewNodeClass;
@@ -53,4 +55,6 @@ GType moto_grid_view_node_get_type(void);
 
 MotoGridViewNode *moto_grid_view_node_new(const gchar *name);
 
-#endif /* MOTO_GRID_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_GRID_VIEW_NODE_H__ */

@@ -19,6 +19,9 @@
 #
 ################################################################################## */
 
+#ifndef __MOTO_H__
+#define __MOTO_H__
+
 #include "moto-forward.h"
 #include "moto-system.h"
 #include "moto-world.h"
@@ -27,3 +30,5 @@
 #include "moto-camera-node.h"
 #include "moto-geometry-view-node.h"
 #include "moto-mesh-view-node.h"
+
+#endif /* __MOTO_H__ */

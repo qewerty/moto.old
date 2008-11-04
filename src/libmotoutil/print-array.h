@@ -19,10 +19,14 @@
 *
 */
 
-#ifndef MOTO_PRINT_ARRAY_H
-#define MOTO_PRINT_ARRAY_H
+#ifndef __MOTO_PRINT_ARRAY_H__
+#define __MOTO_PRINT_ARRAY_H__
 
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void print_matrix44(float m[16])
 {
@@ -42,4 +46,8 @@ void print_vector3(float v[3])
     printf("(%f %f %f)\n", v[0], v[1], v[2]);
 }
 
-#endif /* MOTO_PRINT_ARRAY_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __MOTO_PRINT_ARRAY_H__ */

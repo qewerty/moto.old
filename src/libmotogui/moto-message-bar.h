@@ -21,12 +21,14 @@
 
 /* WARNING! Simple message_bar only for testing. */
 
-#ifndef MOTO_MESSAGE_BAR_H
-#define MOTO_MESSAGE_BAR_H
+#ifndef __MOTO_MESSAGE_BAR_H__
+#define __MOTO_MESSAGE_BAR_H__
 
 #include <gtk/gtk.h>
 
 #include "libmoto/moto-messager.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMessageBar MotoMessageBar;
 typedef struct _MotoMessageBarClass MotoMessageBarClass;
@@ -57,6 +59,8 @@ GType moto_message_bar_get_type(void);
 
 GtkWidget *moto_message_bar_new(MotoMessager *messager);
 
-#endif /* MOTO_MESSAGE_BAR_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESSAGE_BAR_H__ */
 
 

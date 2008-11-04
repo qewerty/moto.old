@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_PLANE_NODE_H
-#define MOTO_PLANE_NODE_H
+#ifndef __MOTO_PLANE_NODE_H__
+#define __MOTO_PLANE_NODE_H__
 
 #include "moto-geometry-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoPlaneNode MotoPlaneNode;
 typedef struct _MotoPlaneNodeClass MotoPlaneNodeClass;
@@ -60,4 +62,6 @@ GType moto_plane_node_get_type(void);
 
 MotoPlaneNode *moto_plane_node_new(const gchar *name);
 
-#endif /* MOTO_PLANE_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_PLANE_NODE_H__ */

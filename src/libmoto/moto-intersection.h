@@ -19,8 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef _MOTO_INTERSECTION_H_
-#define _MOTO_INTERSECTION_H_
+#ifndef __MOTO_INTERSECTION_H__
+#define __MOTO_INTERSECTION_H__
+
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 #define MOTO_INTERSECTION_MAX_HITS 8
 
@@ -44,4 +48,6 @@ struct _MotoIntersection
 void moto_intersection_reset(MotoIntersection *self);
 void moto_intersection_copy(MotoIntersection *self, MotoIntersection *other);
 
-#endif /* _MOTO_INTERSECTION_H_ */
+G_END_DECLS
+
+#endif /* __MOTO_INTERSECTION_H__ */

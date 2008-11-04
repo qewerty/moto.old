@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_IMAGE_H
-#define MOTO_IMAGE_H
+#ifndef __MOTO_IMAGE_H__
+#define __MOTO_IMAGE_H__
 
 #include "glib-object.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoImage MotoImage;
 typedef struct _MotoImageClass MotoImageClass;
@@ -97,6 +99,8 @@ MotoImage *moto_image_new(MotoImagePrecision precision,
 MotoImageArbitraryChannel *moto_image_get_channel(MotoImage *self, const gchar *name);
 void moto_image_add_channel(MotoImage *self, const gchar *name, gsize size);
 
-#endif /* MOTO_IMAGE_H */
+G_END_DECLS
+
+#endif /* __MOTO_IMAGE_H__ */
 
 

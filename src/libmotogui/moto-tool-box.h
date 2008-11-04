@@ -19,12 +19,14 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_TOOL_BOX_H
-#define MOTO_TOOL_BOX_H
+#ifndef __MOTO_TOOL_BOX_H__
+#define __MOTO_TOOL_BOX_H__
 
 #include <gtk/gtk.h>
 
 #include "libmoto/moto-forward.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoToolBox MotoToolBox;
 typedef struct _MotoToolBoxClass MotoToolBoxClass;
@@ -56,4 +58,6 @@ GType moto_tool_box_get_type(void);
 GtkWidget *moto_tool_box_new(MotoSystem *system);
 void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system);
 
-#endif /* MOTO_TOOL_BOX_H */
+G_END_DECLS
+
+#endif /* __MOTO_TOOL_BOX_H__ */

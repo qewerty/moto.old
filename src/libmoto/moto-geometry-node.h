@@ -19,11 +19,13 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_GEOMETRY_NODE_H
-#define MOTO_GEOMETRY_NODE_H
+#ifndef __MOTO_GEOMETRY_NODE_H__
+#define __MOTO_GEOMETRY_NODE_H__
 
 #include "moto-node.h"
 #include "moto-bound.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoGeometryNode MotoGeometryNode;
 typedef struct _MotoGeometryNodeClass MotoGeometryNodeClass;
@@ -55,4 +57,6 @@ GType moto_geometry_node_get_type(void);
 
 MotoBound *moto_geometry_node_get_bound(MotoGeometryNode *self);
 
-#endif /* MOTO_GEOMETRY_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_GEOMETRY_NODE_H__ */

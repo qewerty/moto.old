@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_CAMERA_NODE_H
-#define MOTO_CAMERA_NODE_H
+#ifndef __MOTO_CAMERA_NODE_H__
+#define __MOTO_CAMERA_NODE_H__
 
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoCameraNode MotoCameraNode;
 typedef struct _MotoCameraNodeClass MotoCameraNodeClass;
@@ -54,4 +56,6 @@ GType moto_camera_node_get_type(void);
 MotoCameraNode *moto_camera_node_new(const gchar *name);
 void moto_camera_node_apply(MotoCameraNode *self, gint width, gint height);
 
-#endif /* MOTO_CAMERA_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_CAMERA_NODE_H__ */

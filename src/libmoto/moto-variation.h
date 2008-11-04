@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_VARIATION_H
-#define MOTO_VARIATION_H
+#ifndef __MOTO_VARIATION_H__
+#define __MOTO_VARIATION_H__
 
 #include "moto-forward.h"
 #include "moto-node.h"
@@ -58,4 +58,4 @@ void moto_variation_restore_param(MotoVariation *self, MotoParam *p);
 
 G_END_DECLS
 
-#endif /* MOTO_VARIATION_H */
+#endif /* __MOTO_VARIATION_H__ */

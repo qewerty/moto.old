@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_SLER_MATERIAL_NODE_H
-#define MOTO_SLER_MATERIAL_NODE_H
+#ifndef __MOTO_SLER_MATERIAL_NODE_H__
+#define __MOTO_SLER_MATERIAL_NODE_H__
 
 #include "moto-material-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoSlerMaterialNode MotoSlerMaterialNode;
 typedef struct _MotoSlerMaterialNodeClass MotoSlerMaterialNodeClass;
@@ -57,4 +59,6 @@ GType moto_sler_material_node_get_type(void);
 /* Enables the sler_material in OpenGL viewport. */
 MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name);
 
-#endif /* MOTO_SLER_MATERIAL_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_SLER_MATERIAL_NODE_H__ */

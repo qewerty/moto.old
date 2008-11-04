@@ -19,11 +19,13 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MESH_VIEW_NODE_H
-#define MOTO_MESH_VIEW_NODE_H
+#ifndef __MOTO_MESH_VIEW_NODE_H__
+#define __MOTO_MESH_VIEW_NODE_H__
 
 #include "moto-mesh.h"
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMeshViewNode MotoMeshViewNode;
 typedef struct _MotoMeshViewNodeClass MotoMeshViewNodeClass;
@@ -54,4 +56,6 @@ MotoMeshViewNode *moto_mesh_view_node_new();
 MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self);
 MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self);
 
-#endif /* MOTO_MESH_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESH_VIEW_NODE_H__ */

@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_WOBJ_MESH_LOADER_H
-#define MOTO_WOBJ_MESH_LOADER_H
+#ifndef __MOTO_WOBJ_MESH_LOADER_H__
+#define __MOTO_WOBJ_MESH_LOADER_H__
 
 #include "moto-mesh-loader.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoWobjMeshLoader MotoWobjMeshLoader;
 typedef struct _MotoWobjMeshLoaderClass MotoWobjMeshLoaderClass;
@@ -57,4 +59,6 @@ GType moto_wobj_mesh_loader_get_type(void);
 
 MotoMeshLoader *moto_wobj_mesh_loader_new();
 
-#endif /* MOTO_WOBJ_MESH_LOADER_H */
+G_END_DECLS
+
+#endif /* __MOTO_WOBJ_MESH_LOADER_H__ */

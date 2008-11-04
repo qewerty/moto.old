@@ -21,13 +21,15 @@
 
 /* WARNING! Simple param_editor only for testing. */
 
-#ifndef MOTO_PARAM_EDITOR_H
-#define MOTO_PARAM_EDITOR_H
+#ifndef __MOTO_PARAM_EDITOR_H__
+#define __MOTO_PARAM_EDITOR_H__
 
 #include <gtk/gtk.h>
 
 #include "libmoto/moto-world.h"
 #include "moto-test-window.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoParamEditor MotoParamEditor;
 typedef struct _MotoParamEditorClass MotoParamEditorClass;
@@ -60,6 +62,8 @@ GtkWidget *moto_param_editor_new(MotoTestWindow *window);
 
 void moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
 
-#endif /* MOTO_PARAM_EDITOR_H */
+G_END_DECLS
+
+#endif /* __MOTO_PARAM_EDITOR_H__ */
 
 

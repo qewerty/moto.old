@@ -19,7 +19,12 @@
 #
 ################################################################################## */
 
+#ifndef __MOTO_ENUMS__
+#define __MOTO_ENUMS__
+
 #include <glib-object.h>
+
+G_BEGIN_DECLS
 
 typedef enum _MotoAxis
 {
@@ -29,4 +34,9 @@ typedef enum _MotoAxis
 } MotoAxis;
 
 GType moto_axis_get_type(void);
+
 #define MOTO_TYPE_AXIS (moto_axis_get_type())
+
+G_END_DECLS
+
+#endif /* __MOTO_ENUMS__ */

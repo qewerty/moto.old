@@ -19,13 +19,15 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_BOUND_H
-#define MOTO_BOUND_H
+#ifndef __MOTO_BOUND_H__
+#define __MOTO_BOUND_H__
 
 #include "glib-object.h"
 
 #include "moto-ray.h"
 #include "moto-intersection.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoBound MotoBound;
 typedef struct _MotoBoundClass MotoBoundClass;
@@ -69,4 +71,6 @@ gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
 gboolean moto_bound_is_valid(MotoBound *self);
 void moto_bound_draw(MotoBound *self);
 
-#endif /* MOTO_BOUND_H */
+G_END_DECLS
+
+#endif /* __MOTO_BOUND_H__ */

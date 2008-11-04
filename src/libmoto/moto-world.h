@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef _MOTO_WORLD_H_
-#define _MOTO_WORLD_H_
+#ifndef __MOTO_WORLD_H__
+#define __MOTO_WORLD_H__
 
 #include <glib-object.h>
 
@@ -64,7 +64,7 @@ struct _MotoWorldClass
     guint updated_signal_id;
 };
 
-GType moto_world_get_type(void) G_GNUC_CONST;
+GType moto_world_get_type(void);
 
 #define MOTO_TYPE_WORLD (moto_world_get_type())
 #define MOTO_WORLD(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_WORLD, MotoWorld))
@@ -297,7 +297,7 @@ struct _MotoWorldManipulatorClass
     guint motion_notify_signal_id;
 };
 
-GType moto_world_manipualtor_get_type(void) G_GNUC_CONST;
+GType moto_world_manipualtor_get_type(void);
 
 #define MOTO_TYPE_WORLD_MANIPULATOR (moto_world_manipulator_get_type())
 #define MOTO_WORLD_MANIPULATOR(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_WORLD_MANIPULATOR, MotoWorldManipulator))
@@ -318,4 +318,4 @@ void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld 
 
 G_END_DECLS
 
-#endif /* _MOTO_WORLD_H_ */
+#endif /* __MOTO_WORLD_H__ */

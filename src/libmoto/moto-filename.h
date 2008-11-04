@@ -19,17 +19,17 @@
 #
 ################################################################################## */
 
-#ifndef _MOTO_FILENAME_H_
-#define _MOTO_FILENAME_H_
+#ifndef __MOTO_FILENAME_H__
+#define __MOTO_FILENAME_H__
 
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
-GType moto_filename_get_type(void) G_GNUC_CONST;
+GType moto_filename_get_type(void);
 
 #define MOTO_TYPE_FILENAME (moto_filename_get_type())
 
 G_END_DECLS
 
-#endif /* _MOTO_FILENAME_H_ */
+#endif /* __MOTO_FILENAME_H__ */

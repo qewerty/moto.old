@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_OBJECT_NODE_H
-#define MOTO_OBJECT_NODE_H
+#ifndef __MOTO_OBJECT_NODE_H__
+#define __MOTO_OBJECT_NODE_H__
 
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -30,6 +30,8 @@
 #include "moto-node.h"
 #include "moto-bound.h"
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoObjectNodePriv MotoObjectNodePriv;
 
@@ -121,5 +123,7 @@ gboolean moto_object_node_button_release(MotoObjectNode *self,
 gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height);
 
-#endif /* MOTO_OBJECT_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_OBJECT_NODE_H__ */
 

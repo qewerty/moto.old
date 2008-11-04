@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MAIN_MENU_H
-#define MOTO_MAIN_MENU_H
+#ifndef __MOTO_MAIN_MENU_H__
+#define __MOTO_MAIN_MENU_H__
 
 #include <gtk/gtk.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMainMenu MotoMainMenu;
 typedef struct _MotoMainMenuClass MotoMainMenuClass;
@@ -53,4 +55,6 @@ GType moto_main_menu_get_type(void);
 
 GtkWidget *moto_main_menu_new();
 
-#endif /* MOTO_MAIN_MENU_H */
+G_END_DECLS
+
+#endif /* __MOTO_MAIN_MENU_H__ */

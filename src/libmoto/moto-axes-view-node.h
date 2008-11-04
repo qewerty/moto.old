@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_AXES_VIEW_NODE_H
-#define MOTO_AXES_VIEW_NODE_H
+#ifndef __MOTO_AXES_VIEW_NODE_H__
+#define __MOTO_AXES_VIEW_NODE_H__
 
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoAxesViewNode MotoAxesViewNode;
 typedef struct _MotoAxesViewNodeClass MotoAxesViewNodeClass;
@@ -53,4 +55,6 @@ GType moto_axes_view_node_get_type(void);
 
 MotoAxesViewNode *moto_axes_view_node_new(const gchar *name);
 
-#endif /* MOTO_AXES_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_AXES_VIEW_NODE_H__ */

@@ -19,10 +19,13 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_TRANSFORM_INFO_H
-#define MOTO_TRANSFORM_INFO_H
+#ifndef __MOTO_TRANSFORM_INFO_H__
+#define __MOTO_TRANSFORM_INFO_H__
 
+#include <glib.h>
 #include <GL/glew.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoTransformInfo MotoTransformInfo;
 
@@ -38,4 +41,6 @@ void moto_transform_info_set_model(MotoTransformInfo *self, GLdouble model[16]);
 void moto_transform_info_set_proj(MotoTransformInfo *self, GLdouble proj[16]);
 void moto_transform_info_set_view(MotoTransformInfo *self, GLint view[4]);
 
-#endif /* MOTO_TRANSFORM_INFO_H */
+G_END_DECLS
+
+#endif /* __MOTO_TRANSFORM_INFO_H__ */

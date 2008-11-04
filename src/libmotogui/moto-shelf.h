@@ -21,12 +21,14 @@
 
 /* WARNING! Simple shelf only for testing. */
 
-#ifndef MOTO_SHELF_H
-#define MOTO_SHELF_H
+#ifndef __MOTO_SHELF_H__
+#define __MOTO_SHELF_H__
 
 #include <gtk/gtk.h>
 
 #include "libmoto/moto-system.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoShelf MotoShelf;
 typedef struct _MotoShelfClass MotoShelfClass;
@@ -62,5 +64,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window);
 void moto_shelf_add_tab(MotoShelf *self, const gchar *name);
 void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *name, MotoShelfFunc func);
 
-#endif /* MOTO_SHELF_H */
+G_END_DECLS
+
+#endif /* __MOTO_SHELF_H__ */
 

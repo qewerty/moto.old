@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MATERIAL_NODE_H
-#define MOTO_MATERIAL_NODE_H
+#ifndef __MOTO_MATERIAL_NODE_H__
+#define __MOTO_MATERIAL_NODE_H__
 
 #include "moto-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMaterialNode MotoMaterialNode;
 typedef struct _MotoMaterialNodeClass MotoMaterialNodeClass;
@@ -58,4 +60,6 @@ GType moto_material_node_get_type(void);
 /* Enables the material in OpenGL viewport. */
 void moto_material_node_use(MotoMaterialNode *self);
 
-#endif /* MOTO_MATERIAL_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_MATERIAL_NODE_H__ */

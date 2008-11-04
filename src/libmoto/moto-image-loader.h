@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_IMAGE_LOADER_H
-#define MOTO_IMAGE_LOADER_H
+#ifndef __MOTO_IMAGE_LOADER_H__
+#define __MOTO_IMAGE_LOADER_H__
 
 #include "moto-image.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoImageLoader MotoImageLoader;
 typedef struct _MotoImageLoaderClass MotoImageLoaderClass;
@@ -57,5 +59,7 @@ GType moto_image_loader_get_type(void);
 
 MotoImage *moto_image_loader_load(MotoImageLoader *self, const gchar *filename);
 
-#endif /* MOTO_IMAGE_LOADER_H */
+G_END_DECLS
+
+#endif /* __MOTO_IMAGE_LOADER_H__ */
 

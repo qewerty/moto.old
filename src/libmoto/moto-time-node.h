@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_TIME_NODE_H
-#define MOTO_TIME_NODE_H
+#ifndef __MOTO_TIME_NODE_H__
+#define __MOTO_TIME_NODE_H__
 
 #include "moto-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoTimeNode MotoTimeNode;
 typedef struct _MotoTimeNodeClass MotoTimeNodeClass;
@@ -53,4 +55,6 @@ GType moto_time_node_get_type(void);
 
 MotoTimeNode *moto_time_node_new(const gchar *name);
 
-#endif /* MOTO_TIME_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_TIME_NODE_H__ */

@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_POINT_CLOUD_H
-#define MOTO_POINT_CLOUD_H
+#ifndef __MOTO_POINT_CLOUD_H__
+#define __MOTO_POINT_CLOUD_H__
 
 #include <glib-object.h>
 
@@ -41,15 +41,15 @@ struct _MotoPointCloudIface
     MotoPointCloudForeachPointMethod foreach_point;
 };
 
+GType moto_point_cloud_get_type(void);
+
 #define MOTO_TYPE_POINT_CLOUD           (moto_point_cloud_get_type())
 #define MOTO_POINT_CLOUD(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_POINT_CLOUD, MotoPointCloud))
 #define MOTO_IS_POINT_CLOUD(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MOTO_TYPE_POINT_CLOUD))
 #define MOTO_POINT_CLOUD_GET_INTERFACE(inst)   (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MOTO_TYPE_POINT_CLOUD, MotoPointCloudIface))
 
-GType moto_point_cloud_get_type(void) G_GNUC_CONST;
-
 void moto_point_cloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachPointFunc func, gpointer user_data);
 
 G_END_DECLS
 
-#endif /* MOTO_POINT_CLOUD_H */
+#endif /* __MOTO_POINT_CLOUD_H__ */

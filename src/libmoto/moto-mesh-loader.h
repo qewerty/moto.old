@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MESH_LOADER_H
-#define MOTO_MESH_LOADER_H
+#ifndef __MOTO_MESH_LOADER_H__
+#define __MOTO_MESH_LOADER_H__
 
 #include "moto-mesh.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMeshLoader MotoMeshLoader;
 typedef struct _MotoMeshLoaderClass MotoMeshLoaderClass;
@@ -61,4 +63,6 @@ GSList *moto_mesh_loader_get_extentions(MotoMeshLoader *self);
 gboolean moto_mesh_loader_can(MotoMeshLoader *self, const gchar *filename);
 MotoMesh *moto_mesh_loader_load(MotoMeshLoader *self, const gchar *filename);
 
-#endif /* MOTO_MESH_LOADER_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESH_LOADER_H__ */

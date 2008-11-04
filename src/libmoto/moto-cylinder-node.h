@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_CYLINDER_NODE_H
-#define MOTO_CYLINDER_NODE_H
+#ifndef __MOTO_CYLINDER_NODE_H__
+#define __MOTO_CYLINDER_NODE_H__
 
 #include "moto-geometry-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoCylinderNode MotoCylinderNode;
 typedef struct _MotoCylinderNodeClass MotoCylinderNodeClass;
@@ -53,5 +55,7 @@ GType moto_cylinder_node_get_type(void);
 
 MotoCylinderNode *moto_cylinder_node_new(const gchar *name);
 
-#endif /* MOTO_CYLINDER_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_CYLINDER_NODE_H__ */
 

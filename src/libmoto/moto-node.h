@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_NODE_H
-#define MOTO_NODE_H
+#ifndef __MOTO_NODE_H__
+#define __MOTO_NODE_H__
 
 #include <glib-object.h>
 
@@ -611,4 +611,4 @@ gboolean moto_param_is_animated(MotoParam *self);
 
 G_END_DECLS
 
-#endif /* MOTO_NODE_H */
+#endif /* __MOTO_NODE_H__ */

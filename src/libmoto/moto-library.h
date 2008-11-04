@@ -19,12 +19,14 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_LIBRARY_H
-#define MOTO_LIBRARY_H
+#ifndef __MOTO_LIBRARY_H__
+#define __MOTO_LIBRARY_H__
 
 #include <glib-object.h>
 
 #include "moto-forward.h"
+
+G_BEGIN_DECLS
 
 /* class MotoLibrary */
 
@@ -68,4 +70,6 @@ gpointer moto_library_get_entry(MotoLibrary *self,
 void moto_library_foreach(MotoLibrary *self, const gchar *slot_name,
         MotoLibraryForeachFunc func, gpointer user_data);
 
-#endif /* MOTO_LIBRARY_H */
+G_END_DECLS
+
+#endif /* __MOTO_LIBRARY_H__ */

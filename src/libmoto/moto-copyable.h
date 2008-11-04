@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_COPYABLE_H
-#define MOTO_COPYABLE_H
+#ifndef __MOTO_COPYABLE_H__
+#define __MOTO_COPYABLE_H__
 
 #include <glib-object.h>
 
@@ -43,11 +43,11 @@ struct _MotoCopyableIface
 #define MOTO_IS_COPYABLE(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MOTO_TYPE_COPYABLE))
 #define MOTO_COPYABLE_GET_INTERFACE(inst)   (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MOTO_TYPE_COPYABLE, MotoCopyableIface))
 
-GType moto_copyable_get_type(void) G_GNUC_CONST;
+GType moto_copyable_get_type(void);
 
 MotoCopyable *moto_copyable_copy(MotoCopyable *self);
 
 G_END_DECLS
 
-#endif /* MOTO_COPYABLE_H */
+#endif /* __MOTO_COPYABLE_H__ */
 

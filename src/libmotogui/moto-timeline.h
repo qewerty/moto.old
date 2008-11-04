@@ -21,12 +21,14 @@
 
 /* WARNING! Simple timeline only for testing. */
 
-#ifndef MOTO_TIMELINE_H
-#define MOTO_TIMELINE_H
+#ifndef __MOTO_TIMELINE_H__
+#define __MOTO_TIMELINE_H__
 
 #include <gtk/gtk.h>
 
 #include "libmoto/moto-world.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoTimeline MotoTimeline;
 typedef struct _MotoTimelineClass MotoTimelineClass;
@@ -57,6 +59,8 @@ GType moto_timeline_get_type(void);
 
 GtkWidget *moto_timeline_new(MotoWorld *world);
 
-#endif /* MOTO_TIMELINE_H */
+G_END_DECLS
+
+#endif /* __MOTO_TIMELINE_H__ */
 
 

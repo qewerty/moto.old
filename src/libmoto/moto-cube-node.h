@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_CUBE_NODE_H
-#define MOTO_CUBE_NODE_H
+#ifndef __MOTO_CUBE_NODE_H__
+#define __MOTO_CUBE_NODE_H__
 
 #include "moto-geometry-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoCubeNode MotoCubeNode;
 typedef struct _MotoCubeNodeClass MotoCubeNodeClass;
@@ -50,4 +52,6 @@ GType moto_cube_node_get_type(void);
 
 MotoCubeNode *moto_cube_node_new(const gchar *name);
 
-#endif /* MOTO_CUBE_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_CUBE_NODE_H__ */

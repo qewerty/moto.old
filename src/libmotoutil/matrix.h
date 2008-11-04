@@ -19,8 +19,8 @@
 *
 */
 
-#ifndef QEWERTY_XFORM_MACROS_H
-#define QEWERTY_XFORM_MACROS_H
+#ifndef __QEWERTY_XFORM_MACROS_H__
+#define __QEWERTY_XFORM_MACROS_H__
 
 #include <math.h>
 
@@ -1018,5 +1018,5 @@ Examples:
     (m)[2] = (n)[0]; (m)[6] = (n)[1]; (m)[10] = (n)[2]; (m)[14] = -vector3_dot(eye, n);\
     (m)[3] = 0;      (m)[7] = 0;      (m)[11] = 0;      (m)[15] = 1
 
-#endif /* QEWERTY_XFORM_MACROS_H */
+#endif /* __QEWERTY_XFORM_MACROS_H__ */
 

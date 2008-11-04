@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MESSAGER_H
-#define MOTO_MESSAGER_H
+#ifndef __MOTO_MESSAGER_H__
+#define __MOTO_MESSAGER_H__
 
 #include <glib-object.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMessager MotoMessager;
 typedef struct _MotoMessagerClass MotoMessagerClass;
@@ -61,4 +63,6 @@ void moto_info(const gchar *format, ...)  G_GNUC_PRINTF(1, 2);
 void moto_warning(const gchar *format, ...)  G_GNUC_PRINTF(1, 2);
 void moto_error(const gchar *format, ...)  G_GNUC_PRINTF(1, 2);
 
-#endif /* MOTO_MESSAGER_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESSAGER_H__ */

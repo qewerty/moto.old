@@ -1,5 +1,5 @@
-#ifndef NUM_DEF_H
-#define NUM_DEF_H
+#ifndef __NUM_DEF_H__
+#define __NUM_DEF_H__
 
 #define PI              3.1415926535897932384626433832795028841971693993751
 #define PI2             6.2831853071795862
@@ -17,4 +17,4 @@
 #define min(a, b)       ((a)<(b)?(a):(b))
 #define max(a, b)       ((a)>(b)?(a):(b))
 
-#endif /* NUM_DEF_H */
+#endif /* __NUM_DEF_H__ */

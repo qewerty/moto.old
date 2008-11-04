@@ -19,12 +19,15 @@
 #
 ################################################################################## */
 
-#ifndef _MOTO_RAY_H_
-#define _MOTO_RAY_H_
+#ifndef __MOTO_RAY_H__
+#define __MOTO_RAY_H__
 
 #include <math.h>
+#include <glib.h>
 
 #include "moto-intersection.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoRay MotoRay;
 
@@ -163,4 +166,6 @@ int moto_ray_intersect_cone_dist(MotoRay *self,
         float *dist, float a[3], float b[3],
         float a_radius, float b_radius);
 
-#endif /* _MOTO_RAY_H_ */
+G_END_DECLS
+
+#endif /* __MOTO_RAY_H__ */

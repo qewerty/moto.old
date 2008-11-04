@@ -19,12 +19,14 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_SYSTEM_H
-#define MOTO_SYSTEM_H
+#ifndef __MOTO_SYSTEM_H__
+#define __MOTO_SYSTEM_H__
 
 #include <glib-object.h>
 
 #include "moto-forward.h"
+
+G_BEGIN_DECLS
 
 /* class MotoSystem */
 
@@ -60,5 +62,7 @@ void moto_system_set_world_current(MotoSystem *self, MotoWorld *world);
 
 MotoLibrary *moto_system_get_library(MotoSystem *self);
 
-#endif /* MOTO_SYSTEM_H */
+G_END_DECLS
+
+#endif /* __MOTO_SYSTEM_H__ */
 

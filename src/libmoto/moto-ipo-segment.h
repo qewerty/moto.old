@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_IPO_SEGMENT_H
-#define MOTO_IPO_SEGMENT_H
+#ifndef __MOTO_IPO_SEGMENT_H__
+#define __MOTO_IPO_SEGMENT_H__
 
 #include "moto-mesh.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoIpoFunction MotoIpoFunction;
 typedef struct _MotoIpoSegment MotoIpoSegment;
@@ -78,4 +80,6 @@ gfloat moto_ipo_segment_get_value(MotoIpoSegment *self, gfloat arg);
 void moto_ipo_segment_set_function(MotoIpoSegment *self, const gchar *func_name);
 gchar *moto_ipo_segment_get_function_name(MotoIpoSegment *self);
 
-#endif /* MOTO_IPO_SEGMENT_H */
+G_END_DECLS
+
+#endif /* __MOTO_IPO_SEGMENT_H__ */

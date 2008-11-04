@@ -19,11 +19,13 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_RAY_VIEW_NODE_H
-#define MOTO_RAY_VIEW_NODE_H
+#ifndef __MOTO_RAY_VIEW_NODE_H__
+#define __MOTO_RAY_VIEW_NODE_H__
 
 #include "moto-ray.h"
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoRayViewNode MotoRayViewNode;
 typedef struct _MotoRayViewNodeClass MotoRayViewNodeClass;
@@ -57,4 +59,6 @@ MotoRayViewNode *moto_ray_view_node_new();
 MotoRay *moto_ray_view_node_get_ray(MotoRayViewNode *self);
 void moto_ray_view_node_set_ray(MotoRayViewNode *self, MotoRay *ray);
 
-#endif /* MOTO_RAY_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_RAY_VIEW_NODE_H__ */

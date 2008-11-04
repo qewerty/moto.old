@@ -21,7 +21,20 @@
 
 /* Drawing simple primitives with OpenGL. */
 
+#ifndef __MOTO_DRAW_H__
+#define __MOTO_DRAW_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 inline void moto_draw_circle(float radius);
 inline void moto_draw_arc(float radius, float start_angle, float end_angle);
 
 inline void moto_draw_bezier_segment();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __MOTO_DRAW_H__ */

@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_EDGE_LIST_H
-#define MOTO_EDGE_LIST_H
+#ifndef __MOTO_EDGE_LIST_H__
+#define __MOTO_EDGE_LIST_H__
 
 #include <glib.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoEdgeList MotoEdgeList;
 typedef struct _MotoEdgeList16 MotoEdgeList16;
@@ -51,4 +53,6 @@ guint16 moto_edge_list16_find_edge_and_remove(MotoEdgeList16 **head,
 guint16 moto_edge_list16_find_and_remove(MotoEdgeList16 **head, guint16 ei);
 void moto_edge_list16_remove_all(MotoEdgeList16 *el);
 
-#endif /* MOTO_EDGE_LIST_H */
+G_END_DECLS
+
+#endif /* __MOTO_EDGE_LIST_H__ */

@@ -20,10 +20,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_NURBS_VIEW_NODE_H
-#define MOTO_NURBS_VIEW_NODE_H
+#ifndef __MOTO_NURBS_VIEW_NODE_H__
+#define __MOTO_NURBS_VIEW_NODE_H__
 
 #include "moto-geometry-view-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoNurbsViewNode MotoNurbsViewNode;
 typedef struct _MotoNurbsViewNodeClass MotoNurbsViewNodeClass;
@@ -54,4 +56,6 @@ GType moto_nurbs_view_node_storage_get_type(void);
 
 MotoNurbsViewNode *moto_nurbs_view_node_new();
 
-#endif /* MOTO_NURBS_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_NURBS_VIEW_NODE_H__ */

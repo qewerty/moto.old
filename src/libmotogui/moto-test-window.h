@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_TEST_WINDOW_H
-#define MOTO_TEST_WINDOW_H
+#ifndef __MOTO_TEST_WINDOW_H__
+#define __MOTO_TEST_WINDOW_H__
 
 #include <gtk/gtk.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoTestWindow MotoTestWindow;
 typedef struct _MotoTestWindowClass MotoTestWindowClass;
@@ -56,4 +58,6 @@ GtkWindow *moto_test_window_new();
 void moto_test_window_redraw_3dview(MotoTestWindow *self);
 void moto_test_window_update_param_editor(MotoTestWindow *self);
 
-#endif /* MOTO_TEST_WINDOW_H */
+G_END_DECLS
+
+#endif /* __MOTO_TEST_WINDOW_H__ */

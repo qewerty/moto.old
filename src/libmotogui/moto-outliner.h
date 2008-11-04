@@ -19,12 +19,14 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_OUTLINER_H
-#define MOTO_OUTLINER_H
+#ifndef __MOTO_OUTLINER_H__
+#define __MOTO_OUTLINER_H__
 
 #include <gtk/gtk.h>
 
 #include <libmoto/moto-world.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoOutliner MotoOutliner;
 typedef struct _MotoOutlinerClass MotoOutlinerClass;
@@ -52,4 +54,6 @@ GtkWidget *moto_outliner_new(MotoWorld *world);
 
 void moto_outliner_update(MotoOutliner *self);
 
-#endif /* MOTO_OUTLINER_H */
+G_END_DECLS
+
+#endif /* __MOTO_OUTLINER_H__ */

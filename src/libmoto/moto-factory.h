@@ -20,10 +20,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_FACTORY_H
-#define MOTO_FACTORY_H
+#ifndef __MOTO_FACTORY_H__
+#define __MOTO_FACTORY_H__
 
 #include <glib.h>
+
+G_BEGIN_DECLS
 
 /* class MotoFactory */
 
@@ -49,5 +51,7 @@ void moto_factory_free_all(MotoFactory *self);
 
 gpointer moto_factory_get(MotoFactory *self, const gchar *key);
 
-#endif /* MOTO_FACTORY_H */
+G_END_DECLS
+
+#endif /* __MOTO_FACTORY_H__ */
 

@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MESH_FILE_NODE_H
-#define MOTO_MESH_FILE_NODE_H
+#ifndef __MOTO_MESH_FILE_NODE_H__
+#define __MOTO_MESH_FILE_NODE_H__
 
 #include "moto-geometry-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMeshFileNode MotoMeshFileNode;
 typedef struct _MotoMeshFileNodeClass MotoMeshFileNodeClass;
@@ -53,4 +55,6 @@ GType moto_mesh_file_node_get_type(void);
 
 MotoMeshFileNode *moto_mesh_file_node_new();
 
-#endif /* MOTO_MESH_FILE_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESH_FILE_NODE_H__ */

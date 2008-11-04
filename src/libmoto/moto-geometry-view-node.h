@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_GEOM_VIEW_NODE_H
-#define MOTO_GEOM_VIEW_NODE_H
+#ifndef __MOTO_GEOM_VIEW_NODE_H__
+#define __MOTO_GEOM_VIEW_NODE_H__
 
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -28,6 +28,8 @@
 #include "moto-ray.h"
 #include "moto-transform-info.h"
 #include "moto-geometry-node.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoGeomViewNode MotoGeomViewNode;
 typedef struct _MotoGeomViewNodeClass MotoGeomViewNodeClass;
@@ -186,4 +188,6 @@ void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNo
 void moto_geom_view_state_select_less(MotoGeomViewState *self, MotoGeomViewNode *geom);
 void moto_geom_view_state_invert_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
 
-#endif /* MOTO_GEOM_VIEW_NODE_H */
+G_END_DECLS
+
+#endif /* __MOTO_GEOM_VIEW_NODE_H__ */

@@ -19,14 +19,16 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_MESH_H
-#define MOTO_MESH_H
+#ifndef __MOTO_MESH_H__
+#define __MOTO_MESH_H__
 
 #include <GL/glew.h>
 #include <glib-object.h>
 
 #include "moto-ray.h"
 #include "moto-bitmask.h"
+
+G_BEGIN_DECLS
 
 typedef struct _MotoMesh MotoMesh;
 typedef struct _MotoMeshClass MotoMeshClass;
@@ -339,6 +341,8 @@ gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
 
-#endif /* MOTO_MESH_H */
+G_END_DECLS
+
+#endif /* __MOTO_MESH_H__ */
 
 

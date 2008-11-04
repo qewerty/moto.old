@@ -19,10 +19,12 @@
 #
 ################################################################################## */
 
-#ifndef MOTO_FORWARD_H
-#define MOTO_FORWARD_H
+#ifndef __MOTO_FORWARD_H__
+#define __MOTO_FORWARD_H__
 
 #include <glib-object.h>
+
+G_BEGIN_DECLS
 
 typedef struct _MotoSystem MotoSystem;
 typedef struct _MotoSystemClass MotoSystemClass;
@@ -51,4 +53,6 @@ typedef struct _MotoManipulatorClass MotoManipulatorClass;
 typedef struct _MotoLibrary MotoLibrary;
 typedef struct _MotoLibraryClass MotoLibraryClass;
 
-#endif /* MOTO_FORWARD_H */
+G_END_DECLS
+
+#endif /* __MOTO_FORWARD_H__ */
