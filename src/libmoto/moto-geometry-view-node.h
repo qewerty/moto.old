@@ -63,22 +63,7 @@ typedef void (*MotoGeomViewStateInvertSelectionFunc)(MotoGeomViewState *self, Mo
  *
  * */
 
-typedef enum
-{
-    MOTO_GEOM_VIEW_DRAW_MODE_BBOX,
-    MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME,
-    MOTO_GEOM_VIEW_DRAW_MODE_WIREFRAME_TEX,
-    MOTO_GEOM_VIEW_DRAW_MODE_SOLID,
-    MOTO_GEOM_VIEW_DRAW_MODE_SOLID_TEX,
-    MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH,
-    MOTO_GEOM_VIEW_DRAW_MODE_SMOOTH_TEX,
-    MOTO_GEOM_VIEW_DRAW_MODE_SHADED
-} MotoGeomViewDrawMode;
-
-GType moto_geom_view_draw_mode_get_type(void);
-#define MOTO_TYPE_GEOM_VIEW_DRAW_MODE (moto_geom_view_draw_mode_get_type())
-
-/* class MotoGeomViewNode */
+/* MotoGeomViewNode */
 
 struct _MotoGeomViewNode
 {

@@ -27,6 +27,8 @@
 #include "moto-forward.h"
 #include "moto-axes-view-node.h"
 
+#include "moto-enums.h"
+
 G_BEGIN_DECLS
 
 typedef gboolean (*MotoWorldForeachNodeFunc)(MotoWorld *world, MotoNode *node, gpointer user_data);
@@ -315,6 +317,8 @@ void moto_world_manipulator_button_release(MotoWorldManipulator *self, MotoWorld
         gint x, gint y, gint width, gint height);
 void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld *world,
         gint x, gint y, gint width, gint height);
+
+MotoDrawMode moto_world_get_draw_mode(MotoWorld *self);
 
 G_END_DECLS
 

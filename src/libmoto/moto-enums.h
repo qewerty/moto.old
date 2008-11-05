@@ -37,6 +37,22 @@ GType moto_axis_get_type(void);
 
 #define MOTO_TYPE_AXIS (moto_axis_get_type())
 
+typedef enum
+{
+    MOTO_DRAW_MODE_BBOX_WIREFRAME,
+    MOTO_DRAW_MODE_BBOX_SOLID,
+    MOTO_DRAW_MODE_WIREFRAME,
+    MOTO_DRAW_MODE_WIREFRAME_TEX,
+    MOTO_DRAW_MODE_SOLID,
+    MOTO_DRAW_MODE_SOLID_TEX,
+    MOTO_DRAW_MODE_SMOOTH,
+    MOTO_DRAW_MODE_SMOOTH_TEX,
+    MOTO_DRAW_MODE_SHADED
+} MotoDrawMode;
+
+GType moto_draw_mode_get_type(void);
+#define MOTO_TYPEDRAW_MODE (moto_draw_mode_get_type())
+
 G_END_DECLS
 
 #endif /* __MOTO_ENUMS__ */

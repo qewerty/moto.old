@@ -83,6 +83,8 @@ struct _MotoWorldPriv
 
     MotoWorldManipulator *manipulator;
 
+    MotoDrawMode draw_mode;
+
     // cache
     guint prev_width,
           prev_height;
@@ -152,6 +154,8 @@ moto_world_init(MotoWorld *self)
     self->priv->select_bound_extent = 0.2;
 
     moto_factory_init(& self->priv->mutex_factory, create_mutex, free_mutex, NULL);
+
+    self->priv->draw_mode = MOTO_DRAW_MODE_SOLID;
 
     /* Animation */
     self->priv->timer = g_timer_new();
@@ -754,4 +758,9 @@ void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld 
 {
     g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->motion_notify_signal_id, 0,
             world, x, y, width, height);
+}
+
+MotoDrawMode moto_world_get_draw_mode(MotoWorld *self)
+{
+    return self->priv->draw_mode;
 }

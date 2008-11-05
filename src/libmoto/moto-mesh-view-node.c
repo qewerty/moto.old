@@ -1,11 +1,11 @@
 #include <string.h>
 
-#include <libmotoutil/moto-gl.h>
-
+#include "libmotoutil/moto-gl.h"
 #include "libmotoutil/numdef.h"
 #include "libmotoutil/matrix.h"
 
 #include "moto-mesh-view-node.h"
+#include "moto-enums.h"
 #include "moto-mesh.h"
 
 #define VBUF_NUMBER 4
@@ -25,6 +25,8 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self);
 static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self, gint x, gint y,
         gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeomViewNode *self);
+
+static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wireframe);
 
 static void moto_mesh_view_node_draw_as_object(MotoGeomViewState *self, MotoGeomViewNode *geom);
 static void moto_mesh_view_node_draw_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom);
@@ -67,6 +69,8 @@ struct _MotoMeshViewNodePriv
     MotoMesh **mesh_ptr;
     MotoMeshSelection *selection;
 
+    MotoBound *bound;
+
     GLuint dlist;
     GLuint vbufs[VBUF_NUMBER];
 };
@@ -87,6 +91,7 @@ moto_mesh_view_node_dispose(GObject *obj)
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode *)obj);
 
     moto_mesh_selection_free(priv->selection);
+    g_object_unref(priv->bound);
 
     G_OBJECT_CLASS(mesh_view_node_parent_class)->dispose(obj);
 }
@@ -106,6 +111,8 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
     priv->disposed = FALSE;
 
     priv->selection = NULL;
+
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
 
     priv->dlist = 0;
     bzero(priv->vbufs, VBUF_NUMBER*sizeof(GLuint));
@@ -250,8 +257,10 @@ inline static void draw_mesh_as_object(MotoMeshViewNodePriv *priv, MotoMesh *mes
     glPopClientAttrib();
 }
 
-inline static void draw_mesh_as_verts(MotoMeshViewNodePriv *priv, MotoMesh *mesh, MotoMeshSelection *selection)
+inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
+    MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
+
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -260,41 +269,87 @@ inline static void draw_mesh_as_verts(MotoMeshViewNodePriv *priv, MotoMesh *mesh
     glDepthFunc(GL_LEQUAL);
 
     gboolean force_arrays = FALSE;
+    gboolean using_vbo = TRUE;
     if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
     {
         g_print("Initializng VBO for 'vertex' drawing mode ... ");
         if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
         {
+            GLenum error;
+
             glGenBuffersARB(VBUF_NUMBER, priv->vbufs);
 
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_coords,  GL_STATIC_DRAW_ARB);
+
+            error = glGetError();
+            switch(error)
+            {
+                case GL_NO_ERROR:
+                    // Ok
+                break;
+                case GL_OUT_OF_MEMORY:
+                // break;
+                default:
+                    // Unknown Error
+                    moto_mesh_view_node_delete_buffers(mv);
+                    using_vbo = FALSE;
+                break;
+            }
 
             glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
             glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
                     moto_mesh_get_index_size(mesh) * mesh->e_num * 2,
                     mesh->e_verts, GL_STATIC_DRAW_ARB);
 
+            error = glGetError();
+            switch(error)
+            {
+                case GL_NO_ERROR:
+                    // Ok
+                break;
+                case GL_OUT_OF_MEMORY:
+                // break;
+                default:
+                    // Unknown Error
+                    moto_mesh_view_node_delete_buffers(mv);
+                    using_vbo = FALSE;
+                break;
+            }
+
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
             glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
         }
-        g_print("OK\n");
 
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
+        if(using_vbo)
+        {
+            g_print("OK\n");
 
-        glColor4f(0.6, 0.6, 0.6, 1.0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
-        glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, 0);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+            glVertexPointer(3, GL_FLOAT, 0, 0);
 
-        glColor4f(1, 0.1, 0.1, 1);
-        glPointSize(3);
-        glDrawArrays(GL_POINTS, 0, mesh->v_num);
+            glColor4f(0.6, 0.6, 0.6, 1.0);
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+            glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, 0);
 
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+            glColor4f(1, 0.1, 0.1, 1);
+            glPointSize(3);
+            glDrawArrays(GL_POINTS, 0, mesh->v_num);
+
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+        }
+        else
+        {
+            g_print("Failed\n");
+        }
     }
     else // vertex arrays
+    {
+        using_vbo = FALSE;
+    }
+
+    if( ! using_vbo)
     {
         glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
 
@@ -331,7 +386,6 @@ inline static void draw_mesh_as_edges(MotoMeshViewNodePriv *priv, MotoMesh *mesh
     glColor4f(1, 1, 1, 0.25);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-
 
     gboolean force_arrays = FALSE;
     if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
@@ -422,7 +476,7 @@ inline static void draw_mesh_as_faces(MotoMeshViewNodePriv *priv, MotoMesh *mesh
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    gboolean force_arrays = FALSE;
+    gboolean force_arrays = TRUE;
     if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
     {
         g_print("Initializng VBO for 'face' drawing mode ... ");
@@ -529,12 +583,24 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
     if( ! (*(priv->mesh_ptr)))
         return;
 
-    if( ! moto_geom_view_node_get_prepared(self))
-        moto_mesh_view_node_prepare_for_draw(self);
-    else
-        glCallList(priv->dlist);
+    MotoWorld* world = moto_node_get_world(MOTO_NODE(self));
+    MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
 
-    /* draw */
+    switch(draw_mode)
+    {
+        case MOTO_DRAW_MODE_BBOX_WIREFRAME:
+            moto_mesh_view_node_draw_bound((MotoMeshViewNode*)self, TRUE);
+        break;
+        case MOTO_DRAW_MODE_BBOX_SOLID:
+            moto_mesh_view_node_draw_bound((MotoMeshViewNode*)self, FALSE);
+        break;
+        default:
+            if( ! moto_geom_view_node_get_prepared(self))
+                moto_mesh_view_node_prepare_for_draw(self);
+            else
+                glCallList(priv->dlist);
+        break;
+    }
 }
 
 static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self)
@@ -590,6 +656,80 @@ static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeomViewNode *self
     return (MotoGeometryNode *)moto_param_get_node(s);
 }
 
+static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wireframe)
+{
+    MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
+
+    glPushAttrib(GL_ENABLE_BIT);
+    glPushMatrix();
+
+    gfloat scale[3];
+    moto_bound_get_scale(priv->bound, scale);
+
+    gfloat center[3];
+    moto_bound_get_center(priv->bound, center);
+
+    glTranslatef(center[0], center[1], center[2]);
+    glScalef(scale[0], scale[1], scale[2]);
+
+    gfloat A = 0.5;
+
+    if(wireframe)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_LIGHTING);
+    }
+
+    glBegin(GL_QUADS);
+
+    // 0
+    glNormal3f(0, 0, 1);
+    glVertex3f(A, A, A);
+    glVertex3f(A, -A, A);
+    glVertex3f(-A, -A, A);
+    glVertex3f(-A, A, A);
+
+    // 1
+    glNormal3f(0, 0, -1);
+    glVertex3f(-A, A, -A);
+    glVertex3f(-A, -A, -A);
+    glVertex3f(A, -A, -A);
+    glVertex3f(A, A, -A);
+
+    // 2
+    glNormal3f(0, 1, 0);
+    glVertex3f(A, A, A);
+    glVertex3f(A, A, -A);
+    glVertex3f(-A, A, -A);
+    glVertex3f(-A, A, A);
+
+    // 3
+    glNormal3f(0, -1, 0);
+    glVertex3f(-A, -A, A);
+    glVertex3f(-A, -A, -A);
+    glVertex3f(A, -A, -A);
+    glVertex3f(A, -A, A);
+
+    // 4
+    glNormal3f(1, 0, 0);
+    glVertex3f(A, A, A);
+    glVertex3f(A, A, -A);
+    glVertex3f(A, -A, -A);
+    glVertex3f(A, -A, A);
+
+    // 5
+    glNormal3f(-1, 0, 0);
+    glVertex3f(-A, -A, A);
+    glVertex3f(-A, -A, -A);
+    glVertex3f(-A, A, -A);
+    glVertex3f(-A, A, A);
+
+    glEnd();
+
+    glPopMatrix();
+    glPopAttrib();
+}
+
 /* states */
 
 static void moto_mesh_view_node_draw_as_object(MotoGeomViewState *self, MotoGeomViewNode *geom)
@@ -611,7 +751,7 @@ static void moto_mesh_view_node_draw_as_verts(MotoGeomViewState *self, MotoGeomV
     if( ! mesh)
         return;
 
-    draw_mesh_as_verts(geom_priv, mesh, geom_priv->selection);
+    draw_mesh_as_verts((MotoMeshViewNode*)geom, mesh, geom_priv->selection);
 }
 
 static gboolean
@@ -706,7 +846,8 @@ static void moto_mesh_view_node_grow_selection_as_verts(MotoGeomViewState *self,
 static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
     if( ! mesh)
         return;
 
@@ -716,7 +857,8 @@ static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, Mo
 static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
     if( ! mesh)
         return;
 
@@ -726,7 +868,7 @@ static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *sel
 static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
 
     if( ! mesh)
         return;
@@ -738,7 +880,7 @@ static gboolean
 moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
-    MotoMesh *mesh = moto_mesh_view_node_get_mesh((MotoMeshViewNode *)self);
+    MotoMesh *mesh = (MotoMesh *)moto_mesh_view_node_get_mesh((MotoMeshViewNode *)geom);
     if( ! mesh)
     {
         // g_print("No mesh\n");
@@ -799,7 +941,7 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
             }
         }
 
-        MotoMeshSelection *sel = moto_mesh_view_node_get_selection((MotoMeshViewNode *)self);
+        MotoMeshSelection *sel = moto_mesh_view_node_get_selection((MotoMeshViewNode *)geom);
         if(sel)
         {
             moto_mesh_selection_toggle_edge_selection(sel, index);
@@ -936,6 +1078,8 @@ static void moto_mesh_view_node_update(MotoNode *self)
 
     if( ! (*(priv->mesh_ptr)))
         return;
+
+    moto_mesh_calc_bound(*(priv->mesh_ptr), priv->bound);
 
     if( ! priv->selection)
     {
