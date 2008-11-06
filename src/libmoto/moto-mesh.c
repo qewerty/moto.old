@@ -1123,6 +1123,44 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
     return FALSE;
 }
 
+void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound)
+{
+    gfloat min_x = 0;
+    gfloat max_x = 0;
+    gfloat min_y = 0;
+    gfloat max_y = 0;
+    gfloat min_z = 0;
+    gfloat max_z = 0;
+
+    guint i;
+    for(i = 0; i < self->v_num; i++)
+    {
+        if(self->v_coords[i].x < min_x)
+            min_x = self->v_coords[i].x;
+        if(self->v_coords[i].x > max_x)
+            max_x = self->v_coords[i].x;
+
+        if(self->v_coords[i].y < min_y)
+            min_y = self->v_coords[i].y;
+        if(self->v_coords[i].y > max_y)
+            max_y = self->v_coords[i].y;
+
+        if(self->v_coords[i].z < min_z)
+            min_z = self->v_coords[i].z;
+        if(self->v_coords[i].z > max_z)
+            max_z = self->v_coords[i].z;
+    }
+
+    moto_bound_set(bound, min_x, max_x, min_y, max_y, min_z, max_z);
+}
+
+MotoBound* moto_mesh_create_bound(MotoMesh* self)
+{
+    MotoBound* bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    moto_mesh_calc_bound(self, bound);
+    return bound;
+}
+
 /* MeshSelection */
 
 MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num)

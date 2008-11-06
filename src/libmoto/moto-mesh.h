@@ -27,6 +27,7 @@
 
 #include "moto-ray.h"
 #include "moto-bitmask.h"
+#include "moto-bound.h"
 
 G_BEGIN_DECLS
 
@@ -340,6 +341,9 @@ gboolean moto_mesh_update_he_data(MotoMesh *self);
 gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
+
+void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound);
+MotoBound* moto_mesh_create_bound(MotoMesh* self);
 
 G_END_DECLS
 
