@@ -677,7 +677,13 @@ static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wire
     if(wireframe)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_LIGHTING);
     }
 
     glBegin(GL_QUADS);
