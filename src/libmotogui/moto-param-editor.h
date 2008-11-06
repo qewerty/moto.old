@@ -60,7 +60,14 @@ GType moto_param_editor_get_type(void);
 
 GtkWidget *moto_param_editor_new(MotoTestWindow *window);
 
-void moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
+void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node);
+
+gboolean moto_param_editor_has_prev_node(MotoParamEditor *self);
+gboolean moto_param_editor_has_next_node(MotoParamEditor *self);
+void moto_param_editor_goto_prev_node(MotoParamEditor *self);
+void moto_param_editor_goto_next_node(MotoParamEditor *self);
+void moto_param_editor_goto_first_node(MotoParamEditor *self);
+void moto_param_editor_goto_last_node(MotoParamEditor *self);
 
 G_END_DECLS
 

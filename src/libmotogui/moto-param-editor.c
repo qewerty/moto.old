@@ -6,6 +6,8 @@
 static GtkMenuBar *create_menu_bar(MotoParamEditor *pe);
 
 void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
+void __on_button_prev(GtkButton* button, MotoParamEditor *tb);
+void __on_button_next(GtkButton* button, MotoParamEditor *tb);
 
 /* class MotoParamEditor */
 
@@ -20,10 +22,15 @@ struct _MotoParamEditorPriv
     GtkMenuBar *menu_bar;
     GtkBox *bbox;
 
-    MotoNode *node;
     MotoTestWindow *window;
+    GtkWidget* button_prev;
+    GtkWidget* button_next;
     guint num;
     guint gnum;
+
+    MotoNode *node;
+    GList *prev_nodes;
+    GList *next_nodes;
 };
 
 static void
@@ -56,14 +63,28 @@ moto_param_editor_init(MotoParamEditor *self)
     self->priv->gbox        = (GtkBox *)gtk_vbox_new(FALSE, 0);
     self->priv->bbox        = (GtkBox *)gtk_hbox_new(FALSE, 0);
 
-    GtkWidget *button_back = (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_BACK);
-    GtkWidget *button_forw = (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_FORWARD);
+    GtkWidget *button_back = self->priv->button_prev = \
+        (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_BACK);
+    GtkWidget *button_forw = self->priv->button_next = \
+        (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_FORWARD);
+    gtk_widget_set_sensitive(self->priv->button_prev, FALSE);
+    gtk_widget_set_sensitive(self->priv->button_next, FALSE);
 
-    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)button_forw, FALSE, FALSE, 0);
-    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)button_back, FALSE, FALSE, 0);
-    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "INOUT"), FALSE, FALSE, 0);
-    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "OUT"), FALSE, FALSE, 0);
-    gtk_box_pack_end(self->priv->bbox, (GtkWidget *)gtk_tool_button_new(NULL, "IN"), FALSE, FALSE, 0);
+    g_signal_connect(G_OBJECT(button_back), "clicked", G_CALLBACK(__on_button_prev), self);
+    g_signal_connect(G_OBJECT(button_forw), "clicked", G_CALLBACK(__on_button_next), self);
+
+    GtkWidget *button_in    = (GtkWidget *)gtk_tool_button_new(NULL, "IN");
+    GtkWidget *button_out   = (GtkWidget *)gtk_tool_button_new(NULL, "OUT");
+    GtkWidget *button_inout = (GtkWidget *)gtk_tool_button_new(NULL, "INOUT");
+    gtk_widget_set_sensitive(button_in, FALSE);
+    gtk_widget_set_sensitive(button_out, FALSE);
+    gtk_widget_set_sensitive(button_inout, FALSE);
+
+    gtk_box_pack_start(self->priv->bbox, button_in, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_out, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_inout, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_back, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_forw, FALSE, FALSE, 0);
 
     gtk_container_add((GtkContainer *)self, (GtkWidget *)self->priv->box);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->menu_bar,  FALSE, FALSE, 0);
@@ -71,12 +92,13 @@ moto_param_editor_init(MotoParamEditor *self)
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)gtk_hseparator_new(),  FALSE, FALSE, 0);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->gbox,     TRUE, TRUE, 4);
 
-    // gtk_widget_set_size_request((GtkWidget *)self, 300, 36);
-
-    self->priv->node = NULL;
     self->priv->window = NULL;
     self->priv->num = 0;
     self->priv->gnum = 0;
+
+    self->priv->node = NULL;
+    self->priv->prev_nodes = NULL;
+    self->priv->next_nodes = NULL;
 }
 
 static void
@@ -429,6 +451,16 @@ static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
 
 void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
 {
+    if(self->priv->node)
+    {
+        self->priv->prev_nodes = g_list_prepend(self->priv->prev_nodes, self->priv->node);
+        gtk_widget_set_sensitive(self->priv->button_prev, TRUE);
+    }
+
+    g_list_free(self->priv->next_nodes);
+    self->priv->next_nodes = NULL;
+    gtk_widget_set_sensitive(self->priv->button_next, FALSE);
+
     __moto_param_editor_update(self, node);
 }
 
@@ -496,4 +528,74 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
     gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
 
     return mb;
+}
+
+gboolean moto_param_editor_has_prev_node(MotoParamEditor *self)
+{
+    return 0 != g_list_length(self->priv->prev_nodes);
+}
+
+gboolean moto_param_editor_has_next_node(MotoParamEditor *self)
+{
+    return 0 != g_list_length(self->priv->next_nodes);
+}
+
+void moto_param_editor_goto_prev_node(MotoParamEditor *self)
+{
+    GList *first = g_list_first(self->priv->prev_nodes);
+    if( ! first)
+        return;
+
+    MotoNode *node = MOTO_NODE(first->data);
+
+    self->priv->prev_nodes = g_list_delete_link(self->priv->prev_nodes, first);
+    if(self->priv->node)
+        self->priv->next_nodes = g_list_prepend(self->priv->next_nodes, self->priv->node);
+
+    if( ! moto_param_editor_has_prev_node(self))
+        gtk_widget_set_sensitive(self->priv->button_prev, FALSE);
+    gtk_widget_set_sensitive(self->priv->button_next, TRUE);
+
+    __moto_param_editor_update(self, node);
+}
+
+void moto_param_editor_goto_next_node(MotoParamEditor *self)
+{
+    GList *first = g_list_first(self->priv->next_nodes);
+    if( ! first)
+        return;
+
+    MotoNode *node = MOTO_NODE(first->data);
+
+    self->priv->next_nodes = g_list_delete_link(self->priv->next_nodes, first);
+    if(self->priv->node)
+        self->priv->prev_nodes = g_list_prepend(self->priv->prev_nodes, self->priv->node);
+
+    if( ! moto_param_editor_has_next_node(self))
+        gtk_widget_set_sensitive(self->priv->button_next, FALSE);
+    gtk_widget_set_sensitive(self->priv->button_prev, TRUE);
+
+    __moto_param_editor_update(self, node);
+}
+
+void moto_param_editor_goto_first_node(MotoParamEditor *self)
+{
+    if( ! moto_param_editor_has_prev_node(self))
+        return;
+}
+
+void moto_param_editor_goto_last_node(MotoParamEditor *self)
+{
+    if( ! moto_param_editor_has_next_node(self))
+        return;
+}
+
+void __on_button_prev(GtkButton* button, MotoParamEditor *tb)
+{
+    moto_param_editor_goto_prev_node(tb);
+}
+
+void __on_button_next(GtkButton* button, MotoParamEditor *tb)
+{
+    moto_param_editor_goto_next_node(tb);
 }
