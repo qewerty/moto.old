@@ -51,7 +51,7 @@ typedef enum
 } MotoDrawMode;
 
 GType moto_draw_mode_get_type(void);
-#define MOTO_TYPEDRAW_MODE (moto_draw_mode_get_type())
+#define MOTO_TYPE_DRAW_MODE (moto_draw_mode_get_type())
 
 G_END_DECLS
 

@@ -20,12 +20,12 @@ GType moto_axis_get_type(void)
 
 /* MotoDrawMode */
 
-GType moto_geom_view_draw_mode_get_type(void)
+GType moto_draw_mode_get_type(void)
 {
     static GType type = 0;
     if(0 == type)
     {
-        GEnumValue values[] = {
+        static GEnumValue values[] = {
             {MOTO_DRAW_MODE_BBOX_WIREFRAME,
                 "DRAW_MODE_BBOX_WIREFRAME", "Wireframe Bounding Box"},
             {MOTO_DRAW_MODE_BBOX_SOLID,

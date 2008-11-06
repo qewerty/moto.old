@@ -318,6 +318,7 @@ void moto_world_manipulator_button_release(MotoWorldManipulator *self, MotoWorld
 void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld *world,
         gint x, gint y, gint width, gint height);
 
+void moto_world_set_draw_mode(MotoWorld *self, MotoDrawMode draw_mode);
 MotoDrawMode moto_world_get_draw_mode(MotoWorld *self);
 
 G_END_DECLS

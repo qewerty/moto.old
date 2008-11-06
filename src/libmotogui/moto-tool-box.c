@@ -15,6 +15,7 @@
 
 /* forward */
 
+void show_draw_mode_menu(GtkButton *button, gpointer user_data);
 void show_component_selection_mode_menu(GtkButton *button, gpointer user_data);
 
 /* class ToolBox */
@@ -71,6 +72,9 @@ moto_tool_box_init(MotoToolBox *self)
     g_free(filename);
 
     gtk_button_set_image(b, im);
+
+    g_signal_connect(G_OBJECT(b), "clicked",
+            G_CALLBACK(show_draw_mode_menu), self);
 
     gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
     b = (GtkButton *)gtk_button_new();
@@ -150,6 +154,12 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
 /* signal callbacks */
 
+static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
+{
+    MotoDrawMode draw_mode = *((MotoDrawMode*)g_object_get_data(G_OBJECT(item), "moto-draw-mode-enum-value"));
+    moto_world_set_draw_mode(MOTO_WORLD(user_data), draw_mode);
+}
+
 static void set_state(GtkMenuItem *item, gpointer user_data)
 {
     MotoGeomViewNode *geom = (MotoGeomViewNode *)user_data;
@@ -159,16 +169,12 @@ static void set_state(GtkMenuItem *item, gpointer user_data)
     moto_geom_view_node_set_state(geom, moto_geom_view_state_get_name(state));
 }
 
-void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
+void show_draw_mode_menu(GtkButton *button, gpointer user_data)
 {
     MotoToolBox *tb = (MotoToolBox *)user_data;
-
     if( ! tb->priv->system)
     {
-        GString *msg = \
-            g_string_new("ToolBox has no associated MotoSystem instance. I can do nothing.");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("ToolBox has no associated MotoSystem instance. I can do nothing.");
 
         return;
     }
@@ -176,10 +182,47 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoWorld *world = moto_system_get_current_world(tb->priv->system);
     if( ! world)
     {
-        GString *msg = \
-            g_string_new("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+
+        return;
+    }
+
+
+    GEnumClass *ec = G_ENUM_CLASS(g_type_class_ref(MOTO_TYPE_DRAW_MODE));
+
+    GtkMenu *menu = (GtkMenu *)gtk_menu_new();
+    GtkWidget *item;
+
+    guint i;
+    for(i = 0; i < ec->n_values; i++)
+    {
+        item = gtk_menu_item_new_with_label(ec->values[i].value_nick);
+        g_object_set_data((GObject *)item, "moto-draw-mode-enum-value", & ec->values[i].value);
+        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_draw_mode), world);
+
+        gtk_menu_append(menu, item);
+    }
+    g_type_class_unref(ec);
+
+    gtk_widget_show_all((GtkWidget *)menu);
+    gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, 0);
+}
+
+void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
+{
+    MotoToolBox *tb = (MotoToolBox *)user_data;
+
+    if( ! tb->priv->system)
+    {
+        moto_error("ToolBox has no associated MotoSystem instance. I can do nothing.");
+
+        return;
+    }
+
+    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
+    if( ! world)
+    {
+        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
 
         return;
     }
@@ -187,10 +230,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoObjectNode *object = moto_world_get_current_object(world);
     if( ! object)
     {
-        GString *msg = \
-            g_string_new("MotoWorld instance associated ToolBox has no current object. I can do nothing.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("MotoWorld instance associated ToolBox has no current object. I can do nothing.");
 
         return;
     }
@@ -198,10 +238,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view");
     if(( ! in_view) || (moto_param_get_mode(in_view) == MOTO_PARAM_MODE_OUT))
     {
-        GString *msg = \
-            g_string_new("Current object has no a view. I can do nothing.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("Current object has no a view. I can do nothing.");
 
         return;
     }
@@ -209,10 +246,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoParam *out_view = moto_param_get_source(in_view);
     if( ! out_view)
     {
-        GString *msg = \
-            g_string_new("Current object has no a view. I can do nothing.");
-        moto_warning(msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("Current object has no a view. I can do nothing.");
 
         return;
     }
