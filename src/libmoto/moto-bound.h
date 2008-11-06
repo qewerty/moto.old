@@ -62,6 +62,9 @@ MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
 MotoBound *moto_bound_new_from_array(gfloat array[6]);
 
 void moto_bound_copy(MotoBound *self, MotoBound *other);
+void moto_bound_set(MotoBound *self, gfloat min_x, gfloat max_x,
+                                     gfloat min_y, gfloat max_y,
+                                     gfloat min_z, gfloat max_z);
 void moto_bound_set_extended(MotoBound *self, MotoBound *other, gfloat extent);
 void moto_bound_print(MotoBound *self);
 
@@ -70,6 +73,9 @@ gboolean moto_bound_intersect_ray(MotoBound *self, MotoRay *ray,
 
 gboolean moto_bound_is_valid(MotoBound *self);
 void moto_bound_draw(MotoBound *self);
+
+void moto_bound_get_center(MotoBound* self, gfloat center[3]);
+void moto_bound_get_scale(MotoBound* self, gfloat scale[3]);
 
 G_END_DECLS
 

@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "moto-bound.h"
 #include "libmotoutil/matrix.h"
 #include "libmotoutil/numdef.h"
@@ -90,6 +92,18 @@ void moto_bound_copy(MotoBound *self, MotoBound *other)
     self->bound[5] = other->bound[5];
 }
 
+void moto_bound_set(MotoBound *self, gfloat min_x, gfloat max_x,
+                                     gfloat min_y, gfloat max_y,
+                                     gfloat min_z, gfloat max_z)
+{
+    self->bound[0] = min_x;
+    self->bound[1] = max_x;
+    self->bound[2] = min_y;
+    self->bound[3] = max_y;
+    self->bound[4] = min_z;
+    self->bound[5] = max_z;
+}
+
 void moto_bound_set_extended(MotoBound *self, MotoBound *other, gfloat extent)
 {
     self->bound[0] = other->bound[0] - extent;
@@ -130,4 +144,18 @@ gboolean moto_bound_is_valid(MotoBound *self)
 void moto_bound_draw(MotoBound *self)
 {
     // TODO
+}
+
+void moto_bound_get_center(MotoBound* self, gfloat center[3])
+{
+    center[0] = (self->bound[0] + self->bound[1]) / 2;
+    center[1] = (self->bound[2] + self->bound[3]) / 2;
+    center[2] = (self->bound[4] + self->bound[5]) / 2;
+}
+
+void moto_bound_get_scale(MotoBound* self, gfloat scale[3])
+{
+    scale[0] = fabs(self->bound[0] - self->bound[1]);
+    scale[1] = fabs(self->bound[2] - self->bound[3]);
+    scale[2] = fabs(self->bound[4] - self->bound[5]);
 }
