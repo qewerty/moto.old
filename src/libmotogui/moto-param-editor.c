@@ -1,9 +1,11 @@
 #include "libmoto/moto-filename.h"
 #include "moto-param-editor.h"
 
-/* forwards */
+/*  */
 
 static GtkMenuBar *create_menu_bar(MotoParamEditor *pe);
+
+void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
 
 /* class MotoParamEditor */
 
@@ -110,7 +112,7 @@ typedef struct _OnChangedData
 
 static void node_delete_notify(MotoParamEditor *pe, GObject *where_the_object_was)
 {
-    moto_param_editor_update(pe, NULL);
+    moto_param_editor_set_node(pe, NULL);
 }
 
 static void widget_delete_notify(OnChangedData *data, GObject *where_the_object_was)
@@ -425,7 +427,12 @@ static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
     pe->priv->gnum++;
 }
 
-void moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
+void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
+{
+    __moto_param_editor_update(self, node);
+}
+
+void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
 {
     if(node == self->priv->node)
         return;
@@ -464,9 +471,9 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
     gtk_menu_shell_append((GtkMenuShell *)mb, (GtkWidget *)item);
 
     item = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_BACK, NULL);
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     item = gtk_image_menu_item_new_from_stock(GTK_STOCK_GO_FORWARD, NULL);
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
 
     menu = (GtkMenu *)gtk_menu_new();
     item = gtk_menu_item_new_with_label("View");
@@ -474,11 +481,11 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
     gtk_menu_shell_append((GtkMenuShell *)mb, (GtkWidget *)item);
 
     item = gtk_menu_item_new_with_label("INOUT");
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     item = gtk_menu_item_new_with_label("Only IN");
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     item = gtk_menu_item_new_with_label("Only OUT");
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
 
     menu = (GtkMenu *)gtk_menu_new();
     item = gtk_menu_item_new_with_label("Param");
@@ -486,7 +493,7 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
     gtk_menu_shell_append((GtkMenuShell *)mb, (GtkWidget *)item);
 
     item = gtk_menu_item_new_with_label("Add new");
-    gtk_menu_append(menu, item);
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
 
     return mb;
 }

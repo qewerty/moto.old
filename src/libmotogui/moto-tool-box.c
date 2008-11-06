@@ -200,7 +200,7 @@ void show_draw_mode_menu(GtkButton *button, gpointer user_data)
         g_object_set_data((GObject *)item, "moto-draw-mode-enum-value", & ec->values[i].value);
         g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_draw_mode), world);
 
-        gtk_menu_append(menu, item);
+        gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     }
     g_type_class_unref(ec);
 
@@ -267,7 +267,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         g_object_set_data((GObject *)item, "moto-geometry-view-state", state->data);
         g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_state), geom);
 
-        gtk_menu_append(menu, item);
+        gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     }
 
     gtk_widget_show_all((GtkWidget *)menu);
