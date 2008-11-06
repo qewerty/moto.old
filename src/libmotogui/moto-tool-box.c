@@ -156,8 +156,8 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
 static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 {
-    MotoDrawMode draw_mode = *((MotoDrawMode*)g_object_get_data(G_OBJECT(item), "moto-draw-mode-enum-value"));
-    moto_world_set_draw_mode(MOTO_WORLD(user_data), draw_mode);
+    moto_world_set_draw_mode(MOTO_WORLD(user_data),
+            *((MotoDrawMode*)g_object_get_data(G_OBJECT(item), "moto-draw-mode-enum-value")));
 }
 
 static void set_state(GtkMenuItem *item, gpointer user_data)
@@ -253,12 +253,11 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
 
     MotoGeomViewNode *geom = (MotoGeomViewNode *)moto_param_get_node(out_view);
 
-    GSList *state = moto_geom_view_node_get_state_list(geom);
-
     /* menu */
     GtkMenu *menu = (GtkMenu *)gtk_menu_new();
     GtkWidget *item;
 
+    GSList *state = moto_geom_view_node_get_state_list(geom);
     for(; state; state = g_slist_next(state))
     {
         item = \
