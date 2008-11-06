@@ -453,8 +453,8 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
-    moto_param_editor_update(self->priv->param_editor, moto_param_get_node(s));
-    // moto_param_editor_update(self->priv->param_editor, obj);
+    moto_param_editor_set_node(self->priv->param_editor, moto_param_get_node(s));
+    // moto_param_editor_set_node(self->priv->param_editor, obj);
 }
 
 static void init_gl(GtkWidget *widget, gpointer data)
