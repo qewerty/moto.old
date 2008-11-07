@@ -5,9 +5,11 @@
 
 static GtkMenuBar *create_menu_bar(MotoParamEditor *pe);
 
-void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
-void __on_button_prev(GtkButton* button, MotoParamEditor *tb);
-void __on_button_next(GtkButton* button, MotoParamEditor *tb);
+static void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
+
+static void __on_button_prev(GtkButton* button, MotoParamEditor *tb);
+static void __on_button_next(GtkButton* button, MotoParamEditor *tb);
+static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was);
 
 /* class MotoParamEditor */
 
@@ -147,7 +149,7 @@ static void widget_delete_notify(OnChangedData *data, GObject *where_the_object_
 void on_float_changed(GtkSpinButton *spinbutton,
                       OnChangedData *data)
 {
-    gfloat value = gtk_spin_button_get_value_as_float(spinbutton);
+    gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
     moto_param_set_float(data->param, value);
@@ -457,6 +459,11 @@ void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
         gtk_widget_set_sensitive(self->priv->button_prev, TRUE);
     }
 
+    if( ! g_list_find(self->priv->prev_nodes, node) && ! g_list_find(self->priv->next_nodes, node))
+    {
+        g_object_weak_ref(G_OBJECT(node), (GWeakNotify)__on_node_destroy, self);
+    }
+
     g_list_free(self->priv->next_nodes);
     self->priv->next_nodes = NULL;
     gtk_widget_set_sensitive(self->priv->button_next, FALSE);
@@ -464,7 +471,7 @@ void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
     __moto_param_editor_update(self, node);
 }
 
-void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
+static void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
 {
     if(node == self->priv->node)
         return;
@@ -532,12 +539,12 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
 
 gboolean moto_param_editor_has_prev_node(MotoParamEditor *self)
 {
-    return 0 != g_list_length(self->priv->prev_nodes);
+    return NULL != self->priv->prev_nodes;
 }
 
 gboolean moto_param_editor_has_next_node(MotoParamEditor *self)
 {
-    return 0 != g_list_length(self->priv->next_nodes);
+    return NULL != self->priv->next_nodes;
 }
 
 void moto_param_editor_goto_prev_node(MotoParamEditor *self)
@@ -590,12 +597,30 @@ void moto_param_editor_goto_last_node(MotoParamEditor *self)
         return;
 }
 
-void __on_button_prev(GtkButton* button, MotoParamEditor *tb)
+static void __on_button_prev(GtkButton* button, MotoParamEditor *tb)
 {
     moto_param_editor_goto_prev_node(tb);
 }
 
-void __on_button_next(GtkButton* button, MotoParamEditor *tb)
+static void __on_button_next(GtkButton* button, MotoParamEditor *tb)
 {
     moto_param_editor_goto_next_node(tb);
+}
+
+static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was)
+{
+    pe->priv->prev_nodes = g_list_remove_all(pe->priv->prev_nodes, where_the_object_was);
+    pe->priv->next_nodes = g_list_remove_all(pe->priv->next_nodes, where_the_object_was);
+
+    if(pe->priv->node == where_the_object_was)
+    {
+        if(moto_param_editor_has_prev_node(pe))
+        {
+            moto_param_editor_goto_prev_node(pe);
+        }
+        else
+        {
+            moto_param_editor_goto_next_node(pe);
+        }
+    }
 }
