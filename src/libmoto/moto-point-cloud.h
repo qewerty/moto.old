@@ -59,7 +59,7 @@ void moto_point_cloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachP
 /* Following functions may be used for SSE optimization of point cloud data processing. */
 gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self);
 void moto_point_cloud_get_plain_data(MotoPointCloud *self,
-        gfloat **points, gfloat **normals, gsize *size);
+    gfloat **points, gfloat **normals, gsize *size);
 
 G_END_DECLS
 

@@ -2217,7 +2217,7 @@ __moto_mesh_can_provide_plain_data(MotoPointCloud *self)
 
 static gfloat *
 __moto_mesh_get_plain_data(MotoPointCloud *self,
-        gfloat **points, gfloat **normals, gsize *size)
+    gfloat **points, gfloat **normals, gsize *size)
 {
     MotoMesh *mesh = MOTO_MESH(self);
 
