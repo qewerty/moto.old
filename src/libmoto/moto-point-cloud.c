@@ -53,22 +53,19 @@ gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self)
     return FALSE;
 }
 
-gfloat *moto_point_cloud_get_plain_point_data(MotoPointCloud *self, gsize *size)
+void moto_point_cloud_get_plain_point_data(MotoPointCloud *self,
+        gfloat **points, gfloat **normals, gsize *size)
 {
     MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);
 
-    if(iface->get_plain_point_data)
-        return iface->get_plain_point_data(self, size);
-
-    return NULL;
-}
-
-gfloat *moto_point_cloud_get_plain_normal_data(MotoPointCloud *self, gsize *size)
-{
-    MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);
-
-    if(iface->get_plain_normal_data)
-        return iface->get_plain_normal_data(self, size);
-
-    return NULL;
+    if(iface->get_plain_data)
+    {
+        iface->get_plain_data(self, points, normals, size);
+    }
+    else
+    {
+        *points  = NULL;
+        *normals = NULL;
+        *size    = 0;
+    }
 }

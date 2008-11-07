@@ -9,10 +9,8 @@
 
 /* forwards */
 
-static void
-moto_mesh_copyable_init(MotoCopyableIface *iface);
-static void
-moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
+static void moto_mesh_copyable_init(MotoCopyableIface *iface);
+static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
 
 /* MotoMesh */
 
@@ -2198,10 +2196,10 @@ void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh 
 }
 
 
-/* PointCloud and Copyable interfaces implementation for MotoMesh */
+/* Implementation of MotoPointCloudIface for MotoMesh */
 
 static void
-moto_mesh_foreach_point(MotoPointCloud *self,
+__moto_mesh_foreach_point(MotoPointCloud *self,
     MotoPointCloudForeachPointFunc func, gpointer user_data)
 {
     MotoMesh *mesh = MOTO_MESH(self);
@@ -2211,8 +2209,36 @@ moto_mesh_foreach_point(MotoPointCloud *self,
         func(self, (gfloat *)(mesh->v_coords + i), (gfloat *)(mesh->v_normals + i), user_data);
 }
 
+static gboolean
+__moto_mesh_can_provide_plain_data(MotoPointCloud *self)
+{
+    return TRUE;
+}
+
+static gfloat *
+__moto_mesh_get_plain_data(MotoPointCloud *self,
+        gfloat **points, gfloat **normals, gsize *size)
+{
+    MotoMesh *mesh = MOTO_MESH(self);
+
+    *points  = (gfloat *)(mesh->v_coords);
+    *normals = (gfloat *)(mesh->v_normals);
+    *size    = mesh->v_num;
+}
+
+static void
+moto_mesh_point_cloud_init(MotoPointCloudIface *iface)
+{
+    iface->foreach_point = __moto_mesh_foreach_point;
+
+    iface->can_provide_plain_data = __moto_mesh_can_provide_plain_data;
+    iface->get_plain_data   = __moto_mesh_get_plain_data;
+}
+
+/* Implmentation on MotoCopyableIface for MotoMesh */
+
 static MotoCopyable*
-moto_mesh_copy_for_copyable(MotoCopyable *self)
+__moto_mesh_copy_for_copyable(MotoCopyable *self)
 {
     return MOTO_COPYABLE(moto_mesh_new_copy(MOTO_MESH(self)));
 }
@@ -2220,11 +2246,5 @@ moto_mesh_copy_for_copyable(MotoCopyable *self)
 static void
 moto_mesh_copyable_init(MotoCopyableIface *iface)
 {
-    iface->copy = moto_mesh_copy_for_copyable;
-}
-
-static void
-moto_mesh_point_cloud_init(MotoPointCloudIface *iface)
-{
-    iface->foreach_point = moto_mesh_foreach_point;
+    iface->copy = __moto_mesh_copy_for_copyable;
 }

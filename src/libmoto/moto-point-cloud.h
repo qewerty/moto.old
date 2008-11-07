@@ -34,8 +34,8 @@ typedef void (*MotoPointCloudForeachPointFunc)(MotoPointCloud *ptc,
 typedef void (*MotoPointCloudForeachPointMethod)(MotoPointCloud *self,
         MotoPointCloudForeachPointFunc func, gpointer user_data);
 typedef gboolean (*MotoPointCloudCanProvidePlainDataMethod)(MotoPointCloud *self);
-typedef float *(*MotoPointCloudGetPlainPointDataMethod)(MotoPointCloud *self, gsize *size);
-typedef float *(*MotoPointCloudGetPlainNormalDataMethod)(MotoPointCloud *self, gsize *size);
+typedef gfloat *(*MotoPointCloudGetPlainDataMethod)(MotoPointCloud *self,
+        gfloat **points, gfloat **normals, gsize *size);
 
 struct _MotoPointCloudIface
 {
@@ -44,8 +44,7 @@ struct _MotoPointCloudIface
     MotoPointCloudForeachPointMethod foreach_point;
 
     MotoPointCloudCanProvidePlainDataMethod can_provide_plain_data;
-    MotoPointCloudGetPlainPointDataMethod get_plain_point_data;
-    MotoPointCloudGetPlainNormalDataMethod get_plain_normal_data;
+    MotoPointCloudGetPlainDataMethod get_plain_data;
 };
 
 GType moto_point_cloud_get_type(void);
@@ -59,8 +58,8 @@ void moto_point_cloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachP
 
 /* Following functions may be used for SSE optimization of point cloud data processing. */
 gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self);
-gfloat *moto_point_cloud_get_plain_point_data(MotoPointCloud *self, gsize *size);
-gfloat *moto_point_cloud_get_plain_normal_data(MotoPointCloud *self, gsize *size);
+void moto_point_cloud_get_plain_data(MotoPointCloud *self,
+        gfloat **points, gfloat **normals, gsize *size);
 
 G_END_DECLS
 
