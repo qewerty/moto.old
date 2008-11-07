@@ -4,6 +4,12 @@
 #include "moto-outliner.h"
 #include "moto-test-window.h"
 
+static  void 
+__on_row_activated(GtkTreeView       *tree_view,
+                   GtkTreePath       *path,
+                   GtkTreeViewColumn *column,
+                   MotoOutliner      *outliner);
+
 /* class MotoOutliner */
 
 typedef struct _MotoOutlinerPriv MotoOutlinerPriv;
@@ -15,6 +21,7 @@ static GObjectClass *outliner_parent_class = NULL;
 struct _MotoOutlinerPriv
 {
     MotoWorld *world;
+    MotoTestWindow *window;
 
     GtkListStore *ls;
     GtkTreeView *tv;
@@ -46,12 +53,15 @@ moto_outliner_init(MotoOutliner *self)
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
     priv->world = NULL;
+    priv->window = NULL;
 
     priv->ls = (GtkListStore *)gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, MOTO_TYPE_NODE);
 
     priv->tv = (GtkTreeView *)gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->ls));
     gtk_tree_view_set_rules_hint(priv->tv, TRUE);
     g_object_ref_sink(priv->tv);
+
+    g_signal_connect(G_OBJECT(priv->tv), "row-activated", G_CALLBACK(__on_row_activated), self);
 
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(priv->tv, -1,
@@ -85,15 +95,18 @@ moto_outliner_class_init(MotoOutlinerClass *klass)
 
 G_DEFINE_TYPE(MotoOutliner, moto_outliner, GTK_TYPE_VBOX);
 
-GtkWidget *moto_outliner_new(MotoWorld *world)
+GtkWidget *moto_outliner_new(MotoTestWindow *window, MotoWorld *world)
 {
     g_return_val_if_fail(world, NULL);
+
 
     MotoOutliner *self = (MotoOutliner *)g_object_new(MOTO_TYPE_OUTLINER, NULL);
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
     priv->world = world;
     g_object_add_weak_pointer(G_OBJECT(world), (gpointer *) & priv->world);
+
+    priv->window = window;
 
     moto_outliner_update(self);
 
@@ -125,4 +138,21 @@ void moto_outliner_update(MotoOutliner *self)
 
     moto_world_foreach_node(priv->world, MOTO_TYPE_NODE,
             (MotoWorldForeachNodeFunc)__append_node, priv);
+}
+
+static  void 
+__on_row_activated(GtkTreeView       *tree_view,
+                   GtkTreePath       *path,
+                   GtkTreeViewColumn *column,
+                   MotoOutliner      *outliner)
+{
+    MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(outliner);
+
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter iter;
+    gtk_tree_model_get_iter(model, & iter, path);
+
+    MotoNode *node = NULL;
+    gtk_tree_model_get(model, & iter, 2, & node, -1);
+    moto_test_window_update_param_editor_full(priv->window, node);
 }

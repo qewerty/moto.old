@@ -24,6 +24,8 @@
 
 #include <gtk/gtk.h>
 
+#include "libmoto/moto-forward.h"
+
 G_BEGIN_DECLS
 
 typedef struct _MotoTestWindow MotoTestWindow;
@@ -57,6 +59,8 @@ GtkWindow *moto_test_window_new();
 
 void moto_test_window_redraw_3dview(MotoTestWindow *self);
 void moto_test_window_update_param_editor(MotoTestWindow *self);
+void moto_test_window_update_param_editor_full(MotoTestWindow *self, MotoNode *node);
+void moto_test_window_update_outliner(MotoTestWindow *self);
 
 G_END_DECLS
 

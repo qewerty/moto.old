@@ -24,7 +24,9 @@
 
 #include <gtk/gtk.h>
 
-#include <libmoto/moto-world.h>
+#include "libmoto/moto-world.h"
+#include "moto-test-window.h"
+
 
 G_BEGIN_DECLS
 
@@ -50,7 +52,7 @@ GType moto_outliner_get_type();
 #define MOTO_IS_OUTLINER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_OUTLINER))
 #define MOTO_OUTLINER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OUTLINER, MotoOutlinerClass))
 
-GtkWidget *moto_outliner_new(MotoWorld *world);
+GtkWidget *moto_outliner_new(MotoTestWindow *window, MotoWorld *world);
 
 void moto_outliner_update(MotoOutliner *self);
 
