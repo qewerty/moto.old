@@ -18,7 +18,7 @@ msg.info('Using config file "%s"' % config)
 
 build_dir = os.path.join('build', os.path.basename(config).split(os.extsep)[0])
 
-cpppath = ['..']
+cpppath = ['.', '..']
 
 opts = create_options(config, ARGUMENTS)
 env = Environment(options = opts,
