@@ -5,11 +5,20 @@
 
 static GtkMenuBar *create_menu_bar(MotoParamEditor *pe);
 
-static void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node);
+static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *node, gboolean force);
+#define __moto_param_editor_update(self, node) __moto_param_editor_update_full(self, node, FALSE);
 
-static void __on_button_prev(GtkButton* button, MotoParamEditor *tb);
-static void __on_button_next(GtkButton* button, MotoParamEditor *tb);
+static void __moto_param_editor_set_node_buttons(MotoParamEditor *self, gboolean sensitive);
+static void __moto_param_editor_set_param_mode(MotoParamEditor *self, MotoParamMode mode);
+
+static void __on_button_prev(GtkButton* button, MotoParamEditor *pe);
+static void __on_button_next(GtkButton* button, MotoParamEditor *pe);
 static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was);
+
+static void __on_button_in(GtkButton* button, MotoParamEditor *pe);
+static void __on_button_out(GtkButton* button, MotoParamEditor *pe);
+static void __on_button_inout(GtkButton* button, MotoParamEditor *pe);
+static void __on_button_all(GtkButton* button, MotoParamEditor *pe);
 
 /* class MotoParamEditor */
 
@@ -30,9 +39,17 @@ struct _MotoParamEditorPriv
     guint num;
     guint gnum;
 
+    GtkWidget *button_in;
+    GtkWidget *button_out;
+    GtkWidget *button_inout;
+    GtkWidget *button_all;
+
     MotoNode *node;
     GList *prev_nodes;
     GList *next_nodes;
+
+    MotoParamMode param_mode;
+    gboolean show_all;
 };
 
 static void
@@ -71,27 +88,33 @@ moto_param_editor_init(MotoParamEditor *self)
         (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_FORWARD);
     gtk_widget_set_sensitive(self->priv->button_prev, FALSE);
     gtk_widget_set_sensitive(self->priv->button_next, FALSE);
-
     g_signal_connect(G_OBJECT(button_back), "clicked", G_CALLBACK(__on_button_prev), self);
     g_signal_connect(G_OBJECT(button_forw), "clicked", G_CALLBACK(__on_button_next), self);
 
-    GtkWidget *button_in    = (GtkWidget *)gtk_tool_button_new(NULL, "IN");
-    GtkWidget *button_out   = (GtkWidget *)gtk_tool_button_new(NULL, "OUT");
-    GtkWidget *button_inout = (GtkWidget *)gtk_tool_button_new(NULL, "INOUT");
-    gtk_widget_set_sensitive(button_in, FALSE);
-    gtk_widget_set_sensitive(button_out, FALSE);
+    GtkWidget *button_in    = self->priv->button_in    = (GtkWidget *)gtk_tool_button_new(NULL, "IN");
+    GtkWidget *button_out   = self->priv->button_out   = (GtkWidget *)gtk_tool_button_new(NULL, "OUT");
+    GtkWidget *button_inout = self->priv->button_inout = (GtkWidget *)gtk_tool_button_new(NULL, "INOUT");
+    GtkWidget *button_all   = self->priv->button_all   = (GtkWidget *)gtk_tool_button_new(NULL, "ALL");
+    gtk_widget_set_sensitive(button_in,    FALSE);
+    gtk_widget_set_sensitive(button_out,   FALSE);
     gtk_widget_set_sensitive(button_inout, FALSE);
+    gtk_widget_set_sensitive(button_all,   FALSE);
+    g_signal_connect(G_OBJECT(button_in),    "clicked", G_CALLBACK(__on_button_in),    self);
+    g_signal_connect(G_OBJECT(button_out),   "clicked", G_CALLBACK(__on_button_out),   self);
+    g_signal_connect(G_OBJECT(button_inout), "clicked", G_CALLBACK(__on_button_inout), self);
+    g_signal_connect(G_OBJECT(button_all),   "clicked", G_CALLBACK(__on_button_all),   self);
 
-    gtk_box_pack_start(self->priv->bbox, button_in, FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_out, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_back,  FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_forw,  FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_in,    FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_out,   FALSE, FALSE, 0);
     gtk_box_pack_start(self->priv->bbox, button_inout, FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_back, FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_forw, FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->bbox, button_all,   FALSE, FALSE, 0);
 
     gtk_container_add((GtkContainer *)self, (GtkWidget *)self->priv->box);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->menu_bar,  FALSE, FALSE, 0);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->bbox,     FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->box,     (GtkWidget *)gtk_hseparator_new(),  FALSE, FALSE, 0);
+    gtk_box_pack_start(self->priv->box,     gtk_hseparator_new(),  FALSE, FALSE, 0);
     gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->gbox,     TRUE, TRUE, 4);
 
     self->priv->window = NULL;
@@ -101,6 +124,9 @@ moto_param_editor_init(MotoParamEditor *self)
     self->priv->node = NULL;
     self->priv->prev_nodes = NULL;
     self->priv->next_nodes = NULL;
+
+    self->priv->param_mode = MOTO_PARAM_MODE_IN;
+    self->priv->show_all = FALSE;
 }
 
 static void
@@ -405,6 +431,9 @@ typedef struct _AddWidgetData
 
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
+    if(moto_param_get_mode(param) != data->pe->priv->param_mode && ! data->pe->priv->show_all)
+        return;
+
     GtkWidget *label = gtk_label_new(moto_param_get_title(param));
     gtk_misc_set_alignment((GtkMisc *)label, 1, 0.5);
 
@@ -471,9 +500,9 @@ void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
     __moto_param_editor_update(self, node);
 }
 
-static void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
+static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *node, gboolean force)
 {
-    if(node == self->priv->node)
+    if(node == self->priv->node && ! force)
         return;
 
     if(self->priv->node)
@@ -488,7 +517,11 @@ static void __moto_param_editor_update(MotoParamEditor *self, MotoNode *node)
             gtk_container_remove((GtkContainer *)self->priv->gbox, (GtkWidget *)ch->data);
     }
     if( ! node)
+    {
+        __moto_param_editor_set_node_buttons(self, FALSE);
         return;
+    }
+    __moto_param_editor_set_node_buttons(self, TRUE);
 
     g_object_weak_ref(G_OBJECT(node), (GWeakNotify)node_delete_notify, self);
     self->priv->node = node;
@@ -597,14 +630,14 @@ void moto_param_editor_goto_last_node(MotoParamEditor *self)
         return;
 }
 
-static void __on_button_prev(GtkButton* button, MotoParamEditor *tb)
+static void __on_button_prev(GtkButton* button, MotoParamEditor *pe)
 {
-    moto_param_editor_goto_prev_node(tb);
+    moto_param_editor_goto_prev_node(pe);
 }
 
-static void __on_button_next(GtkButton* button, MotoParamEditor *tb)
+static void __on_button_next(GtkButton* button, MotoParamEditor *pe)
 {
-    moto_param_editor_goto_next_node(tb);
+    moto_param_editor_goto_next_node(pe);
 }
 
 static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was)
@@ -623,4 +656,42 @@ static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_wa
             moto_param_editor_goto_next_node(pe);
         }
     }
+}
+
+static void __moto_param_editor_set_param_mode(MotoParamEditor *self, MotoParamMode mode)
+{
+    self->priv->param_mode = mode;
+    __moto_param_editor_update_full(self, self->priv->node, TRUE);
+}
+
+static void __on_button_in(GtkButton* button, MotoParamEditor *pe)
+{
+    pe->priv->show_all = FALSE;
+    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_IN);
+}
+
+static void __on_button_out(GtkButton* button, MotoParamEditor *pe)
+{
+    pe->priv->show_all = FALSE;
+    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_OUT);
+}
+
+static void __on_button_inout(GtkButton* button, MotoParamEditor *pe)
+{
+    pe->priv->show_all = FALSE;
+    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
+}
+
+static void __on_button_all(GtkButton* button, MotoParamEditor *pe)
+{
+    pe->priv->show_all = TRUE;
+    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
+}
+
+static void __moto_param_editor_set_node_buttons(MotoParamEditor *self, gboolean sensitive)
+{
+    gtk_widget_set_sensitive(self->priv->button_in,    sensitive);
+    gtk_widget_set_sensitive(self->priv->button_out,   sensitive);
+    gtk_widget_set_sensitive(self->priv->button_inout, sensitive);
+    gtk_widget_set_sensitive(self->priv->button_all,   sensitive);
 }
