@@ -15,6 +15,9 @@ G_TYPE_STRING
 G_TYPE_POINTER
 G_TYPE_OBJECT
 
+All except G_TYPE_OBJECT are redefined as:
+    #define G_TYPE_<NAME> MOTO_TYPE_<NAME> MOTO_TYPE_<NAME>1
+
 Specific for Moto
 -----------------
 

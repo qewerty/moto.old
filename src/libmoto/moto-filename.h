@@ -22,6 +22,7 @@
 #ifndef __MOTO_FILENAME_H__
 #define __MOTO_FILENAME_H__
 
+#include <glib.h>
 #include <glib-object.h>
 
 G_BEGIN_DECLS
