@@ -248,18 +248,18 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     self->priv->system = system;
     self->priv->window = window;
 
-    moto_shelf_add_tab(self, "Mesh");
+    moto_shelf_add_tab(self, "Geom");
 
-    moto_shelf_add_item(self, "Mesh", "Plane", create_mesh_plane);
-    moto_shelf_add_item(self, "Mesh", "Cube", create_mesh_cube);
-    moto_shelf_add_item(self, "Mesh", "Sphere", create_mesh_sphere);
-    moto_shelf_add_item(self, "Mesh", "Cylinder", create_mesh_cylinder);
-    moto_shelf_add_item(self, "Mesh", "File", create_mesh_file);
+    moto_shelf_add_item(self, "Geom", "Plane", create_mesh_plane);
+    moto_shelf_add_item(self, "Geom", "Cube", create_mesh_cube);
+    moto_shelf_add_item(self, "Geom", "Sphere", create_mesh_sphere);
+    moto_shelf_add_item(self, "Geom", "Cylinder", create_mesh_cylinder);
+    moto_shelf_add_item(self, "Geom", "File", create_mesh_file);
 
-    moto_shelf_add_tab(self, "Poly");
-    moto_shelf_add_item(self, "Poly", "Extrude", create_mesh_cube);
-    moto_shelf_add_item(self, "Poly", "Bevel", create_mesh_cube);
-    moto_shelf_add_item(self, "Poly", "Collapse", create_mesh_cube);
+    moto_shelf_add_tab(self,  "Model");
+    moto_shelf_add_item(self, "Model", "Extrude", create_mesh_cube);
+    moto_shelf_add_item(self, "Model", "Bevel", create_mesh_cube);
+    moto_shelf_add_item(self, "Model", "Collapse", create_mesh_cube);
 
     moto_shelf_add_tab(self, "Anim");
     moto_shelf_add_item(self, "Anim", "Morph", NULL);

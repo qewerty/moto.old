@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <glib-object.h>
+
 #include "libmotoutil/moto-gl.h"
 
 #include "libmoto/moto.h"
@@ -8,6 +10,8 @@
 #include "libmoto/moto-node.h"
 #include "libmoto/moto-object-node.h"
 #include "libmoto/moto-plane-node.h"
+
+#include "libmoto/moto-types.h"
 
 #include "libmototest/moto-test.h"
 
@@ -79,6 +83,7 @@ int main(int argc, char *argv[])
     }
 
     g_print("Initializing Moto ...\n");
+    moto_types_init();
 
     // g_print("s: %s\n", g_find_program_in_path(argv[0]));
 
