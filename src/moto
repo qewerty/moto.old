@@ -5,7 +5,7 @@ import sys, os
 dirname = os.path.dirname(os.path.realpath(__file__))
 ldpath  = os.path.join(dirname, 'lib')
 
-cmd = 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s && %s' % \
-        (ldpath, os.path.join(dirname, 'moto-gui'))
+cmd = 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s && %s %s' % \
+        (ldpath, os.path.join(dirname, 'moto-gui'), ' '.join(sys.argv[1:]))
 
 os.system(cmd)
