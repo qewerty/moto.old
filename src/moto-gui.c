@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "libmotoutil/moto-gl.h"
 
 #include "libmoto/moto.h"
@@ -6,6 +8,8 @@
 #include "libmoto/moto-node.h"
 #include "libmoto/moto-object-node.h"
 #include "libmoto/moto-plane-node.h"
+
+#include "libmototest/moto-test.h"
 
 void print_type_tree_indent(GType type, const gchar *indent)
 {
@@ -61,10 +65,20 @@ void print_enum()
 
 int main(int argc, char *argv[])
 {
-    g_print("Initializing Moto ...\n");
 
     gtk_init(& argc, & argv);
     g_thread_init(NULL);
+
+    if(argc > 1 && ((0 == g_strcmp0(argv[1], "--test")) || (0 == g_strcmp0(argv[1], "-t"))))
+    {
+        g_print("Testing ... \n");
+        g_test_init(& argc, & argv, NULL);
+        moto_collect_test_cases();
+        g_test_run();
+        exit(0);
+    }
+
+    g_print("Initializing Moto ...\n");
 
     // g_print("s: %s\n", g_find_program_in_path(argv[0]));
 
