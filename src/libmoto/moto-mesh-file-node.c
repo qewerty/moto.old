@@ -21,8 +21,7 @@ static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self);
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
 */
 
-static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename);
-
+static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename);
 static void moto_mesh_file_node_update(MotoNode *self);
 
 /* class MeshFileNode */
@@ -143,7 +142,7 @@ static gboolean try_mesh_loader(gpointer data, gpointer user_data)
     return FALSE;
 }
 
-static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
+static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
 {
     MotoLibrary *lib = moto_node_get_library((MotoNode *)self);
     if( ! lib)
@@ -162,200 +161,26 @@ static void moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filena
 
     if(tmld.mesh)
     {
-        // g_string_assign(self->priv->loaded_filename, tmld.filename);
-
-        GString *msg = g_string_new("Mesh \"");
-        g_string_append(msg, tmld.filename);
-        g_string_append(msg, "\" successfully loaded.");
-        moto_info(msg->str);
-        g_string_free(msg, TRUE);
+        moto_info("Mesh \"%s\" successfully loaded.", tmld.filename);
     }
     else
     {
-        GString *msg = g_string_new("Error while loading mesh \"");
-        g_string_append(msg, tmld.filename);
-        g_string_append(msg, "\". I can't load it. ;(");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("Error while loading mesh \"%s\". I can't load it. ;(", tmld.filename);
     }
+
+    return tmld.mesh;
 }
 
 static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 {
     gchar *filename = *(self->priv->filename_ptr);
 
-    g_print("filename: %s\n", filename);
-
-    GFile *f = g_file_new_for_path(filename);
-    GInputStream *is = (GInputStream *)g_file_read(f, NULL, NULL);
-    if( ! is)
-        return;
-
-    GString *data = g_string_new("");
-    gsize count = 256;
-    gsize read_bytes = 0;
-    gchar buffer[256];
-    while(read_bytes = g_input_stream_read(is, buffer, count, NULL, NULL))
-        g_string_append_len(data, buffer, read_bytes);
-    g_input_stream_close(is, NULL, NULL);
-
-    guint v_num   = 0,
-          e_num   = 0, // WARNING! Initially without edges. Edges will be calculated while preparing mesh.
-          f_num   = 0,
-          f_v_num = 0;
-
-    gulong i;
-    gchar *p = data->str;
-    for(i = 0; i < data->len; i++)
-    {
-        gchar last = data->str[i];
-        if('\n' == last)
-        {
-            if('v' == p[0])
-                v_num++;
-            if('f' == p[0])
-            {
-                f_num++;
-
-                gchar *pp = p+1;
-                do
-                {
-                    if(' ' != *pp)
-                    {
-                        f_v_num++;
-
-                        while(' ' != *pp || '\n' == *pp)
-                        {
-                            if('\n' == *pp)
-                                break;
-                            pp++;
-                        }
-                    }
-                    if('\n' == *pp)
-                        break;
-                    pp++;
-                }
-                while('\n' != *pp);
-            }
-
-            p = data->str + i + 1;
-        }
-    }
-
-    g_print("MeshFile: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
-
-    if(self->priv->mesh)
-    {
-        g_object_unref(self->priv->mesh);
-    }
-    self->priv->mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
-    MotoMesh *mesh = self->priv->mesh;
-
-    GArray *f_verts = g_array_sized_new(FALSE, FALSE, sizeof(guint32), 10);
-
-    v_num = 0;
-    guint32 f_offset = 0;
-    f_v_num = 0;
-    f_num = 0;
-    p = data->str;
-    guint j = 0;
-    for(i = 0; i < data->len; i++)
-    {
-        gchar last = data->str[i];
-        if('\n' == last)
-        {
-            if('v' == p[0])
-            {
-                v_num++;
-                gchar *p2 = p+1;
-                do
-                {
-                    if(' ' != *p2)
-                    {
-
-                        ((gfloat *)mesh->v_coords)[j++] = (gfloat)g_strtod(p2, NULL);
-                        while(' ' != *p2 || '\n' == *p2)
-                        {
-                            if('\n' == *p2)
-                                break;
-                            p2++;
-                        }
-                    }
-                    if('\n' == *p2)
-                        break;
-                    p2++;
-                }
-                while('\n' != *p2);
-            }
-            if('f' == p[0])
-            {
-                f_num++;
-                gchar *p2 = p+1;
-                do
-                {
-                    if(' ' != *p2)
-                    {
-
-                        guint32 vi = (guint32)strtoul(p2, NULL, 10)-1;
-                        g_array_append_val(f_verts, vi);
-                        f_offset++;
-                        f_v_num++;
-                        while(' ' != *p2 || '\n' == *p2)
-                        {
-                            if('\n' == *p2)
-                                break;
-                            p2++;
-                        }
-                    }
-                    if('\n' == *p2)
-                        break;
-                    p2++;
-                }
-                while('\n' != *p2);
-                // f_data[f_num-1].v_num = f_v_num;
-                if( ! moto_mesh_set_face(mesh, f_num-1, f_offset, (guint32*)f_verts->data))
-                    ; // FIXME: Error
-                g_array_remove_range(f_verts, 0, f_v_num);
-                f_v_num = 0;
-            }
-
-            p = data->str + i + 1;
-        }
-    }
-    g_string_free(data, TRUE);
-    g_array_free(f_verts, TRUE);
-
-    g_print("MeshFile: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
-    g_print("DONE\n");
+    MotoMesh *mesh = moto_mesh_file_node_load(self, filename);
 
     self->priv->bound_calculated = FALSE;
-    if( ! moto_mesh_prepare(mesh))
-    {
-        // FIXME: Error while preparing mesh.
-        return;
-    }
-
-    /*
-    MotoPointCloud *pc = MOTO_POINT_CLOUD(mesh);
-    if(moto_point_cloud_can_provide_plain_data(pc))
-    {
-        gfloat *points;
-        gfloat *normals;
-        gsize size;
-        moto_point_cloud_get_plain_data(pc, & points, & normals, & size);
-
-        gsize i;
-        for(i = 0; i < size; i++)
-        {
-            gfloat *p = points + i*3;
-            gfloat *n = normals + i*3;
-            point3_move(p, n, -0.1);
-        }
-    }
-    */
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
+    moto_param_set_object(pm, mesh);
     moto_param_update_dests(pm);
 
 }

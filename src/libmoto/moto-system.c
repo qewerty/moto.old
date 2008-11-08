@@ -100,6 +100,13 @@ moto_system_init(MotoSystem *self)
 
     self->priv->library = moto_library_new();
 
+    moto_library_new_slot(self->priv->library, "mesh-loader", MOTO_TYPE_MESH_LOADER);
+
+#ifdef MOTO_WITH_WOBJ_MESH_LOADER
+    moto_library_new_entry(self->priv->library, "mesh-loader",
+            g_type_name(MOTO_TYPE_WOBJ_MESH_LOADER), moto_wobj_mesh_loader_new());
+#endif
+
     self->priv->world_list_mutex    = g_mutex_new();
     self->priv->current_world_mutex = g_mutex_new();
     self->priv->library_mutex       = g_mutex_new();

@@ -2,7 +2,7 @@
 
 /* forwards */
 
-static gboolean moto_mesh_loader_can_virtual(MotoMeshLoader *self, const gchar *filename);
+static gboolean __moto_mesh_loader_can_virtual(MotoMeshLoader *self, const gchar *filename);
 
 /* class MeshLoader */
 
@@ -35,7 +35,7 @@ moto_mesh_loader_class_init(MotoMeshLoaderClass *klass)
     goclass->finalize   = moto_mesh_loader_finalize;
 
     klass->get_extensions   = NULL;
-    klass->can              = moto_mesh_loader_can_virtual;
+    klass->can              = __moto_mesh_loader_can_virtual;
     klass->load             = NULL;
 }
 
@@ -73,11 +73,11 @@ MotoMesh *moto_mesh_loader_load(MotoMeshLoader *self, const gchar *filename)
     return NULL;
 }
 
-static gboolean moto_mesh_loader_can_virtual(MotoMeshLoader *self, const gchar *filename)
+static gboolean __moto_mesh_loader_can_virtual(MotoMeshLoader *self, const gchar *filename)
 {
     GString *ext;
     gchar *ext2;
-    glong len = g_utf8_strlen(filename, -99);
+    glong len = g_utf8_strlen(filename, -1);
 
     const GSList *ext_list = moto_mesh_loader_get_extentions(self);
     for(; ext_list; ext_list = g_slist_next(ext_list))
@@ -90,7 +90,10 @@ static gboolean moto_mesh_loader_can_virtual(MotoMeshLoader *self, const gchar *
         ext2 = g_utf8_offset_to_pointer(filename, len - ext->len);
 
         if(g_utf8_collate(ext->str, ext2) == 0)
+        {
+            g_print("TRUE\n");
             return TRUE;
+        }
     }
 
     return FALSE;
