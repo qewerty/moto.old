@@ -221,25 +221,41 @@ MotoMesh *moto_mesh_new_copy(MotoMesh *other)
 {
     MotoMesh *self = moto_mesh_new(other->v_num, other->e_num, other->f_num, moto_mesh_get_f_v_num(other));
 
-    /*
-    guint i, j;
+    self->he_calculated = other->he_calculated;
+    self->tesselated = other->tesselated;
+    self->f_tess_num = other->f_tess_num;
 
-    GData *attr = other->v_attrs;
-    for(; attr; attr = g_slist_next(attr))
+    memcpy(self->v_coords, other->v_coords, sizeof(MotoVector)*self->v_num);
+    memcpy(self->v_normals, other->v_normals, sizeof(MotoVector)*self->v_num);
+
+    if(self->b32)
     {
-        MotoMeshVertAttr *va  = (MotoMeshVertAttr *)attr->data;
-        MotoMeshVertAttr *va2 = moto_mesh_add_attr(self, va->name->str, va->chnum);
+        memcpy(self->v_data, other->v_data, sizeof(MotoMeshVert32)*self->v_num);
+        memcpy(self->e_data, other->e_data, sizeof(MotoMeshEdge32)*self->e_num);
+        memcpy(self->f_data, other->f_data, sizeof(MotoMeshFace32)*self->f_num);
 
-        for(i = 0; i < self->v_num; i++)
-        {
-            for(j = 0; j < va->chnum; j++)
-            {
-                guint index = i*va->chnum + j;
-                va2->data[index] = va->data[index];
-            }
-        }
+        memcpy(self->e_verts, other->e_verts, sizeof(guint32) * self->e_num * 2);
+        memcpy(self->f_verts, other->f_verts, sizeof(guint32) * self->f_v_num);
+
+        memcpy(self->f_normals, other->f_normals, sizeof(MotoVector) * self->f_num);
+        //memcpy(self->f_tess_verts, other->f_tess_verts, sizeof(guint32) * self->f_num * 3 * 2);
+
+        memcpy(self->he_data, other->he_data, sizeof(MotoHalfEdge32) * self->e_num * 2);
     }
-    */
+    else
+    {
+        memcpy(self->v_data, other->v_data, sizeof(MotoMeshVert16)*self->v_num);
+        memcpy(self->e_data, other->e_data, sizeof(MotoMeshEdge16)*self->e_num);
+        memcpy(self->f_data, other->f_data, sizeof(MotoMeshFace16)*self->f_num);
+
+        memcpy(self->e_verts, other->e_verts, sizeof(guint16) * self->e_num * 2);
+        memcpy(self->f_verts, other->f_verts, sizeof(guint16) * self->f_v_num);
+
+        memcpy(self->f_normals, other->f_normals, sizeof(MotoVector) * self->f_num);
+        //memcpy(self->f_tess_verts, other->f_tess_verts, sizeof(guint16) * self->f_num * 3 * 2);
+
+        memcpy(self->he_data, other->he_data, sizeof(MotoHalfEdge16) * self->e_num * 2);
+    }
 
     return self;
 }

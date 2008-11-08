@@ -53,7 +53,7 @@ gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self)
     return FALSE;
 }
 
-void moto_point_cloud_get_plain_point_data(MotoPointCloud *self,
+void moto_point_cloud_get_plain_data(MotoPointCloud *self,
         gfloat **points, gfloat **normals, gsize *size)
 {
     MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);

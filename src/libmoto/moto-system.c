@@ -8,6 +8,7 @@
 #include "moto-mesh-loader.h"
 
 /* nodes */
+#include "moto-normal-move-node.h"
 #include "moto-object-node.h"
 #include "moto-camera-node.h"
 #include "moto-sler-material-node.h"
@@ -130,6 +131,7 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_RAY_VIEW_NODE;
         MOTO_TYPE_MATERIAL_NODE;
             MOTO_TYPE_SLER_MATERIAL_NODE;
+        MOTO_TYPE_NORMAL_MOVE_NODE;
 }
 
 G_DEFINE_TYPE(MotoSystem, moto_system, G_TYPE_OBJECT);

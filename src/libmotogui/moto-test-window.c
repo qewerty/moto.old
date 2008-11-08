@@ -450,7 +450,12 @@ void moto_test_window_redraw_3dview(MotoTestWindow *self)
 void moto_test_window_update_param_editor(MotoTestWindow *self)
 {
     MotoNode *obj = (MotoNode *)moto_world_get_current_object(self->priv->world);
+    if( ! obj)
+        return;
+
     MotoNode *view = (MotoNode *)moto_node_get_param_object(obj, "view");
+    if( ! view)
+        return;
 
     MotoParam *p = moto_node_get_param(view, "mesh");
     if( ! p)

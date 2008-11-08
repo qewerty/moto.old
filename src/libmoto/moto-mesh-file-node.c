@@ -2,6 +2,7 @@
 
 #include <gio/gio.h>
 
+#include "moto-point-cloud.h"
 #include "moto-filename.h"
 #include "moto-mesh-file-node.h"
 #include "moto-library.h"
@@ -333,6 +334,25 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
         // FIXME: Error while preparing mesh.
         return;
     }
+
+    /*
+    MotoPointCloud *pc = MOTO_POINT_CLOUD(mesh);
+    if(moto_point_cloud_can_provide_plain_data(pc))
+    {
+        gfloat *points;
+        gfloat *normals;
+        gsize size;
+        moto_point_cloud_get_plain_data(pc, & points, & normals, & size);
+
+        gsize i;
+        for(i = 0; i < size; i++)
+        {
+            gfloat *p = points + i*3;
+            gfloat *n = normals + i*3;
+            point3_move(p, n, -0.1);
+        }
+    }
+    */
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);

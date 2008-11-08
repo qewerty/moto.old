@@ -155,10 +155,30 @@ static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
     MotoNode *view_node = moto_world_create_node(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *mf_node = moto_world_create_node(w, "MotoMeshFileNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mod = moto_world_create_node(w, "MotoNormalMoveNode", "NormalMove", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", mf_node, "mesh");
+    moto_node_link(mod, "in_pc", mf_node, "mesh");
+    moto_node_link(view_node, "mesh", mod, "out_pc");
     moto_node_link(obj_node, "material", mat_node, "material");
+}
+
+static void create_normal_move(MotoShelf *shelf, MotoSystem *system)
+{
+    if( ! system)
+    {
+        moto_error("MotoShelf has no associated system.");
+        return;
+    }
+
+    MotoWorld *w = moto_system_get_current_world(system);
+    if( ! w)
+    {
+        moto_error("MotoSystem associated with the shelf has no current world.");
+        return;
+    }
+
+    MotoNode *node = moto_world_create_node(w, "MotoNormalMoveNode", "NormalMove", NULL);
 }
 
 /* class MotoShelf */
@@ -253,6 +273,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Deform", "Twist", NULL);
     moto_shelf_add_item(self, "Deform", "Bend", NULL);
     moto_shelf_add_item(self, "Deform", "Displace", NULL);
+    moto_shelf_add_item(self, "Deform", "Normal", create_normal_move);
 
     return (GtkWidget *)self;
 }

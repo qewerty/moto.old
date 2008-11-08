@@ -1,9 +1,7 @@
 #include <math.h>
 
-
 #include "moto-axes-view-node.h"
 #include "libmotoutil/moto-gl.h"
-
 
 /* forwards */
 
@@ -81,11 +79,6 @@ moto_axes_view_node_class_init(MotoAxesViewNodeClass *klass)
 G_DEFINE_TYPE(MotoAxesViewNode, moto_axes_view_node, MOTO_TYPE_GEOMETRY_VIEW_NODE);
 
 /* methods of class AxesViewNode */
-
-static gpointer get_view(MotoParam *param)
-{
-    return moto_param_get_node(param);
-}
 
 MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
 {

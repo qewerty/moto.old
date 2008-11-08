@@ -342,7 +342,10 @@ void moto_node_add_params(MotoNode *self, ...)
         MotoParamMode pmode = va_arg(ap, MotoParamMode);
 
         GValue v = {0,};
-        g_value_init(&v, ptype);
+        if( ! g_type_is_a(ptype, G_TYPE_INTERFACE))
+            g_value_init(&v, ptype);
+        else
+            g_value_init(&v, G_TYPE_OBJECT);
 
         switch(ptype)
         {
@@ -388,7 +391,7 @@ void moto_node_add_params(MotoNode *self, ...)
                 {
                     g_value_set_string(&v, va_arg(ap, gchar*));
                 }
-                else if(g_type_is_a(ptype, G_TYPE_OBJECT))
+                else if(g_type_is_a(ptype, G_TYPE_OBJECT) || g_type_is_a(ptype, G_TYPE_INTERFACE))
                 {
                     g_value_set_object(&v, va_arg(ap, gpointer));
                 }
@@ -400,9 +403,11 @@ void moto_node_add_params(MotoNode *self, ...)
                     va_arg(ap, GParamSpec*);
                     va_arg(ap, gchar*);
                     va_arg(ap, gchar*);
+                    // FIXME: Why SegFault?
 
                     continue;
                 }
+            break;
         }
 
         GParamSpec *pspec = va_arg(ap, GParamSpec*);
@@ -1547,7 +1552,9 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
     {
         if( ! g_type_is_a(src_type, self_type))
-            return;
+        {
+            //return; // FIXME
+        }
     }
     else
     {
@@ -1704,6 +1711,8 @@ void moto_param_update_dests(MotoParam *self)
 
     GSList *dest = priv->dests;
     for(; dest; dest = g_slist_next(dest))
+    {
         moto_param_update((MotoParam *)dest->data);
+    }
 }
 

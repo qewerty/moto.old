@@ -210,7 +210,7 @@ inline static void draw_mesh_as_object(MotoMeshViewNodePriv *priv, MotoMesh *mes
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    gboolean force_arrays = FALSE;
+    gboolean force_arrays = TRUE;
     if(moto_gl_is_vbo_supported() && ! force_arrays) // VBO used if supported
     {
         if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
@@ -580,12 +580,12 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
 {
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
 
-    if( ! (*(priv->mesh_ptr)))
+    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
+    if( ! mesh)
         return;
 
     MotoWorld* world = moto_node_get_world(MOTO_NODE(self));
     MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
-
     switch(draw_mode)
     {
         case MOTO_DRAW_MODE_BBOX_WIREFRAME:
@@ -606,10 +606,9 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
 static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self)
 {
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
-    MotoMesh *mesh = (*(priv->mesh_ptr));
-
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode*)self);
 
+    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
     if( ! mesh)
         return;
 
@@ -632,9 +631,9 @@ static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
-    MotoMesh *mesh = (*(priv->mesh_ptr));
 
-    if(! mesh)
+    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
+    if( ! mesh)
         return TRUE;
 
     if( ! glIsList(priv->dlist))
