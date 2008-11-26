@@ -3,10 +3,10 @@ MOTO_GUI = 'moto-gui'
 CC  = 'gcc'
 CXX = 'g++'
 
-CFLAGS  = ['-O3', '-pipe', '-ffast-math', '-Wall', '-march=i686', '-msse', '-msse2', '-mfpmath=sse,387']
+CFLAGS  = ['-O3', '-pipe', '-ffast-math', '-Wall', '-march=i686', '-msse', '-msse2', '-mfpmath=sse']
 LIBS    = ['GL', 'GLU', 'GLEW']
 
-CPPFLAGS = ['-DMOTO_WOBJ_MESH_LOADER',
+CPPFLAGS = ['-DMOTO_WITH_WOBJ_MESH_LOADER',
             # '-DMOTO_MBM_MESH_LOADER',
             # '-DMOTO_RIB_MESH_LOADER',
             ]

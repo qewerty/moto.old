@@ -237,6 +237,7 @@ void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes);
 void moto_world_redraw(MotoWorld *self);
 
 void moto_world_draw(MotoWorld *self, gint width, gint height);
+void moto_world_draw_fps_test(MotoWorld *self);
 
 /**
  * moto_world_apply_default_camera:

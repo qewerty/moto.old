@@ -250,16 +250,16 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
 
     moto_shelf_add_tab(self, "Geom");
 
-    moto_shelf_add_item(self, "Geom", "Plane", create_mesh_plane);
-    moto_shelf_add_item(self, "Geom", "Cube", create_mesh_cube);
-    moto_shelf_add_item(self, "Geom", "Sphere", create_mesh_sphere);
+    moto_shelf_add_item(self, "Geom", "Plane",    create_mesh_plane);
+    moto_shelf_add_item(self, "Geom", "Cube",     create_mesh_cube);
+    moto_shelf_add_item(self, "Geom", "Sphere",   create_mesh_sphere);
     moto_shelf_add_item(self, "Geom", "Cylinder", create_mesh_cylinder);
-    moto_shelf_add_item(self, "Geom", "File", create_mesh_file);
+    moto_shelf_add_item(self, "Geom", "File",     create_mesh_file);
 
     moto_shelf_add_tab(self,  "Model");
-    moto_shelf_add_item(self, "Model", "Extrude", create_mesh_cube);
-    moto_shelf_add_item(self, "Model", "Bevel", create_mesh_cube);
-    moto_shelf_add_item(self, "Model", "Collapse", create_mesh_cube);
+    moto_shelf_add_item(self, "Model", "Extrude",  NULL);
+    moto_shelf_add_item(self, "Model", "Bevel",    NULL);
+    moto_shelf_add_item(self, "Model", "Collapse", NULL);
 
     moto_shelf_add_tab(self, "Anim");
     moto_shelf_add_item(self, "Anim", "Morph", NULL);

@@ -424,6 +424,325 @@ gboolean moto_value_get_as_double_2x2(GValue *value, gdouble *mem);
 gboolean moto_value_get_as_double_3x3(GValue *value, gdouble *mem);
 gboolean moto_value_get_as_double_4x4(GValue *value, gdouble *mem);
 
+// Setting values
+
+void moto_value_set_boolean_1(GValue *value, gboolean v0);
+void moto_value_set_boolean_1_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_2(GValue *value, gboolean v0, gboolean v1);
+void moto_value_set_boolean_2_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_3(GValue *value, gboolean v0, gboolean v1, gboolean v2);
+void moto_value_set_boolean_3_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_4(GValue *value, gboolean v0, gboolean v1, gboolean v2, gboolean v3);
+void moto_value_set_boolean_4_v(GValue *value, gboolean *v);
+
+void moto_value_set_int_1(GValue *value, gint v0);
+void moto_value_set_int_1_v(GValue *value, gint *v);
+void moto_value_set_int_2(GValue *value, gint v0, gint v1);
+void moto_value_set_int_2_v(GValue *value, gint *v);
+void moto_value_set_int_3(GValue *value, gint v0, gint v1, gint v2);
+void moto_value_set_int_3_v(GValue *value, gint *v);
+void moto_value_set_int_4(GValue *value, gint v0, gint v1, gint v2, gint v3);
+void moto_value_set_int_4_v(GValue *value, gint *v);
+
+void moto_value_set_uint_1(GValue *value, guint v0);
+void moto_value_set_uint_1_v(GValue *value, guint *v);
+void moto_value_set_uint_2(GValue *value, guint v0, guint v1);
+void moto_value_set_uint_2_v(GValue *value, guint *v);
+void moto_value_set_uint_3(GValue *value, guint v0, guint v1, guint v2);
+void moto_value_set_uint_3_v(GValue *value, guint *v);
+void moto_value_set_uint_4(GValue *value, guint v0, guint v1, guint v2, guint v3);
+void moto_value_set_uint_4_v(GValue *value, guint *v);
+
+void moto_value_set_long_1(GValue *value, glong v0);
+void moto_value_set_long_1_v(GValue *value, glong *v);
+void moto_value_set_long_2(GValue *value, glong v0, glong v1);
+void moto_value_set_long_2_v(GValue *value, glong *v);
+void moto_value_set_long_3(GValue *value, glong v0, glong v1, glong v2);
+void moto_value_set_long_3_v(GValue *value, glong *v);
+void moto_value_set_long_4(GValue *value, glong v0, glong v1, glong v2, glong v3);
+void moto_value_set_long_4_v(GValue *value, glong *v);
+
+void moto_value_set_ulong_1(GValue *value, gulong v0);
+void moto_value_set_ulong_1_v(GValue *value, gulong *v);
+void moto_value_set_ulong_2(GValue *value, gulong v0, gulong v1);
+void moto_value_set_ulong_2_v(GValue *value, gulong *v);
+void moto_value_set_ulong_3(GValue *value, gulong v0, gulong v1, gulong v2);
+void moto_value_set_ulong_3_v(GValue *value, gulong *v);
+void moto_value_set_ulong_4(GValue *value, gulong v0, gulong v1, gulong v2, gulong v3);
+void moto_value_set_ulong_4_v(GValue *value, gulong *v);
+
+void moto_value_set_int64_1(GValue *value, gint64 v0);
+void moto_value_set_int64_1_v(GValue *value, gint64 *v);
+void moto_value_set_int64_2(GValue *value, gint64 v0, gint64 v1);
+void moto_value_set_int64_2_v(GValue *value, gint64 *v);
+void moto_value_set_int64_3(GValue *value, gint64 v0, gint64 v1, gint64 v2);
+void moto_value_set_int64_3_v(GValue *value, gint64 *v);
+void moto_value_set_int64_4(GValue *value, gint64 v0, gint64 v1, gint64 v2, gint64 v3);
+void moto_value_set_int64_4_v(GValue *value, gint64 *v);
+
+void moto_value_set_uint64_1(GValue *value, guint64 v0);
+void moto_value_set_uint64_1_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_2(GValue *value, guint64 v0, guint64 v1);
+void moto_value_set_uint64_2_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_3(GValue *value, guint64 v0, guint64 v1, guint64 v2);
+void moto_value_set_uint64_3_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_4(GValue *value, guint64 v0, guint64 v1, guint64 v2, guint64 v3);
+void moto_value_set_uint64_4_v(GValue *value, guint64 *v);
+
+void moto_value_set_float_1(GValue *value, gfloat v0);
+void moto_value_set_float_1_v(GValue *value, gfloat *v);
+void moto_value_set_float_2(GValue *value, gfloat v0, gfloat v1);
+void moto_value_set_float_2_v(GValue *value, gfloat *v);
+void moto_value_set_float_3(GValue *value, gfloat v0, gfloat v1, gfloat v2);
+void moto_value_set_float_3_v(GValue *value, gfloat *v);
+void moto_value_set_float_4(GValue *value, gfloat v0, gfloat v1, gfloat v2, gfloat v3);
+void moto_value_set_float_4_v(GValue *value, gfloat *v);
+
+void moto_value_set_double_1(GValue *value, gdouble v0);
+void moto_value_set_double_1_v(GValue *value, gdouble *v);
+void moto_value_set_double_2(GValue *value, gdouble v0, gdouble v1);
+void moto_value_set_double_2_v(GValue *value, gdouble *v);
+void moto_value_set_double_3(GValue *value, gdouble v0, gdouble v1, gdouble v2);
+void moto_value_set_double_3_v(GValue *value, gdouble *v);
+void moto_value_set_double_4(GValue *value, gdouble v0, gdouble v1, gdouble v2, gdouble v3);
+void moto_value_set_double_4_v(GValue *value, gdouble *v);
+
+void moto_value_set_boolean_1x1(GValue *value, gboolean v0);
+void moto_value_set_boolean_1x1_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_2x2(GValue *value,
+        gboolean v00, gboolean v01,
+        gboolean v10, gboolean v11);
+void moto_value_set_boolean_2x2_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_3x3(GValue *value,
+        gboolean v00, gboolean v01, gboolean v02,
+        gboolean v10, gboolean v11, gboolean v12,
+        gboolean v20, gboolean v21, gboolean v22);
+void moto_value_set_boolean_3x3_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_4x4(GValue *value,
+        gboolean v00, gboolean v01, gboolean v02, gboolean v03,
+        gboolean v10, gboolean v11, gboolean v12, gboolean v13,
+        gboolean v20, gboolean v21, gboolean v22, gboolean v23,
+        gboolean v30, gboolean v31, gboolean v32, gboolean v33);
+void moto_value_set_boolean_4x4_v(GValue *value, gboolean *v);
+
+void moto_value_set_int_1x1(GValue *value, gint v0);
+void moto_value_set_int_1x1_v(GValue *value, gint *v);
+void moto_value_set_int_2x2(GValue *value,
+        gint v00, gint v01,
+        gint v10, gint v11);
+void moto_value_set_int_2x2_v(GValue *value, gint *v);
+void moto_value_set_int_3x3(GValue *value,
+        gint v00, gint v01, gint v02,
+        gint v10, gint v11, gint v12,
+        gint v20, gint v21, gint v22);
+void moto_value_set_int_3x3_v(GValue *value, gint *v);
+void moto_value_set_int_4x4(GValue *value,
+        gint v00, gint v01, gint v02, gint v03,
+        gint v10, gint v11, gint v12, gint v13,
+        gint v20, gint v21, gint v22, gint v23,
+        gint v30, gint v31, gint v32, gint v33);
+void moto_value_set_int_4x4_v(GValue *value, gint *v);
+
+void moto_value_set_uint_1x1(GValue *value, guint v0);
+void moto_value_set_uint_1x1_v(GValue *value, guint *v);
+void moto_value_set_uint_2x2(GValue *value,
+        guint v00, guint v01,
+        guint v10, guint v11);
+void moto_value_set_uint_2x2_v(GValue *value, guint *v);
+void moto_value_set_uint_3x3(GValue *value,
+        guint v00, guint v01, guint v02,
+        guint v10, guint v11, guint v12,
+        guint v20, guint v21, guint v22);
+void moto_value_set_uint_3x3_v(GValue *value, guint *v);
+void moto_value_set_uint_4x4(GValue *value,
+        guint v00, guint v01, guint v02, guint v03,
+        guint v10, guint v11, guint v12, guint v13,
+        guint v20, guint v21, guint v22, guint v23,
+        guint v30, guint v31, guint v32, guint v33);
+void moto_value_set_uint_4x4_v(GValue *value, guint *v);
+
+void moto_value_set_long_1x1(GValue *value, glong v0);
+void moto_value_set_long_1x1_v(GValue *value, glong *v);
+void moto_value_set_long_2x2(GValue *value,
+        glong v00, glong v01,
+        glong v10, glong v11);
+void moto_value_set_long_2x2_v(GValue *value, glong *v);
+void moto_value_set_long_3x3(GValue *value,
+        glong v00, glong v01, glong v02,
+        glong v10, glong v11, glong v12,
+        glong v20, glong v21, glong v22);
+void moto_value_set_long_3x3_v(GValue *value, glong *v);
+void moto_value_set_long_4x4(GValue *value,
+        glong v00, glong v01, glong v02, glong v03,
+        glong v10, glong v11, glong v12, glong v13,
+        glong v20, glong v21, glong v22, glong v23,
+        glong v30, glong v31, glong v32, glong v33);
+void moto_value_set_long_4x4_v(GValue *value, glong *v);
+
+void moto_value_set_ulong_1x1(GValue *value, gulong v0);
+void moto_value_set_ulong_1x1_v(GValue *value, gulong *v);
+void moto_value_set_ulong_2x2(GValue *value,
+        gulong v00, gulong v01,
+        gulong v10, gulong v11);
+void moto_value_set_ulong_2x2_v(GValue *value, gulong *v);
+void moto_value_set_ulong_3x3(GValue *value,
+        gulong v00, gulong v01, gulong v02,
+        gulong v10, gulong v11, gulong v12,
+        gulong v20, gulong v21, gulong v22);
+void moto_value_set_ulong_3x3_v(GValue *value, gulong *v);
+void moto_value_set_ulong_4x4(GValue *value,
+        gulong v00, gulong v01, gulong v02, gulong v03,
+        gulong v10, gulong v11, gulong v12, gulong v13,
+        gulong v20, gulong v21, gulong v22, gulong v23,
+        gulong v30, gulong v31, gulong v32, gulong v33);
+void moto_value_set_ulong_4x4_v(GValue *value, gulong *v);
+
+void moto_value_set_int64_1x1(GValue *value, gint64 v0);
+void moto_value_set_int64_1x1_v(GValue *value, gint64 *v);
+void moto_value_set_int64_2x2(GValue *value,
+        gint64 v00, gint64 v01,
+        gint64 v10, gint64 v11);
+void moto_value_set_int64_2x2_v(GValue *value, gint64 *v);
+void moto_value_set_int64_3x3(GValue *value,
+        gint64 v00, gint64 v01, gint64 v02,
+        gint64 v10, gint64 v11, gint64 v12,
+        gint64 v20, gint64 v21, gint64 v22);
+void moto_value_set_int64_3x3_v(GValue *value, gint64 *v);
+void moto_value_set_int64_4x4(GValue *value,
+        gint64 v00, gint64 v01, gint64 v02, gint64 v03,
+        gint64 v10, gint64 v11, gint64 v12, gint64 v13,
+        gint64 v20, gint64 v21, gint64 v22, gint64 v23,
+        gint64 v30, gint64 v31, gint64 v32, gint64 v33);
+void moto_value_set_int64_4x4_v(GValue *value, gint64 *v);
+
+void moto_value_set_uint64_1x1(GValue *value, guint64 v0);
+void moto_value_set_uint64_1x1_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_2x2(GValue *value,
+        guint64 v00, guint64 v01,
+        guint64 v10, guint64 v11);
+void moto_value_set_uint64_2x2_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_3x3(GValue *value,
+        guint64 v00, guint64 v01, guint64 v02,
+        guint64 v10, guint64 v11, guint64 v12,
+        guint64 v20, guint64 v21, guint64 v22);
+void moto_value_set_uint64_3x3_v(GValue *value, guint64 *v);
+void moto_value_set_uint64_4x4(GValue *value,
+        guint64 v00, guint64 v01, guint64 v02, guint64 v03,
+        guint64 v10, guint64 v11, guint64 v12, guint64 v13,
+        guint64 v20, guint64 v21, guint64 v22, guint64 v23,
+        guint64 v30, guint64 v31, guint64 v32, guint64 v33);
+void moto_value_set_uint64_4x4_v(GValue *value, guint64 *v);
+
+void moto_value_set_float_1x1(GValue *value, gfloat v0);
+void moto_value_set_float_1x1_v(GValue *value, gfloat *v);
+void moto_value_set_float_2x2(GValue *value,
+        gfloat v00, gfloat v01,
+        gfloat v10, gfloat v11);
+void moto_value_set_float_2x2_v(GValue *value, gfloat *v);
+void moto_value_set_float_3x3(GValue *value,
+        gfloat v00, gfloat v01, gfloat v02,
+        gfloat v10, gfloat v11, gfloat v12,
+        gfloat v20, gfloat v21, gfloat v22);
+void moto_value_set_float_3x3_v(GValue *value, gfloat *v);
+void moto_value_set_float_4x4(GValue *value,
+        gfloat v00, gfloat v01, gfloat v02, gfloat v03,
+        gfloat v10, gfloat v11, gfloat v12, gfloat v13,
+        gfloat v20, gfloat v21, gfloat v22, gfloat v23,
+        gfloat v30, gfloat v31, gfloat v32, gfloat v33);
+void moto_value_set_float_4x4_v(GValue *value, gfloat *v);
+
+void moto_value_set_double_1x1(GValue *value, gdouble v0);
+void moto_value_set_double_1x1_v(GValue *value, gdouble *v);
+void moto_value_set_double_2x2(GValue *value,
+        gdouble v00, gdouble v01,
+        gdouble v10, gdouble v11);
+void moto_value_set_double_2x2_v(GValue *value, gdouble *v);
+void moto_value_set_double_3x3(GValue *value,
+        gdouble v00, gdouble v01, gdouble v02,
+        gdouble v10, gdouble v11, gdouble v12,
+        gdouble v20, gdouble v21, gdouble v22);
+void moto_value_set_double_3x3_v(GValue *value, gdouble *v);
+void moto_value_set_double_4x4(GValue *value,
+        gdouble v00, gdouble v01, gdouble v02, gdouble v03,
+        gdouble v10, gdouble v11, gdouble v12, gdouble v13,
+        gdouble v20, gdouble v21, gdouble v22, gdouble v23,
+        gdouble v30, gdouble v31, gdouble v32, gdouble v33);
+void moto_value_set_double_4x4_v(GValue *value, gdouble *v);
+
+// Setting individual element of vector or matrix
+
+void moto_value_set_boolean_2_element(GValue *value, gsize i, gboolean v);
+void moto_value_set_boolean_3_element(GValue *value, gsize i, gboolean v);
+void moto_value_set_boolean_4_element(GValue *value, gsize i, gboolean v);
+
+void moto_value_set_int_2_element(GValue *value, gsize i, gint v);
+void moto_value_set_int_3_element(GValue *value, gsize i, gint v);
+void moto_value_set_int_4_element(GValue *value, gsize i, gint v);
+
+void moto_value_set_uint_2_element(GValue *value, gsize i, guint v);
+void moto_value_set_uint_3_element(GValue *value, gsize i, guint v);
+void moto_value_set_uint_4_element(GValue *value, gsize i, guint v);
+
+void moto_value_set_long_2_element(GValue *value, gsize i, glong v);
+void moto_value_set_long_3_element(GValue *value, gsize i, glong v);
+void moto_value_set_long_4_element(GValue *value, gsize i, glong v);
+
+void moto_value_set_ulong_2_element(GValue *value, gsize i, gulong v);
+void moto_value_set_ulong_3_element(GValue *value, gsize i, gulong v);
+void moto_value_set_ulong_4_element(GValue *value, gsize i, gulong v);
+
+void moto_value_set_int64_2_element(GValue *value, gsize i, gint64 v);
+void moto_value_set_int64_3_element(GValue *value, gsize i, gint64 v);
+void moto_value_set_int64_4_element(GValue *value, gsize i, gint64 v);
+
+void moto_value_set_uint64_2_element(GValue *value, gsize i, guint64 v);
+void moto_value_set_uint64_3_element(GValue *value, gsize i, guint64 v);
+void moto_value_set_uint64_4_element(GValue *value, gsize i, guint64 v);
+
+void moto_value_set_float_2_element(GValue *value, gsize i, gfloat v);
+void moto_value_set_float_3_element(GValue *value, gsize i, gfloat v);
+void moto_value_set_float_4_element(GValue *value, gsize i, gfloat v);
+
+void moto_value_set_double_2_element(GValue *value, gsize i, gdouble v);
+void moto_value_set_double_3_element(GValue *value, gsize i, gdouble v);
+void moto_value_set_double_4_element(GValue *value, gsize i, gdouble v);
+
+void moto_value_set_boolean_2x2_element(GValue *value, gsize i, gsize j, gboolean v);
+void moto_value_set_boolean_3x3_element(GValue *value, gsize i, gsize j, gboolean v);
+void moto_value_set_boolean_4x4_element(GValue *value, gsize i, gsize j, gboolean v);
+
+void moto_value_set_int_2x2_element(GValue *value, gsize i, gsize j, gint v);
+void moto_value_set_int_3x3_element(GValue *value, gsize i, gsize j, gint v);
+void moto_value_set_int_4x4_element(GValue *value, gsize i, gsize j, gint v);
+
+void moto_value_set_uint_2x2_element(GValue *value, gsize i, gsize j, guint v);
+void moto_value_set_uint_3x3_element(GValue *value, gsize i, gsize j, guint v);
+void moto_value_set_uint_4x4_element(GValue *value, gsize i, gsize j, guint v);
+
+void moto_value_set_long_2x2_element(GValue *value, gsize i, gsize j, glong v);
+void moto_value_set_long_3x3_element(GValue *value, gsize i, gsize j, glong v);
+void moto_value_set_long_4x4_element(GValue *value, gsize i, gsize j, glong v);
+
+void moto_value_set_ulong_2x2_element(GValue *value, gsize i, gsize j, gulong v);
+void moto_value_set_ulong_3x3_element(GValue *value, gsize i, gsize j, gulong v);
+void moto_value_set_ulong_4x4_element(GValue *value, gsize i, gsize j, gulong v);
+
+void moto_value_set_int64_2x2_element(GValue *value, gsize i, gsize j, gint64 v);
+void moto_value_set_int64_3x3_element(GValue *value, gsize i, gsize j, gint64 v);
+void moto_value_set_int64_4x4_element(GValue *value, gsize i, gsize j, gint64 v);
+
+void moto_value_set_uint64_2x2_element(GValue *value, gsize i, gsize j, guint64 v);
+void moto_value_set_uint64_3x3_element(GValue *value, gsize i, gsize j, guint64 v);
+void moto_value_set_uint64_4x4_element(GValue *value, gsize i, gsize j, guint64 v);
+
+void moto_value_set_float_2x2_element(GValue *value, gsize i, gsize j, gfloat v);
+void moto_value_set_float_3x3_element(GValue *value, gsize i, gsize j, gfloat v);
+void moto_value_set_float_4x4_element(GValue *value, gsize i, gsize j, gfloat v);
+
+void moto_value_set_double_2x2_element(GValue *value, gsize i, gsize j, gdouble v);
+void moto_value_set_double_3x3_element(GValue *value, gsize i, gsize j, gdouble v);
+void moto_value_set_double_4x4_element(GValue *value, gsize i, gsize j, gdouble v);
+
 G_END_DECLS
 
 #endif /* __MOTO_TYPES_H__ */

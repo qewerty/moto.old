@@ -401,6 +401,23 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         moto_world_manipulator_draw(self->priv->manipulator, self);
 }
 
+void moto_world_draw_fps_test(MotoWorld *self)
+{
+    int iters = 1000;
+
+    GTimer *timer = g_timer_new();
+
+    int i;
+    for(i = 0; i < iters; i++)
+    {
+        moto_world_redraw(self);
+    }
+    double time = g_timer_elapsed(timer, NULL);
+    moto_info("iters: %d; time: %f; fps: %.2f", iters, time, iters / time);
+
+    g_timer_destroy(timer);
+}
+
 void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)
 {
     gluPerspective(self->priv->fovy*DEG_PER_RAD, width/(GLdouble)height,

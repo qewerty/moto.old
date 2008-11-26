@@ -21,8 +21,8 @@ All except G_TYPE_OBJECT are redefined as:
 Specific for Moto
 -----------------
 
-Array types
-***********
+Vector types
+************
 
 MOTO_TYPE_BOOLEAN_2
 MOTO_TYPE_BOOLEAN_3

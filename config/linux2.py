@@ -6,7 +6,7 @@ CXX = 'g++'
 CFLAGS  = ['-O3', '-pipe', '-ffast-math', '-Wall', '-march=i686']
 LIBS    = ['GL', 'GLU', 'GLEW']
 
-CPPFLAGS = ['-DMOTO_WOBJ_MESH_LOADER',
+CPPFLAGS = ['-DMOTO_WITH_WOBJ_MESH_LOADER',
             # '-DMOTO_MBM_MESH_LOADER',
             # '-DMOTO_RIB_MESH_LOADER',
             ]

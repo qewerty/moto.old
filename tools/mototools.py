@@ -11,11 +11,14 @@ def plugin_name(path):
     return os.path.basename(path).replace(PLUGIN_PREFIX, '')
 
 def find_plugins():
-    plugins_dir = \
-        os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-            '..', 'src', 'plugins'))
-    plugins = [plugin_name(f) for f in os.listdir(plugins_dir) if os.path.isdir(os.path.join(plugins_dir, f)) and is_a_plugin_dir(os.path.join(plugins_dir, f))]
-    return plugins
+    try:
+        plugins_dir = \
+            os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                '..', 'src', 'plugins'))
+        plugins = [plugin_name(f) for f in os.listdir(plugins_dir) if os.path.isdir(os.path.join(plugins_dir, f)) and is_a_plugin_dir(os.path.join(plugins_dir, f))]
+        return plugins
+    except:
+        return []
 
 def create_options(filename, args):
     opts = Options(filename, args)

@@ -17,6 +17,7 @@
 
 void show_draw_mode_menu(GtkButton *button, gpointer user_data);
 void show_component_selection_mode_menu(GtkButton *button, gpointer user_data);
+void do_fps_test(GtkButton *button, gpointer user_data);
 
 /* class ToolBox */
 
@@ -89,6 +90,22 @@ moto_tool_box_init(MotoToolBox *self)
 
     g_signal_connect(G_OBJECT(b), "clicked",
             G_CALLBACK(show_component_selection_mode_menu), self);
+
+    gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
+
+    // FPS Test
+    b = (GtkButton *)gtk_button_new();
+    // gtk_widget_set_size_request((GtkWidget *)b, 24, 24);
+
+    filename = g_build_filename("resources", "icons", "moto-fps-test-icon.png", NULL);
+    im = gtk_image_new_from_file(filename);
+    g_free(filename);
+
+    gtk_button_set_image(b, im);
+    gtk_button_set_relief(b, GTK_RELIEF_NONE);
+
+    g_signal_connect(G_OBJECT(b), "clicked",
+            G_CALLBACK(do_fps_test), self);
 
     gtk_box_pack_start((GtkBox *)self, (GtkWidget *)b, FALSE, FALSE, 0);
 
@@ -271,4 +288,26 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
 
     gtk_widget_show_all((GtkWidget *)menu);
     gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, 0);
+}
+
+void do_fps_test(GtkButton *button, gpointer user_data)
+{
+    MotoToolBox *tb = (MotoToolBox *)user_data;
+
+    if( ! tb->priv->system)
+    {
+        moto_error("ToolBox has no associated MotoSystem instance. I can do nothing.");
+
+        return;
+    }
+
+    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
+    if( ! world)
+    {
+        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+
+        return;
+    }
+
+    moto_world_draw_fps_test(world);
 }

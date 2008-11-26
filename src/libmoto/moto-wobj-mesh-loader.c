@@ -92,7 +92,7 @@ gboolean moto_wobj_mesh_loader_can(MotoWobjMeshLoader *self, const gchar *filena
 }
 */
 
-MotoMesh *moto_wobj_mesh_loader_load(MotoMeshLoader *self, const gchar *filename)
+GString *moto_gstring_from_file(const gchar *filename)
 {
     GFile *f = g_file_new_for_path(filename);
     GInputStream *is = (GInputStream *)g_file_read(f, NULL, NULL);
@@ -106,6 +106,13 @@ MotoMesh *moto_wobj_mesh_loader_load(MotoMeshLoader *self, const gchar *filename
     while(read_bytes = g_input_stream_read(is, buffer, count, NULL, NULL))
         g_string_append_len(data, buffer, read_bytes);
     g_input_stream_close(is, NULL, NULL);
+
+    return data;
+}
+
+MotoMesh *moto_wobj_mesh_loader_load(MotoMeshLoader *self, const gchar *filename)
+{
+    GString *data = moto_gstring_from_file(filename);
 
     guint v_num   = 0,
           e_num   = 0, // WARNING! Initially without edges. Edges will be calculated while preparing mesh.

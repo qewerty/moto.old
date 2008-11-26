@@ -70,7 +70,7 @@ moto_outliner_init(MotoOutliner *self)
                                                 "text", 0,
                                                 NULL);
 
-    // renderer = gtk_cell_renderer_text_new();
+    renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(priv->tv, -1,
                                                 "Type",
                                                 renderer,

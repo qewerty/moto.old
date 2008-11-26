@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -86,106 +87,6 @@ typedef struct _MotoFloat_4x4 MotoFloat_4x4;
 typedef struct _MotoDouble_2x2 MotoDouble_2x2;
 typedef struct _MotoDouble_3x3 MotoDouble_3x3;
 typedef struct _MotoDouble_4x4 MotoDouble_4x4;
-
-void __moto_transform_float_2_to_float_1(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_3_to_float_1(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_4_to_float_1(const GValue *src_value, GValue *dest_value);
-
-// MotoFloat_1 -> *
-
-void __moto_transform_float_1_to_boolean_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_boolean_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_boolean_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_int_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_int_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_int_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_uint_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_uint_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_uint_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_long_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_long_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_long_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_ulong_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_ulong_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_ulong_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_int64_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_int64_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_int64_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_uint64_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_uint64_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_uint64_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_float_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_float_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_float_4(const GValue *src_value, GValue *dest_value);
-
-void __moto_transform_float_1_to_double_2(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_double_3(const GValue *src_value, GValue *dest_value);
-void __moto_transform_float_1_to_double_4(const GValue *src_value, GValue *dest_value);
-
-void moto_types_init(void)
-{
-    // 1 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_2, __moto_transform_float_1_to_boolean_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_3, __moto_transform_float_1_to_boolean_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_4, __moto_transform_float_1_to_boolean_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_2, __moto_transform_float_1_to_int_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_3, __moto_transform_float_1_to_int_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_4, __moto_transform_float_1_to_int_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_2, __moto_transform_float_1_to_uint_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_3, __moto_transform_float_1_to_uint_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_4, __moto_transform_float_1_to_uint_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_2, __moto_transform_float_1_to_long_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_3, __moto_transform_float_1_to_long_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_4, __moto_transform_float_1_to_long_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_2, __moto_transform_float_1_to_ulong_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_3, __moto_transform_float_1_to_ulong_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_4, __moto_transform_float_1_to_ulong_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_2, __moto_transform_float_1_to_int64_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_3, __moto_transform_float_1_to_int64_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_4, __moto_transform_float_1_to_int64_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_2, __moto_transform_float_1_to_uint64_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_3, __moto_transform_float_1_to_uint64_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_4, __moto_transform_float_1_to_uint64_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_2, __moto_transform_float_1_to_float_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_3, __moto_transform_float_1_to_float_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_4, __moto_transform_float_1_to_float_4);
-
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_2, __moto_transform_float_1_to_double_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_3, __moto_transform_float_1_to_double_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_4, __moto_transform_float_1_to_double_4);
-
-    /*
-    // 2 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_1, __moto_transform_float_2_to_float_1);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_3, __moto_transform_float_2_to_float_3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_4, __moto_transform_float_2_to_float_4);
-
-    // 3 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_1, __moto_transform_float_3_to_float_1);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_2, __moto_transform_float_3_to_float_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_4, __moto_transform_float_3_to_float_4);
-
-    // 4 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_1, __moto_transform_float_4_to_float_1);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_2, __moto_transform_float_4_to_float_2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_3, __moto_transform_float_4_to_float_3);
-    */
-
-}
 
 // MOTO_TYPE_BOOLEAN_2
 
@@ -2620,8 +2521,741 @@ GType moto_double_4_get_type(void)
 // Transformation functions
 
 // 1 -> *
+//
+// boolean -> *
+static void __moto_transform_boolean_1_to_boolean_2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-void __moto_transform_float_1_to_boolean_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_boolean_1_to_boolean_3(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_boolean_4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_int_2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_int_3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_int_4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint_2(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint_3(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint_4(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_long_2(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_int) ? 1 : 0;
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_long_3(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_int) ? 1 : 0;
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_long_4(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_int) ? 1 : 0;
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_ulong_2(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (src_value->data[0].v_int) ? 1 : 0;
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_ulong_3(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (src_value->data[0].v_int) ? 1 : 0;
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_ulong_4(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (src_value->data[0].v_int) ? 1 : 0;
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_int64_2(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_int64_3(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_int64_4(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint64_2(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint64_3(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_uint64_4(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src  = (src_value->data[0].v_int) ? 1 : 0;
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_float_2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_float_3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_float_4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_boolean_1_to_double_2(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src  = (src_value->data[0].v_int) ? 1.0 : 0.0;
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_boolean_1_to_double_3(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src  = (src_value->data[0].v_int) ? 1.0 : 0.0;
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_boolean_1_to_double_4(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src  = (src_value->data[0].v_int) ? 1.0 : 0.0;
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+// int -> *
+static void __moto_transform_int_1_to_boolean_2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_boolean_3(const GValue *src_value, GValue *dest_value)
+{
+    gint src = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gint *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_boolean_4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_int_2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_int_3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_int_4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_uint_2(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (guint)abs(src_value->data[0].v_int);
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_uint_3(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (guint)abs(src_value->data[0].v_int);
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_uint_4(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = (guint)abs(src_value->data[0].v_int);
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_long_2(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (glong)(src_value->data[0].v_int);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_long_3(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (glong)(src_value->data[0].v_int);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_long_4(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (glong)(src_value->data[0].v_int);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_ulong_2(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (gulong)abs(src_value->data[0].v_int);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_ulong_3(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (glong)abs(src_value->data[0].v_int);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_ulong_4(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (glong)abs(src_value->data[0].v_int);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_int64_2(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_int);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_int64_3(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_int);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_int64_4(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_int);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_uint64_2(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_int);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_uint64_3(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_int);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_uint64_4(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_int);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_float_2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_float_3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_float_4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_int_1_to_double_2(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_int);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_int_1_to_double_3(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_int);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_int_1_to_double_4(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_int);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+// uint -> *
+static void __moto_transform_uint_1_to_boolean_2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_uint) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_boolean_3(const GValue *src_value, GValue *dest_value)
+{
+    guint src = (src_value->data[0].v_uint) ? TRUE : FALSE;
+    guint *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_boolean_4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_uint) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_int_2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_uint > (guint)G_MAXINT) ? G_MAXINT: (gint)(src_value->data[0].v_uint);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoUint_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_int_3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_uint > (guint)G_MAXINT) ? G_MAXINT: (gint)(src_value->data[0].v_uint);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoUint_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_int_4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_uint > (guint)G_MAXINT) ? G_MAXINT: (gint)(src_value->data[0].v_uint);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoUint_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_uint_2(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = src_value->data[0].v_uint;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_uint_3(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = src_value->data[0].v_uint;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_uint_4(const GValue *src_value, GValue *dest_value)
+{
+    guint src  = src_value->data[0].v_uint;
+    guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_long_2(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_uint > (guint)G_MAXLONG) ? G_MAXLONG : (glong)(src_value->data[0].v_uint);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_long_3(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_uint > (guint)G_MAXLONG) ? G_MAXLONG : (glong)(src_value->data[0].v_uint);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_long_4(const GValue *src_value, GValue *dest_value)
+{
+    glong src  = (src_value->data[0].v_uint > (guint)G_MAXLONG) ? G_MAXLONG : (glong)(src_value->data[0].v_uint);
+    glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_ulong_2(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (gulong)(src_value->data[0].v_uint);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_ulong_3(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (gulong)(src_value->data[0].v_uint);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_ulong_4(const GValue *src_value, GValue *dest_value)
+{
+    gulong src  = (gulong)abs(src_value->data[0].v_uint);
+    gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_int64_2(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_uint);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_int64_3(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_uint);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_int64_4(const GValue *src_value, GValue *dest_value)
+{
+    gint64 src  = (gint64)(src_value->data[0].v_uint);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_uint64_2(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_uint);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_uint64_3(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_uint);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_uint64_4(const GValue *src_value, GValue *dest_value)
+{
+    guint64 src = (guint64)abs(src_value->data[0].v_uint);
+    guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_float_2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_uint);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_float_3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_uint);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_float_4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_uint);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+static void __moto_transform_uint_1_to_double_2(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_uint);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_2);
+    dest[0] = src;
+    dest[1] = src;
+}
+
+static void __moto_transform_uint_1_to_double_3(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_uint);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
+
+static void __moto_transform_uint_1_to_double_4(const GValue *src_value, GValue *dest_value)
+{
+    gdouble src = (gdouble)(src_value->data[0].v_uint);
+    gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
+
+// float -> *
+static void __moto_transform_float_1_to_boolean_2(const GValue *src_value, GValue *dest_value)
 {
     gboolean src  = (gboolean)(src_value->data[0].v_float);
     gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_2);
@@ -2629,7 +3263,7 @@ void __moto_transform_float_1_to_boolean_2(const GValue *src_value, GValue *dest
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_boolean_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_boolean_3(const GValue *src_value, GValue *dest_value)
 {
     gboolean src = (gboolean)( src_value->data[0].v_float);
     gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_3);
@@ -2638,7 +3272,7 @@ void __moto_transform_float_1_to_boolean_3(const GValue *src_value, GValue *dest
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_boolean_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_boolean_4(const GValue *src_value, GValue *dest_value)
 {
     gboolean src  = (gboolean)(src_value->data[0].v_float);
     gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBoolean_4);
@@ -2648,7 +3282,7 @@ void __moto_transform_float_1_to_boolean_4(const GValue *src_value, GValue *dest
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_int_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int_2(const GValue *src_value, GValue *dest_value)
 {
     gint src  = (gint)(src_value->data[0].v_float);
     gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_2);
@@ -2656,7 +3290,7 @@ void __moto_transform_float_1_to_int_2(const GValue *src_value, GValue *dest_val
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_int_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int_3(const GValue *src_value, GValue *dest_value)
 {
     gint src  = (gint)(src_value->data[0].v_float);
     gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_3);
@@ -2665,7 +3299,7 @@ void __moto_transform_float_1_to_int_3(const GValue *src_value, GValue *dest_val
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_int_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int_4(const GValue *src_value, GValue *dest_value)
 {
     gint src  = (gint)(src_value->data[0].v_float);
     gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt_4);
@@ -2675,7 +3309,7 @@ void __moto_transform_float_1_to_int_4(const GValue *src_value, GValue *dest_val
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_uint_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint_2(const GValue *src_value, GValue *dest_value)
 {
     guint src  = (guint)fabs(src_value->data[0].v_float);
     guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_2);
@@ -2683,7 +3317,7 @@ void __moto_transform_float_1_to_uint_2(const GValue *src_value, GValue *dest_va
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_uint_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint_3(const GValue *src_value, GValue *dest_value)
 {
     guint src  = (guint)fabs(src_value->data[0].v_float);
     guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_3);
@@ -2692,7 +3326,7 @@ void __moto_transform_float_1_to_uint_3(const GValue *src_value, GValue *dest_va
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_uint_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint_4(const GValue *src_value, GValue *dest_value)
 {
     guint src  = (guint)fabs(src_value->data[0].v_float);
     guint *dest = dest_value->data[0].v_pointer = (guint *)g_slice_new(MotoUint_4);
@@ -2702,7 +3336,7 @@ void __moto_transform_float_1_to_uint_4(const GValue *src_value, GValue *dest_va
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_long_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_long_2(const GValue *src_value, GValue *dest_value)
 {
     glong src  = (glong)(src_value->data[0].v_float);
     glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_2);
@@ -2710,7 +3344,7 @@ void __moto_transform_float_1_to_long_2(const GValue *src_value, GValue *dest_va
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_long_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_long_3(const GValue *src_value, GValue *dest_value)
 {
     glong src  = (glong)(src_value->data[0].v_float);
     glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_3);
@@ -2719,7 +3353,7 @@ void __moto_transform_float_1_to_long_3(const GValue *src_value, GValue *dest_va
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_long_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_long_4(const GValue *src_value, GValue *dest_value)
 {
     glong src  = (glong)(src_value->data[0].v_float);
     glong *dest = dest_value->data[0].v_pointer = (glong *)g_slice_new(MotoLong_4);
@@ -2729,7 +3363,7 @@ void __moto_transform_float_1_to_long_4(const GValue *src_value, GValue *dest_va
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_ulong_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_ulong_2(const GValue *src_value, GValue *dest_value)
 {
     gulong src  = (gulong)fabs(src_value->data[0].v_float);
     gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_2);
@@ -2737,7 +3371,7 @@ void __moto_transform_float_1_to_ulong_2(const GValue *src_value, GValue *dest_v
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_ulong_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_ulong_3(const GValue *src_value, GValue *dest_value)
 {
     gulong src  = (gulong)fabs(src_value->data[0].v_float);
     gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_3);
@@ -2746,7 +3380,7 @@ void __moto_transform_float_1_to_ulong_3(const GValue *src_value, GValue *dest_v
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_ulong_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_ulong_4(const GValue *src_value, GValue *dest_value)
 {
     gulong src  = (gulong)fabs(src_value->data[0].v_float);
     gulong *dest = dest_value->data[0].v_pointer = (gulong *)g_slice_new(MotoUlong_4);
@@ -2756,34 +3390,34 @@ void __moto_transform_float_1_to_ulong_4(const GValue *src_value, GValue *dest_v
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_int64_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int64_2(const GValue *src_value, GValue *dest_value)
 {
     gint64 src  = (gint64)(src_value->data[0].v_float);
-    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt_2);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_2);
     dest[0] = src;
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_int64_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int64_3(const GValue *src_value, GValue *dest_value)
 {
     gint64 src  = (gint64)(src_value->data[0].v_float);
-    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt_3);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_3);
     dest[0] = src;
     dest[1] = src;
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_int64_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_int64_4(const GValue *src_value, GValue *dest_value)
 {
     gint64 src  = (gint64)(src_value->data[0].v_float);
-    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt_4);
+    gint64 *dest = dest_value->data[0].v_pointer = (gint64 *)g_slice_new(MotoInt64_4);
     dest[0] = src;
     dest[1] = src;
     dest[2] = src;
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_uint64_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint64_2(const GValue *src_value, GValue *dest_value)
 {
     guint64 src  = (guint64)fabs(src_value->data[0].v_float);
     guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_2);
@@ -2791,7 +3425,7 @@ void __moto_transform_float_1_to_uint64_2(const GValue *src_value, GValue *dest_
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_uint64_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint64_3(const GValue *src_value, GValue *dest_value)
 {
     guint64 src  = (guint64)fabs(src_value->data[0].v_float);
     guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_3);
@@ -2800,7 +3434,7 @@ void __moto_transform_float_1_to_uint64_3(const GValue *src_value, GValue *dest_
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_uint64_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_uint64_4(const GValue *src_value, GValue *dest_value)
 {
     guint64 src  = (guint64)fabs(src_value->data[0].v_float);
     guint64 *dest = dest_value->data[0].v_pointer = (guint64 *)g_slice_new(MotoUint64_4);
@@ -2810,7 +3444,7 @@ void __moto_transform_float_1_to_uint64_4(const GValue *src_value, GValue *dest_
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_float_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_float_2(const GValue *src_value, GValue *dest_value)
 {
     gfloat src  = src_value->data[0].v_float;
     gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_2);
@@ -2818,7 +3452,7 @@ void __moto_transform_float_1_to_float_2(const GValue *src_value, GValue *dest_v
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_float_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_float_3(const GValue *src_value, GValue *dest_value)
 {
     gfloat src  = src_value->data[0].v_float;
     gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_3);
@@ -2827,7 +3461,7 @@ void __moto_transform_float_1_to_float_3(const GValue *src_value, GValue *dest_v
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_float_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_float_4(const GValue *src_value, GValue *dest_value)
 {
     gfloat src  = src_value->data[0].v_float;
     gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat_4);
@@ -2837,7 +3471,7 @@ void __moto_transform_float_1_to_float_4(const GValue *src_value, GValue *dest_v
     dest[3] = src;
 }
 
-void __moto_transform_float_1_to_double_2(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_double_2(const GValue *src_value, GValue *dest_value)
 {
     gdouble src  = (gdouble)(src_value->data[0].v_float);
     gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_2);
@@ -2845,7 +3479,7 @@ void __moto_transform_float_1_to_double_2(const GValue *src_value, GValue *dest_
     dest[1] = src;
 }
 
-void __moto_transform_float_1_to_double_3(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_double_3(const GValue *src_value, GValue *dest_value)
 {
     gdouble src  = (gdouble)(src_value->data[0].v_float);
     gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_3);
@@ -2854,7 +3488,7 @@ void __moto_transform_float_1_to_double_3(const GValue *src_value, GValue *dest_
     dest[2] = src;
 }
 
-void __moto_transform_float_1_to_double_4(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_1_to_double_4(const GValue *src_value, GValue *dest_value)
 {
     gdouble src  = (gdouble)(src_value->data[0].v_float);
     gdouble *dest = dest_value->data[0].v_pointer = (gdouble *)g_slice_new(MotoDouble_4);
@@ -2866,7 +3500,7 @@ void __moto_transform_float_1_to_double_4(const GValue *src_value, GValue *dest_
 
 // 2 -> *
 
-void __moto_transform_float_2_to_float_1(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_2_to_float_1(const GValue *src_value, GValue *dest_value)
 {
     gfloat *src = (gfloat *)src_value->data[0].v_pointer;
     g_value_set_float(dest_value, (src[0] + src[1]) / 2);
@@ -2874,7 +3508,7 @@ void __moto_transform_float_2_to_float_1(const GValue *src_value, GValue *dest_v
 
 // 3 -> *
 
-void __moto_transform_float_3_to_float_1(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_3_to_float_1(const GValue *src_value, GValue *dest_value)
 {
     gfloat *src = (gfloat *)src_value->data[0].v_pointer;
     g_value_set_float(dest_value, (src[0] + src[1] + src[2]) / 3);
@@ -2882,8 +3516,431 @@ void __moto_transform_float_3_to_float_1(const GValue *src_value, GValue *dest_v
 
 // 4 -> *
 
-void __moto_transform_float_4_to_float_1(const GValue *src_value, GValue *dest_value)
+static void __moto_transform_float_4_to_float_1(const GValue *src_value, GValue *dest_value)
 {
     gfloat *src = (gfloat *)src_value->data[0].v_pointer;
     g_value_set_float(dest_value, (src[0] + src[1] + src[2] + src[3]) / 4);
+}
+
+// Public functions
+
+void moto_types_init(void)
+{
+    // 1 -> *
+
+    // boolean -> *
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_BOOLEAN_2, __moto_transform_boolean_1_to_boolean_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_BOOLEAN_3, __moto_transform_boolean_1_to_boolean_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_BOOLEAN_4, __moto_transform_boolean_1_to_boolean_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT_2, __moto_transform_boolean_1_to_int_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT_3, __moto_transform_boolean_1_to_int_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT_4, __moto_transform_boolean_1_to_int_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT_2, __moto_transform_boolean_1_to_uint_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT_3, __moto_transform_boolean_1_to_uint_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT_4, __moto_transform_boolean_1_to_uint_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_LONG_2, __moto_transform_boolean_1_to_long_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_LONG_3, __moto_transform_boolean_1_to_long_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_LONG_4, __moto_transform_boolean_1_to_long_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_ULONG_2, __moto_transform_boolean_1_to_ulong_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_ULONG_3, __moto_transform_boolean_1_to_ulong_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_ULONG_4, __moto_transform_boolean_1_to_ulong_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT64_2, __moto_transform_boolean_1_to_int64_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT64_3, __moto_transform_boolean_1_to_int64_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_INT64_4, __moto_transform_boolean_1_to_int64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT64_2, __moto_transform_boolean_1_to_uint64_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT64_3, __moto_transform_boolean_1_to_uint64_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_UINT64_4, __moto_transform_boolean_1_to_uint64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_FLOAT_2, __moto_transform_boolean_1_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_FLOAT_3, __moto_transform_boolean_1_to_float_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_FLOAT_4, __moto_transform_boolean_1_to_float_4);
+
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_DOUBLE_2, __moto_transform_boolean_1_to_double_2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_DOUBLE_3, __moto_transform_boolean_1_to_double_3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_1, MOTO_TYPE_DOUBLE_4, __moto_transform_boolean_1_to_double_4);
+
+    // int -> *
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_BOOLEAN_2, __moto_transform_int_1_to_boolean_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_BOOLEAN_3, __moto_transform_int_1_to_boolean_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_BOOLEAN_4, __moto_transform_int_1_to_boolean_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT_2, __moto_transform_int_1_to_int_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT_3, __moto_transform_int_1_to_int_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT_4, __moto_transform_int_1_to_int_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT_2, __moto_transform_int_1_to_uint_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT_3, __moto_transform_int_1_to_uint_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT_4, __moto_transform_int_1_to_uint_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_LONG_2, __moto_transform_int_1_to_long_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_LONG_3, __moto_transform_int_1_to_long_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_LONG_4, __moto_transform_int_1_to_long_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_ULONG_2, __moto_transform_int_1_to_ulong_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_ULONG_3, __moto_transform_int_1_to_ulong_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_ULONG_4, __moto_transform_int_1_to_ulong_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT64_2, __moto_transform_int_1_to_int64_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT64_3, __moto_transform_int_1_to_int64_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_INT64_4, __moto_transform_int_1_to_int64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT64_2, __moto_transform_int_1_to_uint64_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT64_3, __moto_transform_int_1_to_uint64_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_UINT64_4, __moto_transform_int_1_to_uint64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_FLOAT_2, __moto_transform_int_1_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_FLOAT_3, __moto_transform_int_1_to_float_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_FLOAT_4, __moto_transform_int_1_to_float_4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_DOUBLE_2, __moto_transform_int_1_to_double_2);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_DOUBLE_3, __moto_transform_int_1_to_double_3);
+    g_value_register_transform_func(MOTO_TYPE_INT_1, MOTO_TYPE_DOUBLE_4, __moto_transform_int_1_to_double_4);
+
+    // uint -> *
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_BOOLEAN_2, __moto_transform_uint_1_to_boolean_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_BOOLEAN_3, __moto_transform_uint_1_to_boolean_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_BOOLEAN_4, __moto_transform_uint_1_to_boolean_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT_2, __moto_transform_uint_1_to_int_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT_3, __moto_transform_uint_1_to_int_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT_4, __moto_transform_uint_1_to_int_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT_2, __moto_transform_uint_1_to_uint_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT_3, __moto_transform_uint_1_to_uint_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT_4, __moto_transform_uint_1_to_uint_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_LONG_2, __moto_transform_uint_1_to_long_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_LONG_3, __moto_transform_uint_1_to_long_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_LONG_4, __moto_transform_uint_1_to_long_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_ULONG_2, __moto_transform_uint_1_to_ulong_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_ULONG_3, __moto_transform_uint_1_to_ulong_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_ULONG_4, __moto_transform_uint_1_to_ulong_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT64_2, __moto_transform_uint_1_to_int64_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT64_3, __moto_transform_uint_1_to_int64_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_INT64_4, __moto_transform_uint_1_to_int64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT64_2, __moto_transform_uint_1_to_uint64_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT64_3, __moto_transform_uint_1_to_uint64_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_UINT64_4, __moto_transform_uint_1_to_uint64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_FLOAT_2, __moto_transform_uint_1_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_FLOAT_3, __moto_transform_uint_1_to_float_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_FLOAT_4, __moto_transform_uint_1_to_float_4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_DOUBLE_2, __moto_transform_uint_1_to_double_2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_DOUBLE_3, __moto_transform_uint_1_to_double_3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_1, MOTO_TYPE_DOUBLE_4, __moto_transform_uint_1_to_double_4);
+
+    // float -> *
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_2, __moto_transform_float_1_to_boolean_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_3, __moto_transform_float_1_to_boolean_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_BOOLEAN_4, __moto_transform_float_1_to_boolean_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_2, __moto_transform_float_1_to_int_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_3, __moto_transform_float_1_to_int_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT_4, __moto_transform_float_1_to_int_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_2, __moto_transform_float_1_to_uint_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_3, __moto_transform_float_1_to_uint_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT_4, __moto_transform_float_1_to_uint_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_2, __moto_transform_float_1_to_long_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_3, __moto_transform_float_1_to_long_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_LONG_4, __moto_transform_float_1_to_long_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_2, __moto_transform_float_1_to_ulong_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_3, __moto_transform_float_1_to_ulong_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_ULONG_4, __moto_transform_float_1_to_ulong_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_2, __moto_transform_float_1_to_int64_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_3, __moto_transform_float_1_to_int64_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_INT64_4, __moto_transform_float_1_to_int64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_2, __moto_transform_float_1_to_uint64_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_3, __moto_transform_float_1_to_uint64_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_UINT64_4, __moto_transform_float_1_to_uint64_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_2, __moto_transform_float_1_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_3, __moto_transform_float_1_to_float_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_FLOAT_4, __moto_transform_float_1_to_float_4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_2, __moto_transform_float_1_to_double_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_3, __moto_transform_float_1_to_double_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_1, MOTO_TYPE_DOUBLE_4, __moto_transform_float_1_to_double_4);
+
+    /*
+    // 2 -> *
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_1, __moto_transform_float_2_to_float_1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_3, __moto_transform_float_2_to_float_3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2, MOTO_TYPE_FLOAT_4, __moto_transform_float_2_to_float_4);
+
+    // 3 -> *
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_1, __moto_transform_float_3_to_float_1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_2, __moto_transform_float_3_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3, MOTO_TYPE_FLOAT_4, __moto_transform_float_3_to_float_4);
+
+    // 4 -> *
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_1, __moto_transform_float_4_to_float_1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_2, __moto_transform_float_4_to_float_2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4, MOTO_TYPE_FLOAT_3, __moto_transform_float_4_to_float_3);
+    */
+
+    /*
+    // Matrix types trasformations
+
+    // 2x2 -> 2x2
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_INT_2x2,    __moto_transform_boolean_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_UINT_2x2,   __moto_transform_boolean_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_LONG_2x2,   __moto_transform_boolean_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_ULONG_2x2,  __moto_transform_boolean_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_INT64_2x2,  __moto_transform_boolean_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_UINT64_2x2, __moto_transform_boolean_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_FLOAT_2x2,  __moto_transform_boolean_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_2x2, MOTO_TYPE_DOUBLE_2x2, __moto_transform_boolean_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_int_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_int_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_int_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_int_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_int_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_int_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_int_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_int_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_uint_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_uint_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_uint_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_uint_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_uint_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_uint_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_uint_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_uint_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_long_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_long_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_long_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_long_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_long_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_long_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_long_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_LONG_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_long_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_ulong_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_ulong_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_ulong_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_ulong_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_ulong_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_ulong_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_ulong_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_ulong_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_int64_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_int64_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_int64_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_int64_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_int64_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_int64_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_int64_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_INT64_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_int64_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_uint64_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_uint64_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_uint64_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_uint64_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_uint64_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_uint64_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_uint64_2x2_to_float_2x2);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_uint64_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_float_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_float_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_float_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_float_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_float_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_float_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_float_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_2x2, MOTO_TYPE_DOUBLE_2x2,  __moto_transform_float_2x2_to_double_2x2);
+
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_BOOLEAN_2x2, __moto_transform_double_2x2_to_boolean_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_INT_2x2,     __moto_transform_double_2x2_to_int_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_UINT_2x2,    __moto_transform_double_2x2_to_uint_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_LONG_2x2,    __moto_transform_double_2x2_to_long_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_ULONG_2x2,   __moto_transform_double_2x2_to_ulong_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_INT64_2x2,   __moto_transform_double_2x2_to_int64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_UINT64_2x2,  __moto_transform_double_2x2_to_uint64_2x2);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_2x2, MOTO_TYPE_FLOAT_2x2,   __moto_transform_double_2x2_to_float_2x2);
+
+    // 3x3 -> 3x3
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_INT_3x3,    __moto_transform_boolean_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_UINT_3x3,   __moto_transform_boolean_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_LONG_3x3,   __moto_transform_boolean_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_ULONG_3x3,  __moto_transform_boolean_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_INT64_3x3,  __moto_transform_boolean_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_UINT64_3x3, __moto_transform_boolean_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_FLOAT_3x3,  __moto_transform_boolean_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_3x3, MOTO_TYPE_DOUBLE_3x3, __moto_transform_boolean_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_int_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_int_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_int_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_int_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_int_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_int_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_int_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_int_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_uint_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_uint_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_uint_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_uint_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_uint_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_uint_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_uint_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_uint_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_long_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_long_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_long_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_long_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_long_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_long_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_long_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_LONG_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_long_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_ulong_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_ulong_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_ulong_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_ulong_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_ulong_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_ulong_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_ulong_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_ulong_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_int64_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_int64_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_int64_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_int64_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_int64_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_int64_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_int64_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_INT64_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_int64_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_uint64_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_uint64_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_uint64_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_uint64_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_uint64_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_uint64_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_uint64_3x3_to_float_3x3);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_uint64_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_float_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_float_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_float_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_float_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_float_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_float_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_float_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_3x3, MOTO_TYPE_DOUBLE_3x3,  __moto_transform_float_3x3_to_double_3x3);
+
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_BOOLEAN_3x3, __moto_transform_double_3x3_to_boolean_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_INT_3x3,     __moto_transform_double_3x3_to_int_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_UINT_3x3,    __moto_transform_double_3x3_to_uint_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_LONG_3x3,    __moto_transform_double_3x3_to_long_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_ULONG_3x3,   __moto_transform_double_3x3_to_ulong_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_INT64_3x3,   __moto_transform_double_3x3_to_int64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_UINT64_3x3,  __moto_transform_double_3x3_to_uint64_3x3);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_3x3, MOTO_TYPE_FLOAT_3x3,   __moto_transform_double_3x3_to_float_3x3);
+
+    // 4x4 -> 4x4
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_INT_4x4,    __moto_transform_boolean_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_UINT_4x4,   __moto_transform_boolean_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_LONG_4x4,   __moto_transform_boolean_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_ULONG_4x4,  __moto_transform_boolean_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_INT64_4x4,  __moto_transform_boolean_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_UINT64_4x4, __moto_transform_boolean_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_FLOAT_4x4,  __moto_transform_boolean_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_BOOLEAN_4x4, MOTO_TYPE_DOUBLE_4x4, __moto_transform_boolean_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_int_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_int_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_int_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_int_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_int_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_int_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_int_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_int_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_uint_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_uint_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_uint_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_uint_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_uint_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_uint_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_uint_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_uint_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_long_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_long_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_long_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_long_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_long_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_long_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_long_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_LONG_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_long_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_ulong_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_ulong_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_ulong_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_ulong_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_ulong_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_ulong_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_ulong_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_ULONG_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_ulong_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_int64_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_int64_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_int64_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_int64_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_int64_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_int64_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_int64_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_INT64_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_int64_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_uint64_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_uint64_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_uint64_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_uint64_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_uint64_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_uint64_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_uint64_4x4_to_float_4x4);
+    g_value_register_transform_func(MOTO_TYPE_UINT64_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_uint64_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_float_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_float_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_float_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_float_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_float_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_float_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_float_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT_4x4, MOTO_TYPE_DOUBLE_4x4,  __moto_transform_float_4x4_to_double_4x4);
+
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_BOOLEAN_4x4, __moto_transform_double_4x4_to_boolean_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_INT_4x4,     __moto_transform_double_4x4_to_int_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_UINT_4x4,    __moto_transform_double_4x4_to_uint_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_LONG_4x4,    __moto_transform_double_4x4_to_long_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_ULONG_4x4,   __moto_transform_double_4x4_to_ulong_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_INT64_4x4,   __moto_transform_double_4x4_to_int64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_UINT64_4x4,  __moto_transform_double_4x4_to_uint64_4x4);
+    g_value_register_transform_func(MOTO_TYPE_DOUBLE_4x4, MOTO_TYPE_FLOAT_4x4,   __moto_transform_double_4x4_to_float_4x4);
+     */
+
 }
