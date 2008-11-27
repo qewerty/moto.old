@@ -1128,7 +1128,8 @@ moto_param_dispose(GObject *obj)
     g_string_free(priv->name, TRUE);
     g_string_free(priv->title, TRUE);
 
-    g_ptr_array_free(priv->depends_on_params, TRUE);
+    if(priv->depends_on_params)
+        g_ptr_array_free(priv->depends_on_params, TRUE);
     g_string_free(priv->expression, TRUE);
 
     param_parent_class->dispose(obj);
