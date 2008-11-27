@@ -88,6 +88,8 @@ struct _MotoWorldPriv
     // cache
     guint prev_width,
           prev_height;
+
+    gboolean use_vbo;
 };
 
 static void
@@ -170,6 +172,8 @@ moto_world_init(MotoWorld *self)
     // cache
     self->priv->prev_width = 640;
     self->priv->prev_height = 480;
+
+    self->priv->use_vbo = FALSE;
 }
 
 static void
@@ -247,7 +251,8 @@ MotoNode *moto_world_create_node(MotoWorld *self,
     }
 
     MotoNode *node = moto_create_node_by_name(type_name, node_name);
-    moto_world_add_node(self, node);
+    if(node)
+        moto_world_add_node(self, node);
 
     return node;
 }
@@ -413,7 +418,7 @@ void moto_world_draw_fps_test(MotoWorld *self)
         moto_world_redraw(self);
     }
     double time = g_timer_elapsed(timer, NULL);
-    moto_info("iters: %d; time: %f; fps: %.2f", iters, time, iters / time);
+    moto_info("iters: %d, time: %f, fps: %.2f", iters, time, iters / time);
 
     g_timer_destroy(timer);
 }
@@ -456,7 +461,7 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
     GSList *l = self->priv->nodes;
     for(; l; l=g_slist_next(l))
     {
-        if(G_TYPE_CHECK_INSTANCE_TYPE(l->data, type))
+        if(g_type_is_a(G_TYPE_FROM_INSTANCE(l->data), type))
         {
             if( ! func(self, (MotoNode *)l->data, user_data))
             {
@@ -466,6 +471,29 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
     }
 
     g_mutex_unlock(self->priv->node_list_mutex);
+}
+
+void moto_world_set_use_vbo(MotoWorld *self, gboolean use)
+{
+    self->priv->use_vbo = use;
+}
+
+gboolean moto_world_get_use_vbo(MotoWorld *self)
+{
+    return self->priv->use_vbo;
+}
+
+static gboolean
+__reset_geometry_view(MotoWorld *world, MotoNode *node, gpointer user_data)
+{
+    moto_geom_view_node_set_prepared((MotoGeomViewNode *)node, FALSE);
+
+    return TRUE;
+}
+
+void moto_world_reset(MotoWorld *self)
+{
+    moto_world_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_geometry_view, NULL);
 }
 
 typedef struct _MotoIntersectData
