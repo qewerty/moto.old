@@ -4,19 +4,19 @@
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-mesh.h" // FIXME: Temporary!
-#include "moto-normal-move-node.h"
+#include "moto-displace-node.h"
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/matrix.h"
 
 /* forwards */
 
-static void moto_normal_move_node_update(MotoNode *self);
+static void moto_displace_node_update(MotoNode *self);
 
 /* class NormalMoveNode */
 
 static GObjectClass *normal_move_node_parent_class = NULL;
 
-struct _MotoNormalMoveNodePriv
+struct _MotoDisplaceNodePriv
 {
     MotoPointCloud *pc;
     MotoPointCloud *prev_pc;
@@ -24,29 +24,29 @@ struct _MotoNormalMoveNodePriv
 };
 
 static void
-moto_normal_move_node_dispose(GObject *obj)
+moto_displace_node_dispose(GObject *obj)
 {
     G_OBJECT_CLASS(normal_move_node_parent_class)->dispose(obj);
 }
 
 static void
-moto_normal_move_node_finalize(GObject *obj)
+moto_displace_node_finalize(GObject *obj)
 {
-    MotoNormalMoveNode *self = (MotoNormalMoveNode *)obj;
+    MotoDisplaceNode *self = (MotoDisplaceNode *)obj;
 
     if(self->priv->pc);
         g_object_unref(self->priv->pc);
-    g_slice_free(MotoNormalMoveNodePriv, self->priv);
+    g_slice_free(MotoDisplaceNodePriv, self->priv);
 
     normal_move_node_parent_class->finalize(obj);
 }
 
 static void
-moto_normal_move_node_init(MotoNormalMoveNode *self)
+moto_displace_node_init(MotoDisplaceNode *self)
 {
     MotoNode *node = (MotoNode *)self;
 
-    self->priv = g_slice_new(MotoNormalMoveNodePriv);
+    self->priv = g_slice_new(MotoDisplaceNodePriv);
 
     self->priv->pc = NULL;
     self->priv->prev_pc = NULL;
@@ -63,26 +63,26 @@ moto_normal_move_node_init(MotoNormalMoveNode *self)
 }
 
 static void
-moto_normal_move_node_class_init(MotoNormalMoveNodeClass *klass)
+moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
 {
     normal_move_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
 
-    goclass->dispose    = moto_normal_move_node_dispose;
-    goclass->finalize   = moto_normal_move_node_finalize;
+    goclass->dispose    = moto_displace_node_dispose;
+    goclass->finalize   = moto_displace_node_finalize;
 
-    nclass->update = moto_normal_move_node_update;
+    nclass->update = moto_displace_node_update;
 }
 
-G_DEFINE_TYPE(MotoNormalMoveNode, moto_normal_move_node, MOTO_TYPE_NODE);
+G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_NODE);
 
 /* methods of class NormalMoveNode */
 
-MotoNormalMoveNode *moto_normal_move_node_new(const gchar *name)
+MotoDisplaceNode *moto_displace_node_new(const gchar *name)
 {
-    MotoNormalMoveNode *self = (MotoNormalMoveNode *)g_object_new(MOTO_TYPE_NORMAL_MOVE_NODE, NULL);
+    MotoDisplaceNode *self = (MotoDisplaceNode *)g_object_new(MOTO_TYPE_DISPLACE_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -90,9 +90,9 @@ MotoNormalMoveNode *moto_normal_move_node_new(const gchar *name)
     return self;
 }
 
-static void moto_normal_move_node_update(MotoNode *self)
+static void moto_displace_node_update(MotoNode *self)
 {
-    MotoNormalMoveNode *nm = (MotoNormalMoveNode*)self;
+    MotoDisplaceNode *nm = (MotoDisplaceNode*)self;
 
     MotoPointCloud *in_pc = (MotoPointCloud *)moto_node_get_param_object(self, "in_pc");
     if( ! in_pc)

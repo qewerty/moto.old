@@ -19,43 +19,43 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_NORMAL_MOVE_NODE_H__
-#define __MOTO_NORMAL_MOVE_NODE_H__
+#ifndef __MOTO_DISPLACE_NODE_H__
+#define __MOTO_DISPLACE_NODE_H__
 
 #include "moto-geometry-view-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoNormalMoveNode MotoNormalMoveNode;
-typedef struct _MotoNormalMoveNodeClass MotoNormalMoveNodeClass;
-typedef struct _MotoNormalMoveNodePriv MotoNormalMoveNodePriv;
+typedef struct _MotoDisplaceNode MotoDisplaceNode;
+typedef struct _MotoDisplaceNodeClass MotoDisplaceNodeClass;
+typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
 
-/* class MotoNormalMoveNode */
+/* class MotoDisplaceNode */
 
-struct _MotoNormalMoveNode
+struct _MotoDisplaceNode
 {
     MotoNode parent;
 
-    MotoNormalMoveNodePriv *priv;
+    MotoDisplaceNodePriv *priv;
 };
 
-struct _MotoNormalMoveNodeClass
+struct _MotoDisplaceNodeClass
 {
     MotoNodeClass parent;
 };
 
-GType moto_normal_move_node_get_type(void);
+GType moto_displace_node_get_type(void);
 
-#define MOTO_TYPE_NORMAL_MOVE_NODE (moto_normal_move_node_get_type())
-#define MOTO_NORMAL_MOVE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_NORMAL_MOVE_NODE, MotoNormalMoveNode))
-#define MOTO_NORMAL_MOVE_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_NORMAL_MOVE_NODE, MotoNormalMoveNodeClass))
-#define MOTO_IS_NORMAL_MOVE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_NORMAL_MOVE_NODE))
-#define MOTO_IS_NORMAL_MOVE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_NORMAL_MOVE_NODE))
-#define MOTO_NORMAL_MOVE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_NORMAL_MOVE_NODE, MotoNormalMoveNodeClass))
+#define MOTO_TYPE_DISPLACE_NODE (moto_displace_node_get_type())
+#define MOTO_DISPLACE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNode))
+#define MOTO_DISPLACE_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodeClass))
+#define MOTO_IS_DISPLACE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_DISPLACE_NODE))
+#define MOTO_IS_DISPLACE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_DISPLACE_NODE))
+#define MOTO_DISPLACE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodeClass))
 
-MotoNormalMoveNode *moto_normal_move_node_new(const gchar *name);
+MotoDisplaceNode *moto_displace_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_NORMAL_MOVE_NODE_H__ */
+#endif /* __MOTO_DISPLACE_NODE_H__ */
 
