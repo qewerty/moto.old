@@ -135,7 +135,8 @@ static void moto_normal_move_node_update(MotoNode *self)
             moto_point_cloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
             moto_point_cloud_get_plain_data(pc,    & points_o, & normals_o, & size_o);
 
-            gsize i;
+            gint i;
+            #pragma omp parallel for private(i)
             for(i = 0; i < size_i; i++)
             {
                 gfloat *pi = points_i + i*3;
