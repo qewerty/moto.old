@@ -35,8 +35,6 @@ typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
 struct _MotoDisplaceNode
 {
     MotoNode parent;
-
-    MotoDisplaceNodePriv *priv;
 };
 
 struct _MotoDisplaceNodeClass

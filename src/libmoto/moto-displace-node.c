@@ -14,6 +14,7 @@ static void moto_displace_node_update(MotoNode *self);
 
 /* class NormalMoveNode */
 
+#define MOTO_DISPLACE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodePriv)
 static GObjectClass *normal_move_node_parent_class = NULL;
 
 struct _MotoDisplaceNodePriv
@@ -32,11 +33,10 @@ moto_displace_node_dispose(GObject *obj)
 static void
 moto_displace_node_finalize(GObject *obj)
 {
-    MotoDisplaceNode *self = (MotoDisplaceNode *)obj;
+    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(obj);
 
-    if(self->priv->pc);
-        g_object_unref(self->priv->pc);
-    g_slice_free(MotoDisplaceNodePriv, self->priv);
+    if(priv->pc);
+        g_object_unref(priv->pc);
 
     normal_move_node_parent_class->finalize(obj);
 }
@@ -45,12 +45,11 @@ static void
 moto_displace_node_init(MotoDisplaceNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(self);
 
-    self->priv = g_slice_new(MotoDisplaceNodePriv);
-
-    self->priv->pc = NULL;
-    self->priv->prev_pc = NULL;
-    self->priv->prev_scale = 0.0f;
+    priv->pc = NULL;
+    priv->prev_pc = NULL;
+    priv->prev_scale = 0.0f;
 
     /* params */
 
@@ -65,6 +64,8 @@ moto_displace_node_init(MotoDisplaceNode *self)
 static void
 moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
 {
+    g_type_class_add_private(klass, sizeof(MotoDisplaceNodePriv));
+
     normal_move_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
@@ -92,36 +93,36 @@ MotoDisplaceNode *moto_displace_node_new(const gchar *name)
 
 static void moto_displace_node_update(MotoNode *self)
 {
-    MotoDisplaceNode *nm = (MotoDisplaceNode*)self;
+    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(self);
 
     MotoPointCloud *in_pc = (MotoPointCloud *)moto_node_get_param_object(self, "in_pc");
     if( ! in_pc)
     {
-        if(nm->priv->pc)
+        if(priv->pc)
         {
-            g_object_unref(nm->priv->pc);
+            g_object_unref(priv->pc);
         }
-        nm->priv->pc = NULL;
+        priv->pc = NULL;
         return;
     }
     else
     {
-        if(in_pc != nm->priv->prev_pc)
+        if(in_pc != priv->prev_pc)
         {
-            if(nm->priv->pc)
+            if(priv->pc)
             {
-                g_object_unref(nm->priv->pc);
+                g_object_unref(priv->pc);
             }
-            nm->priv->pc = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
-            moto_mesh_prepare(MOTO_MESH(nm->priv->pc));
+            priv->pc = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+            moto_mesh_prepare(MOTO_MESH(priv->pc));
         }
-        MotoPointCloud *pc = nm->priv->pc;
-        nm->priv->prev_pc = in_pc;
+        MotoPointCloud *pc = priv->pc;
+        priv->prev_pc = in_pc;
 
         gfloat scale = moto_node_get_param_float(self, "scale");
-        if(scale == nm->priv->prev_scale)
+        if(scale == priv->prev_scale)
             return;
-        nm->priv->prev_scale = scale;
+        priv->prev_scale = scale;
 
         if(moto_point_cloud_can_provide_plain_data(pc))
         {
@@ -152,6 +153,6 @@ static void moto_displace_node_update(MotoNode *self)
     }
 
     MotoParam *param = moto_node_get_param((MotoNode *)self, "out_pc");
-    g_value_set_object(moto_param_get_value(param), nm->priv->pc);
+    g_value_set_object(moto_param_get_value(param), priv->pc);
     moto_param_update_dests(param);
 }
