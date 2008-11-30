@@ -321,7 +321,8 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe->priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
+        data->handler_id = \
+            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
         data->param_handler_id = \
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_int_param_changed), data);
     }
@@ -361,7 +362,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(G_TYPE_FLOAT == ptype)
     {
-        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.01);
+        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_float(param));
         gtk_editable_set_editable((GtkEditable *)widget, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
