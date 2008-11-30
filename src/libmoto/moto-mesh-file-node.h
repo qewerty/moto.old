@@ -22,21 +22,18 @@
 #ifndef __MOTO_MESH_FILE_NODE_H__
 #define __MOTO_MESH_FILE_NODE_H__
 
-#include "moto-geometry-node.h"
+#include "moto-geom-node.h"
 
 G_BEGIN_DECLS
 
 typedef struct _MotoMeshFileNode MotoMeshFileNode;
 typedef struct _MotoMeshFileNodeClass MotoMeshFileNodeClass;
-typedef struct _MotoMeshFileNodePriv MotoMeshFileNodePriv;
 
 /* class MotoMeshFileNode */
 
 struct _MotoMeshFileNode
 {
     MotoGeometryNode parent;
-
-    MotoMeshFileNodePriv *priv;
 };
 
 struct _MotoMeshFileNodeClass

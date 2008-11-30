@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include <gio/gio.h>
 
@@ -12,9 +13,6 @@
 
 /* forwards */
 
-static gchar *moto_mesh_file_node_get_filename(MotoMeshFileNode *self);
-static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar *filename);
-
 static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self);
 
 /*
@@ -26,14 +24,15 @@ static void moto_mesh_file_node_update(MotoNode *self);
 
 /* class MeshFileNode */
 
+typedef struct _MotoMeshFileNodePriv MotoMeshFileNodePriv;
+#define MOTO_MESH_FILE_NODE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_MESH_FILE_NODE, MotoMeshFileNodePriv)
+
 static GObjectClass *mesh_file_node_parent_class = NULL;
 
 struct _MotoMeshFileNodePriv
 {
-    gchar **filename_ptr;
-
     MotoMesh *mesh;
-    MotoMesh **mesh_ptr;
 
     MotoBound *bound;
     gboolean bound_calculated;
@@ -42,10 +41,10 @@ struct _MotoMeshFileNodePriv
 static void
 moto_mesh_file_node_dispose(GObject *obj)
 {
-    MotoMeshFileNode *self = (MotoMeshFileNode *)obj;
+    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(obj);
 
-    g_object_unref((GObject *)self->priv->mesh);
-    g_slice_free(MotoMeshFileNodePriv, self->priv);
+    if(priv->mesh)
+        g_object_unref((GObject *)priv->mesh);
 
     mesh_file_node_parent_class->dispose(obj);
 }
@@ -60,20 +59,18 @@ static void
 moto_mesh_file_node_init(MotoMeshFileNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
-    self->priv = g_slice_new(MotoMeshFileNodePriv);
+    priv->mesh = NULL;
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General", "General",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
 
-    self->priv->filename_ptr = moto_node_param_value_pointer(node, "filename", gchar*);
-    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
-
-    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-    self->priv->bound_calculated = FALSE;
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+    priv->bound_calculated = FALSE;
 }
 
 static void
@@ -105,23 +102,6 @@ MotoMeshFileNode *moto_mesh_file_node_new()
     return self;
 }
 
-static gchar *moto_mesh_file_node_get_filename(MotoMeshFileNode *self)
-{
-    return *(self->priv->filename_ptr);
-}
-
-static void moto_mesh_file_node_set_filename(MotoMeshFileNode *self, const gchar *filename)
-{
-    //g_string_assign(self->priv->filename, filename);
-}
-
-/*
-static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self)
-{
-    return self->priv->mesh;
-}
-*/
-
 typedef struct _TryMeshLoaderData
 {
     const gchar *filename;
@@ -144,13 +124,16 @@ static gboolean try_mesh_loader(gpointer data, gpointer user_data)
 
 static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *filename)
 {
+    if( ! strlen(filename))
+        return NULL;
+
     MotoLibrary *lib = moto_node_get_library((MotoNode *)self);
     if( ! lib)
     {
         GString *msg = g_string_new("I have no library and can't load meshes. :(");
         moto_error(msg->str);
         g_string_free(msg, TRUE);
-        return;
+        return NULL;
     }
 
     TryMeshLoaderData tmld;
@@ -173,14 +156,19 @@ static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *f
 
 static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 {
-    gchar *filename = *(self->priv->filename_ptr);
+    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
-    MotoMesh *mesh = moto_mesh_file_node_load(self, filename);
+    const gchar *filename = moto_node_get_param_string((MotoNode *)self, "filename");
 
-    self->priv->bound_calculated = FALSE;
+    if(priv->mesh)
+        g_object_unref(priv->mesh);
+
+    priv->mesh = moto_mesh_file_node_load(self, filename);
+
+    priv->bound_calculated = FALSE;
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    moto_param_set_object(pm, mesh);
+    moto_param_set_object(pm, G_OBJECT(priv->mesh));
     moto_param_update_dests(pm);
 
 }
@@ -198,17 +186,19 @@ static void moto_mesh_file_node_update(MotoNode *self)
 
 static void calc_bound(MotoMeshFileNode *self)
 {
-    self->priv->bound->bound[0] = 0;
-    self->priv->bound->bound[1] = 0;
-    self->priv->bound->bound[2] = 0;
-    self->priv->bound->bound[3] = 0;
-    self->priv->bound->bound[4] = 0;
-    self->priv->bound->bound[5] = 0;
+    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
-    if( ! self->priv->mesh)
+    priv->bound->bound[0] = 0;
+    priv->bound->bound[1] = 0;
+    priv->bound->bound[2] = 0;
+    priv->bound->bound[3] = 0;
+    priv->bound->bound[4] = 0;
+    priv->bound->bound[5] = 0;
+
+    if( ! priv->mesh)
         return;
 
-    MotoMesh *mesh = self->priv->mesh;
+    MotoMesh *mesh = priv->mesh;
     gfloat min_x = 0, max_x = 0, min_y = 0, max_y = 0, min_z = 0, max_z = 0;
     guint i;
     for(i = 0; i < mesh->v_num; i++)
@@ -229,21 +219,22 @@ static void calc_bound(MotoMeshFileNode *self)
             max_z = mesh->v_coords[i].z;
     }
 
-    self->priv->bound->bound[0] = min_x;
-    self->priv->bound->bound[1] = max_y;
-    self->priv->bound->bound[2] = min_y;
-    self->priv->bound->bound[3] = max_y;
-    self->priv->bound->bound[4] = min_z;
-    self->priv->bound->bound[5] = max_z;
+    priv->bound->bound[0] = min_x;
+    priv->bound->bound[1] = max_y;
+    priv->bound->bound[2] = min_y;
+    priv->bound->bound[3] = max_y;
+    priv->bound->bound[4] = min_z;
+    priv->bound->bound[5] = max_z;
 }
 
 static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self)
 {
     MotoMeshFileNode *mf = (MotoMeshFileNode *)self;
+    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
-    if( ! mf->priv->bound_calculated)
+    if( ! priv->bound_calculated)
         calc_bound(mf);
 
-    return mf->priv->bound;
+    return priv->bound;
 }
 
