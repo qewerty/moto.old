@@ -1,5 +1,8 @@
 #include <math.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
@@ -7,6 +10,7 @@
 #include "moto-displace-node.h"
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/matrix.h"
+#include "libmotoutil/numdef.h"
 
 /* forwards */
 
@@ -14,7 +18,9 @@ static void moto_displace_node_update(MotoNode *self);
 
 /* class NormalMoveNode */
 
+typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
 #define MOTO_DISPLACE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodePriv)
+
 static GObjectClass *normal_move_node_parent_class = NULL;
 
 struct _MotoDisplaceNodePriv
@@ -27,7 +33,7 @@ struct _MotoDisplaceNodePriv
 static void
 moto_displace_node_dispose(GObject *obj)
 {
-    G_OBJECT_CLASS(normal_move_node_parent_class)->dispose(obj);
+    normal_move_node_parent_class->dispose(obj);
 }
 
 static void
@@ -120,7 +126,7 @@ static void moto_displace_node_update(MotoNode *self)
         priv->prev_pc = in_pc;
 
         gfloat scale = moto_node_get_param_float(self, "scale");
-        if(scale == priv->prev_scale)
+        if(fabs(scale-priv->prev_scale) <= MICRO)
             return;
         priv->prev_scale = scale;
 
@@ -137,13 +143,14 @@ static void moto_displace_node_update(MotoNode *self)
             moto_point_cloud_get_plain_data(pc,    & points_o, & normals_o, & size_o);
 
             gint i;
-            #pragma omp parallel for private(i)
+            gfloat *pi, *ni, *po;
+            #pragma omp parallel for if(size_i > 400) private(i, pi, ni, po) \
+                shared(size_i, scale, points_i, normals_i, points_o)
             for(i = 0; i < size_i; i++)
             {
-                gfloat *pi = points_i + i*3;
-                gfloat *ni = normals_i + i*3;
-                gfloat *po = points_o + i*3;
-                //gfloat *no = normals_o + i*3;
+                pi = points_i + i*3;
+                ni = normals_i + i*3;
+                po = points_o + i*3;
 
                 po[0] = pi[0] + ni[0]*scale;
                 po[1] = pi[1] + ni[1]*scale;
