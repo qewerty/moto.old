@@ -56,7 +56,11 @@ struct _MotoNodeClass
 
     GData *actions;
 
+    /* Virtual Table */
     MotoNodeUpdateMethod update;
+
+    /* Signals */
+    guint source_changed_signal_id;
 };
 
 GType moto_node_get_type(void);
@@ -98,6 +102,7 @@ gint64   moto_node_get_param_int64(MotoNode *self,      const gchar *name);
 guint64  moto_node_get_param_uint64(MotoNode *self,     const gchar *name);
 gfloat   moto_node_get_param_float(MotoNode *self,      const gchar *name);
 gdouble  moto_node_get_param_double(MotoNode *self,     const gchar *name);
+const gchar *moto_node_get_param_string(MotoNode *self,    const gchar *name);
 gpointer moto_node_get_param_pointer(MotoNode *self,    const gchar *name);
 gint     moto_node_get_param_enum(MotoNode *self,       const gchar *name);
 GObject *moto_node_get_param_object(MotoNode *self,     const gchar *name);

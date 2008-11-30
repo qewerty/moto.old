@@ -4,6 +4,7 @@
 #include "moto-node.h"
 #include "moto-world.h"
 #include "moto-messager.h"
+#include "moto-variation.h"
 
 /* enums */
 
@@ -165,8 +166,10 @@ struct _MotoParamPriv
 
 /* class MotoNode */
 
-#define MOTO_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_NODE, MotoNodePriv)
-#define MOTO_PARAM_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_PARAM, MotoParamPriv)
+#define MOTO_NODE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_NODE, MotoNodePriv)
+#define MOTO_PARAM_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_PARAM, MotoParamPriv)
 
 static GObjectClass *node_parent_class = NULL;
 
@@ -533,6 +536,17 @@ gdouble moto_node_get_param_double(MotoNode *self, const gchar *name)
         // return;
     }
     return moto_param_get_double(p);
+}
+
+const gchar *moto_node_get_param_string(MotoNode *self, const gchar *name)
+{
+    MotoParam *p = moto_node_get_param(self, name);
+    if( ! p)
+    {
+        // TODO: print error
+        return NULL;
+    }
+    return moto_param_get_string(p);
 }
 
 gpointer moto_node_get_param_pointer(MotoNode *self, const gchar *name)
