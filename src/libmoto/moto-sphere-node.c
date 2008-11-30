@@ -151,7 +151,6 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     guint e_num = (rows-2)*cols + (rows-1)*cols;
     guint f_num = (rows-1)*cols;
     guint f_v_num = (rows-2)*cols*4 + 6*cols;
-    g_print("Sphere: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
     if(priv->mesh)

@@ -153,7 +153,6 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     guint e_num = rows*cols + (rows-1)*cols;// + cols*2;
     guint f_num = (rows-1)*cols;// + cols*2;
     guint f_v_num = f_num*4;// - 2*cols;
-    g_print("Cylinder: v_num, e_num, f_num, f_v_num: %u, %u, %u, %u\n", v_num, e_num, f_num, f_v_num);
 
     gboolean new_mesh = FALSE;
     if(self->priv->mesh)
@@ -264,27 +263,6 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 fi++;
             }
         }
-        /*
-        for(j = 0; j < cols; j++)
-        {
-            guint32 jj = (j == cols-1) ? 0 : j+1;
-            verts[0] = get_v(0, j);
-            verts[1] = get_v(0, jj);
-            verts[2] = rows*cols;
-            g_print("v0, v1, v2: %u, %u, %u\n", verts[0], verts[1], verts[2]);
-            moto_mesh_set_face(mesh, fi, v_offset+3, verts);
-            v_offset += 3;
-            fi++;
-
-            verts[0] = get_v(rows-2, j);
-            verts[1] = get_v(rows-2, jj);
-            verts[2] = rows*cols+1;
-            g_print("v0, v1, v2: %u, %u, %u\n", verts[0], verts[1], verts[2]);
-            moto_mesh_set_face(mesh, fi, v_offset+3, verts);
-            v_offset += 3;
-            fi++;
-        }
-        */
     }
 
     self->priv->bound_calculated = FALSE;

@@ -368,7 +368,7 @@ moto_geom_view_state_new(const gchar *name, const gchar *title,
         MotoGeomViewStateSelectLessFunc select_less,
         MotoGeomViewStateInvertSelectionFunc invert_selection)
 {
-    MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOMETRY_VIEW_STATE, NULL);
+    MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOM_VIEW_STATE, NULL);
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);

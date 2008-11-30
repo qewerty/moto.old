@@ -28,7 +28,6 @@ G_BEGIN_DECLS
 
 typedef struct _MotoDisplaceNode MotoDisplaceNode;
 typedef struct _MotoDisplaceNodeClass MotoDisplaceNodeClass;
-typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
 
 /* class MotoDisplaceNode */
 

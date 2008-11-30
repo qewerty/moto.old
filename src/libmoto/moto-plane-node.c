@@ -168,7 +168,6 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
     guint f_num = div_x*div_y;
-    g_print("Plane: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
     if(priv->mesh)

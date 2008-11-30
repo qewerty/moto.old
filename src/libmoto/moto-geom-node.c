@@ -1,6 +1,6 @@
 #include <GL/gl.h>
 
-#include "moto-geometry-node.h"
+#include "moto-geom-node.h"
 
 /* class GeometryNode */
 

@@ -22,7 +22,7 @@
 #ifndef __MOTO_CYLINDER_NODE_H__
 #define __MOTO_CYLINDER_NODE_H__
 
-#include "moto-geometry-node.h"
+#include "moto-geom-node.h"
 
 G_BEGIN_DECLS
 

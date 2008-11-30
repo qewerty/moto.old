@@ -8,6 +8,7 @@
 #include "moto-object-node.h"
 #include "moto-material-node.h"
 #include "moto-camera-node.h"
+#include "moto-mesh-view-node.h"
 
 #include "libmotoutil/matrix.h"
 #include "libmotoutil/numdef.h"
@@ -180,7 +181,7 @@ moto_object_node_init(MotoObjectNode *self)
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec,   "Transform", "Transform/Misc",
             "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
-            "view", "View",   MOTO_TYPE_GEOMETRY_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
+            "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
             "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec,      "View", "View",
             "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading", "Shading/Material",
             NULL);
@@ -436,12 +437,12 @@ static void calc_global_bound(MotoObjectNode *self)
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
+
     MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
-    MotoGeometryNode *gn = moto_geom_view_node_get_geometry(gvn);
-    if( ! gn)
+    if(! g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
         return;
 
-    // MotoBound *b = moto_geometry_node_get_bound(gn);
+    // MotoBound *b = moto_mesh_view_node_get_bound(MOTO_MESH_VIEW_NODE(gvn));
 
     /* TODO */
 
@@ -454,12 +455,13 @@ static void calc_local_bound(MotoObjectNode *self)
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return;
+
     MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
-    MotoGeometryNode *gn = moto_geom_view_node_get_geometry(gvn);
-    if( ! gn)
+    if(! g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
         return;
 
-    moto_bound_copy(self->priv->local_bound, moto_geometry_node_get_bound(gn));
+    moto_bound_copy(self->priv->local_bound,
+            moto_mesh_view_node_get_bound(MOTO_MESH_VIEW_NODE(gvn)));
 
     self->priv->local_bound_calculated = TRUE;
 }

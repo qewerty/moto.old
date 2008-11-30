@@ -94,7 +94,7 @@ moto_ray_view_node_class_init(MotoRayViewNodeClass *klass)
     */
 }
 
-G_DEFINE_TYPE(MotoRayViewNode, moto_ray_view_node, MOTO_TYPE_GEOMETRY_VIEW_NODE);
+G_DEFINE_TYPE(MotoRayViewNode, moto_ray_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
 
 /* methods of class RayViewNode */
 

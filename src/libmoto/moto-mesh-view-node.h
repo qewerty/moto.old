@@ -56,6 +56,8 @@ MotoMeshViewNode *moto_mesh_view_node_new();
 MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self);
 MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self);
 
+const MotoBound *moto_mesh_view_node_get_bound(MotoMeshViewNode *self);
+
 G_END_DECLS
 
 #endif /* __MOTO_MESH_VIEW_NODE_H__ */

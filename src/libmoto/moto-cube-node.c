@@ -183,7 +183,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
     guint f_num = div_x*div_y*2 + div_x*div_z*2 + div_y*div_z*2;
-    g_print("Cube: v_num, e_num, f_num: %d, %d, %d\n", v_num, e_num, f_num);
 
     gboolean new_mesh = FALSE;
     if(priv->mesh)

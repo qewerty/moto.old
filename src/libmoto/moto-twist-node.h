@@ -19,40 +19,40 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_DISPLACE_NODE_H__
-#define __MOTO_DISPLACE_NODE_H__
+#ifndef __MOTO_TWIST_NODE_H__
+#define __MOTO_TWIST_NODE_H__
 
 #include "moto-geometry-view-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoDisplaceNode MotoDisplaceNode;
-typedef struct _MotoDisplaceNodeClass MotoDisplaceNodeClass;
+typedef struct _MotoTwistNode MotoTwistNode;
+typedef struct _MotoTwistNodeClass MotoTwistNodeClass;
 
-/* class MotoDisplaceNode */
+/* class MotoTwistNode */
 
-struct _MotoDisplaceNode
+struct _MotoTwistNode
 {
     MotoNode parent;
 };
 
-struct _MotoDisplaceNodeClass
+struct _MotoTwistNodeClass
 {
     MotoNodeClass parent;
 };
 
-GType moto_displace_node_get_type(void);
+GType moto_twist_node_get_type(void);
 
-#define MOTO_TYPE_DISPLACE_NODE (moto_displace_node_get_type())
-#define MOTO_DISPLACE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNode))
-#define MOTO_DISPLACE_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodeClass))
-#define MOTO_IS_DISPLACE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_DISPLACE_NODE))
-#define MOTO_IS_DISPLACE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_DISPLACE_NODE))
-#define MOTO_DISPLACE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodeClass))
+#define MOTO_TYPE_TWIST_NODE (moto_twist_node_get_type())
+#define MOTO_TWIST_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_TWIST_NODE, MotoTwistNode))
+#define MOTO_TWIST_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_TWIST_NODE, MotoTwistNodeClass))
+#define MOTO_IS_TWIST_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_TWIST_NODE))
+#define MOTO_IS_TWIST_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_TWIST_NODE))
+#define MOTO_TWIST_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TWIST_NODE, MotoTwistNodeClass))
 
-MotoDisplaceNode *moto_displace_node_new(const gchar *name);
+MotoTwistNode *moto_twist_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_DISPLACE_NODE_H__ */
+#endif /* __MOTO_TWIST_NODE_H__ */
 

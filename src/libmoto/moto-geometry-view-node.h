@@ -27,7 +27,7 @@
 
 #include "moto-ray.h"
 #include "moto-transform-info.h"
-#include "moto-geometry-node.h"
+#include "moto-geom-node.h"
 
 G_BEGIN_DECLS
 
@@ -99,12 +99,12 @@ struct _MotoGeomViewNodeClass
 
 GType moto_geom_view_node_get_type(void);
 
-#define MOTO_TYPE_GEOMETRY_VIEW_NODE (moto_geom_view_node_get_type())
-#define MOTO_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNode))
-#define MOTO_GEOM_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNodeClass))
-#define MOTO_IS_GEOMETRY_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_VIEW_NODE))
-#define MOTO_IS_GEOMETRY_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_VIEW_NODE))
-#define MOTO_GEOM_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_NODE, MotoGeomViewNodeClass))
+#define MOTO_TYPE_GEOM_VIEW_NODE (moto_geom_view_node_get_type())
+#define MOTO_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNode))
+#define MOTO_GEOM_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNodeClass))
+#define MOTO_IS_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM_VIEW_NODE))
+#define MOTO_IS_GEOM_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM_VIEW_NODE))
+#define MOTO_GEOM_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNodeClass))
 
 void moto_geom_view_node_draw(MotoGeomViewNode *self);
 void moto_geom_view_node_prepare_for_draw(MotoGeomViewNode *self);
@@ -148,12 +148,12 @@ struct _MotoGeomViewStateClass
 
 GType moto_geom_view_state_get_type(void);
 
-#define MOTO_TYPE_GEOMETRY_VIEW_STATE (moto_geom_view_state_get_type())
-#define MOTO_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewState))
-#define MOTO_GEOM_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewStateClass))
-#define MOTO_IS_GEOMETRY_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE))
-#define MOTO_IS_GEOMETRY_VIEW_STATE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_VIEW_STATE))
-#define MOTO_GEOM_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_VIEW_STATE, MotoGeomViewStateClass))
+#define MOTO_TYPE_GEOM_VIEW_STATE (moto_geom_view_state_get_type())
+#define MOTO_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewState))
+#define MOTO_GEOM_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewStateClass))
+#define MOTO_IS_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM_VIEW_STATE))
+#define MOTO_IS_GEOM_VIEW_STATE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM_VIEW_STATE))
+#define MOTO_GEOM_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewStateClass))
 
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,
