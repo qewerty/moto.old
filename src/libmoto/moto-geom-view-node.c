@@ -3,7 +3,7 @@
 #include "libmotoutil/matrix.h"
 
 #include "moto-messager.h"
-#include "moto-geometry-view-node.h"
+#include "moto-geom-view-node.h"
 #include "moto-mesh-view-node.h"
 
 /* forwards */
