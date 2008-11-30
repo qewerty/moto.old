@@ -4,11 +4,12 @@
 #include "moto-node.h"
 #include "moto-messager.h"
 
-#include "moto-image-loader.h"
+// #include "moto-image-loader.h"
 #include "moto-mesh-loader.h"
 
 /* nodes */
-#include "moto-normal-move-node.h"
+#include "moto-displace-node.h"
+#include "moto-twist-node.h"
 #include "moto-object-node.h"
 #include "moto-camera-node.h"
 #include "moto-sler-material-node.h"
@@ -131,14 +132,15 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_SPHERE_NODE;
             MOTO_TYPE_CYLINDER_NODE;
             MOTO_TYPE_MESH_FILE_NODE;
-        MOTO_TYPE_GEOMETRY_VIEW_NODE;
+        MOTO_TYPE_GEOM_VIEW_NODE;
             MOTO_TYPE_MESH_VIEW_NODE;
             MOTO_TYPE_GRID_VIEW_NODE;
             MOTO_TYPE_AXES_VIEW_NODE;
             MOTO_TYPE_RAY_VIEW_NODE;
         MOTO_TYPE_MATERIAL_NODE;
             MOTO_TYPE_SLER_MATERIAL_NODE;
-        MOTO_TYPE_NORMAL_MOVE_NODE;
+        MOTO_TYPE_DISPLACE_NODE;
+        MOTO_TYPE_TWIST_NODE;
 }
 
 G_DEFINE_TYPE(MotoSystem, moto_system, G_TYPE_OBJECT);
