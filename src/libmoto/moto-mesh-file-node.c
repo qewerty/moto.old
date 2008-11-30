@@ -25,6 +25,7 @@ static void moto_mesh_file_node_update(MotoNode *self);
 /* class MeshFileNode */
 
 typedef struct _MotoMeshFileNodePriv MotoMeshFileNodePriv;
+
 #define MOTO_MESH_FILE_NODE_GET_PRIVATE(obj) \
     G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_MESH_FILE_NODE, MotoMeshFileNodePriv)
 
@@ -76,6 +77,8 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
 static void
 moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
 {
+    g_type_class_add_private(klass, sizeof(MotoMeshFileNodePriv));
+
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
     MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
@@ -184,56 +187,54 @@ static void moto_mesh_file_node_update(MotoNode *self)
         moto_mesh_file_node_update_mesh(mesh_file);
 }
 
-static void calc_bound(MotoMeshFileNode *self)
-{
-    MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
-
-    priv->bound->bound[0] = 0;
-    priv->bound->bound[1] = 0;
-    priv->bound->bound[2] = 0;
-    priv->bound->bound[3] = 0;
-    priv->bound->bound[4] = 0;
-    priv->bound->bound[5] = 0;
-
-    if( ! priv->mesh)
-        return;
-
-    MotoMesh *mesh = priv->mesh;
-    gfloat min_x = 0, max_x = 0, min_y = 0, max_y = 0, min_z = 0, max_z = 0;
-    guint i;
-    for(i = 0; i < mesh->v_num; i++)
-    {
-        if(mesh->v_coords[i].x < min_x)
-            min_x = mesh->v_coords[i].x;
-        if(mesh->v_coords[i].x > max_x)
-            max_x = mesh->v_coords[i].x;
-
-        if(mesh->v_coords[i].y < min_y)
-            min_y = mesh->v_coords[i].y;
-        if(mesh->v_coords[i].y > max_y)
-            max_y = mesh->v_coords[i].y;
-
-        if(mesh->v_coords[i].z < min_z)
-            min_z = mesh->v_coords[i].z;
-        if(mesh->v_coords[i].z > max_z)
-            max_z = mesh->v_coords[i].z;
-    }
-
-    priv->bound->bound[0] = min_x;
-    priv->bound->bound[1] = max_y;
-    priv->bound->bound[2] = min_y;
-    priv->bound->bound[3] = max_y;
-    priv->bound->bound[4] = min_z;
-    priv->bound->bound[5] = max_z;
-}
-
 static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self)
 {
     MotoMeshFileNode *mf = (MotoMeshFileNode *)self;
     MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
     if( ! priv->bound_calculated)
-        calc_bound(mf);
+    {
+
+        priv->bound->bound[0] = 0;
+        priv->bound->bound[1] = 0;
+        priv->bound->bound[2] = 0;
+        priv->bound->bound[3] = 0;
+        priv->bound->bound[4] = 0;
+        priv->bound->bound[5] = 0;
+
+        if( ! priv->mesh)
+            return;
+
+        MotoMesh *mesh = priv->mesh;
+        gfloat min_x = 0, max_x = 0, min_y = 0, max_y = 0, min_z = 0, max_z = 0;
+        guint i;
+        for(i = 0; i < mesh->v_num; i++)
+        {
+            if(mesh->v_coords[i].x < min_x)
+                min_x = mesh->v_coords[i].x;
+            if(mesh->v_coords[i].x > max_x)
+                max_x = mesh->v_coords[i].x;
+
+            if(mesh->v_coords[i].y < min_y)
+                min_y = mesh->v_coords[i].y;
+            if(mesh->v_coords[i].y > max_y)
+                max_y = mesh->v_coords[i].y;
+
+            if(mesh->v_coords[i].z < min_z)
+                min_z = mesh->v_coords[i].z;
+            if(mesh->v_coords[i].z > max_z)
+                max_z = mesh->v_coords[i].z;
+        }
+
+        priv->bound->bound[0] = min_x;
+        priv->bound->bound[1] = max_y;
+        priv->bound->bound[2] = min_y;
+        priv->bound->bound[3] = max_y;
+        priv->bound->bound[4] = min_z;
+        priv->bound->bound[5] = max_z;
+
+        priv->bound_calculated = TRUE;
+    }
 
     return priv->bound;
 }
