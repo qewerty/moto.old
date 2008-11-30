@@ -20,7 +20,7 @@
 #include "libmoto/moto-object-node.h"
 #include "libmotoutil/numdef.h"
 
-#include "libmoto/moto-geometry-view-node.h"
+#include "libmoto/moto-geom-view-node.h"
 
 #include "moto-shelf.h"
 

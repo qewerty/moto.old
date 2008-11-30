@@ -22,7 +22,7 @@
 #ifndef __MOTO_TWIST_NODE_H__
 #define __MOTO_TWIST_NODE_H__
 
-#include "moto-geometry-view-node.h"
+#include "moto-geom-view-node.h"
 
 G_BEGIN_DECLS
 

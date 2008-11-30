@@ -28,7 +28,7 @@
 #include "moto-node.h"
 #include "moto-object-node.h"
 #include "moto-camera-node.h"
-#include "moto-geometry-view-node.h"
+#include "moto-geom-view-node.h"
 #include "moto-mesh-view-node.h"
 #include "moto-wobj-mesh-loader.h"
 #include "moto-variation.h"
@@ -52,6 +52,6 @@
 #include "moto-ipo-segment.h"
 #include "moto-library.h"
 
-#include "moto-geometry-view-node.h"
+#include "moto-geom-view-node.h"
 
 #endif /* __MOTO_H__ */
