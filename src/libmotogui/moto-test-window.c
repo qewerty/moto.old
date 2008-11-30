@@ -176,6 +176,22 @@ gboolean on_key_press_event(GtkWidget   *widget,
 
         moto_test_window_redraw_3dview(self);
     }
+    else if(0 == g_utf8_collate(event->string, "b"))
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return FALSE;
+
+        moto_world_set_use_vbo(w, ! moto_world_get_use_vbo(w));
+
+        if(moto_world_get_use_vbo(w))
+            moto_info("VBO enabled");
+        else
+            moto_info("VBO disabled");
+
+        moto_world_reset(w);
+        moto_test_window_redraw_3dview(self);
+    }
     else if(65289 == event->keyval)
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
@@ -275,27 +291,27 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
-    MotoNode *root_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Root", NULL);
+    MotoNode *root_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Root", NULL);
     moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
 
     param = moto_node_get_param(root_node, "ty");
 
-    MotoNode *obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Object", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
-    MotoNode *grid_view_node = moto_world_create_node(self->priv->world, "MotoGridViewNode", "GridView", NULL);
+    MotoNode *grid_view_node = moto_world_create_node_by_name(self->priv->world, "MotoGridViewNode", "GridView", NULL);
     moto_node_link(obj_node, "view", grid_view_node, "view");
 
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "Object", NULL);
+    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Object", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
 
-    MotoNode *axes_view_node = moto_world_create_node(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
+    MotoNode *axes_view_node = moto_world_create_node_by_name(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
     moto_node_link(obj_node, "view", axes_view_node, "view");
 
     // cube instance
-    obj_node = moto_world_create_node(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
+    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
     // moto_node_link(obj_node, "view", view_node, "view");
 
@@ -325,8 +341,8 @@ moto_test_window_init(MotoTestWindow *self)
     // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
 
     // camera 
-    MotoNode *cam_obj = moto_world_create_node(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
-    // MotoNode *cam = moto_world_create_node(self->priv->world, "MotoCameraNode", "CameraObject");
+    MotoNode *cam_obj = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
+    // MotoNode *cam = moto_world_create_node_by_name(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
 
     // Window
