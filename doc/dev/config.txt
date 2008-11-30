@@ -1,0 +1,12 @@
+Some things for config
+======================
+
+Video
+-----
+
+ * Use GLSL for drawing selected elements. Needs additional memory
+   to store selection vertex atribute varying data, but should be faster.
+ * Use GL_ARB_vertex_buffer_object extension (if supported) for MotoMeshViewNode.
+ * Use GLSL vertex shaders for object transformations.
+ * Use GLSL vertex shaders for mesh deformation. It works only if all mesh modifiers
+   provide correct GLSL code for deformation.
