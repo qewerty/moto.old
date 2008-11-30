@@ -1,5 +1,8 @@
+#include <string.h>
+
 #include "libmotoutil/moto-mapped-list.h"
 
+#include "moto-types.h"
 #include "moto-filename.h"
 #include "moto-node.h"
 #include "moto-world.h"
@@ -386,7 +389,13 @@ void moto_node_add_params(MotoNode *self, ...)
                 g_value_set_pointer(&v, va_arg(ap, gpointer));
             break;
             default:
-                if(g_type_is_a(ptype, G_TYPE_ENUM))
+                if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_3))
+                {
+                    // FIXME: Rewrite with moto_value_set_float_3 when it will be implemented
+                    gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*3);
+                }
+                else if(g_type_is_a(ptype, G_TYPE_ENUM))
                 {
                     g_value_set_enum(&v, va_arg(ap, gint));
                 }

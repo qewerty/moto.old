@@ -189,7 +189,6 @@ static void moto_mesh_file_node_update(MotoNode *self)
 
 static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self)
 {
-    MotoMeshFileNode *mf = (MotoMeshFileNode *)self;
     MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
     if( ! priv->bound_calculated)

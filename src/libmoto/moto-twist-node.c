@@ -1,6 +1,7 @@
 #include <math.h>
 
 
+#include "moto-types.h"
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-mesh.h" // FIXME: Temporary!
@@ -56,11 +57,16 @@ moto_twist_node_init(MotoTwistNode *self)
 
     /* params */
 
+    gfloat orig[3] = {0, 0, 0};
+    gfloat dir[3] = {0, 1, 0};
+
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry", "Geometry",
             "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry", "Geometry",
-            "scale",  "Scaling Value",        G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Geometry", "Geometry",
+            "scale",  "Scaling Value",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Geometry", "Geometry",
+            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Geometry", "Geometry",
+            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Geometry", "Geometry",
             NULL);
 }
 
@@ -97,6 +103,11 @@ MotoTwistNode *moto_twist_node_new(const gchar *name)
 static void moto_twist_node_update(MotoNode *self)
 {
     MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
+
+    GValue *vorig = moto_node_get_param_value(self, "orig");
+    GValue *vdir  = moto_node_get_param_value(self, "dir");
+    gfloat *orig = (gfloat *)g_value_peek_pointer(vorig);
+    gfloat *dir  = (gfloat *)g_value_peek_pointer(vdir);
 
     MotoPointCloud *in_pc = (MotoPointCloud *)moto_node_get_param_object(self, "in_pc");
     if( ! in_pc)
@@ -139,7 +150,11 @@ static void moto_twist_node_update(MotoNode *self)
             moto_point_cloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
             moto_point_cloud_get_plain_data(pc,    & points_o, & normals_o, & size_o);
 
-            gfloat axis[3] = {0, 1, 0};
+            gfloat axis[3];
+            vector3_copy(axis, dir);
+            gfloat lenbuf;
+            vector3_normalize(axis, lenbuf);
+
             gfloat m[16];
 
             gint i;
@@ -156,10 +171,19 @@ static void moto_twist_node_update(MotoNode *self)
                 s = sin(a);
                 c = cos(a);
 
+                gfloat tmp[3];
+                tmp[0] = pi[0] - orig[0];
+                tmp[1] = pi[1] - orig[1];
+                tmp[2] = pi[2] - orig[2];
+
                 matrix44_identity(m);
                 matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
 
-                point3_transform(po, m, pi);
+                point3_transform(po, m, tmp);
+
+                po[0] += orig[0];
+                po[1] += orig[1];
+                po[2] += orig[2];
             }
             if(g_type_is_a(G_TYPE_FROM_INSTANCE(pc), MOTO_TYPE_MESH))
             {
