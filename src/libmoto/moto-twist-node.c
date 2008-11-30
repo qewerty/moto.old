@@ -4,23 +4,23 @@
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-mesh.h" // FIXME: Temporary!
-#include "moto-displace-node.h"
+#include "moto-twist-node.h"
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/matrix.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */
 
-static void moto_displace_node_update(MotoNode *self);
+static void moto_twist_node_update(MotoNode *self);
 
 /* class NormalMoveNode */
 
-typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
-#define MOTO_DISPLACE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodePriv)
+typedef struct _MotoTwistNodePriv MotoTwistNodePriv;
+#define MOTO_TWIST_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_TWIST_NODE, MotoTwistNodePriv)
 
 static GObjectClass *normal_move_node_parent_class = NULL;
 
-struct _MotoDisplaceNodePriv
+struct _MotoTwistNodePriv
 {
     MotoPointCloud *pc;
     MotoPointCloud *prev_pc;
@@ -28,15 +28,15 @@ struct _MotoDisplaceNodePriv
 };
 
 static void
-moto_displace_node_dispose(GObject *obj)
+moto_twist_node_dispose(GObject *obj)
 {
     normal_move_node_parent_class->dispose(obj);
 }
 
 static void
-moto_displace_node_finalize(GObject *obj)
+moto_twist_node_finalize(GObject *obj)
 {
-    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(obj);
+    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(obj);
 
     if(priv->pc);
         g_object_unref(priv->pc);
@@ -45,10 +45,10 @@ moto_displace_node_finalize(GObject *obj)
 }
 
 static void
-moto_displace_node_init(MotoDisplaceNode *self)
+moto_twist_node_init(MotoTwistNode *self)
 {
     MotoNode *node = (MotoNode *)self;
-    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(self);
+    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
 
     priv->pc = NULL;
     priv->prev_pc = NULL;
@@ -65,28 +65,28 @@ moto_displace_node_init(MotoDisplaceNode *self)
 }
 
 static void
-moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
+moto_twist_node_class_init(MotoTwistNodeClass *klass)
 {
-    g_type_class_add_private(klass, sizeof(MotoDisplaceNodePriv));
+    g_type_class_add_private(klass, sizeof(MotoTwistNodePriv));
 
     normal_move_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
 
-    goclass->dispose    = moto_displace_node_dispose;
-    goclass->finalize   = moto_displace_node_finalize;
+    goclass->dispose    = moto_twist_node_dispose;
+    goclass->finalize   = moto_twist_node_finalize;
 
-    nclass->update = moto_displace_node_update;
+    nclass->update = moto_twist_node_update;
 }
 
-G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_NODE);
+G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_NODE);
 
 /* methods of class NormalMoveNode */
 
-MotoDisplaceNode *moto_displace_node_new(const gchar *name)
+MotoTwistNode *moto_twist_node_new(const gchar *name)
 {
-    MotoDisplaceNode *self = (MotoDisplaceNode *)g_object_new(MOTO_TYPE_DISPLACE_NODE, NULL);
+    MotoTwistNode *self = (MotoTwistNode *)g_object_new(MOTO_TYPE_TWIST_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -94,9 +94,9 @@ MotoDisplaceNode *moto_displace_node_new(const gchar *name)
     return self;
 }
 
-static void moto_displace_node_update(MotoNode *self)
+static void moto_twist_node_update(MotoNode *self)
 {
-    MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(self);
+    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
 
     MotoPointCloud *in_pc = (MotoPointCloud *)moto_node_get_param_object(self, "in_pc");
     if( ! in_pc)
@@ -143,39 +143,28 @@ static void moto_displace_node_update(MotoNode *self)
             gfloat m[16];
 
             gint i;
-            #pragma omp parallel for private(i)
+            gfloat *pi, *po;
+            gfloat a, s, c;
+            #pragma omp parallel for if(size_i > 100) private(i, pi, po, a, s, c) \
+                shared(size_i, scale, points_i, points_o)
             for(i = 0; i < size_i; i++)
             {
-                gfloat *pi = points_i + i*3;
-                // gfloat *ni = normals_i + i*3;
-                gfloat *po = points_o + i*3;
-                //gfloat *no = normals_o + i*3;
+                pi = points_i + i*3;
+                po = points_o + i*3;
 
-                gfloat a = scale*RAD_PER_DEG*pi[1];
-                gfloat s = sin(a);
-                gfloat c = cos(a);
+                a = scale*RAD_PER_DEG*pi[1];
+                s = sin(a);
+                c = cos(a);
 
                 matrix44_identity(m);
                 matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
 
                 point3_transform(po, m, pi);
             }
-
-            /*
-            gint i;
-            #pragma omp parallel for private(i)
-            for(i = 0; i < size_i; i++)
+            if(g_type_is_a(G_TYPE_FROM_INSTANCE(pc), MOTO_TYPE_MESH))
             {
-                gfloat *pi = points_i + i*3;
-                gfloat *ni = normals_i + i*3;
-                gfloat *po = points_o + i*3;
-                //gfloat *no = normals_o + i*3;
-
-                po[0] = pi[0] + ni[0]*scale;
-                po[1] = pi[1] + ni[1]*scale;
-                po[2] = pi[2] + ni[2]*scale;
+                moto_mesh_calc_normals(MOTO_MESH(pc));
             }
-            */
         }
     }
 
