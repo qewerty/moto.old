@@ -237,19 +237,22 @@ void moto_world_add_node(MotoWorld *self, MotoNode *node)
 }
 
 MotoNode *moto_world_create_node(MotoWorld *self,
+        GType type,
+        const gchar *node_name,
+        const gchar *path)
+{
+    MotoNode *node = moto_create_node(type, node_name);
+    if(node)
+        moto_world_add_node(self, node);
+
+    return node;
+}
+
+MotoNode *moto_world_create_node_by_name(MotoWorld *self,
         const gchar *type_name,
         const gchar *node_name,
         const gchar *path)
 {
-    MotoLibrary *lib = moto_world_get_library(self);
-    if( ! lib)
-    {
-        GString *msg = g_string_new("I have no library and can't create nodes. :(");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
-        return NULL;
-    }
-
     MotoNode *node = moto_create_node_by_name(type_name, node_name);
     if(node)
         moto_world_add_node(self, node);

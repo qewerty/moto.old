@@ -115,6 +115,20 @@ const gchar *moto_world_get_name(MotoWorld *self);
  * Returns pointer to newly created node.
  */
 MotoNode *moto_world_create_node(MotoWorld *self,
+        GType type,
+        const gchar *node_name,
+        const gchar *path);
+
+/**
+ * moto_world_create_node_by_name:
+ * @self: a #MotoWorld.
+ * @type_name: node class name as a string. Ex: "#MotoObjectNode", "#MotoMeshViewNode".
+ * @node_name: name for new node. Name must be unique in the given container.
+ * @path: path in which node will be placed. If NULL, node is placed in the root.
+ *
+ * Returns pointer to newly created node.
+ */
+MotoNode *moto_world_create_node_by_name(MotoWorld *self,
         const gchar *type_name,
         const gchar *node_name,
         const gchar *path);
@@ -263,6 +277,12 @@ MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name);
 
 void moto_world_foreach_node(MotoWorld *self, GType type,
         MotoWorldForeachNodeFunc func, gpointer user_data);
+
+/* Configuration */
+
+void moto_world_set_use_vbo(MotoWorld *self, gboolean use);
+gboolean moto_world_get_use_vbo(MotoWorld *self);
+void moto_world_reset(MotoWorld *self);
 
 /* Animation */
 
