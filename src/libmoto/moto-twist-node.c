@@ -25,7 +25,7 @@ struct _MotoTwistNodePriv
 {
     MotoPointCloud *pc;
     MotoPointCloud *prev_pc;
-    gfloat prev_scale;
+    gfloat prev_angle;
 };
 
 static void
@@ -53,20 +53,20 @@ moto_twist_node_init(MotoTwistNode *self)
 
     priv->pc = NULL;
     priv->prev_pc = NULL;
-    priv->prev_scale = 0.0f;
+    priv->prev_angle = 0.0f;
 
     /* params */
 
     gfloat orig[3] = {0, 0, 0};
-    gfloat dir[3] = {0, 1, 0};
+    gfloat dir[3] = {1, 1, 0};
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
+            "angle",  "Angle",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Arguments", "Arguments",
+            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Arguments", "Arguments",
+            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Arguments", "Arguments",
             "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry", "Geometry",
             "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry", "Geometry",
-            "scale",  "Scaling Value",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Geometry", "Geometry",
-            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Geometry", "Geometry",
-            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Geometry", "Geometry",
             NULL);
 }
 
@@ -133,10 +133,10 @@ static void moto_twist_node_update(MotoNode *self)
         MotoPointCloud *pc = priv->pc;
         priv->prev_pc = in_pc;
 
-        gfloat scale = moto_node_get_param_float(self, "scale");
-        if(fabs(scale-priv->prev_scale) <= MICRO)
-            return;
-        priv->prev_scale = scale;
+        gfloat angle = moto_node_get_param_float(self, "angle");
+        //if(angle >= MICRO && fabs(angle - priv->prev_angle) <= MICRO)
+        //    return;
+        priv->prev_angle = angle;
 
         if(moto_point_cloud_can_provide_plain_data(pc))
         {
@@ -150,44 +150,65 @@ static void moto_twist_node_update(MotoNode *self)
             moto_point_cloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
             moto_point_cloud_get_plain_data(pc,    & points_o, & normals_o, & size_o);
 
-            gfloat axis[3];
-            vector3_copy(axis, dir);
-            gfloat lenbuf;
-            vector3_normalize(axis, lenbuf);
-
-            gfloat m[16];
-
             gint i;
-            gfloat *pi, *po;
-            gfloat a, s, c;
-            #pragma omp parallel for if(size_i > 100) private(i, pi, po, a, s, c) \
-                shared(size_i, scale, points_i, points_o)
-            for(i = 0; i < size_i; i++)
+            gfloat *pi, *po, *ni, *no;
+            if(fabs(angle) >= MICRO)
             {
-                pi = points_i + i*3;
-                po = points_o + i*3;
+                gfloat axis[3];
+                vector3_copy(axis, dir);
+                gfloat lenbuf;
+                vector3_normalize(axis, lenbuf);
 
-                a = scale*RAD_PER_DEG*pi[1];
-                s = sin(a);
-                c = cos(a);
+                gfloat m[16];
 
-                gfloat tmp[3];
-                tmp[0] = pi[0] - orig[0];
-                tmp[1] = pi[1] - orig[1];
-                tmp[2] = pi[2] - orig[2];
+                gfloat a, s, c;
+                gfloat to_p[3], tmp[3];
+                #pragma omp parallel for if(size_i > 100) private(i, pi, po, a, s, c, tmp, to_p) \
+                    shared(size_i, angle, points_i, points_o, orig, axis)
+                for(i = 0; i < size_i; i++)
+                {
+                    gint offset = i*3;
+                    pi = points_i + offset;
+                    po = points_o + offset;
 
-                matrix44_identity(m);
-                matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
+                    vector3_dif(to_p, pi, orig);
 
-                point3_transform(po, m, tmp);
+                    a = angle * RAD_PER_DEG * vector3_dot(to_p, axis);
+                    s = sin(a);
+                    c = cos(a);
 
-                po[0] += orig[0];
-                po[1] += orig[1];
-                po[2] += orig[2];
+                    tmp[0] = pi[0] - orig[0];
+                    tmp[1] = pi[1] - orig[1];
+                    tmp[2] = pi[2] - orig[2];
+
+                    matrix44_identity(m);
+                    matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
+
+                    point3_transform(po, m, tmp);
+
+                    po[0] += orig[0];
+                    po[1] += orig[1];
+                    po[2] += orig[2];
+                }
+                if(g_type_is_a(G_TYPE_FROM_INSTANCE(pc), MOTO_TYPE_MESH))
+                {
+                    moto_mesh_calc_normals(MOTO_MESH(pc));
+                }
             }
-            if(g_type_is_a(G_TYPE_FROM_INSTANCE(pc), MOTO_TYPE_MESH))
+            else
             {
-                moto_mesh_calc_normals(MOTO_MESH(pc));
+                for(i = 0; i < size_i; i++)
+                {
+                    gint offset = i*3;
+
+                    pi = points_i + offset;
+                    po = points_o + offset;
+                    vector3_copy(po, pi);
+
+                    ni = normals_i + offset;
+                    no = normals_o + offset;
+                    vector3_copy(no, ni);
+                }
             }
         }
     }
