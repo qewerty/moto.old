@@ -133,9 +133,7 @@ static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *f
     MotoLibrary *lib = moto_node_get_library((MotoNode *)self);
     if( ! lib)
     {
-        GString *msg = g_string_new("I have no library and can't load meshes. :(");
-        moto_error(msg->str);
-        g_string_free(msg, TRUE);
+        moto_error("I have no library and can't load meshes. :(");
         return NULL;
     }
 
