@@ -479,15 +479,15 @@ void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder ord
 
 gboolean moto_object_node_get_keep_transform(MotoObjectNode *self)
 {
-    return moto_node_get_param_enum((MotoNode*)self, "kt");
+    return moto_node_get_param_boolean((MotoNode*)self, "kt");
 }
 
 void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt)
 {
-    if(kt != moto_node_get_param_enum((MotoNode*)self, "kt"))
+    if(kt != moto_node_get_param_boolean((MotoNode*)self, "kt"))
     {
         self->priv->transform_calculated = FALSE;
-        moto_node_set_param_enum((MotoNode *)self, "kt", kt);
+        moto_node_set_param_boolean((MotoNode *)self, "kt", kt);
     }
 }
 
