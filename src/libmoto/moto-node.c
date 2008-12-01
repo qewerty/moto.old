@@ -389,11 +389,59 @@ void moto_node_add_params(MotoNode *self, ...)
                 g_value_set_pointer(&v, va_arg(ap, gpointer));
             break;
             default:
-                if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_3))
+                if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_2))
                 {
-                    // FIXME: Rewrite with moto_value_set_float_3 when it will be implemented
+                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    gboolean *ptr = (gboolean *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*2);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_3))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*3);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_4))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    gboolean *ptr = (gboolean *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*4);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT_2))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    gint *ptr = (gint *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*2);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT_3))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*3);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT_4))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    gint *ptr = (gint *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*4);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_2))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+                    gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*2);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_3))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*3);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_4))
+                {
+                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+                    gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
+                    memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*4);
                 }
                 else if(g_type_is_a(ptype, G_TYPE_ENUM))
                 {
