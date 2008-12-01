@@ -1,3 +1,4 @@
+#include "moto-types.h"
 #include "moto-plane-node.h"
 #include "moto-mesh.h"
 
@@ -36,14 +37,6 @@ struct _MotoPlaneNodePriv
 {
     gboolean disposed;
 
-    gfloat *size_x_ptr;
-    gfloat *size_y_ptr;
-
-    guint *div_x_ptr;
-    guint *div_y_ptr;
-
-    MotoOrientation *orientation_ptr;
-
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
 
@@ -81,23 +74,16 @@ moto_plane_node_init(MotoPlaneNode *self)
 
     priv->mesh = NULL;
 
+    gfloat size[2] = {10, 10};
+    gint divs[2] = {10, 10};
+
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 10.0f, pspec, "Size", "Size",
-            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 10.0f, pspec, "Size", "Size",
-            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
-            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "size", "Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, size, pspec, "Form", "Form",
+            "divs", "Divisions",  MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form", "Form",
             "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
-
-    priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
-    priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
-
-    priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
-    priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
-
-    priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoOrientation);
 
     priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
@@ -152,18 +138,24 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 {
     MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 
-    gfloat size_x = *(priv->size_x_ptr);
-    gfloat size_y = *(priv->size_y_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+    GValue *vsize = moto_node_get_param_value((MotoNode *)self, "size");
+    gfloat *size = (gfloat *)g_value_peek_pointer(vsize);
+    GValue *vdivs = moto_node_get_param_value((MotoNode *)self, "divs");
+    gint *divs = (gint *)g_value_peek_pointer(vdivs);
+
+    gfloat size_x = size[0];
+    gfloat size_y = size[1];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
 
-    guint div_x = *(priv->div_x_ptr);
-    guint div_y = *(priv->div_y_ptr);
+    gint div_x = divs[0];
+    gint div_y = divs[1];
 
     div_x = (div_x < 1) ? 1 : div_x;
     div_y = (div_y < 1) ? 1 : div_y;
 
-    MotoOrientation orientation = *(priv->orientation_ptr);
+    MotoOrientation orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
 
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
@@ -350,9 +342,12 @@ static void calc_bound(MotoPlaneNode *self)
 {
     MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 
-    gfloat size_x = *(priv->size_x_ptr);
-    gfloat size_y = *(priv->size_y_ptr);
-    MotoOrientation orientation = *(priv->orientation_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+    GValue *vsize = moto_node_get_param_value((MotoNode *)self, "size");
+    gfloat *size = g_value_peek_pointer(vsize);
+    gfloat size_x = size[0];
+    gfloat size_y = size[1];
+    MotoOrientation orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
 
     gfloat hsx, hsy, hsz;
     switch(orientation)

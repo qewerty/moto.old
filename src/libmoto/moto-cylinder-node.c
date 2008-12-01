@@ -1,5 +1,6 @@
 #include <math.h>
 
+#include "moto-types.h"
 #include "moto-cylinder-node.h"
 #include "moto-mesh.h"
 #include "moto-enums.h"
@@ -16,20 +17,6 @@ static GObjectClass *cylinder_node_parent_class = NULL;
 
 struct _MotoCylinderNodePriv
 {
-    gfloat *radius_x_f_ptr;
-    gfloat *radius_y_f_ptr;
-    gfloat *radius_x_s_ptr;
-    gfloat *radius_y_s_ptr;
-    gfloat *height_ptr;
-
-    gfloat *screw_ptr;
-    gboolean *screw_s_ptr;
-
-    guint *rows_ptr;
-    guint *cols_ptr;
-
-    MotoAxis *orientation_ptr;
-
     MotoMesh *mesh;
     MotoMesh **mesh_ptr;
 
@@ -63,33 +50,21 @@ moto_cylinder_node_init(MotoCylinderNode *self)
 
     self->priv->mesh = NULL;
 
+    gfloat radius0[2] = {1,  1};
+    gfloat radius1[2] = {1,  1};
+    gint   rc[2]      = {10, 10};
+
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius_x_f", "Radius X Begin", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
-            "radius_y_f", "Radius Y Begin", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
-            "radius_x_s", "Radius X End", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
-            "radius_y_s", "Radius Y End", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0f, pspec, "Size", "Size",
+            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Size", "Size",
+            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Size", "Size",
             "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Size", "Size",
             "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Size", "Size",
             "screw_s", "Screw S", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Size", "Size",
-            "rows", "Rows",     G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
-            "cols", "Columns",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 10u, pspec, "Divisions", "Divisions",
+            "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Divisions", "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation", "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
-
-    self->priv->radius_x_f_ptr = moto_node_param_value_pointer(node, "radius_x_f", gfloat);
-    self->priv->radius_y_f_ptr = moto_node_param_value_pointer(node, "radius_y_f", gfloat);
-    self->priv->radius_x_s_ptr = moto_node_param_value_pointer(node, "radius_x_s", gfloat);
-    self->priv->radius_y_s_ptr = moto_node_param_value_pointer(node, "radius_y_s", gfloat);
-    self->priv->height_ptr = moto_node_param_value_pointer(node, "height", gfloat);
-    self->priv->screw_ptr = moto_node_param_value_pointer(node, "screw", gfloat);
-    self->priv->screw_s_ptr = moto_node_param_value_pointer(node, "screw_s", gfloat);
-
-    self->priv->rows_ptr = moto_node_param_value_pointer(node, "rows", guint);
-    self->priv->cols_ptr = moto_node_param_value_pointer(node, "cols", guint);
-
-    self->priv->orientation_ptr = moto_node_param_value_pointer(node, "orientation", MotoAxis);
 
     self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
@@ -133,21 +108,25 @@ MotoCylinderNode *moto_cylinder_node_new(const gchar *name)
 
 static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 {
-    gfloat radius_x_f = *(self->priv->radius_x_f_ptr);
-    gfloat radius_y_f = *(self->priv->radius_y_f_ptr);
-    gfloat radius_x_s = *(self->priv->radius_x_s_ptr);
-    gfloat radius_y_s = *(self->priv->radius_y_s_ptr);
-    gfloat height = *(self->priv->height_ptr);
-    gfloat screw = *(self->priv->screw_ptr);
-    gboolean screw_s = *(self->priv->screw_s_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
+    gfloat *radius0 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius0"));
+    gfloat *radius1 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius1"));
+    gint *rc        = (gint *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "rc"));
 
-    guint rows = *(self->priv->rows_ptr);
-    guint cols = *(self->priv->cols_ptr);
+    gfloat radius_x_f = radius0[0];
+    gfloat radius_y_f = radius0[1];
+    gfloat radius_x_s = radius1[0];
+    gfloat radius_y_s = radius1[1];
+    gfloat height     = moto_node_get_param_float((MotoNode *)self, "height");
+    gfloat screw      = moto_node_get_param_float((MotoNode *)self, "screw");
+    gboolean screw_s  = moto_node_get_param_boolean((MotoNode *)self, "screw_s");
+    guint rows        = rc[0];
+    guint cols        = rc[1];
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
 
-    MotoAxis orientation = *(self->priv->orientation_ptr);
+    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
 
     guint v_num = rows*cols;// + 2;
     guint e_num = rows*cols + (rows-1)*cols;// + cols*2;
@@ -293,12 +272,14 @@ static void moto_cylinder_node_update(MotoNode *self)
 
 static void calc_bound(MotoCylinderNode *self)
 {
-    gfloat radius_x = *(self->priv->radius_x_f_ptr);
-    gfloat radius_y = *(self->priv->radius_y_f_ptr);
-    gfloat radius_x_s = *(self->priv->radius_x_s_ptr);
-    gfloat radius_y_s = *(self->priv->radius_y_s_ptr);
-    gfloat height   = *(self->priv->height_ptr);
-    MotoAxis orientation = *(self->priv->orientation_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
+    gfloat *radius0 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius0"));
+    gfloat *radius1 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius1"));
+
+    gfloat radius_x      = max(radius0[0], radius1[0]);
+    gfloat radius_y      = max(radius0[1], radius1[1]);
+    gfloat height        = moto_node_get_param_float((MotoNode *)self, "height");
+    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
 
     gfloat rsx, rsy, rsz;
     switch(orientation)

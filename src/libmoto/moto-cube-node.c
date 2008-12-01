@@ -1,3 +1,4 @@
+#include "moto-types.h"
 #include "moto-cube-node.h"
 #include "moto-mesh.h"
 
@@ -17,14 +18,6 @@ static GObjectClass *cube_node_parent_class = NULL;
 struct _MotoCubeNodePriv
 {
     gboolean disposed;
-
-    gfloat *size_x_ptr;
-    gfloat *size_y_ptr;
-    gfloat *size_z_ptr;
-
-    guint *div_x_ptr;
-    guint *div_y_ptr;
-    guint *div_z_ptr;
 
     gboolean *side_px_ptr;
     gboolean *side_mx_ptr;
@@ -71,14 +64,13 @@ moto_cube_node_init(MotoCubeNode *self)
 
     priv->mesh = NULL;
 
+    gfloat size[3] = {1, 1, 1};
+    gint   divs[3] = {3, 3, 3};
+
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size_x", "Size X", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "size_y", "Size Y", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "size_z", "Size Z", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 8.0f, pspec, "Size", "Size",
-            "div_x", "Divisions by X",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 3u, pspec, "Divisions", "Divisions",
-            "div_y", "Divisions by Y",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 3u, pspec, "Divisions", "Divisions",
-            "div_z", "Divisions by Z",  G_TYPE_UINT, MOTO_PARAM_MODE_INOUT, 3u, pspec, "Divisions", "Divisions",
+            "size", "Size", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, size, pspec, "Form", "Form",
+            "divs", "Divisions",  MOTO_TYPE_INT_3, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form", "Form",
             "side_px", "Side +X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
             "side_mx", "Side -X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
             "side_py", "Side +Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
@@ -90,14 +82,6 @@ moto_cube_node_init(MotoCubeNode *self)
             "bev_size", "Bevel Size",  G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Bevel", "Bevel",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
             NULL);
-
-    priv->size_x_ptr = moto_node_param_value_pointer(node, "size_x", gfloat);
-    priv->size_y_ptr = moto_node_param_value_pointer(node, "size_y", gfloat);
-    priv->size_z_ptr = moto_node_param_value_pointer(node, "size_z", gfloat);
-
-    priv->div_x_ptr = moto_node_param_value_pointer(node, "div_x", guint);
-    priv->div_y_ptr = moto_node_param_value_pointer(node, "div_y", guint);
-    priv->div_z_ptr = moto_node_param_value_pointer(node, "div_z", guint);
 
     priv->side_px_ptr = moto_node_param_value_pointer(node, "side_px", gboolean);
     priv->side_mx_ptr = moto_node_param_value_pointer(node, "side_mx", gboolean);
@@ -155,16 +139,20 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 {
     MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 
-    gfloat size_x = *(priv->size_x_ptr);
-    gfloat size_y = *(priv->size_y_ptr);
-    gfloat size_z = *(priv->size_z_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
+    gfloat *size = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "size"));
+    gint   *divs = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "divs"));
+
+    gfloat size_x = size[0];
+    gfloat size_y = size[1];
+    gfloat size_z = size[2];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    guint div_x = *(priv->div_x_ptr);
-    guint div_y = *(priv->div_y_ptr);
-    guint div_z = *(priv->div_z_ptr);
+    guint div_x = divs[0];
+    guint div_y = divs[1];
+    guint div_z = divs[2];
 
     if(div_x < 1)
         div_x = 1;
@@ -442,9 +430,12 @@ static void calc_bound(MotoCubeNode *self)
 {
     MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 
-    gfloat size_x = *(priv->size_x_ptr);
-    gfloat size_y = *(priv->size_y_ptr);
-    gfloat size_z = *(priv->size_z_ptr);
+    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
+    gfloat *size = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "size"));
+
+    gfloat size_x = size[0];
+    gfloat size_y = size[1];
+    gfloat size_z = size[2];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
