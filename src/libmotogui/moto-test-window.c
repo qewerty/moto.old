@@ -192,7 +192,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         moto_world_reset(w);
         moto_test_window_redraw_3dview(self);
     }
-    else if(65289 == event->keyval)
+    else if(65289 == event->keyval && (GDK_CONTROL_MASK & event->state))
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
