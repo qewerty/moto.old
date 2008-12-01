@@ -61,7 +61,7 @@ MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
 
 MotoBound *moto_bound_new_from_array(gfloat array[6]);
 
-void moto_bound_copy(MotoBound *self, MotoBound *other);
+void moto_bound_copy(MotoBound *self, const MotoBound *other);
 void moto_bound_set(MotoBound *self, gfloat min_x, gfloat max_x,
                                      gfloat min_y, gfloat max_y,
                                      gfloat min_z, gfloat max_z);

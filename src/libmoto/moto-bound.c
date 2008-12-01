@@ -82,7 +82,7 @@ MotoBound *moto_bound_new_from_array(gfloat array[6])
     return self;
 }
 
-void moto_bound_copy(MotoBound *self, MotoBound *other)
+void moto_bound_copy(MotoBound *self, const MotoBound *other)
 {
     self->bound[0] = other->bound[0];
     self->bound[1] = other->bound[1];
