@@ -218,7 +218,7 @@ void on_int_3_changed_0(GtkSpinButton *spinbutton,
     // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
-    vec[0] = value;
+    vec[0] = (gint)value;
     g_signal_handler_unblock(spinbutton, data->handler_id);
 
     moto_node_update(moto_param_get_node(data->param));
@@ -234,7 +234,7 @@ void on_int_3_changed_1(GtkSpinButton *spinbutton,
     // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
-    vec[1] = value;
+    vec[1] = (gint)value;
     g_signal_handler_unblock(spinbutton, data->handler_id);
 
     moto_node_update(moto_param_get_node(data->param));
@@ -250,7 +250,7 @@ void on_int_3_changed_2(GtkSpinButton *spinbutton,
     // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
-    vec[2] = value;
+    vec[2] = (gint)value;
     g_signal_handler_unblock(spinbutton, data->handler_id);
 
     moto_node_update(moto_param_get_node(data->param));
@@ -1018,7 +1018,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
+        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[3]);
         gtk_editable_set_editable((GtkEditable *)entry, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
         gtk_spin_button_set_digits((GtkSpinButton *)entry, 3);
@@ -1128,7 +1128,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
+        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
         gtk_editable_set_editable((GtkEditable *)entry, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
 
@@ -1191,7 +1191,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
+        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
         gtk_editable_set_editable((GtkEditable *)entry, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
 
@@ -1208,7 +1208,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
+        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[3]);
         gtk_editable_set_editable((GtkEditable *)entry, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
 
@@ -1405,7 +1405,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
+        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[3]);
         gtk_editable_set_editable((GtkEditable *)entry, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
         gtk_spin_button_set_digits((GtkSpinButton *)entry, 3);
