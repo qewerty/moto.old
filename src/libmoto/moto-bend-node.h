@@ -19,40 +19,40 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_TWIST_NODE_H__
-#define __MOTO_TWIST_NODE_H__
+#ifndef __MOTO_BEND_NODE_H__
+#define __MOTO_BEND_NODE_H__
 
 #include "moto-geom-view-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoTwistNode MotoTwistNode;
-typedef struct _MotoTwistNodeClass MotoTwistNodeClass;
+typedef struct _MotoBendNode MotoBendNode;
+typedef struct _MotoBendNodeClass MotoBendNodeClass;
 
-/* class MotoTwistNode */
+/* class MotoBendNode */
 
-struct _MotoTwistNode
+struct _MotoBendNode
 {
     MotoNode parent;
 };
 
-struct _MotoTwistNodeClass
+struct _MotoBendNodeClass
 {
     MotoNodeClass parent;
 };
 
-GType moto_twist_node_get_type(void);
+GType moto_bend_node_get_type(void);
 
-#define MOTO_TYPE_TWIST_NODE (moto_twist_node_get_type())
-#define MOTO_TWIST_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_TWIST_NODE, MotoTwistNode))
-#define MOTO_TWIST_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_TWIST_NODE, MotoTwistNodeClass))
-#define MOTO_IS_TWIST_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_TWIST_NODE))
-#define MOTO_IS_TWIST_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_TWIST_NODE))
-#define MOTO_TWIST_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TWIST_NODE, MotoTwistNodeClass))
+#define MOTO_TYPE_BEND_NODE (moto_bend_node_get_type())
+#define MOTO_BEND_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_BEND_NODE, MotoBendNode))
+#define MOTO_BEND_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_BEND_NODE, MotoBendNodeClass))
+#define MOTO_IS_BEND_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_BEND_NODE))
+#define MOTO_IS_BEND_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_BEND_NODE))
+#define MOTO_BEND_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_BEND_NODE, MotoBendNodeClass))
 
-MotoTwistNode *moto_twist_node_new(const gchar *name);
+MotoBendNode *moto_bend_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_TWIST_NODE_H__ */
+#endif /* __MOTO_BEND_NODE_H__ */
 

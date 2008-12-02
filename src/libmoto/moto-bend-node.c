@@ -5,23 +5,23 @@
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-mesh.h" // FIXME: Temporary!
-#include "moto-twist-node.h"
+#include "moto-bend-node.h"
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/matrix.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */
 
-static void moto_twist_node_update(MotoNode *self);
+static void moto_bend_node_update(MotoNode *self);
 
-/* class MotoTwistNode */
+/* class MotoBendNode */
 
-typedef struct _MotoTwistNodePriv MotoTwistNodePriv;
-#define MOTO_TWIST_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_TWIST_NODE, MotoTwistNodePriv)
+typedef struct _MotoBendNodePriv MotoBendNodePriv;
+#define MOTO_BEND_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_BEND_NODE, MotoBendNodePriv)
 
 static GObjectClass *normal_move_node_parent_class = NULL;
 
-struct _MotoTwistNodePriv
+struct _MotoBendNodePriv
 {
     MotoPointCloud *pc;
     MotoPointCloud *prev_pc;
@@ -29,15 +29,15 @@ struct _MotoTwistNodePriv
 };
 
 static void
-moto_twist_node_dispose(GObject *obj)
+moto_bend_node_dispose(GObject *obj)
 {
     normal_move_node_parent_class->dispose(obj);
 }
 
 static void
-moto_twist_node_finalize(GObject *obj)
+moto_bend_node_finalize(GObject *obj)
 {
-    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(obj);
+    MotoBendNodePriv *priv = MOTO_BEND_NODE_GET_PRIVATE(obj);
 
     if(priv->pc);
         g_object_unref(priv->pc);
@@ -46,10 +46,10 @@ moto_twist_node_finalize(GObject *obj)
 }
 
 static void
-moto_twist_node_init(MotoTwistNode *self)
+moto_bend_node_init(MotoBendNode *self)
 {
     MotoNode *node = (MotoNode *)self;
-    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
+    MotoBendNodePriv *priv = MOTO_BEND_NODE_GET_PRIVATE(self);
 
     priv->pc = NULL;
     priv->prev_pc = NULL;
@@ -71,28 +71,28 @@ moto_twist_node_init(MotoTwistNode *self)
 }
 
 static void
-moto_twist_node_class_init(MotoTwistNodeClass *klass)
+moto_bend_node_class_init(MotoBendNodeClass *klass)
 {
-    g_type_class_add_private(klass, sizeof(MotoTwistNodePriv));
+    g_type_class_add_private(klass, sizeof(MotoBendNodePriv));
 
     normal_move_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
 
-    goclass->dispose    = moto_twist_node_dispose;
-    goclass->finalize   = moto_twist_node_finalize;
+    goclass->dispose    = moto_bend_node_dispose;
+    goclass->finalize   = moto_bend_node_finalize;
 
-    nclass->update = moto_twist_node_update;
+    nclass->update = moto_bend_node_update;
 }
 
-G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_NODE);
+G_DEFINE_TYPE(MotoBendNode, moto_bend_node, MOTO_TYPE_NODE);
 
-/* methods of class MotoTwistNode */
+/* methods of class MotoBendNode */
 
-MotoTwistNode *moto_twist_node_new(const gchar *name)
+MotoBendNode *moto_bend_node_new(const gchar *name)
 {
-    MotoTwistNode *self = (MotoTwistNode *)g_object_new(MOTO_TYPE_TWIST_NODE, NULL);
+    MotoBendNode *self = (MotoBendNode *)g_object_new(MOTO_TYPE_BEND_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -100,9 +100,9 @@ MotoTwistNode *moto_twist_node_new(const gchar *name)
     return self;
 }
 
-static void moto_twist_node_update(MotoNode *self)
+static void moto_bend_node_update(MotoNode *self)
 {
-    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
+    MotoBendNodePriv *priv = MOTO_BEND_NODE_GET_PRIVATE(self);
 
     GValue *vorig = moto_node_get_param_value(self, "orig");
     GValue *vdir  = moto_node_get_param_value(self, "dir");
