@@ -181,7 +181,7 @@ MotoMesh *moto_wobj_mesh_loader_load(MotoMeshLoader *self, const gchar *filename
                     if(' ' != *p2)
                     {
 
-                        ((gfloat *)mesh->v_coords)[j++] = (gfloat)g_strtod(p2, NULL);
+                        ((gfloat *)mesh->v_coords)[j++] = (gfloat)g_ascii_strtod(p2, NULL);
                         while(' ' != *p2 || '\n' == *p2)
                         {
                             if('\n' == *p2)
