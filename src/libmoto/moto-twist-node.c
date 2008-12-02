@@ -14,7 +14,7 @@
 
 static void moto_twist_node_update(MotoNode *self);
 
-/* class NormalMoveNode */
+/* class MotoTwistNode */
 
 typedef struct _MotoTwistNodePriv MotoTwistNodePriv;
 #define MOTO_TWIST_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_TWIST_NODE, MotoTwistNodePriv)
@@ -88,7 +88,7 @@ moto_twist_node_class_init(MotoTwistNodeClass *klass)
 
 G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_NODE);
 
-/* methods of class NormalMoveNode */
+/* methods of class MotoTwistNode */
 
 MotoTwistNode *moto_twist_node_new(const gchar *name)
 {
@@ -104,6 +104,7 @@ static void moto_twist_node_update(MotoNode *self)
 {
     MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
 
+    // FIXME
     GValue *vorig = moto_node_get_param_value(self, "orig");
     GValue *vdir  = moto_node_get_param_value(self, "dir");
     gfloat *orig = (gfloat *)g_value_peek_pointer(vorig);
@@ -181,7 +182,6 @@ static void moto_twist_node_update(MotoNode *self)
                     tmp[1] = pi[1] - orig[1];
                     tmp[2] = pi[2] - orig[2];
 
-                    matrix44_identity(m);
                     matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
 
                     point3_transform(po, m, tmp);
@@ -214,6 +214,6 @@ static void moto_twist_node_update(MotoNode *self)
     }
 
     MotoParam *param = moto_node_get_param((MotoNode *)self, "out_pc");
-    g_value_set_object(moto_param_get_value(param), priv->pc);
+    moto_param_set_object(param, (GObject *)priv->pc);
     moto_param_update_dests(param);
 }
