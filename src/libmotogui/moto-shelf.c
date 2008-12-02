@@ -157,7 +157,7 @@ static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *mf_node = moto_world_create_node_by_name(w, "MotoMeshFileNode", "Cube", NULL);
     MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
-    MotoNode *mod = moto_world_create_node_by_name(w, "MotoTwistNode", "NormalMove", NULL);
+    MotoNode *mod = moto_world_create_node_by_name(w, "MotoBendNode", "Bend", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(mod, "in_pc", mf_node, "mesh");

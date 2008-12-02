@@ -58,7 +58,7 @@ moto_bend_node_init(MotoBendNode *self)
     /* params */
 
     gfloat orig[3] = {0, 0, 0};
-    gfloat dir[3] = {1, 1, 0};
+    gfloat dir[3] = {1, 0, 0};
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
@@ -104,6 +104,7 @@ static void moto_bend_node_update(MotoNode *self)
 {
     MotoBendNodePriv *priv = MOTO_BEND_NODE_GET_PRIVATE(self);
 
+    // FIXME
     GValue *vorig = moto_node_get_param_value(self, "orig");
     GValue *vdir  = moto_node_get_param_value(self, "dir");
     gfloat *orig = (gfloat *)g_value_peek_pointer(vorig);
@@ -161,6 +162,11 @@ static void moto_bend_node_update(MotoNode *self)
 
                 gfloat m[16];
 
+                // 2*PI/A = 2*PI*R
+                // R*PI = PI/A
+                // R = 1/A
+                gfloat R = (fabs(angle) >= MICRO) ? 1 / (angle*RAD_PER_DEG): MACRO;
+
                 gfloat a, s, c;
                 gfloat to_p[3], tmp[3];
                 #pragma omp parallel for if(size_i > 100) private(i, pi, po, a, s, c, tmp, to_p) \
@@ -173,21 +179,32 @@ static void moto_bend_node_update(MotoNode *self)
 
                     vector3_dif(to_p, pi, orig);
 
-                    a = angle * RAD_PER_DEG * vector3_dot(to_p, axis);
+                    gfloat vec[3] = {0, 1, 0};
+
+                    gfloat move = vector3_dot(to_p, vec);
+
+                    gfloat P[3] = {pi[0], pi[1], pi[2]};
+                    point3_move(P, vec, -move);
+
+                    a = move/R;
                     s = sin(a);
                     c = cos(a);
 
-                    tmp[0] = pi[0] - orig[0];
-                    tmp[1] = pi[1] - orig[1];
-                    tmp[2] = pi[2] - orig[2];
+                    gfloat z[3] = {0, 0, 1};
+                    gfloat O[3] = {orig[0], orig[1], orig[2]};
+                    point3_move(O, z, R);
+
+                    tmp[0] = P[0] - O[0];
+                    tmp[1] = P[1] - O[1];
+                    tmp[2] = P[2] - O[2];
 
                     matrix44_rotate_from_axis(m, a, axis[0], axis[1], axis[2]);
 
                     point3_transform(po, m, tmp);
 
-                    po[0] += orig[0];
-                    po[1] += orig[1];
-                    po[2] += orig[2];
+                    po[0] += O[0];
+                    po[1] += O[1];
+                    po[2] += O[2];
                 }
                 if(g_type_is_a(G_TYPE_FROM_INSTANCE(pc), MOTO_TYPE_MESH))
                 {
