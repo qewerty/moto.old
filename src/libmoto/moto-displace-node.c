@@ -16,7 +16,7 @@
 
 static void moto_displace_node_update(MotoNode *self);
 
-/* class NormalMoveNode */
+/* class MotoDisplaceNode */
 
 typedef struct _MotoDisplaceNodePriv MotoDisplaceNodePriv;
 #define MOTO_DISPLACE_NODE_GET_PRIVATE(obj) G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_DISPLACE_NODE, MotoDisplaceNodePriv)
@@ -85,7 +85,7 @@ moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
 
 G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_NODE);
 
-/* methods of class NormalMoveNode */
+/* methods of class MotoDisplaceNode */
 
 MotoDisplaceNode *moto_displace_node_new(const gchar *name)
 {
