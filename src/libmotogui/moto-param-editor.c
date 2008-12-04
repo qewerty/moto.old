@@ -1,3 +1,5 @@
+#include <gdk/gdkkeysyms.h>
+
 #include "libmoto/moto-types.h"
 #include "libmoto/moto-filename.h"
 #include "moto-param-editor.h"
@@ -722,6 +724,82 @@ void on_string_changed(GtkEditable *editable,
     moto_test_window_redraw_3dview(data->window);
 }
 
+static gboolean
+on_expression_key_press_event(GtkEditable *editable,
+                              GdkEventKey *event,
+                              OnChangedData *data)
+{
+    if(GDK_Return == event->keyval)
+    {
+        const gchar* value = gtk_entry_get_text((GtkEntry *)editable);
+
+        if(g_utf8_collate(value, moto_param_get_expression(data->param)) != 0)
+        {
+            moto_param_set_expression(data->param, value);
+            if( ! moto_param_eval(data->param))
+            {
+                // FIXME: Replace with moto_param_get_full_name(...) when this function is implemented.
+                moto_error("Expression of '%s.%s' parameter is invalid",
+                    moto_node_get_name(moto_param_get_node(data->param)),
+                    moto_param_get_name(data->param));
+            }
+            else
+            {
+                // FIXME: Replace with moto_param_get_full_name(...) when this function is implemented.
+                moto_info("Expression of '%s.%s' parameter successfully evaluated",
+                    moto_node_get_name(moto_param_get_node(data->param)),
+                    moto_param_get_name(data->param));
+            }
+
+            moto_node_update(moto_param_get_node(data->param));
+            moto_test_window_redraw_3dview(data->window);
+        }
+    }
+
+    return FALSE;
+}
+
+static gboolean
+on_expression_focus_out_event(GtkEditable *editable,
+                              GdkEventFocus *event,
+                              OnChangedData *data)
+{
+    // TODO: Add this parameter in global Moto configuration.
+    gboolean accept_expr_on_focus_out = TRUE;
+    if(accept_expr_on_focus_out)
+    {
+        const gchar* value = gtk_entry_get_text((GtkEntry *)editable);
+
+        if(g_utf8_collate(value, moto_param_get_expression(data->param)) != 0)
+        {
+            moto_param_set_expression(data->param, value);
+            if( ! moto_param_eval(data->param))
+            {
+                // FIXME: Replace with moto_param_get_full_name(...) when this function is implemented.
+                moto_error("Expression of '%s.%s' parameter is invalid",
+                    moto_node_get_name(moto_param_get_node(data->param)),
+                    moto_param_get_name(data->param));
+            }
+            else
+            {
+                // FIXME: Replace with moto_param_get_full_name(...) when this function is implemented.
+                moto_info("Expression of '%s.%s' parameter successfully evaluated",
+                    moto_node_get_name(moto_param_get_node(data->param)),
+                    moto_param_get_name(data->param));
+            }
+
+            moto_node_update(moto_param_get_node(data->param));
+            moto_test_window_redraw_3dview(data->window);
+        }
+    }
+    else
+    {
+        gtk_entry_set_text((GtkEntry *)editable, moto_param_get_expression(data->param));
+    }
+
+    return FALSE;
+}
+
 typedef struct _FilenameDialogData
 {
     GtkEntry *entry;
@@ -766,6 +844,27 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     GtkWidget *widget = NULL;
     OnChangedData *data;
     GType ptype = moto_param_get_value_type(param);
+
+    if(moto_param_get_use_expression(param))
+    {
+        widget = gtk_entry_new();
+        gtk_widget_add_events(widget, GDK_FOCUS_CHANGE_MASK);
+
+        gtk_entry_set_text((GtkEntry *)widget, moto_param_get_expression(param));
+
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_expression_key_press_event), data);
+        data->handler_id = \
+            g_signal_connect(G_OBJECT(widget), "focus-out-event", G_CALLBACK(on_expression_focus_out_event), data);
+        data->param_handler_id = NULL;
+
+        return widget;
+    }
+
     if(G_TYPE_INT == ptype)
     {
         widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
@@ -1472,13 +1571,50 @@ typedef struct _AddWidgetData
     GtkTable *table;
 } AddWidgetData;
 
+typedef struct _OnLabelButtonPressData
+{
+    MotoParamEditor *pe;
+    MotoParam *param;
+} OnLabelButtonPressData;
+
+gboolean on_label_button_press_event(GtkLabel       *label,
+                                     GdkEventButton *event,
+                                     OnLabelButtonPressData *data)
+{
+    if(1 == event->button)
+    {
+        moto_param_set_use_expression(data->param, ! moto_param_get_use_expression(data->param));
+
+        __moto_param_editor_update_full(data->pe, data->pe->priv->node, TRUE);
+    }
+
+    return TRUE;
+}
+
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
     if(moto_param_get_mode(param) != data->pe->priv->param_mode && ! data->pe->priv->show_all)
         return;
 
-    GtkWidget *label = gtk_label_new(moto_param_get_title(param));
+    const gchar *title = moto_param_get_title(param);
+    GtkWidget *label = gtk_label_new(title);
     gtk_misc_set_alignment((GtkMisc *)label, 1, 0.5);
+    if(moto_param_get_use_expression(param))
+    {
+        gchar *markup = g_markup_printf_escaped("<b>%s</b>", title);
+        gtk_label_set_markup((GtkLabel *)label, markup);
+        g_free(markup);
+    }
+
+    OnLabelButtonPressData *on_label_button_press_data = g_slice_new(OnLabelButtonPressData);
+    on_label_button_press_data->param = param;
+    on_label_button_press_data->pe = data->pe;
+
+    gtk_label_set_selectable((GtkLabel *)label, TRUE);
+    gtk_widget_add_events(label, GDK_BUTTON_PRESS_MASK);
+    g_signal_connect(G_OBJECT(label), "button-press-event",
+        G_CALLBACK(on_label_button_press_event), on_label_button_press_data);
+
 
     gtk_table_attach((GtkTable *)data->table,
             label,
