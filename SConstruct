@@ -28,7 +28,11 @@ Export('env')
 
 pkg_config = env['PKG_CONFIG']
 if pkg_config:
-    env.ParseConfig(pkg_config)
+    if type(pkg_config) is str:
+        env.ParseConfig(pkg_config)
+    elif type(pkg_config) in (tuple, list):
+        for c in pkg_config:
+            env.ParseConfig(c)
 
 Help(opts.GenerateHelpText(env))
 
