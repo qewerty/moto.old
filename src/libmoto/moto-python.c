@@ -230,3 +230,55 @@ gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj)
 #undef MOTO_INSERT_CONVERTER
 #undef MOTO_INSERT_VECTOR_CONVERTER
 #undef moto_TYPE_SIZE_from_PyObject
+
+// Creating function for expression
+
+PyObject *moto_PyFunction_from_args_and_body(const gchar *argsdef, const gchar *body)
+{
+    GString *code = g_string_new("");
+
+    const gchar *indent = "    ";
+
+    const gchar *end = g_utf8_strchr(body, -1, g_utf8_get_char("\n"));
+    if( ! end)
+    {
+        // Single-line expression.
+        g_string_printf(code, "def func%s:\n    return %s\n", argsdef, body);
+    }
+    else
+    {
+        // Multi-line expression.
+        g_string_printf(code, "def func%s:\n", argsdef);
+
+        const gchar *line = body;
+
+        g_string_append(code, indent);
+        g_string_append_len(code, line, g_utf8_pointer_to_offset(line, end));
+
+        line = g_utf8_next_char(end);
+        end = g_utf8_strchr(line, -1, g_utf8_get_char("\n"));
+
+        while(end)
+        {
+            g_string_append(code, indent);
+            g_string_append_len(code, line, g_utf8_pointer_to_offset(line, end));
+
+            line = g_utf8_next_char(end);
+            end = g_utf8_strchr(line, -1, g_utf8_get_char("\n"));
+        }
+        g_string_append(code, "\n");
+    }
+
+    PyObject *module   = NULL;
+    PyObject *func     = NULL;
+    PyObject *compiled = Py_CompileString(code->str, "__moto__", Py_file_input);
+    if(compiled)
+    {
+        module = PyImport_ExecCodeModule("moto.__moto__", compiled);
+        if(module)
+            func = PyObject_GetAttrString(module, "func");
+    }
+
+    g_string_free(code, TRUE);
+    return func;
+}

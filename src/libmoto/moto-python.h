@@ -46,6 +46,8 @@ gboolean moto_float_4_from_PyObject(gfloat *v, PyObject *obj);
 
 gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj);
 
+PyObject *moto_PyFunction_from_args_and_body(const gchar *argsdef, const gchar *body);
+
 G_END_DECLS
 
 #endif /* __MOTO_PYTHON_H__ */

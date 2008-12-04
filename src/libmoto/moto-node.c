@@ -1772,30 +1772,16 @@ gboolean moto_param_get_use_expression(MotoParam *self)
     return priv->use_expression;
 }
 
-void moto_param_set_expression(MotoParam *self, const gchar *code)
+void moto_param_set_expression(MotoParam *self, const gchar *body)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_string_assign(priv->expression, code);
-
-    GString *func = g_string_new("");
-    g_string_printf(func, "def expression(p=None, v=None, s=None):\n    %s\n", code);
+    g_string_assign(priv->expression, body);
 
     if(priv->expression_function)
         Py_DECREF(priv->expression_function);
 
-    PyObject *compiled = Py_CompileString(func->str, "__moto__", Py_file_input);
-    PyObject *module   = NULL;
-    if(compiled)
-    {
-        module = PyImport_ExecCodeModule("moto.__moto__", compiled);
-        priv->expression_function = PyObject_GetAttrString(module, "expression");
-    }
-    else
-    {
-        priv->expression_function = NULL;
-    }
-
-    g_string_free(func, TRUE);
+    priv->expression_function = \
+        moto_PyFunction_from_args_and_body("(p=None, v=None, s=None)", body);
 }
 
 const gchar *moto_param_get_expression(MotoParam *self)
