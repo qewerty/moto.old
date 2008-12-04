@@ -1,5 +1,7 @@
 #include <string.h>
 
+#include <moto-python.h>
+
 #include "libmotoutil/moto-mapped-list.h"
 
 #include "moto-types.h"
@@ -153,8 +155,9 @@ struct _MotoParamPriv
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
     GPtrArray *depends_on_params;
 
-    gboolean use_expession;
+    gboolean use_expression;
     GString *expression;
+    PyObject *expression_function;
 
     GString *name;
     GString *title;
@@ -1194,12 +1197,13 @@ moto_param_dispose(GObject *obj)
         return;
     priv->disposed = TRUE;
 
-    // TODO: Free priv->pspec! At the moment MotoParamSpec is not implemented.
+    // TODO: Free priv->pspec! At the moment MotoParamSpec is not implemented. Pointer priv->pspec must never be NULL.
+    // g_object_unref(priv->pspec) // or moto_param_spec_free(priv->pspec) ???
 
     g_string_free(priv->name, TRUE);
     g_string_free(priv->title, TRUE);
 
-    if(priv->depends_on_params)
+    if(priv->depends_on_params) // FIXME: Remove depends_on_params?
         g_ptr_array_free(priv->depends_on_params, TRUE);
     g_string_free(priv->expression, TRUE);
 
@@ -1219,6 +1223,8 @@ moto_param_init(MotoParam *self)
     priv->disposed = FALSE;
 
     static guint id = 0;
+    // FIXME: Implement generating unique ids correcly even when
+    // scene loaded from file and params are saved in variations.
     priv->id = ++id;
 
     priv->source = NULL;
@@ -1226,8 +1232,9 @@ moto_param_init(MotoParam *self)
 
     priv->depends_on_params = NULL;
 
-    priv->use_expession = FALSE;
+    priv->use_expression = FALSE;
     priv->expression = g_string_new("");
+    priv->expression_function = NULL;
 
     priv->name = g_string_new("");
     priv->title = g_string_new("");
@@ -1715,7 +1722,7 @@ gboolean moto_param_is_animated(MotoParam *self)
     {
         /* Evaluation order: value, source, expression (can use value and source).
          * If expresion is invalid source is used if it's not NULL else value of param. */
-        if(priv->use_expession)
+        if(priv->use_expression)
         {
             return TRUE;
         }
@@ -1747,10 +1754,79 @@ MotoNode *moto_param_get_node(MotoParam *self)
     return priv->node;
 }
 
+// Dealing with expressions
+// ------------------------
+
+void moto_param_set_use_expression(MotoParam *self, gboolean use)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    priv->use_expression = use;
+
+    if(use)
+        moto_param_eval(self);
+}
+
+gboolean moto_param_get_use_expression(MotoParam *self)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    return priv->use_expression;
+}
+
+void moto_param_set_expression(MotoParam *self, const gchar *code)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    g_string_assign(priv->expression, code);
+
+    GString *func = g_string_new("");
+    g_string_printf(func, "def expression(p=None, v=None, s=None):\n    %s\n", code);
+
+    if(priv->expression_function)
+        Py_DECREF(priv->expression_function);
+
+    PyObject *compiled = Py_CompileString(func->str, "__moto__", Py_file_input);
+    PyObject *module   = NULL;
+    if(compiled)
+    {
+        module = PyImport_ExecCodeModule("moto.__moto__", compiled);
+        priv->expression_function = PyObject_GetAttrString(module, "expression");
+    }
+    else
+    {
+        priv->expression_function = NULL;
+    }
+
+    g_string_free(func, TRUE);
+}
+
+const gchar *moto_param_get_expression(MotoParam *self)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    return priv->expression->str;
+}
+
 gboolean moto_param_eval(MotoParam *self)
 {
-    return FALSE;
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+
+    PyObject *result = NULL;
+    if(priv->expression_function)
+    {
+        PyObject *args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, PyString_FromString(moto_param_get_name(self)));
+        result = PyObject_CallObject(priv->expression_function, args);
+    }
+
+    gboolean status = FALSE;
+    if(result)
+    {
+        status = moto_GValue_from_PyObject(moto_param_get_value(self), result);
+        Py_DECREF(result);
+    }
+
+    return status;
 }
+
+// ------------------------
 
 void moto_param_update(MotoParam *self)
 {
@@ -1758,7 +1834,7 @@ void moto_param_update(MotoParam *self)
 
     gboolean use_source = TRUE;
 
-    if(priv->use_expession)
+    if(priv->use_expression)
     {
         use_source = FALSE;
         if( ! moto_param_eval(self))
