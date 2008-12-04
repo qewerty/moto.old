@@ -591,6 +591,11 @@ gint moto_param_get_dim_size(MotoParam *self, gint dimension);
 // Returns the total number of elements
 gint moto_param_get_total_size(MotoParam *self);
 
+void moto_param_set_use_expression(MotoParam *self, gboolean use);
+gboolean moto_param_get_use_expression(MotoParam *self);
+
+void moto_param_set_expression(MotoParam *self, const gchar *code);
+const gchar *moto_param_get_expression(MotoParam *self);
 gboolean moto_param_eval(MotoParam *self);
 
 void moto_param_update(MotoParam *self);
