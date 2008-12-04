@@ -1,3 +1,5 @@
+#include <Python.h>
+
 #include "moto-system.h"
 #include "moto-world.h"
 #include "moto-library.h"
@@ -92,12 +94,16 @@ moto_system_dispose(GObject *obj)
 static void
 moto_system_finalize(GObject *obj)
 {
+    Py_Finalize();
+
     system_parent_class->finalize(obj);
 }
 
 static void
 moto_system_init(MotoSystem *self)
 {
+    Py_Initialize();
+
     self->priv = g_slice_new(MotoSystemPriv);
 
     self->priv->library = moto_library_new();
