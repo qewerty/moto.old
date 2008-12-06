@@ -201,7 +201,7 @@ moto_node_class_init(MotoNodeClass *klass)
     g_type_class_add_private(goclass, sizeof(MotoNodePriv));
 }
 
-G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_OBJECT);
+G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_INITIALLY_UNOWNED);
 
 /* methods of class MotoNode */
 
@@ -1017,8 +1017,8 @@ moto_param_dispose(GObject *obj)
         return;
     priv->disposed = TRUE;
 
-    // TODO: Free priv->pspec! At the moment MotoParamSpec is not implemented. Pointer priv->pspec must never be NULL.
-    // g_object_unref(priv->pspec) // or moto_param_spec_free(priv->pspec) ???
+    if(priv->pspec)
+        g_object_unref(priv->pspec);
 
     g_string_free(priv->name, TRUE);
     g_string_free(priv->title, TRUE);

@@ -47,12 +47,12 @@ GType moto_param_mode_get_type(void);
 
 struct _MotoNode
 {
-    GObject parent;
+    GInitiallyUnowned parent;
 };
 
 struct _MotoNodeClass
 {
-    GObjectClass parent;
+    GInitiallyUnownedClass parent;
 
     GData *actions;
 
