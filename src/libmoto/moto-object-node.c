@@ -157,18 +157,18 @@ moto_object_node_init(MotoObjectNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "t", "Translate", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, translate, pspec, "Transform", "Transform",
-            "r", "Rotate",    MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, rotate, pspec, "Transform", "Transform",
-            "s", "Scale",     MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, scale, pspec, "Transform", "Transform",
-            "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec,   "Transform", "Transform/Misc",
-            "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec,   "Transform", "Transform/Misc",
-            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "Transform", "Transform/Misc",
-            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec,        "Transform", "Transform",
-            "transform", "Transform",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_OUT, self, pspec,        "Transform", "Transform",
-            "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec,         "View", "View",
-            "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View", "View",
-            "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec,      "View", "View",
-            "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading", "Shading/Material",
+            "t", "Translate", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, translate, pspec, "Transform",
+            "r", "Rotate",    MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, rotate, pspec, "Transform",
+            "s", "Scale",     MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, scale, pspec, "Transform",
+            "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec, "Transform/Misc",
+            "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec, "Transform/Misc",
+            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
+            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec, "Transform",
+            "transform", "Transform",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Transform",
+            "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
+            "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
+            "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
+            "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading/Material",
             NULL);
 
     /* camera */

@@ -86,22 +86,17 @@ guint moto_node_get_id(MotoNode *self);
 gboolean moto_node_is_valid(MotoNode *self);
 
 void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param,
-        const gchar *domain, const gchar *group);
-#define moto_node_add_param(self, param, domain, group) \
-    moto_node_add_dynamic_param(self, param, domain, group)
+        const gchar *group);
+#define moto_node_add_param(self, param, group) \
+    moto_node_add_dynamic_param(self, param, group)
 void moto_node_add_params(MotoNode *self, ...);
+
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
 
 gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name);
 gint     moto_node_get_param_int(MotoNode *self,        const gchar *name);
-guint    moto_node_get_param_uint(MotoNode *self,       const gchar *name);
-glong    moto_node_get_param_long(MotoNode *self,       const gchar *name);
-gulong   moto_node_get_param_ulong(MotoNode *self,      const gchar *name);
-gint64   moto_node_get_param_int64(MotoNode *self,      const gchar *name);
-guint64  moto_node_get_param_uint64(MotoNode *self,     const gchar *name);
 gfloat   moto_node_get_param_float(MotoNode *self,      const gchar *name);
-gdouble  moto_node_get_param_double(MotoNode *self,     const gchar *name);
 const gchar *moto_node_get_param_string(MotoNode *self,    const gchar *name);
 gpointer moto_node_get_param_pointer(MotoNode *self,    const gchar *name);
 gint     moto_node_get_param_enum(MotoNode *self,       const gchar *name);
@@ -109,13 +104,7 @@ GObject *moto_node_get_param_object(MotoNode *self,     const gchar *name);
 
 void moto_node_set_param_boolean(MotoNode *self,    const gchar *name, gboolean value);
 void moto_node_set_param_int(MotoNode *self,        const gchar *name, gint     value);
-void moto_node_set_param_uint(MotoNode *self,       const gchar *name, guint    value);
-void moto_node_set_param_long(MotoNode *self,       const gchar *name, glong    value);
-void moto_node_set_param_ulong(MotoNode *self,      const gchar *name, gulong   value);
-void moto_node_set_param_int64(MotoNode *self,      const gchar *name, gint64   value);
-void moto_node_set_param_uint64(MotoNode *self,     const gchar *name, guint64  value);
 void moto_node_set_param_float(MotoNode *self,      const gchar *name, gfloat   value);
-void moto_node_set_param_double(MotoNode *self,     const gchar *name, gdouble  value);
 void moto_node_set_param_pointer(MotoNode *self,    const gchar *name, gpointer value);
 void moto_node_set_param_enum(MotoNode *self,       const gchar *name, gint     value);
 void moto_node_set_param_object(MotoNode *self,     const gchar *name, GObject *value);
@@ -150,81 +139,6 @@ void moto_node_set_param_4iv(MotoNode *self, const gchar *name, const gint *v);
 
 void moto_node_set_param_Niv(MotoNode *self, const gchar *name, const gint *v, gsize N);
 
-// uint
-void moto_node_set_param_1ui(MotoNode *self, const gchar *name, guint v);
-void moto_node_set_param_1uiv(MotoNode *self, const gchar *name, const guint *v);
-
-void moto_node_set_param_2ui(MotoNode *self,  const gchar *name, guint v0, guint v1);
-void moto_node_set_param_2uiv(MotoNode *self, const gchar *name, const guint *v);
-
-void moto_node_set_param_3ui(MotoNode *self,  const gchar *name, guint v0, guint v1, guint v2);
-void moto_node_set_param_3uiv(MotoNode *self, const gchar *name, const guint *v);
-
-void moto_node_set_param_4ui(MotoNode *self,  const gchar *name, guint v0, guint v1, guint v2, guint v3);
-void moto_node_set_param_4uiv(MotoNode *self, const gchar *name, const guint *v);
-
-void moto_node_set_param_Nuiv(MotoNode *self, const gchar *name, const guint *v, gsize N);
-
-// long
-void moto_node_set_param_1l(MotoNode *self, const gchar *name, glong v);
-void moto_node_set_param_1lv(MotoNode *self, const gchar *name, const glong *v);
-
-void moto_node_set_param_2l(MotoNode *self,  const gchar *name, glong v0, glong v1);
-void moto_node_set_param_2lv(MotoNode *self, const gchar *name, const glong *v);
-
-void moto_node_set_param_3l(MotoNode *self,  const gchar *name, glong v0, glong v1, glong v2);
-void moto_node_set_param_3lv(MotoNode *self, const gchar *name, const glong *v);
-
-void moto_node_set_param_4l(MotoNode *self,  const gchar *name, glong v0, glong v1, glong v2, glong v3);
-void moto_node_set_param_4lv(MotoNode *self, const gchar *name, const glong *v);
-
-void moto_node_set_param_Nlv(MotoNode *self, const gchar *name, const glong *v, gsize N);
-
-// ulong
-void moto_node_set_param_1ul(MotoNode *self, const gchar *name, gulong v);
-void moto_node_set_param_1ulv(MotoNode *self, const gchar *name, const gulong *v);
-
-void moto_node_set_param_2ul(MotoNode *self,  const gchar *name, gulong v0, gulong v1);
-void moto_node_set_param_2ulv(MotoNode *self, const gchar *name, const gulong *v);
-
-void moto_node_set_param_3ul(MotoNode *self,  const gchar *name, gulong v0, gulong v1, gulong v2);
-void moto_node_set_param_3ulv(MotoNode *self, const gchar *name, const gulong *v);
-
-void moto_node_set_param_4ul(MotoNode *self,  const gchar *name, gulong v0, gulong v1, gulong v2, gulong v3);
-void moto_node_set_param_4ulv(MotoNode *self, const gchar *name, const gulong *v);
-
-void moto_node_set_param_Nulv(MotoNode *self, const gchar *name, const gulong *v, gsize N);
-
-// int64
-void moto_node_set_param_1i64(MotoNode *self, const gchar *name, gint64 v);
-void moto_node_set_param_1i64v(MotoNode *self, const gchar *name, const gint64 *v);
-
-void moto_node_set_param_2i64(MotoNode *self,  const gchar *name, gint64 v0, gint64 v1);
-void moto_node_set_param_2i64v(MotoNode *self, const gchar *name, const gint64 *v);
-
-void moto_node_set_param_3i64(MotoNode *self,  const gchar *name, gint64 v0, gint64 v1, gint64 v2);
-void moto_node_set_param_3i64v(MotoNode *self, const gchar *name, const gint64 *v);
-
-void moto_node_set_param_4i64(MotoNode *self,  const gchar *name, gint64 v0, gint64 v1, gint64 v2, gint64 v3);
-void moto_node_set_param_4i64v(MotoNode *self, const gchar *name, const gint64 *v);
-
-void moto_node_set_param_Ni64v(MotoNode *self, const gchar *name, const gint64 *v, gsize N);
-
-// uint64
-void moto_node_set_param_1ui64(MotoNode *self, const gchar *name, guint64 v);
-void moto_node_set_param_1ui64v(MotoNode *self, const gchar *name, const guint64 *v);
-
-void moto_node_set_param_2ui64(MotoNode *self,  const gchar *name, guint64 v0, guint64 v1);
-void moto_node_set_param_2ui64v(MotoNode *self, const gchar *name, const guint64 *v);
-
-void moto_node_set_param_3ui64(MotoNode *self,  const gchar *name, guint64 v0, guint64 v1, guint64 v2);
-void moto_node_set_param_3ui64v(MotoNode *self, const gchar *name, const guint64 *v);
-
-void moto_node_set_param_4ui64(MotoNode *self,  const gchar *name, guint64 v0, guint64 v1, guint64 v2, guint64 v3);
-void moto_node_set_param_4ui64v(MotoNode *self, const gchar *name, const guint64 *v);
-
-void moto_node_set_param_Nui64v(MotoNode *self, const gchar *name, const guint64 *v, gsize N);
-
 // float
 void moto_node_set_param_1f(MotoNode *self, const gchar *name, gfloat v);
 void moto_node_set_param_1fv(MotoNode *self, const gchar *name, const gfloat *v);
@@ -239,21 +153,6 @@ void moto_node_set_param_4f(MotoNode *self,  const gchar *name, gfloat v0, gfloa
 void moto_node_set_param_4fv(MotoNode *self, const gchar *name, const gfloat *v);
 
 void moto_node_set_param_Nfv(MotoNode *self, const gchar *name, const gfloat *v, gsize N);
-
-// float
-void moto_node_set_param_1d(MotoNode *self, const gchar *name, gdouble v);
-void moto_node_set_param_1dv(MotoNode *self, const gchar *name, const gdouble *v);
-
-void moto_node_set_param_2d(MotoNode *self,  const gchar *name, gdouble v0, gdouble v1);
-void moto_node_set_param_2dv(MotoNode *self, const gchar *name, const gdouble *v);
-
-void moto_node_set_param_3d(MotoNode *self,  const gchar *name, gdouble v0, gdouble v1, gdouble v2);
-void moto_node_set_param_3dv(MotoNode *self, const gchar *name, const gdouble *v);
-
-void moto_node_set_param_4d(MotoNode *self,  const gchar *name, gdouble v0, gdouble v1, gdouble v2, gdouble v3);
-void moto_node_set_param_4dv(MotoNode *self, const gchar *name, const gdouble *v);
-
-void moto_node_set_param_Ndv(MotoNode *self, const gchar *name, const gdouble *v, gsize N);
 
 void moto_node_get_params(MotoNode *self, ...);
 void moto_node_set_params(MotoNode *self, ...);
@@ -360,20 +259,12 @@ guint moto_param_get_id(MotoParam *self);
 
 GValue * moto_param_get_value(MotoParam *self);
 gpointer moto_param_get_value_pointer(MotoParam *self);
-#define moto_param_value_pointer(p, c_type) ((c_type *)moto_param_get_value_pointer(p))
-#define moto_param_value(p, c_type) (*moto_param_value_pointer(p, c_type))
 
 GType moto_param_get_value_type(MotoParam *self);
 
 gboolean moto_param_get_boolean(MotoParam *self);
 gint     moto_param_get_int(MotoParam *self);
-guint    moto_param_get_uint(MotoParam *self);
-glong    moto_param_get_long(MotoParam *self);
-gulong   moto_param_get_ulong(MotoParam *self);
-gint64   moto_param_get_int64(MotoParam *self);
-guint64  moto_param_get_uint64(MotoParam *self);
 gfloat   moto_param_get_float(MotoParam *self);
-gdouble  moto_param_get_double(MotoParam *self);
 const gchar *moto_param_get_string(MotoParam *self);
 gpointer moto_param_get_pointer(MotoParam *self);
 gint     moto_param_get_enum(MotoParam *self);
@@ -382,13 +273,7 @@ GObject *moto_param_get_object(MotoParam *self);
 // Set parameter value
 void moto_param_set_boolean(MotoParam *self,    gboolean    value);
 void moto_param_set_int(MotoParam *self,        gint        value);
-void moto_param_set_uint(MotoParam *self,       guint       value);
-void moto_param_set_long(MotoParam *self,       glong       value);
-void moto_param_set_ulong(MotoParam *self,      gulong      value);
-void moto_param_set_int64(MotoParam *self,      gint64      value);
-void moto_param_set_uint64(MotoParam *self,     guint64     value);
 void moto_param_set_float(MotoParam *self,      gfloat      value);
-void moto_param_set_double(MotoParam *self,     gdouble     value);
 void moto_param_set_string(MotoParam *self,     const gchar *value);
 void moto_param_set_pointer(MotoParam *self,    gpointer    value);
 void moto_param_set_enum(MotoParam *self,       gint        value);
@@ -424,81 +309,6 @@ void moto_param_set_4iv(MotoParam *self, const gint *v);
 
 void moto_param_set_Niv(MotoParam *self, const gchar *name, const gint *v, gsize N);
 
-// uint
-void moto_param_set_1ui(MotoParam *self, guint v);
-void moto_param_set_1uiv(MotoParam *self, const guint *v);
-
-void moto_param_set_2ui(MotoParam *self, guint v0, guint v1);
-void moto_param_set_2uiv(MotoParam *self, const guint *v);
-
-void moto_param_set_3ui(MotoParam *self, guint v0, guint v1, guint v2);
-void moto_param_set_3uiv(MotoParam *self, const guint *v);
-
-void moto_param_set_4ui(MotoParam *self, guint v0, guint v1, guint v2, guint v3);
-void moto_param_set_4uiv(MotoParam *self, const guint *v);
-
-void moto_param_set_Nuiv(MotoParam *self, const gchar *name, const guint *v, gsize N);
-
-// long
-void moto_param_set_1l(MotoParam *self, glong v);
-void moto_param_set_1lv(MotoParam *self, const glong *v);
-
-void moto_param_set_2l(MotoParam *self, glong v0, glong v1);
-void moto_param_set_2lv(MotoParam *self, const glong *v);
-
-void moto_param_set_3l(MotoParam *self, glong v0, glong v1, glong v2);
-void moto_param_set_3lv(MotoParam *self, const glong *v);
-
-void moto_param_set_4l(MotoParam *self, glong v0, glong v1, glong v2, glong v3);
-void moto_param_set_4lv(MotoParam *self, const glong *v);
-
-void moto_param_set_Nlv(MotoParam *self, const gchar *name, const glong *v, gsize N);
-
-// ulong
-void moto_param_set_1ul(MotoParam *self, gulong v);
-void moto_param_set_1ulv(MotoParam *self, const gulong *v);
-
-void moto_param_set_2ul(MotoParam *self, gulong v0, gulong v1);
-void moto_param_set_2ulv(MotoParam *self, const gulong *v);
-
-void moto_param_set_3ul(MotoParam *self, gulong v0, gulong v1, gulong v2);
-void moto_param_set_3ulv(MotoParam *self, const gulong *v);
-
-void moto_param_set_4ul(MotoParam *self, gulong v0, gulong v1, gulong v2, gulong v3);
-void moto_param_set_4ulv(MotoParam *self, const gulong *v);
-
-void moto_param_set_Nulv(MotoParam *self, const gchar *name, const gulong *v, gsize N);
-
-// int64
-void moto_param_set_1i64(MotoParam *self, gint64 v);
-void moto_param_set_1i64v(MotoParam *self, const gint64 *v);
-
-void moto_param_set_2i64(MotoParam *self, gint64 v0, gint64 v1);
-void moto_param_set_2i64v(MotoParam *self, const gint64 *v);
-
-void moto_param_set_3i64(MotoParam *self, gint64 v0, gint64 v1, gint64 v2);
-void moto_param_set_3i64v(MotoParam *self, const gint64 *v);
-
-void moto_param_set_4i64(MotoParam *self, gint64 v0, gint64 v1, gint64 v2, gint64 v3);
-void moto_param_set_4i64v(MotoParam *self, const gint64 *v);
-
-void moto_param_set_Ni64v(MotoParam *self, const gchar *name, const gint64 *v, gsize N);
-
-// uint64
-void moto_param_set_1ui64(MotoParam *self, guint64 v);
-void moto_param_set_1ui64v(MotoParam *self, const guint64 *v);
-
-void moto_param_set_2ui64(MotoParam *self, guint64 v0, guint64 v1);
-void moto_param_set_2ui64v(MotoParam *self, const guint64 *v);
-
-void moto_param_set_3ui64(MotoParam *self, guint64 v0, guint64 v1, guint64 v2);
-void moto_param_set_3ui64v(MotoParam *self, const guint64 *v);
-
-void moto_param_set_4ui64(MotoParam *self, guint64 v0, guint64 v1, guint64 v2, guint64 v3);
-void moto_param_set_4ui64v(MotoParam *self, const guint64 *v);
-
-void moto_param_set_Nui64v(MotoParam *self, const gchar *name, const guint64 *v, gsize N);
-
 // float
 void moto_param_set_1f(MotoParam *self, gfloat v);
 void moto_param_set_1fv(MotoParam *self, const gfloat *v);
@@ -513,52 +323,6 @@ void moto_param_set_4f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2, gfloat 
 void moto_param_set_4fv(MotoParam *self, const gfloat *v);
 
 void moto_param_set_Nfv(MotoParam *self, const gchar *name, const gfloat *v, gsize N);
-
-// double
-void moto_param_set_1d(MotoParam *self, gdouble v);
-void moto_param_set_1dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_a1d(MotoParam *self, glong start, glong num, const gdouble *v);
-
-void moto_param_set_2d(MotoParam *self, gdouble v0, gdouble v1);
-void moto_param_set_2dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_a2d(MotoParam *self, glong start, glong num, const gdouble *v);
-
-void moto_param_set_3d(MotoParam *self, gdouble v0, gdouble v1, gdouble v2);
-void moto_param_set_3dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_a3d(MotoParam *self, glong start, glong num, const gdouble *v);
-
-void moto_param_set_4d(MotoParam *self, gdouble v0, gdouble v1, gdouble v2, gdouble v3);
-void moto_param_set_4dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_a4d(MotoParam *self, glong start, glong num, const gdouble *v);
-
-void moto_param_set_Ndv(MotoParam *self, const gchar *name, const gdouble *v, gsize N);
-
-void moto_param_set_aNd(MotoParam *self, glong start, glong num, const gdouble *v, gsize N);
-
-void moto_param_set_2x2dr(MotoParam *self, gdouble v00, gdouble v01,
-                                          gdouble v10, gdouble v11);
-void moto_param_set_2x2drv(MotoParam *self, const gdouble *v);
-void moto_param_set_2x2dc(MotoParam *self, gdouble v00, gdouble v01,
-                                          gdouble v10, gdouble v11);
-void moto_param_set_2x2dcv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_3x3d(MotoParam *self, gdouble v00, gdouble v01, gdouble v02,
-                                          gdouble v10, gdouble v11, gdouble v12,
-                                          gdouble v20, gdouble v21, gdouble v22);
-void moto_param_set_3x3dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_4x4d(MotoParam *self, gdouble v00, gdouble v01, gdouble v02, gdouble v03,
-                                          gdouble v10, gdouble v11, gdouble v12, gdouble v13,
-                                          gdouble v20, gdouble v21, gdouble v22, gdouble v23,
-                                          gdouble v30, gdouble v31, gdouble v32, gdouble v33);
-void moto_param_set_4x4dv(MotoParam *self, const gdouble *v);
-
-void moto_param_set_a4x4dv(MotoParam *self, const gdouble *v, ...);
-void moto_param_set_ae4x4dv(MotoParam *self, const gdouble *v, ...);
 
 gboolean moto_param_is_array(MotoParam *self);
 gboolean moto_param_is_array_unsized(MotoParam *self);

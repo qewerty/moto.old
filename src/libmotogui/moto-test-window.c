@@ -171,7 +171,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         if( ! dx)
             return FALSE;
 
-        moto_param_set_uint(dx, moto_param_get_uint(dx) + 1);
+        moto_param_set_int(dx, moto_param_get_int(dx) + 1);
         moto_node_update(node);
 
         moto_test_window_redraw_3dview(self);

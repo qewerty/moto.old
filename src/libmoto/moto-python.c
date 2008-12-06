@@ -1,6 +1,9 @@
 #include "libmotoutil/numdef.h"
 #include "moto-python.h"
 #include "moto-types.h"
+#include "moto-filename.h"
+
+// Py -> moto
 
 #define moto_TYPE_SIZE_from_PyObject(TYPE, SIZE, v, obj) \
     if(PyTuple_Check(obj)) \
@@ -130,6 +133,18 @@ gboolean moto_float_4_from_PyObject(gfloat *v, PyObject *obj)
     moto_TYPE_SIZE_from_PyObject(float, 4, v, obj);
 }
 
+gboolean moto_string_from_PyObject(gchar **v, PyObject *obj)
+{
+    if(PyString_Check(obj))
+    {
+        *v = PyString_AS_STRING(obj);
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* PyObject -> GValue */
 
 static GHashTable *htable = NULL;
@@ -142,7 +157,7 @@ static void destroy_key(gpointer data)
 static void free_htable(void)
 {
     if(htable)
-        g_hash_table_destroy(htable);
+        g_hash_table_unref(htable);
 }
 
 #define MOTO_INSERT_CONVERTER(G_TYPE, TYPE) \
@@ -188,12 +203,26 @@ DEFINE_CONVERTER(float, 2)
 DEFINE_CONVERTER(float, 3)
 DEFINE_CONVERTER(float, 4)
 
-/*
 static gboolean moto_string_value_from_PyObject(GValue *v, PyObject *obj)
 {
-    return moto_string_from_PyObject( & v->data[0].v_int, obj);
+    return moto_string_from_PyObject((gchar **)(& v->data[0].v_pointer), obj);
 }
-*/
+
+typedef struct _HTableData
+{
+    GType type;
+    MotoGValueFromPyObjectFunc func;
+} HTableData;
+
+static void convert_value(gpointer key, gpointer value, gpointer user_data)
+{
+    HTableData *data = (HTableData *)user_data;
+    if(data->func)
+        return;
+
+    if(g_type_is_a(data->type, *((GType *)key)))
+        data->func = g_hash_table_lookup(htable, key);
+}
 
 gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj)
 {
@@ -215,6 +244,7 @@ gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj)
         MOTO_INSERT_VECTOR_CONVERTER(MOTO_TYPE_FLOAT, float, 2);
         MOTO_INSERT_VECTOR_CONVERTER(MOTO_TYPE_FLOAT, float, 3);
         MOTO_INSERT_VECTOR_CONVERTER(MOTO_TYPE_FLOAT, float, 4);
+        MOTO_INSERT_CONVERTER(G_TYPE_STRING, string);
 
         atexit(free_htable);
     }
@@ -222,7 +252,19 @@ gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj)
     GType type = G_VALUE_TYPE(v);
     MotoGValueFromPyObjectFunc func = g_hash_table_lookup(htable, & type);
     if(func)
+    {
         return func(v, obj);
+    }
+    else
+    {
+        HTableData data;
+        data.type = type;
+        data.func = NULL;
+        g_hash_table_foreach(htable, convert_value, & data);
+
+        if(data.func)
+            return data.func(v, obj);
+    }
 
     return FALSE;
 }
@@ -281,4 +323,26 @@ PyObject *moto_PyFunction_from_args_and_body(const gchar *argsdef, const gchar *
 
     g_string_free(code, TRUE);
     return func;
+}
+
+// moto -> Py
+
+PyObject *moto_PyObject_from_GValue(GValue *v)
+{
+    PyObject *obj = NULL;
+
+    GType type = G_VALUE_TYPE(v);
+    if(g_type_is_a(type, G_TYPE_INT))
+    {
+        obj = PyInt_FromLong(v->data[0].v_int);
+    }
+    else if(g_type_is_a(type, G_TYPE_FLOAT))
+    {
+        obj = PyFloat_FromDouble(v->data[0].v_float);
+    }
+
+    if( ! obj)
+        Py_RETURN_NONE;
+
+    return obj;
 }

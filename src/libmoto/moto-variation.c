@@ -124,7 +124,7 @@ void moto_variation_save_param(MotoVariation *self, MotoParam *p)
 
     if(g_type_is_a(pt, G_TYPE_OBJECT))
     {
-        GObject *o = moto_param_value(p, GObject*);
+        GObject *o = moto_param_get_object(p);
         if(o)
             g_object_weak_ref(o, (GWeakNotify)null_value, v);
     }

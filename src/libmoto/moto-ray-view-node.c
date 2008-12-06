@@ -58,7 +58,7 @@ moto_ray_view_node_init(MotoRayViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "view", "View", MOTO_TYPE_RAY_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry", "Geometry",
+            "view", "View", MOTO_TYPE_RAY_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
             NULL);
 
     self->priv->ray.pos[0] = 0;

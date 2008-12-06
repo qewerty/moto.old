@@ -51,7 +51,7 @@ GType moto_mesh_view_node_get_type(void);
 #define MOTO_IS_MESH_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESH_VIEW_NODE))
 #define MOTO_MESH_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESH_VIEW_NODE, MotoMeshViewNodeClass))
 
-MotoMeshViewNode *moto_mesh_view_node_new();
+MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name);
 
 MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self);
 MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self);

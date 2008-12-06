@@ -31,46 +31,10 @@ GType moto_param_mode_get_type(void)
 
 /* utils */
 
-typedef struct _Domain
-{
-    GArray *types; // Param types allowed in the domain. If NULL any type allowed.
-    GSList *params;
-} Domain;
-
-static Domain *domain_new()
-{
-    Domain *self = g_slice_new(Domain);
-    self->types = NULL;
-    self->params = NULL;
-    return self;
-}
-
-static void domain_free(Domain *self)
-{
-    g_slist_free(self->params);
-    g_slice_free(Domain, self);
-}
-
-static void domain_add_param(Domain *self, MotoParam *param)
-{
-    self->params = g_slist_append(self->params, param);
-}
-
-static void domain_foreach_param(Domain *self, GFunc func, gpointer user_data)
-{
-    g_slist_foreach(self->params, func, user_data);
-}
-
 static void
 unref_gobject(gpointer data, gpointer user_data)
 {
     g_object_unref(data);
-}
-
-static void
-free_domain(Domain *domain, gpointer user_data)
-{
-    domain_free(domain);
 }
 
 typedef struct _Group
@@ -129,7 +93,6 @@ struct _MotoNodePriv
 
     MotoMappedList params;
     MotoMappedList pgroups;
-    MotoMappedList pdomains;
 
     gboolean hidden;
 
@@ -190,7 +153,6 @@ moto_node_dispose(GObject *obj)
     g_string_free(priv->name, TRUE);
     moto_mapped_list_free_all(& priv->params, unref_gobject);
     moto_mapped_list_free_all(& priv->pgroups, (GFunc)free_group);
-    moto_mapped_list_free_all(& priv->pdomains, (GFunc)free_domain);
 
     node_parent_class->dispose(obj);
 }
@@ -215,7 +177,6 @@ moto_node_init(MotoNode *self)
 
     moto_mapped_list_init(& priv->params);
     moto_mapped_list_init(& priv->pgroups);
-    moto_mapped_list_init(& priv->pdomains);
 
     priv->hidden = FALSE;
     g_get_current_time(& priv->last_modified);
@@ -313,17 +274,9 @@ guint moto_node_get_id(MotoNode *self)
     return priv->id;
 }
 
-void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param,
-        const gchar *domain, const gchar *group)
+void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *group)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    Domain *d = (Domain *)moto_mapped_list_get(& priv->pdomains, domain);
-    if( ! d)
-    {
-        d = domain_new();
-        moto_mapped_list_set(& priv->pdomains, domain, d);
-    }
-    domain_add_param(d, param);
 
     Group *g = (Group *)moto_mapped_list_get(& priv->pgroups, group);
     if( ! g)
@@ -474,12 +427,11 @@ void moto_node_add_params(MotoNode *self, ...)
         }
 
         GParamSpec *pspec = va_arg(ap, GParamSpec*);
-        gchar *domain   = va_arg(ap, gchar*);
         gchar *group    = va_arg(ap, gchar*);
 
         MotoParam *p = moto_param_new(pname, ptitle, pmode, &v, pspec, self);
 
-        moto_node_add_param(self, p, domain, group);
+        moto_node_add_param(self, p, group);
     }
 
     va_end(ap);
@@ -521,61 +473,6 @@ gint moto_node_get_param_int(MotoNode *self, const gchar *name)
     return moto_param_get_int(p);
 }
 
-guint moto_node_get_param_uint(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_uint(p);
-}
-
-glong moto_node_get_param_long(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_long(p);
-}
-
-gulong moto_node_get_param_ulong(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_ulong(p);
-}
-
-gint64  moto_node_get_param_int64(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_int64(p);
-}
-
-guint64 moto_node_get_param_uint64(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_uint64(p);
-}
-
 gfloat moto_node_get_param_float(MotoNode *self, const gchar *name)
 {
     MotoParam *p = moto_node_get_param(self, name);
@@ -585,17 +482,6 @@ gfloat moto_node_get_param_float(MotoNode *self, const gchar *name)
         // return;
     }
     return moto_param_get_float(p);
-}
-
-gdouble moto_node_get_param_double(MotoNode *self, const gchar *name)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        // return;
-    }
-    return moto_param_get_double(p);
 }
 
 const gchar *moto_node_get_param_string(MotoNode *self, const gchar *name)
@@ -664,61 +550,6 @@ void moto_node_set_param_int(MotoNode *self, const gchar *name, gint value)
     moto_param_set_int(p, value);
 }
 
-void moto_node_set_param_uint(MotoNode *self, const gchar *name, guint value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_uint(p, value);
-}
-
-void moto_node_set_param_long(MotoNode *self, const gchar *name, glong value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_long(p, value);
-}
-
-void moto_node_set_param_ulong(MotoNode *self, const gchar *name, gulong value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_ulong(p, value);
-}
-
-void moto_node_set_param_int64(MotoNode *self, const gchar *name, gint64 value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_int64(p, value);
-}
-
-void moto_node_set_param_uint64(MotoNode *self, const gchar *name, guint64 value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_uint64(p, value);
-}
-
 void moto_node_set_param_float(MotoNode *self, const gchar *name, gfloat value)
 {
     MotoParam *p = moto_node_get_param(self, name);
@@ -728,17 +559,6 @@ void moto_node_set_param_float(MotoNode *self, const gchar *name, gfloat value)
         return;
     }
     moto_param_set_float(p, value);
-}
-
-void moto_node_set_param_double(MotoNode *self, const gchar *name, gdouble value)
-{
-    MotoParam *p = moto_node_get_param(self, name);
-    if( ! p)
-    {
-        // TODO: print error
-        return;
-    }
-    moto_param_set_double(p, value);
 }
 
 void moto_node_set_param_pointer(MotoNode *self, const gchar *name, gpointer value)
@@ -1406,46 +1226,10 @@ gint moto_param_get_int(MotoParam *self)
     return g_value_get_int(& priv->value);
 }
 
-guint moto_param_get_uint(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_uint(& priv->value);
-}
-
-glong moto_param_get_long(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_long(& priv->value);
-}
-
-gulong moto_param_get_ulong(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_ulong(& priv->value);
-}
-
-gint64 moto_param_get_int64(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_int64(& priv->value);
-}
-
-guint64 moto_param_get_uint64(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_uint64(& priv->value);
-}
-
 gfloat moto_param_get_float(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     return g_value_get_float(& priv->value);
-}
-
-gdouble moto_param_get_double(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return g_value_get_double(& priv->value);
 }
 
 const gchar *moto_param_get_string(MotoParam *self)
@@ -1486,52 +1270,10 @@ void moto_param_set_int(MotoParam *self, gint value)
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
-void moto_param_set_uint(MotoParam *self, guint value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_uint(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
-void moto_param_set_long(MotoParam *self, glong value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_long(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
-void moto_param_set_ulong(MotoParam *self, gulong value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_ulong(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
-void moto_param_set_int64(MotoParam *self, gint64 value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_int64(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
-void moto_param_set_uint64(MotoParam *self, guint64 value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_uint64(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
 void moto_param_set_float(MotoParam *self, gfloat value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_float(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
-}
-
-void moto_param_set_double(MotoParam *self, gdouble value)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_double(& priv->value, value);
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 
@@ -1778,7 +1520,9 @@ void moto_param_set_expression(MotoParam *self, const gchar *body)
     g_string_assign(priv->expression, body);
 
     if(priv->expression_function)
+    {
         Py_DECREF(priv->expression_function);
+    }
 
     priv->expression_function = \
         moto_PyFunction_from_args_and_body("(p=None, v=None, s=None)", body);
@@ -1797,8 +1541,21 @@ gboolean moto_param_eval(MotoParam *self)
     PyObject *result = NULL;
     if(priv->expression_function)
     {
-        PyObject *args = PyTuple_New(1);
+        PyObject *args = PyTuple_New(3);
         PyTuple_SetItem(args, 0, PyString_FromString(moto_param_get_name(self)));
+
+        PyTuple_SetItem(args, 1, moto_PyObject_from_GValue( & priv->value));
+
+        if(priv->source)
+        {
+            PyTuple_SetItem(args, 2, moto_PyObject_from_GValue(moto_param_get_value(priv->source)));
+        }
+        else
+        {
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(args, 2, Py_None);
+        }
+
         result = PyObject_CallObject(priv->expression_function, args);
     }
 

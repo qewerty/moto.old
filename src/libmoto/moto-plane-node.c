@@ -38,7 +38,6 @@ struct _MotoPlaneNodePriv
     gboolean disposed;
 
     MotoMesh *mesh;
-    MotoMesh **mesh_ptr;
 
     MotoBound *bound;
     gboolean bound_calculated;
@@ -79,13 +78,11 @@ moto_plane_node_init(MotoPlaneNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size", "Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, size, pspec, "Form", "Form",
-            "divs", "Divisions",  MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form", "Form",
-            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation", "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
+            "size", "Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, size, pspec, "Form",
+            "divs", "Divisions",  MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form",
+            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
             NULL);
-
-    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     priv->bound_calculated = FALSE;

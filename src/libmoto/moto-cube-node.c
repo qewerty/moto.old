@@ -19,15 +19,7 @@ struct _MotoCubeNodePriv
 {
     gboolean disposed;
 
-    gboolean *side_px_ptr;
-    gboolean *side_mx_ptr;
-    gboolean *side_py_ptr;
-    gboolean *side_my_ptr;
-    gboolean *side_pz_ptr;
-    gboolean *side_mz_ptr;
-
     MotoMesh *mesh;
-    MotoMesh **mesh_ptr;
 
     MotoBound *bound;
     gboolean bound_calculated;
@@ -69,28 +61,19 @@ moto_cube_node_init(MotoCubeNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "size", "Size", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, size, pspec, "Form", "Form",
-            "divs", "Divisions",  MOTO_TYPE_INT_3, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form", "Form",
-            "side_px", "Side +X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "side_mx", "Side -X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "side_py", "Side +Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "side_my", "Side -Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "side_pz", "Side +Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "side_mz", "Side -Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides", "Sides",
-            "bevel",    "Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
-            "bev_abs",  "Absolute Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel", "Bevel",
-            "bev_size", "Bevel Size",  G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Bevel", "Bevel",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry", "Geometry",
+            "size", "Size", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, size, pspec, "Form",
+            "divs", "Divisions",  MOTO_TYPE_INT_3, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form",
+            "side_px", "Side +X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "side_mx", "Side -X",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "side_py", "Side +Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "side_my", "Side -Y",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "side_pz", "Side +Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "side_mz", "Side -Z",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Sides",
+            "bevel",    "Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel",
+            "bev_abs",  "Absolute Bevel",  G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Bevel",
+            "bev_size", "Bevel Size",  G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Bevel",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
             NULL);
-
-    priv->side_px_ptr = moto_node_param_value_pointer(node, "side_px", gboolean);
-    priv->side_mx_ptr = moto_node_param_value_pointer(node, "side_mx", gboolean);
-    priv->side_py_ptr = moto_node_param_value_pointer(node, "side_py", gboolean);
-    priv->side_my_ptr = moto_node_param_value_pointer(node, "side_my", gboolean);
-    priv->side_pz_ptr = moto_node_param_value_pointer(node, "side_pz", gboolean);
-    priv->side_mz_ptr = moto_node_param_value_pointer(node, "side_mz", gboolean);
-
-    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     priv->bound_calculated = FALSE;
@@ -161,12 +144,12 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     if(div_z < 1)
         div_z = 1;
 
-    gboolean side_px = *(priv->side_px_ptr);
-    gboolean side_mx = *(priv->side_mx_ptr);
-    gboolean side_py = *(priv->side_py_ptr);
-    gboolean side_my = *(priv->side_my_ptr);
-    gboolean side_pz = *(priv->side_pz_ptr);
-    gboolean side_mz = *(priv->side_mz_ptr);
+    gboolean side_px = moto_node_get_param_boolean((MotoNode *)self, "side_px");
+    gboolean side_mx = moto_node_get_param_boolean((MotoNode *)self, "side_mx");
+    gboolean side_py = moto_node_get_param_boolean((MotoNode *)self, "side_py");
+    gboolean side_my = moto_node_get_param_boolean((MotoNode *)self, "side_my");
+    gboolean side_pz = moto_node_get_param_boolean((MotoNode *)self, "side_pz");
+    gboolean side_mz = moto_node_get_param_boolean((MotoNode *)self, "side_mz");
 
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;

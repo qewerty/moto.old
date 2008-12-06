@@ -18,7 +18,6 @@ static GObjectClass *cylinder_node_parent_class = NULL;
 struct _MotoCylinderNodePriv
 {
     MotoMesh *mesh;
-    MotoMesh **mesh_ptr;
 
     MotoBound *bound;
     gboolean bound_calculated;
@@ -56,17 +55,15 @@ moto_cylinder_node_init(MotoCylinderNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Size", "Size",
-            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Size", "Size",
-            "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Size", "Size",
-            "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Size", "Size",
-            "screw_s", "Screw S", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Size", "Size",
-            "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Divisions", "Divisions",
-            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation", "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry", "Geometry",
+            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Size",
+            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Size",
+            "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Size",
+            "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Size",
+            "screw_s", "Screw S", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Size",
+            "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Divisions",
+            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
             NULL);
-
-    self->priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
     self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     self->priv->bound_calculated = FALSE;

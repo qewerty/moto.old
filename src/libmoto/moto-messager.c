@@ -22,21 +22,21 @@ struct _MotoMessagerPriv
     gboolean print_messages;
 };
 
-static void info_inc()
+static void info_inc(void)
 {
     MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
     priv->msg_count++;
     priv->info_count++;
 }
 
-static void warning_inc()
+static void warning_inc(void)
 {
     MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
     priv->msg_count++;
     priv->warning_count++;
 }
 
-static void error_inc()
+static void error_inc(void)
 {
     MotoMessagerPriv *priv = MOTO_MESSAGER_GET_PRIVATE(moto_messager_singleton());
     priv->msg_count++;

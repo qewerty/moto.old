@@ -61,9 +61,9 @@ moto_displace_node_init(MotoDisplaceNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry", "Geometry",
-            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry", "Geometry",
-            "scale",  "Scaling Value",        G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Geometry", "Geometry",
+            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
+            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry",
+            "scale",  "Scaling Value",        G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, pspec, "Geometry",
             NULL);
 }
 

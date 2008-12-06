@@ -519,26 +519,6 @@ void on_int_param_changed(MotoParam *param, OnChangedData *data)
     g_signal_handler_unblock(data->widget, data->handler_id);
 }
 
-void on_uint_changed(GtkSpinButton *spinbutton,
-                     OnChangedData *data)
-{
-    guint value = gtk_spin_button_get_value_as_int(spinbutton);
-
-    g_signal_handler_block(spinbutton, data->handler_id);
-    moto_param_set_uint(data->param, value);
-    g_signal_handler_unblock(spinbutton, data->handler_id);
-
-    moto_node_update(moto_param_get_node(data->param));
-    moto_test_window_redraw_3dview(data->window);
-}
-
-void on_uint_param_changed(MotoParam *param, OnChangedData *data)
-{
-    g_signal_handler_block(data->widget, data->handler_id);
-    gtk_spin_button_set_value((GtkSpinButton *)data->widget, moto_param_get_uint(param));
-    g_signal_handler_unblock(data->widget, data->handler_id);
-}
-
 // boolean
 
 void on_boolean_changed(GtkToggleButton *togglebutton,
@@ -881,26 +861,6 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
         data->param_handler_id = \
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_int_param_changed), data);
-    }
-    else if(G_TYPE_UINT == ptype)
-    {
-        widget = gtk_spin_button_new_with_range(0, 1000000, 1);
-        gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_uint(param));
-        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
-        gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
-
-        GParamSpecUInt *ps = (GParamSpecUInt *)moto_param_get_spec(param);
-        if(ps)
-            gtk_spin_button_set_range((GtkSpinButton *)widget, ps->minimum, ps->maximum);
-
-        data = g_slice_new(OnChangedData);
-        data->param = param;
-        data->window = pe->priv->window;
-        data->widget = widget;
-        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_uint_changed), data);
-        data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_uint_param_changed), data);
     }
     else if(G_TYPE_BOOLEAN == ptype)
     {

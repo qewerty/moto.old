@@ -191,11 +191,8 @@ void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_na
         }
     }
 
-    GString *msg = g_string_new("instance \"");
-    g_string_printf(msg, "instance \"%s\" of GeometryViewNode has no state with name \"%s\"",
-            moto_node_get_name((MotoNode *)self), state_name);
-    moto_warning(msg->str);
-    g_string_free(msg, TRUE);
+    moto_warning("Instance \"%s\" of GeometryViewNode has no state with name \"%s\"",
+        moto_node_get_name((MotoNode *)self), state_name);
 }
 
 GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self)

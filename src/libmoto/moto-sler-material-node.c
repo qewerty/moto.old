@@ -92,7 +92,7 @@ moto_sler_material_node_init(MotoSlerMaterialNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "material", "Material", MOTO_TYPE_SLER_MATERIAL_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Material", "Material",
+            "material", "Material", MOTO_TYPE_SLER_MATERIAL_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Material",
             NULL);
 
     // TODO: Temporary! When internal Sler editor is integrated 'use_external' default value will be FALSE.

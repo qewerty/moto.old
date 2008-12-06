@@ -56,4 +56,4 @@ def make_tags(target, source, env):
     print cmd
     os.system(cmd)
 
-env.Command('tags', None, make_tags)
+# env.Command('tags', None, make_tags)

@@ -329,7 +329,7 @@ GType moto_world_manipualtor_get_type(void);
 #define MOTO_IS_WORLD_MANIPULATOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_WORLD_MANIPULATOR))
 #define MOTO_WORLD_MANIPULATOR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_WORLD_MANIPULATOR, MotoWorldManipulatorClass))
 
-MotoWorldManipulator *moto_world_manipulator_new();
+MotoWorldManipulator *moto_world_manipulator_new(void);
 void moto_world_manipulator_draw(MotoWorldManipulator *self, MotoWorld *world);
 
 gboolean moto_world_manipulator_button_press(MotoWorldManipulator *self, MotoWorld *world,

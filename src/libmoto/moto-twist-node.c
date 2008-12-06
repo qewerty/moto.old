@@ -62,11 +62,11 @@ moto_twist_node_init(MotoTwistNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "angle",  "Angle",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Arguments", "Arguments",
-            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Arguments", "Arguments",
-            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Arguments", "Arguments",
-            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry", "Geometry",
-            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry", "Geometry",
+            "angle",  "Angle",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Arguments",
+            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Arguments",
+            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Arguments",
+            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
+            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry",
             NULL);
 }
 

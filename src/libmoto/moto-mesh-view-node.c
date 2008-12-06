@@ -7,6 +7,7 @@
 #include "moto-mesh-view-node.h"
 #include "moto-enums.h"
 #include "moto-mesh.h"
+#include "moto-world.h"
 
 #define VBUF_NUMBER 4
 
@@ -66,7 +67,6 @@ struct _MotoMeshViewNodePriv
 {
     gboolean disposed;
 
-    MotoMesh **mesh_ptr;
     MotoMeshSelection *selection;
 
     MotoBound *bound;
@@ -121,11 +121,9 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "mesh", "Mesh", MOTO_TYPE_MESH, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry", "Geometry",
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry", "Geometry",
+            "mesh", "Mesh", MOTO_TYPE_MESH, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
+            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
             NULL);
-
-    priv->mesh_ptr = moto_node_param_value_pointer(node, "mesh", MotoMesh*);
 
     moto_geom_view_node_set_state((MotoGeomViewNode *)self, "verts");
 }
@@ -189,8 +187,7 @@ MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 
 MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self)
 {
-    MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
-    return (*(priv->mesh_ptr));
+    return (MotoMesh *)moto_node_get_param_object(MOTO_NODE(self), "mesh");
 }
 
 MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self)
@@ -599,7 +596,8 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
 {
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
 
-    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(self), "mesh"));
     if( ! mesh)
         return;
 
@@ -627,7 +625,8 @@ static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self)
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode*)self);
 
-    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(self), "mesh"));
     if( ! mesh)
         return;
 
@@ -651,7 +650,8 @@ static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self,
 {
     MotoMeshViewNodePriv* priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(self);
 
-    MotoMesh *mesh = moto_node_get_param_object((MotoNode*)self, "mesh");
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(self), "mesh"));
     if( ! mesh)
         return TRUE;
 
@@ -758,8 +758,8 @@ static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wire
 
 static void moto_mesh_view_node_draw_as_object(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
-    MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
 
     if( ! mesh)
         return;
@@ -770,8 +770,9 @@ static void moto_mesh_view_node_draw_as_object(MotoGeomViewState *self, MotoGeom
 static void moto_mesh_view_node_draw_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
 
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -783,7 +784,9 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
-    MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
     {
         // g_print("No mesh\n");
@@ -791,9 +794,10 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
     }
 
     /* Array of intersected verts. */
-    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
+    GArray *hits = \
+        g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
 
-    guint index;
+    guint index = 0;
     gfloat dist, dist_tmp;
     dist = MACRO;
     gfloat square_radius = 0.25*0.25;
@@ -860,7 +864,9 @@ moto_mesh_view_node_select_as_verts(MotoGeomViewState *self, MotoGeomViewNode *g
 static void moto_mesh_view_node_grow_selection_as_verts(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if(! mesh)
         return;
 
@@ -871,7 +877,8 @@ static void moto_mesh_view_node_select_less_as_verts(MotoGeomViewState *self, Mo
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
 
-    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -882,7 +889,8 @@ static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *sel
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
 
-    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -892,8 +900,9 @@ static void moto_mesh_view_node_invert_selection_as_verts(MotoGeomViewState *sel
 static void moto_mesh_view_node_draw_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (MotoMesh *)moto_node_get_param_object(MOTO_NODE(geom), "mesh");
 
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -904,7 +913,8 @@ static gboolean
 moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
-    MotoMesh *mesh = (MotoMesh *)moto_mesh_view_node_get_mesh((MotoMeshViewNode *)geom);
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
     {
         // g_print("No mesh\n");
@@ -912,9 +922,10 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
     }
 
     /* Array of intersected verts. */
-    GArray *hits = g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
+    GArray *hits = \
+        g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
 
-    guint index;
+    guint index = 0;
     gfloat dist, dist_tmp;
     dist = MACRO;
     gfloat square_radius = 0.25*0.25;
@@ -981,7 +992,9 @@ moto_mesh_view_node_select_as_edges(MotoGeomViewState *self, MotoGeomViewNode *g
 static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -991,7 +1004,9 @@ static void moto_mesh_view_node_grow_selection_as_edges(MotoGeomViewState *self,
 static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -1001,7 +1016,9 @@ static void moto_mesh_view_node_select_less_as_edges(MotoGeomViewState *self, Mo
 static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -1011,8 +1028,9 @@ static void moto_mesh_view_node_invert_selection_as_edges(MotoGeomViewState *sel
 static void moto_mesh_view_node_draw_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
 
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if(! mesh)
         return;
 
@@ -1024,7 +1042,9 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo)
 {
     MotoMeshViewNode *mv = (MotoMeshViewNode *)geom;
-    MotoMesh *mesh = moto_mesh_view_node_get_mesh(mv);
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
     {
         // g_print("No mesh\n");
@@ -1065,7 +1085,9 @@ moto_mesh_view_node_select_as_faces(MotoGeomViewState *self, MotoGeomViewNode *g
 static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -1075,7 +1097,9 @@ static void moto_mesh_view_node_grow_selection_as_faces(MotoGeomViewState *self,
 static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -1085,7 +1109,9 @@ static void moto_mesh_view_node_select_less_as_faces(MotoGeomViewState *self, Mo
 static void moto_mesh_view_node_invert_selection_as_faces(MotoGeomViewState *self, MotoGeomViewNode *geom)
 {
     MotoMeshViewNodePriv* geom_priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(geom);
-    MotoMesh *mesh = (*(geom_priv->mesh_ptr));
+
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(MOTO_NODE(geom), "mesh"));
     if( ! mesh)
         return;
 
@@ -1100,22 +1126,24 @@ static void moto_mesh_view_node_update(MotoNode *self)
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode *)self);
     moto_geom_view_node_set_prepared(gv, FALSE);
 
-    if( ! (*(priv->mesh_ptr)))
+    MotoMesh *mesh = \
+        MOTO_MESH(moto_node_get_param_object(self, "mesh"));
+    if( ! mesh)
         return;
 
-    moto_mesh_calc_bound(*(priv->mesh_ptr), priv->bound);
+    moto_mesh_calc_bound(mesh, priv->bound);
 
     if( ! priv->selection)
     {
-        priv->selection = moto_mesh_selection_new_for_mesh((*(priv->mesh_ptr)));
+        priv->selection = moto_mesh_selection_new_for_mesh(mesh);
 
         return;
     }
 
-    if( ! moto_mesh_selection_is_valid(priv->selection, (*(priv->mesh_ptr))))
+    if( ! moto_mesh_selection_is_valid(priv->selection, mesh))
     {
         MotoMeshSelection *old = priv->selection;
-        priv->selection = moto_mesh_selection_new_for_mesh((*(priv->mesh_ptr)));
+        priv->selection = moto_mesh_selection_new_for_mesh(mesh);
         moto_mesh_selection_copy_smth(priv->selection, old);
 
         moto_mesh_selection_free(old);

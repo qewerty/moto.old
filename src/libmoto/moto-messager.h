@@ -55,9 +55,9 @@ GType moto_messager_get_type(void);
 #define MOTO_IS_MESSAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MESSAGER))
 #define MOTO_MESSAGER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MESSAGER, MotoMessagerClass))
 
-MotoMessager *moto_messager_singleton();
+MotoMessager *moto_messager_singleton(void);
 void moto_messager_set_print_messages(gboolean status);
-gboolean moto_messager_get_print_messages();
+gboolean moto_messager_get_print_messages(void);
 
 void moto_info(const gchar *format, ...)  G_GNUC_PRINTF(1, 2);
 void moto_warning(const gchar *format, ...)  G_GNUC_PRINTF(1, 2);
