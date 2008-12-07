@@ -22,8 +22,8 @@
 #ifndef __MOTO_PYTHON_H__
 #define __MOTO_PYTHON_H__
 
-#include <glib-object.h>
 #include <Python.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 

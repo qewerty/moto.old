@@ -1,5 +1,6 @@
-#include "libmotoutil/numdef.h"
 #include "moto-python.h"
+
+#include "libmotoutil/numdef.h"
 #include "moto-types.h"
 #include "moto-filename.h"
 
@@ -18,6 +19,26 @@
             PyObject *o = PyTuple_GET_ITEM(obj, i); \
             if( ! moto_##TYPE##_from_PyObject(tmp + i, o)) \
                 return FALSE; \
+        } \
+\
+        for(i = 0; i < size; i++) \
+            v[i] = tmp[i]; \
+\
+        return TRUE; \
+    } \
+    else if(PySequence_Check(obj)) \
+    { \
+        Py_ssize_t size = PySequence_Size(obj); \
+        size = min(SIZE, size); \
+        g##TYPE tmp[SIZE]; \
+\
+        gint i; \
+        for(i = 0; i < size; i++) \
+        { \
+            PyObject *o = PySequence_GetItem(obj, i); \
+            if( ! moto_##TYPE##_from_PyObject(tmp + i, o)) \
+                return FALSE; \
+            Py_DECREF(o);\
         } \
 \
         for(i = 0; i < size; i++) \
@@ -50,6 +71,16 @@ gboolean moto_boolean_from_PyObject(gboolean *v, PyObject *obj)
     else if(PyFloat_Check(obj))
     {
         v[0] = fabs(PyFloat_AS_DOUBLE(obj)) >= MICRO;
+        return TRUE;
+    }
+    else if(PySequence_Check(obj))
+    {
+        v[0] = PySequence_Size(obj) > 0;
+        return TRUE;
+    }
+    else
+    {
+        v[0] = obj != Py_None;
         return TRUE;
     }
 
@@ -320,6 +351,15 @@ PyObject *moto_PyFunction_from_args_and_body(const gchar *argsdef, const gchar *
         if(module)
             func = PyObject_GetAttrString(module, "func");
     }
+    else
+    {
+        g_print("PyErr_Occured(): %d\n", PyErr_Occurred());
+        PyErr_Clear();
+    }
+
+error:
+    Py_XDECREF(module);
+    Py_XDECREF(compiled);
 
     g_string_free(code, TRUE);
     return func;
@@ -332,6 +372,10 @@ PyObject *moto_PyObject_from_GValue(GValue *v)
     PyObject *obj = NULL;
 
     GType type = G_VALUE_TYPE(v);
+    if(g_type_is_a(type, G_TYPE_BOOLEAN))
+    {
+        obj = PyBool_FromLong(v->data[0].v_int);
+    }
     if(g_type_is_a(type, G_TYPE_INT))
     {
         obj = PyInt_FromLong(v->data[0].v_int);
@@ -339,6 +383,59 @@ PyObject *moto_PyObject_from_GValue(GValue *v)
     else if(g_type_is_a(type, G_TYPE_FLOAT))
     {
         obj = PyFloat_FromDouble(v->data[0].v_float);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_BOOLEAN_2))
+    {
+        gboolean *tmp = (gboolean *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(bb)", tmp[0], tmp[1]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_INT_2))
+    {
+        gint *tmp = (gint *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(ii)", tmp[0], tmp[1]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_FLOAT_2))
+    {
+        gfloat *tmp = (gfloat *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(ff)", tmp[0], tmp[1]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_BOOLEAN_3))
+    {
+        gboolean *tmp = (gboolean *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(bbb)", tmp[0], tmp[1], tmp[2]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_INT_3))
+    {
+        gint *tmp = (gint *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(iii)", tmp[0], tmp[1], tmp[2]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_FLOAT_3))
+    {
+        gfloat *tmp = (gfloat *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(fff)", tmp[0], tmp[1], tmp[2]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_BOOLEAN_4))
+    {
+        gboolean *tmp = (gboolean *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(bbbb)", tmp[0], tmp[1], tmp[2], tmp[3]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_INT_4))
+    {
+        gint *tmp = (gint *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(iiii)", tmp[0], tmp[1], tmp[2], tmp[3]);
+    }
+    else if(g_type_is_a(type, MOTO_TYPE_FLOAT_4))
+    {
+        gfloat *tmp = (gfloat *)g_value_peek_pointer(v);
+        obj = Py_BuildValue("(ffff)", tmp[0], tmp[1], tmp[2], tmp[3]);
+    }
+    else if(g_type_is_a(type, G_TYPE_STRING))
+    {
+        obj = PyString_FromString(g_value_get_string(v));
+    }
+    else if(g_type_is_a(type, G_TYPE_OBJECT))
+    {
+        obj = NULL; // TODO
     }
 
     if( ! obj)
