@@ -1,4 +1,3 @@
-
 /* ##################################################################################
 #
 #  Moto - small node based image compositor with 32bit floating point processing
@@ -21,8 +20,8 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_COMMAND_H__
-#define __MOTO_COMMAND_H__
+#ifndef __MOTO_COMMAND_STACK_H__
+#define __MOTO_COMMAND_STACK_H__
 
 #include <glib-object.h>
 
@@ -33,8 +32,8 @@ G_BEGIN_DECLS
 typedef struct _MotoCommand MotoCommand;
 typedef struct _MotoCommandClass MotoCommandClass;
 
-typedef void (*MotoCommandDoMethod)(MotoCommand *self);
-typedef void (*MotoCommandUndoMethod)(MotoCommand *self);
+typedef gboolean (*MotoCommandDoMethod)(MotoCommand *self);
+typedef gboolean (*MotoCommandUndoMethod)(MotoCommand *self);
 
 struct _MotoCommand
 {
@@ -62,8 +61,8 @@ GType moto_command_get_type(void);
 
 gchar *moto_command_get_name(MotoCommand *self);
 
-void moto_command_do(MotoCommand *self);
-void moto_command_undo(MotoCommand *self);
+gboolean moto_command_do(MotoCommand *self);
+gboolean moto_command_undo(MotoCommand *self);
 
 /* MotoCommandStack */
 
@@ -104,4 +103,4 @@ void moto_command_stack_commit(MotoCommandStack *self);
 
 G_END_DECLS
 
-#endif /* __MOTO_COMMAND_H__ */
+#endif /* __MOTO_COMMAND_STACK_H__ */
