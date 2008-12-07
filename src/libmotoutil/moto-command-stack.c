@@ -1,5 +1,14 @@
 #include "moto-command-stack.h"
 
+/* Utils */
+
+static void
+unref_command(gpointer data,
+              gpointer user_data)
+{
+    g_object_unref(data);
+}
+
 /* MotoCommand */
 
 typedef struct _MotoCommandPriv MotoCommandPriv;
@@ -50,7 +59,7 @@ moto_command_class_init(MotoCommandClass *klass)
 
     GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
-    gobject_class->dispose = moto_command_dispose;
+    gobject_class->dispose  = moto_command_dispose;
     gobject_class->finalize = moto_command_finalize;
 
     klass->do_command = NULL;
@@ -61,7 +70,7 @@ moto_command_class_init(MotoCommandClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoCommand, moto_command, G_TYPE_OBJECT);
 
-/* methods */
+/* Methods of class MotoCommand */
 
 gchar *moto_command_get_name(MotoCommand *self)
 {
@@ -69,20 +78,78 @@ gchar *moto_command_get_name(MotoCommand *self)
     return priv->name->str;
 }
 
-void moto_command_do(MotoCommand *self)
+gboolean moto_command_do(MotoCommand *self)
 {
     MotoCommandClass *klass = MOTO_COMMAND_GET_CLASS(self);
 
     if(klass->do_command)
-        klass->do_command(self);
+        return klass->do_command(self);
+
+    return FALSE;
 }
 
-void moto_command_undo(MotoCommand *self)
+gboolean moto_command_undo(MotoCommand *self)
 {
     MotoCommandClass *klass = MOTO_COMMAND_GET_CLASS(self);
 
-    if(klass->do_command)
-        klass->do_command(self);
+    if(klass->undo_command)
+        return klass->undo_command(self);
+
+    return FALSE;
+}
+
+/* MotoCommandTransaction */
+
+typedef struct _MotoCommandTransaction MotoCommandTransaction;
+
+struct _MotoCommandTransaction
+{
+    GList *begin;
+    GList *end;
+
+    GList *commands;
+};
+
+void moto_command_transaction_init(MotoCommandTransaction *self)
+{
+    self->commands = NULL;
+}
+
+MotoCommandTransaction *moto_command_transaction_new(void)
+{
+    MotoCommandTransaction *self = g_slice_new(MotoCommandTransaction);
+    moto_command_transaction_init(self);
+    return self;
+}
+
+void moto_command_transaction_free(MotoCommandTransaction *self)
+{
+    g_list_foreach(self->commands,
+                   unref_command, NULL);
+    g_list_free(self->commands);
+
+    g_slice_free(MotoCommandTransaction, self);
+}
+
+void moto_command_transaction_next_command(MotoCommandTransaction *self,
+                                           MotoCommand *command)
+{
+    moto_command_do(command);
+    self->commands = g_list_append(self->commands, command);
+}
+
+void moto_command_transaction_do(MotoCommandTransaction *self)
+{
+    GList *l = g_list_first(self->commands);
+    for(; l; l = g_list_next(l))
+        moto_command_do(MOTO_COMMAND(l->data));
+}
+
+void moto_command_transaction_undo(MotoCommandTransaction *self)
+{
+    GList *l = g_list_last(self->commands);
+    for(; l; l = g_list_previous(l))
+        moto_command_undo(MOTO_COMMAND(l->data));
 }
 
 /* MotoCommandStack */
@@ -96,17 +163,12 @@ struct _MotoCommandStackPriv
 {
     gboolean disposed;
 
+    // Transactions
     GList *undoable;
     GList *redoable;
+
+    MotoCommandTransaction *current_transaction;
 };
-
-static void
-unref_command(gpointer data,
-              gpointer user_data)
-{
-    g_object_unref(data);
-}
-
 
 static void
 moto_command_stack_dispose(GObject *obj)
@@ -141,6 +203,8 @@ moto_command_stack_init(MotoCommandStack *self)
 
     priv->undoable = NULL;
     priv->redoable = NULL;
+
+    priv->current_transaction = NULL;
 }
 
 static void
@@ -158,7 +222,7 @@ moto_command_stack_class_init(MotoCommandStackClass *klass)
 
 G_DEFINE_TYPE(MotoCommandStack, moto_command_stack, G_TYPE_OBJECT);
 
-/* methods */
+/* Methods of class MotoCommandStack */
 
 MotoCommandStack *moto_command_stack_new(void)
 {
@@ -213,11 +277,28 @@ void moto_command_stack_redo(MotoCommandStack *self)
 }
 
 void moto_command_stack_begin(MotoCommandStack *self)
-{}
+{
+    MotoCommandStackPriv *priv = MOTO_COMMAND_STACK_GET_PRIVATE(self);
+
+    // Makes autocommit.
+    priv->current_transaction = moto_command_transaction_new();
+}
 
 void moto_command_stack_rollback(MotoCommandStack *self)
-{}
+{
+    MotoCommandStackPriv *priv = MOTO_COMMAND_STACK_GET_PRIVATE(self);
+
+    if(priv->current_transaction)
+    {
+        moto_command_transaction_undo(priv->current_transaction);
+        moto_command_transaction_free(priv->current_transaction);
+        priv->current_transaction = NULL;
+    }
+}
 
 void moto_command_stack_commit(MotoCommandStack *self)
-{}
+{
+    MotoCommandStackPriv *priv = MOTO_COMMAND_STACK_GET_PRIVATE(self);
+    priv->current_transaction = NULL;
+}
 
