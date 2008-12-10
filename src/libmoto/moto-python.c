@@ -209,6 +209,11 @@ static void free_htable(void)
 
 // Converters
 
+static gboolean moto_boolean_value_from_PyObject(GValue *v, PyObject *obj)
+{
+    return moto_boolean_from_PyObject( & v->data[0].v_int, obj);
+}
+
 static gboolean moto_int_value_from_PyObject(GValue *v, PyObject *obj)
 {
     return moto_int_from_PyObject( & v->data[0].v_int, obj);
@@ -217,11 +222,6 @@ static gboolean moto_int_value_from_PyObject(GValue *v, PyObject *obj)
 static gboolean moto_float_value_from_PyObject(GValue *v, PyObject *obj)
 {
     return moto_float_from_PyObject( & v->data[0].v_float, obj);
-}
-
-static gboolean moto_boolean_value_from_PyObject(GValue *v, PyObject *obj)
-{
-    return moto_boolean_from_PyObject( & v->data[0].v_int, obj);
 }
 
 DEFINE_CONVERTER(boolean, 2)
@@ -237,6 +237,39 @@ DEFINE_CONVERTER(float, 4)
 static gboolean moto_string_value_from_PyObject(GValue *v, PyObject *obj)
 {
     return moto_string_from_PyObject((gchar **)(& v->data[0].v_pointer), obj);
+}
+
+static gboolean check_enum_value(GType g_type, gint value)
+{
+    if( ! G_TYPE_IS_ENUM(g_type))
+        return FALSE;
+
+    GEnumClass *ec = (GEnumClass *)g_type_class_ref(g_type);
+
+    guint i;
+    for(i = 0; i < ec->n_values; i++)
+    {
+        if(ec->values[i].value == value)
+        {
+            g_type_class_unref(ec);
+            return TRUE;
+        }
+    }
+
+    g_type_class_unref(ec);
+
+    return FALSE;
+}
+
+static gboolean moto_enum_value_from_PyObject(GValue *v, PyObject *obj)
+{
+    gint value;
+    gboolean result = moto_int_from_PyObject( & value, obj);
+    if( ! result || ! check_enum_value(G_VALUE_TYPE(v), value))
+        return FALSE;
+
+    g_value_set_enum(v, value);
+    return TRUE;
 }
 
 typedef struct _HTableData
@@ -276,6 +309,7 @@ gboolean moto_GValue_from_PyObject(GValue *v, PyObject *obj)
         MOTO_INSERT_VECTOR_CONVERTER(MOTO_TYPE_FLOAT, float, 3);
         MOTO_INSERT_VECTOR_CONVERTER(MOTO_TYPE_FLOAT, float, 4);
         MOTO_INSERT_CONVERTER(G_TYPE_STRING, string);
+        MOTO_INSERT_CONVERTER(G_TYPE_ENUM, enum);
 
         atexit(free_htable);
     }
