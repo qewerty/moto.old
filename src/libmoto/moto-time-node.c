@@ -69,7 +69,7 @@ moto_time_node_class_init(MotoTimeNodeClass *klass)
 
 G_DEFINE_TYPE(MotoTimeNode, moto_time_node, MOTO_TYPE_NODE);
 
-/* methods of class TimeNode */
+/* Methods of class TimeNode */
 
 MotoTimeNode *moto_time_node_new(const gchar *name)
 {

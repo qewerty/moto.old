@@ -39,6 +39,7 @@ GType moto_axis_get_type(void);
 
 typedef enum
 {
+    MOTO_DRAW_MODE_NONE,
     MOTO_DRAW_MODE_BBOX_WIREFRAME,
     MOTO_DRAW_MODE_BBOX_SOLID,
     MOTO_DRAW_MODE_WIREFRAME,

@@ -85,7 +85,7 @@ moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
 
 G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_NODE);
 
-/* methods of class MotoDisplaceNode */
+/* Methods of class MotoDisplaceNode */
 
 MotoDisplaceNode *moto_displace_node_new(const gchar *name)
 {

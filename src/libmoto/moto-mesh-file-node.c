@@ -95,7 +95,7 @@ moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
 
 G_DEFINE_TYPE(MotoMeshFileNode, moto_mesh_file_node, MOTO_TYPE_GEOMETRY_NODE);
 
-/* methods of class MeshFileNode */
+/* Methods of class MeshFileNode */
 
 MotoMeshFileNode *moto_mesh_file_node_new()
 {

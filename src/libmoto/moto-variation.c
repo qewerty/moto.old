@@ -64,7 +64,7 @@ moto_variation_class_init(MotoVariationClass *klass)
 
 G_DEFINE_TYPE(MotoVariation, moto_variation, G_TYPE_OBJECT);
 
-/* methods of class MotoVariation */
+/* Methods of class MotoVariation */
 
 MotoVariation *moto_variation_new(const gchar *name)
 {

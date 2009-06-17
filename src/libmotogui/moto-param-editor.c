@@ -1,6 +1,7 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "libmoto/moto-types.h"
+#include "libmoto/moto-param-spec.h"
 #include "libmoto/moto-filename.h"
 #include "moto-param-editor.h"
 
@@ -691,6 +692,7 @@ void on_boolean_4_changed_3(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
+static
 void on_string_changed(GtkEditable *editable,
                         OnChangedData *data)
 {
@@ -699,6 +701,20 @@ void on_string_changed(GtkEditable *editable,
     g_signal_handler_block(editable, data->handler_id);
     moto_param_set_string(data->param, value);
     g_signal_handler_unblock(editable, data->handler_id);
+
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+static
+void on_enum_changed(GtkComboBox *combo_box,
+                     OnChangedData *data)
+{
+    gint value = gtk_combo_box_get_active((GtkEntry *)combo_box);
+
+    g_signal_handler_block(combo_box, data->handler_id);
+    moto_param_set_enum(data->param, value);
+    g_signal_handler_unblock(combo_box, data->handler_id);
 
     moto_node_update(moto_param_get_node(data->param));
     moto_test_window_redraw_3dview(data->window);
@@ -840,7 +856,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_expression_key_press_event), data);
         data->handler_id = \
             g_signal_connect(G_OBJECT(widget), "focus-out-event", G_CALLBACK(on_expression_focus_out_event), data);
-        data->param_handler_id = NULL;
+        data->param_handler_id = 0;
 
         return widget;
     }
@@ -878,7 +894,11 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(G_TYPE_FLOAT == ptype)
     {
-        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        MotoParamSpecFloat *pspec = MOTO_PARAM_SPEC_FLOAT(moto_param_get_spec(param));
+        if(pspec)
+            widget = gtk_spin_button_new_with_range(pspec->min, pspec->max, pspec->step);
+        else
+            widget = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_float(param));
         gtk_editable_set_editable((GtkEditable *)widget, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
@@ -1093,6 +1113,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_INT_2 == ptype)
     {
+        MotoParamSpecInt_2 *pspec = \
+            MOTO_PARAM_SPEC_INT_2(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1104,7 +1127,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1121,7 +1147,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1139,6 +1168,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_INT_3 == ptype)
     {
+        MotoParamSpecInt_3 *pspec = \
+            MOTO_PARAM_SPEC_INT_3(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1150,7 +1182,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1167,7 +1202,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1184,7 +1222,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 3
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[2], pspec->max[2], pspec->step[2]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
@@ -1202,6 +1243,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_INT_4 == ptype)
     {
+        MotoParamSpecInt_4 *pspec = \
+            MOTO_PARAM_SPEC_INT_4(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1213,7 +1257,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1230,7 +1277,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1247,6 +1297,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 3
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[2], pspec->max[2], pspec->step[2]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
@@ -1264,7 +1318,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 4
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[3], pspec->max[3], pspec->step[3]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[3]);
@@ -1282,6 +1339,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_2 == ptype)
     {
+        MotoParamSpecInt_2 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT_2(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1293,7 +1353,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1311,7 +1374,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1330,6 +1396,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_3 == ptype)
     {
+        MotoParamSpecInt_3 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT_3(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1341,7 +1410,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1359,7 +1431,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1377,7 +1452,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 3
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[2], pspec->max[2], pspec->step[2]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
@@ -1396,6 +1474,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_4 == ptype)
     {
+        MotoParamSpecInt_4 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT_4(moto_param_get_spec(param));
+
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
@@ -1407,7 +1488,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[0], pspec->max[0], pspec->step[0]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
@@ -1425,7 +1509,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[1], pspec->max[1], pspec->step[1]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
@@ -1443,7 +1530,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 3
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[2], pspec->max[2], pspec->step[2]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[2]);
@@ -1461,7 +1551,10 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
 
         // 4
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        if(pspec)
+            entry = gtk_spin_button_new_with_range(pspec->min[3], pspec->max[3], pspec->step[3]);
+        else
+            entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
         gtk_spin_button_set_value((GtkSpinButton *)entry, vec[3]);
@@ -1522,6 +1615,28 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->param_handler_id = 0;
         //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
     }
+    else if(G_TYPE_IS_ENUM(ptype))
+    {
+        widget = gtk_combo_box_new_text();
+        GtkComboBox *combo_box = (GtkComboBox*)widget;
+
+        GEnumClass *ec = (GEnumClass *)g_type_class_ref(ptype);
+        guint i;
+        for(i = 0; i < ec->n_values; i++)
+        {
+            gtk_combo_box_append_text(combo_box, ec->values[i].value_nick);
+        }
+        gtk_combo_box_set_active(combo_box, moto_param_get_enum(param));
+
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe->priv->window;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(combo_box), "changed", G_CALLBACK(on_enum_changed), data);
+        data->param_handler_id = 0;
+
+        g_type_class_unref(ec);
+    }
     return widget;
 }
 
@@ -1561,7 +1676,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
     gtk_misc_set_alignment((GtkMisc *)label, 1, 0.5);
     if(moto_param_get_use_expression(param))
     {
-        gchar *markup = g_markup_printf_escaped("<b>%s</b>", title);
+        gchar *markup = g_markup_printf_escaped("<span color=\"#AA1100\">%s</span>", title);
         gtk_label_set_markup((GtkLabel *)label, markup);
         g_free(markup);
     }
@@ -1700,6 +1815,14 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
 
     menu = (GtkMenu *)gtk_menu_new();
     item = gtk_menu_item_new_with_label("Param");
+    gtk_menu_item_set_submenu((GtkMenuItem *)item, (GtkWidget *)menu);
+    gtk_menu_shell_append((GtkMenuShell *)mb, (GtkWidget *)item);
+
+    item = gtk_menu_item_new_with_label("Add new");
+    gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
+
+    menu = (GtkMenu *)gtk_menu_new();
+    item = gtk_menu_item_new_with_label("Action");
     gtk_menu_item_set_submenu((GtkMenuItem *)item, (GtkWidget *)menu);
     gtk_menu_shell_append((GtkMenuShell *)mb, (GtkWidget *)item);
 

@@ -103,7 +103,7 @@ moto_ipo_segment_class_init(MotoIpoSegmentClass *klass)
 
 G_DEFINE_TYPE(MotoIpoSegment, moto_ipo_segment, G_TYPE_OBJECT);
 
-/* methods of class IpoSegment */
+/* Methods of class IpoSegment */
 
 MotoIpoSegment *moto_ipo_segment_new(const gchar *func_name)
 {

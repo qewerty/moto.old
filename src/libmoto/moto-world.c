@@ -200,7 +200,7 @@ moto_world_class_init(MotoWorldClass *klass)
 
 G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);
 
-/* methods of class World */
+/* Methods of class World */
 
 MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
 {

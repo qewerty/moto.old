@@ -96,7 +96,7 @@ moto_ray_view_node_class_init(MotoRayViewNodeClass *klass)
 
 G_DEFINE_TYPE(MotoRayViewNode, moto_ray_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
 
-/* methods of class RayViewNode */
+/* Methods of class RayViewNode */
 
 static gpointer view_param_get(MotoParam *param)
 {

@@ -25,7 +25,6 @@
 
 #include <glib-object.h>
 
-#include "moto-node.h"
 #include "moto-types.h"
 
 G_BEGIN_DECLS

@@ -82,7 +82,7 @@ moto_grid_view_node_class_init(MotoGridViewNodeClass *klass)
 
 G_DEFINE_TYPE(MotoGridViewNode, moto_grid_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
 
-/* methods of class GridViewNode */
+/* Methods of class GridViewNode */
 
 MotoGridViewNode *moto_grid_view_node_new(const gchar *name)
 {

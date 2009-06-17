@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <gtk/gtkgl.h>
 
 #include "libmotoutil/moto-gl.h"
@@ -176,8 +178,12 @@ moto_graph_area_init(MotoGraphArea *self)
         g_print("\nMoto: Error - Unable to initialize OpenGL!\n");
         exit(1);
     }
-    gtk_widget_set_gl_capability(self, gl_config,
+    gtk_widget_set_gl_capability((GtkWidget*)self, gl_config,
         NULL, TRUE, GDK_GL_RGBA_TYPE);
+
+    gtk_widget_add_events(GTK_WIDGET(self), GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+            GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
+            GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
     g_signal_connect(G_OBJECT(self), "expose-event",
         G_CALLBACK(moto_graph_area_on_expose_event), NULL);
@@ -207,12 +213,15 @@ add_node_view(MotoWorld *world, MotoNode *node, MotoGraphArea *area)
 {
     MotoGraphAreaPriv *priv = MOTO_GRAPH_AREA_GET_PRIVATE(area);
 
-    MotoGraphAreaNodeView *nv = moto_graph_area_node_view_new(node);
+    MotoGraphAreaNodeView *nv = \
+        (MotoGraphAreaNodeView *)moto_graph_area_node_view_new(node);
 
     nv->x = g_random_int_range(10, 300);
     nv->y = g_random_int_range(10, 300);
 
     priv->node_views = g_list_prepend(priv->node_views, nv);
+
+    return TRUE;
 }
 
 GtkWidget *moto_graph_area_new(MotoSystem *system)
@@ -232,11 +241,9 @@ GtkWidget *moto_graph_area_new(MotoSystem *system)
 
     g_object_add_weak_pointer(G_OBJECT(system), (gpointer *)( & priv->system));
 
-    /*
     priv->node_created_handler_id = \
         g_signal_connect(G_OBJECT(system), "node-created",
             G_CALLBACK(moto_graph_area_on_node_created), self);
-            */
 
     return (GtkWidget *)self;
 }

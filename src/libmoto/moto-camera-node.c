@@ -54,7 +54,7 @@ moto_camera_node_class_init(MotoCameraNodeClass *klass)
 
 G_DEFINE_TYPE(MotoCameraNode, moto_camera_node, MOTO_TYPE_NODE);
 
-/* methods of class CameraNode */
+/* Methods of class CameraNode */
 
 static gpointer get_camera(MotoParam *param)
 {

@@ -50,7 +50,7 @@ moto_bound_class_init(MotoBoundClass *klass)
 
 G_DEFINE_TYPE(MotoBound, moto_bound, G_TYPE_OBJECT);
 
-/* methods of class Bound */
+/* Methods of class Bound */
 
 MotoBound *moto_bound_new(gfloat min_x, gfloat max_x,
                           gfloat min_y, gfloat max_y,

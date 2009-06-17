@@ -194,7 +194,7 @@ moto_object_node_class_init(MotoObjectNodeClass *klass)
 
 G_DEFINE_TYPE(MotoObjectNode, moto_object_node, MOTO_TYPE_NODE);
 
-/* methods of class ObjectNode */
+/* Methods of class ObjectNode */
 
 MotoObjectNode *moto_object_node_new(const gchar *name)
 {

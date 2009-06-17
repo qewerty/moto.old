@@ -26,6 +26,8 @@ GType moto_draw_mode_get_type(void)
     if(0 == type)
     {
         static GEnumValue values[] = {
+            {MOTO_DRAW_MODE_NONE,
+                "DRAW_MODE_NONE", "None"},
             {MOTO_DRAW_MODE_BBOX_WIREFRAME,
                 "DRAW_MODE_BBOX_WIREFRAME", "Wireframe Bounding Box"},
             {MOTO_DRAW_MODE_BBOX_SOLID,

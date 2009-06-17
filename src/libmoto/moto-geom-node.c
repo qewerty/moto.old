@@ -47,7 +47,7 @@ moto_geometry_node_class_init(MotoGeometryNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoGeometryNode, moto_geometry_node, MOTO_TYPE_NODE);
 
-/* methods of class GeometryNode */
+/* Methods of class GeometryNode */
 
 MotoBound *moto_geometry_node_get_bound(MotoGeometryNode *self)
 {

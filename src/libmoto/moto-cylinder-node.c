@@ -88,7 +88,7 @@ moto_cylinder_node_class_init(MotoCylinderNodeClass *klass)
 
 G_DEFINE_TYPE(MotoCylinderNode, moto_cylinder_node, MOTO_TYPE_GEOMETRY_NODE);
 
-/* methods of class CylinderNode */
+/* Methods of class CylinderNode */
 
 MotoCylinderNode *moto_cylinder_node_new(const gchar *name)
 {

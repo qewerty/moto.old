@@ -175,7 +175,7 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
 
 G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
 
-/* methods of class MeshViewNode */
+/* Methods of class MeshViewNode */
 
 MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name)
 {

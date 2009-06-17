@@ -12,6 +12,7 @@
 #include "moto-message-bar.h"
 #include "moto-param-editor.h"
 #include "moto-outliner.h"
+#include "moto-graph-area.h"
 
 #include "libmoto/moto-world.h"
 #include "libmoto/moto-system.h"
@@ -58,6 +59,7 @@ struct _MotoTestWindowPriv
 
     MotoParamEditor *param_editor;
     MotoOutliner *outliner;
+    MotoGraphArea *graph_area;
 
     GtkDrawingArea *area;
 
@@ -353,7 +355,7 @@ moto_test_window_init(MotoTestWindow *self)
                 gdk_gl_config_new_by_mode((GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
     if( ! gl_config)
     {
-            g_print("\nNUll: Error - Unable to initialize OpenGL!\n");
+            g_print("\nMoto: Error - Unable to initialize OpenGL!\n");
             exit(1);
     }
     gtk_widget_set_gl_capability(area, gl_config,
@@ -379,8 +381,10 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_paned_pack1(vp, (GtkWidget *)sw, TRUE, FALSE);
     GtkScrolledWindow *sw0 = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(sw0, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    self->priv->outliner = (MotoOutliner *)moto_outliner_new(self, self->priv->world);
-    gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->outliner);
+    self->priv->outliner   = (MotoOutliner *)moto_outliner_new(self, self->priv->world); // FIXME: Temp unused!!!
+    // gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->outliner);
+    self->priv->graph_area = (MotoOutliner *)moto_graph_area_new(self->priv->system);
+    gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->graph_area);
     gtk_paned_pack2(vp, (GtkWidget *)sw0, FALSE, FALSE);
     gtk_paned_pack2(hp, (GtkWidget *)vp, FALSE, FALSE);
     // gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
@@ -441,7 +445,7 @@ moto_test_window_class_init(MotoTestWindowClass *klass)
 
 G_DEFINE_TYPE(MotoTestWindow, moto_test_window, GTK_TYPE_WINDOW);
 
-/* methods of class TestWindow */
+/* Methods of class TestWindow */
 
 GtkWindow *moto_test_window_new()
 {
@@ -518,7 +522,7 @@ draw(GtkWidget *widget,
     if(!GDK_IS_GL_DRAWABLE(gl_drawable)) return FALSE;
     if(!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    gint width = widget->allocation.width;
+    gint width  = widget->allocation.width;
     gint height = widget->allocation.height;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -40,6 +40,8 @@ struct _MotoSystem
 struct _MotoSystemClass
 {
     GObjectClass parent;
+
+    guint node_created_signal_id;
 };
 
 GType moto_system_get_type(void);
@@ -59,6 +61,9 @@ void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_curr
 void moto_system_delete_world(MotoSystem *self, MotoWorld *world);
 void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name);
 void moto_system_set_world_current(MotoSystem *self, MotoWorld *world);
+
+MotoNode *moto_system_create_node(MotoSystem *self,
+        const gchar *type_name, const gchar *node_path);
 
 MotoLibrary *moto_system_get_library(MotoSystem *self);
 

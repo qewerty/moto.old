@@ -109,7 +109,7 @@ G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, G_TYPE_OBJECT,
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINT_CLOUD,
                                               moto_mesh_point_cloud_init));
 
-/* methods of class Mesh */
+/* Methods of class Mesh */
 
 MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num)
 {

@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include "moto-types.h"
+#include "moto-param-spec.h"
 #include "moto-sphere-node.h"
 #include "moto-mesh.h"
 #include "moto-enums.h"
@@ -63,16 +64,21 @@ moto_sphere_node_init(MotoSphereNode *self)
     gfloat radius[3] = {1, 1, 1};
     gint   rc[2]     = {10, 10};
 
+    MotoParamSpec *rc_spec = moto_param_spec_int_2_new(10, 3, 1000000, 1, 10,
+                                                       10, 3, 1000000, 1, 10);
+
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "radius", "Radius",   MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, radius, pspec, "Form",
-            "rc", "Rows/Columns", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Form",
+            "rc", "Rows/Columns", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Form",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Y, pspec, "Orientation",
             "mesh",   "Polygonal Mesh",    MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     priv->bound_calculated = FALSE;
+
+    g_object_unref(rc_spec);
 }
 
 static void
@@ -96,7 +102,7 @@ moto_sphere_node_class_init(MotoSphereNodeClass *klass)
 
 G_DEFINE_TYPE(MotoSphereNode, moto_sphere_node, MOTO_TYPE_GEOMETRY_NODE);
 
-/* methods of class SphereNode */
+/* Methods of class SphereNode */
 
 MotoSphereNode *moto_sphere_node_new(const gchar *name)
 {

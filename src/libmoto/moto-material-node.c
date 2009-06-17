@@ -42,7 +42,7 @@ moto_material_node_class_init(MotoMaterialNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoMaterialNode, moto_material_node, MOTO_TYPE_NODE);
 
-/* methods of class MaterialNode */
+/* Methods of class MaterialNode */
 
 void moto_material_node_use(MotoMaterialNode *self)
 {

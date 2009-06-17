@@ -5,7 +5,9 @@
 #include "libmotoutil/moto-mapped-list.h"
 
 #include "moto-types.h"
+#include "moto-param-spec.h"
 #include "moto-filename.h"
+
 #include "moto-node.h"
 #include "moto-world.h"
 #include "moto-messager.h"
@@ -86,6 +88,9 @@ struct _MotoNodePriv
 {
     gboolean disposed;
 
+    MotoNode *parent;
+    GList *children;
+
     guint id;
 
     GString *name;
@@ -110,7 +115,7 @@ struct _MotoParamPriv
     guint id;
 
     GValue value;
-    GParamSpec *pspec;
+    MotoParamSpec *pspec;
     MotoParam *source;
     GSList *dests;
 
@@ -169,6 +174,9 @@ moto_node_init(MotoNode *self)
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
     priv->disposed = FALSE;
 
+    priv->parent   = NULL;
+    priv->children = NULL;
+
     static guint id = 0;
     priv->id = ++id;
 
@@ -203,7 +211,7 @@ moto_node_class_init(MotoNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoNode, moto_node, G_TYPE_INITIALLY_UNOWNED);
 
-/* methods of class MotoNode */
+/* Methods of class MotoNode */
 
 MotoNode *moto_create_node(GType type, const gchar *name)
 {
@@ -236,6 +244,47 @@ MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name)
     }
 
     return moto_create_node(type, name);
+}
+
+MotoNode *moto_node_create_child(MotoNode *self, const gchar *child_name)
+{
+    // TODO
+}
+
+guint moto_node_get_n_children(MotoNode *self)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+    return g_list_length(priv->children);
+}
+
+void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+    g_list_foreach(priv->children, func, user_data);
+}
+
+MotoNode *moto_node_get_parent(MotoNode *self)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+    return priv->parent;
+}
+
+void moto_node_set_parent(MotoNode *self, MotoNode *parent)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    if(parent)
+    {
+        const gchar *name = moto_node_get_name(self);
+        /* MotoNode *child = moto_node_get_child(parent, self);
+        if(child)
+        {
+            // Parent already has child with this name. Auto-renaming.
+        }
+        */
+    }
+
+    priv->parent = parent;
 }
 
 void moto_node_do_action(MotoNode *self, const gchar *action_name)
@@ -426,8 +475,8 @@ void moto_node_add_params(MotoNode *self, ...)
             break;
         }
 
-        GParamSpec *pspec = va_arg(ap, GParamSpec*);
-        gchar *group    = va_arg(ap, gchar*);
+        MotoParamSpec *pspec = va_arg(ap, MotoParamSpec*);
+        gchar         *group = va_arg(ap, gchar*);
 
         MotoParam *p = moto_param_new(pname, ptitle, pmode, &v, pspec, self);
 
@@ -857,28 +906,6 @@ void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation)
     moto_mapped_list_foreach(& priv->params, (GFunc)restore_param, variation);
 }
 
-gboolean moto_node_is_hidden(MotoNode *self)
-{
-    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    return priv->hidden;
-}
-
-void moto_node_set_hidden(MotoNode *self, gboolean hidden)
-{
-    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    priv->hidden = hidden;
-}
-
-void moto_node_hide(MotoNode *self)
-{
-    moto_node_set_hidden(self, FALSE);
-}
-
-void moto_node_show(MotoNode *self)
-{
-    moto_node_set_hidden(self, TRUE);
-}
-
 void moto_node_update(MotoNode *self)
 {
     MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
@@ -1126,27 +1153,21 @@ moto_param_class_init(MotoParamClass *klass)
 
 G_DEFINE_TYPE(MotoParam, moto_param, G_TYPE_OBJECT);
 
-/* methods of class MotoParam */
+/* Methods of class MotoParam */
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoParamMode mode, GValue *value, GParamSpec *pspec,
+        MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
         MotoNode *node)
 {
     if( ! node)
         return NULL;
     if( ! value)
         return NULL;
-    /*
-    if( ! pspec)
-        return NULL;
-    */
 
     GValue none = {0, };
 
     MotoParam *self = (MotoParam *)g_object_new(MOTO_TYPE_PARAM, NULL);
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-
-    priv->pspec = pspec;
 
     g_string_assign(priv->name, name);
     g_string_assign(priv->title, title);
@@ -1154,8 +1175,32 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
     priv->node = node;
 
     priv->value = none;
-    g_value_init(& priv->value, G_VALUE_TYPE(value));
+    g_value_init( & priv->value, G_VALUE_TYPE(value));
     g_value_copy(value, & priv->value);
+
+    GType ptype = G_VALUE_TYPE( & priv->value);
+
+    if(pspec)
+    {
+        GType spec_type = moto_param_spec_get_value_type(pspec);
+        if(g_type_is_a(ptype, spec_type))
+        {
+            priv->pspec = moto_param_spec_copy(pspec);
+        }
+        else
+        {
+            moto_error("ParamSpec %s/%s is not compatibale with parameter %s.%s of %s type. I ignore it.",
+                       g_type_name(G_TYPE_FROM_INSTANCE(pspec)), g_type_name(spec_type),
+                       g_type_name(G_TYPE_FROM_INSTANCE(node)), moto_param_get_name(self),
+                       g_type_name(G_VALUE_TYPE(value)));
+
+            priv->pspec = NULL;
+        }
+    }
+    else
+    {
+        priv->pspec = NULL;
+    }
 
     return self;
 }
@@ -1184,7 +1229,7 @@ MotoParamMode moto_param_get_mode(MotoParam *self)
     return priv->mode;
 }
 
-GParamSpec *moto_param_get_spec(MotoParam *self)
+MotoParamSpec *moto_param_get_spec(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     return priv->pspec;
@@ -1259,7 +1304,18 @@ GObject *moto_param_get_object(MotoParam *self)
 void moto_param_set_boolean(MotoParam *self, gboolean value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    g_value_set_boolean(& priv->value, value);
+
+    /*
+    GValue new_value = {0, };
+    g_value_init( & new_value, G_VALUE_TYPE( & priv->value));
+    g_value_set_boolean( & new_value, value);
+
+    MotoCommand *cmd = moto_command_change_param_value_new(self, & new_value);
+    moto_command_stack_do(moto_param_get_command_stack(self), cmd);
+    */
+
+    g_value_set_boolean( & priv->value, value);
+
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 

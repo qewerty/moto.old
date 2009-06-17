@@ -78,7 +78,7 @@ moto_axes_view_node_class_init(MotoAxesViewNodeClass *klass)
 
 G_DEFINE_TYPE(MotoAxesViewNode, moto_axes_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
 
-/* methods of class AxesViewNode */
+/* Methods of class AxesViewNode */
 
 MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
 {

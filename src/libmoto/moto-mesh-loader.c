@@ -41,7 +41,7 @@ moto_mesh_loader_class_init(MotoMeshLoaderClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoMeshLoader, moto_mesh_loader, G_TYPE_OBJECT);
 
-/* methods of class MeshLoader */
+/* Methods of class MeshLoader */
 
 GSList *moto_mesh_loader_get_extentions(MotoMeshLoader *self)
 {

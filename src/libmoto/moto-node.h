@@ -25,6 +25,7 @@
 #include <glib-object.h>
 
 #include "moto-forward.h"
+#include "moto-param-spec.h"
 
 G_BEGIN_DECLS
 
@@ -75,21 +76,32 @@ GType moto_node_get_type(void);
 MotoNode *moto_create_node(GType type, const gchar *name);
 MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name);
 
+MotoNode *moto_node_create_child(MotoNode *self, const gchar *child_name);
+guint moto_node_get_n_children(MotoNode *self);
+void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data);
+
+MotoNode *moto_node_get_parent(MotoNode *self);
+void moto_node_set_parent(MotoNode *self, MotoNode *parent);
+
 void moto_node_do_action(MotoNode *self, const gchar *action_name);
 void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func);
 
 const gchar *moto_node_get_name(MotoNode *self);
+const gchar *moto_node_get_full_name(MotoNode *self);
+const gchar *moto_node_get_class_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
 
 guint moto_node_get_id(MotoNode *self);
 
 gboolean moto_node_is_valid(MotoNode *self);
 
-void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param,
-        const gchar *group);
+void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *group);
 #define moto_node_add_param(self, param, group) \
     moto_node_add_dynamic_param(self, param, group)
 void moto_node_add_params(MotoNode *self, ...);
+
+void moto_node_add_static_param(MotoNode *self, MotoParam *param, const gchar *group);
+void moto_node_add_static_params(MotoNode *self, ...);
 
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
@@ -168,19 +180,11 @@ void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group_name,
 void moto_node_link(MotoNode *self, const gchar *in_name,
                     MotoNode *other, const gchar *out_name);
 
-#define moto_node_param_value_pointer(self, name, c_type) \
-    moto_param_value_pointer(moto_node_get_param(self, name), c_type)
-
 void moto_node_update_param_dests(MotoNode *self, const gchar *name);
 void moto_node_update_all_param_dests(MotoNode *self);
 
 void moto_node_save_to_variation(MotoNode *self, MotoVariation *variation);
 void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation);
-
-gboolean moto_node_is_hidden(MotoNode *self);
-void moto_node_set_hidden(MotoNode *self, gboolean hidden);
-void moto_node_hide(MotoNode *self);
-void moto_node_show(MotoNode *self);
 
 const GTimeVal *moto_node_get_last_modified(MotoNode *self);
 void moto_node_update_last_modified(MotoNode *self);
@@ -245,7 +249,7 @@ GType moto_param_get_type(void);
 #define MOTO_PARAM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM, MotoParamClass))
 
 MotoParam *moto_param_new(const gchar *name, const gchar *title,
-        MotoParamMode mode, GValue *value, GParamSpec *pspec,
+        MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
         MotoNode *node);
 
 const gchar *moto_param_get_name(MotoParam *self);
@@ -253,7 +257,7 @@ const gchar *moto_param_get_title(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
 MotoParamMode moto_param_get_mode(MotoParam *self);
 
-GParamSpec *moto_param_get_spec(MotoParam *self);
+MotoParamSpec *moto_param_get_spec(MotoParam *self);
 
 guint moto_param_get_id(MotoParam *self);
 

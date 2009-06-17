@@ -123,7 +123,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoGeomViewNode, moto_geom_view_node, MOTO_TYPE_NODE);
 
-/* methods of class GeometryViewNode */
+/* Methods of class GeometryViewNode */
 
 void moto_geom_view_node_draw(MotoGeomViewNode *self)
 {
@@ -356,7 +356,7 @@ moto_geom_view_state_class_init(MotoGeomViewStateClass *klass)
 
 G_DEFINE_TYPE(MotoGeomViewState, moto_geom_view_state, G_TYPE_OBJECT);
 
-/* methods of class GeometryViewState */
+/* Methods of class GeometryViewState */
 
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,

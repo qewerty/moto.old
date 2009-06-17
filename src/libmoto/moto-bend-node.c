@@ -2,6 +2,7 @@
 
 
 #include "moto-types.h"
+#include "moto-param-spec.h"
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-mesh.h" // FIXME: Temporary!
@@ -60,14 +61,17 @@ moto_bend_node_init(MotoBendNode *self)
     gfloat orig[3] = {0, 0, 0};
     gfloat dir[3] = {1, 0, 0};
 
-    GParamSpec *pspec = NULL; // FIXME: Implement.
+    MotoParamSpec *angle_spec = moto_param_spec_float_new(0, -1000000, 1000000, 0.1, 1);
+
     moto_node_add_params(node,
-            "angle",  "Angle",      G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Arguments",
-            "orig",   "Origin",             MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, pspec, "Arguments",
-            "dir",    "Direction",          MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir, pspec, "Arguments",
-            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
-            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT, NULL, pspec, "Geometry",
+            "angle",  "Angle",              G_TYPE_FLOAT,          MOTO_PARAM_MODE_INOUT, 0.0f, angle_spec, "Arguments",
+            "orig",   "Origin",             MOTO_TYPE_FLOAT_3,     MOTO_PARAM_MODE_INOUT, orig, NULL,       "Arguments",
+            "dir",    "Direction",          MOTO_TYPE_FLOAT_3,     MOTO_PARAM_MODE_INOUT, dir,  NULL,       "Arguments",
+            "in_pc",  "Input Point Cloud",  MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_IN,    NULL, NULL,       "Geometry",
+            "out_pc", "Output Point Cloud", MOTO_TYPE_POINT_CLOUD, MOTO_PARAM_MODE_OUT,   NULL, NULL,       "Geometry",
             NULL);
+
+    g_object_unref(angle_spec);
 }
 
 static void

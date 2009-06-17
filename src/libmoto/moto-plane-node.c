@@ -1,4 +1,6 @@
+#include "libmotoutil/numdef.h"
 #include "moto-types.h"
+#include "moto-param-spec.h"
 #include "moto-plane-node.h"
 #include "moto-mesh.h"
 
@@ -76,16 +78,20 @@ moto_plane_node_init(MotoPlaneNode *self)
     gfloat size[2] = {10, 10};
     gint divs[2] = {10, 10};
 
-    GParamSpec *pspec = NULL; // FIXME: Implement.
+    MotoParamSpec *divs_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
+                                                         10, 1, 1000000, 1, 10);
+
     moto_node_add_params(node,
-            "size", "Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, size, pspec, "Form",
-            "divs", "Divisions",  MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, pspec, "Form",
-            "orientation", "Orientation",  MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, pspec, "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
+            "size", "Size",               MOTO_TYPE_FLOAT_2,     MOTO_PARAM_MODE_INOUT, size,                NULL,      "Form",
+            "divs", "Divisions",          MOTO_TYPE_INT_2,       MOTO_PARAM_MODE_INOUT, divs,                divs_spec, "Form",
+            "orientation", "Orientation", MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, NULL,      "Orientation",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,        MOTO_PARAM_MODE_OUT,   priv->mesh,          NULL,      "Geometry",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     priv->bound_calculated = FALSE;
+
+    g_object_unref(divs_spec);
 }
 
 static void
@@ -109,7 +115,7 @@ moto_plane_node_class_init(MotoPlaneNodeClass *klass)
 
 G_DEFINE_TYPE(MotoPlaneNode, moto_plane_node, MOTO_TYPE_GEOMETRY_NODE);
 
-/* methods of class PlaneNode */
+/* Methods of class PlaneNode */
 
 MotoPlaneNode *moto_plane_node_new(const gchar *name)
 {
@@ -149,8 +155,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     gint div_x = divs[0];
     gint div_y = divs[1];
 
-    div_x = (div_x < 1) ? 1 : div_x;
-    div_y = (div_y < 1) ? 1 : div_y;
+    div_x = max(div_x, 1);
+    div_y = max(div_y, 1);
 
     MotoOrientation orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
 

@@ -98,7 +98,7 @@ moto_library_class_init(MotoLibraryClass *klass)
 
 G_DEFINE_TYPE(MotoLibrary, moto_library, G_TYPE_OBJECT);
 
-/* methods of class Library */
+/* Methods of class Library */
 
 MotoLibrary *moto_library_new()
 {

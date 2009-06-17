@@ -130,6 +130,19 @@ moto_system_class_init(MotoSystemClass *klass)
     goclass->dispose    = moto_system_dispose;
     goclass->finalize   = moto_system_finalize;
 
+    GType node_created_types[] = {MOTO_TYPE_NODE};
+    klass->node_created_signal_id = \
+        g_signal_newv ("node-created",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__OBJECT,
+                 G_TYPE_NONE /* return_type */,
+                 1     /* n_params */,
+                 node_created_types  /* param_types */);
+
     /* init node types */
     MOTO_TYPE_NODE;
         MOTO_TYPE_OBJECT_NODE;

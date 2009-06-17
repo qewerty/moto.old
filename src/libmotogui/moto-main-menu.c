@@ -4,6 +4,8 @@
 #include <GL/glew.h>
 #include <gtk/gtkgl.h>
 
+#include <glade/glade.h>
+
 #include "moto-test-window.h"
 #include "moto-main-menu.h"
 
@@ -17,6 +19,27 @@
 void file_menu_quit(GtkMenuItem *item, gpointer user_data)
 {
     gtk_main_quit();
+}
+
+void on_about_dialog_response(GtkDialog *dialog,
+                              gint id,
+                              gpointer   user_data)
+{
+    g_object_unref(dialog);
+}
+
+void on_help_about_activate(GtkMenuItem *item, gpointer user_data)
+{
+    gchar *filename = g_build_filename("resources", "glade", "about.glade", NULL);
+    GladeXML *glade = glade_xml_new(filename, NULL, NULL);
+    g_free(filename);
+
+    GtkWidget *widget = glade_xml_get_widget(glade, "aboutdialog1");
+    g_signal_connect(G_OBJECT(widget), "response", G_CALLBACK(on_about_dialog_response), NULL);
+
+    gtk_widget_show_all(widget);
+
+    g_object_unref(glade);
 }
 
 /* class MainMenu */
@@ -99,7 +122,15 @@ moto_main_menu_init(MotoMainMenu *self)
     item = (GtkMenuItem *)gtk_menu_item_new_with_label("Set");
     gtk_menu_append(project_menu, (GtkWidget *)item);
 
-    
+    /* Help menu */
+    GtkMenu *help_menu = (GtkMenu *)gtk_menu_new();
+    gtk_menu_item_set_submenu((GtkMenuItem *)help, (GtkWidget *)help_menu);
+
+    item = (GtkMenuItem *)gtk_menu_item_new_with_label("Help");
+    gtk_menu_append(help_menu, (GtkWidget *)item);
+    item = (GtkMenuItem *)gtk_menu_item_new_with_label("About");
+    gtk_menu_append(help_menu, (GtkWidget *)item);
+    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(on_help_about_activate), NULL);
 
     // gtk_widget_set_size_request((GtkWidget *)self, 42, 120);
 }
@@ -117,7 +148,7 @@ moto_main_menu_class_init(MotoMainMenuClass *klass)
 
 G_DEFINE_TYPE(MotoMainMenu, moto_main_menu, GTK_TYPE_MENU_BAR);
 
-/* methods of class MainMenu */
+/* Methods of class MainMenu */
 
 GtkWidget *moto_main_menu_new()
 {

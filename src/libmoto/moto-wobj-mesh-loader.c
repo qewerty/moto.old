@@ -67,7 +67,7 @@ moto_wobj_mesh_loader_class_init(MotoWobjMeshLoaderClass *klass)
 
 G_DEFINE_TYPE(MotoWobjMeshLoader, moto_wobj_mesh_loader, MOTO_TYPE_MESH_LOADER);
 
-/* methods of class WobjMeshLoader */
+/* Methods of class WobjMeshLoader */
 
 MotoMeshLoader *moto_wobj_mesh_loader_new()
 {

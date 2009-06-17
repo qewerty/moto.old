@@ -125,7 +125,7 @@ moto_tool_box_class_init(MotoToolBoxClass *klass)
 
 G_DEFINE_TYPE(MotoToolBox, moto_tool_box, GTK_TYPE_VBOX);
 
-/* methods of class ToolBox */
+/* Methods of class ToolBox */
 
 GtkWidget *moto_tool_box_new(MotoSystem *system)
 {

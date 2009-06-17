@@ -118,7 +118,7 @@ moto_sler_material_node_class_init(MotoSlerMaterialNodeClass *klass)
 
 G_DEFINE_TYPE(MotoSlerMaterialNode, moto_sler_material_node, MOTO_TYPE_MATERIAL_NODE);
 
-/* methods of class SlerMaterialNode */
+/* Methods of class SlerMaterialNode */
 
 MotoSlerMaterialNode *moto_sler_material_node_new(const gchar *name)
 {
