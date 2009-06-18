@@ -1,6 +1,8 @@
 *.[oad]
 *~
 *.swp
+*.pyc
+*.pyo
 build
 tags
 .sconsign.dblite

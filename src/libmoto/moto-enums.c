@@ -8,9 +8,9 @@ GType moto_axis_get_type(void)
     if(0 == type)
     {
         static GEnumValue values[] = {
-            {MOTO_AXIS_X, "AXIS_X", "X"},
-            {MOTO_AXIS_Y, "AXIS_Y", "Y"},
-            {MOTO_AXIS_Z, "AXIS_Z", "Z"},
+            {MOTO_AXIS_X, "AXIS_X", "oX"},
+            {MOTO_AXIS_Y, "AXIS_Y", "oY"},
+            {MOTO_AXIS_Z, "AXIS_Z", "oZ"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoAxis", values);

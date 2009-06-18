@@ -1626,6 +1626,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         {
             gtk_combo_box_append_text(combo_box, ec->values[i].value_nick);
         }
+        // TODO: Reimplement. Enum value may not match combo box index.
         gtk_combo_box_set_active(combo_box, moto_param_get_enum(param));
 
         data = g_slice_new(OnChangedData);
