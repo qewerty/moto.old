@@ -365,7 +365,6 @@ void moto_world_redraw(MotoWorld *self)
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
     glDisable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.3, 0.3, 0.3, 1);
 
@@ -387,6 +386,12 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         glViewport(0, 0, width, height);
         gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
     }
+
+    GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
+    GLfloat white_light[]    = {1.0,1.0,1.0,1.0};
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  white_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
 
     if(self->priv->left_coords)
         glScalef(1, 1, -1);
@@ -625,12 +630,7 @@ void moto_world_button_press(MotoWorld *self,
 
     if(idata.obj)
     {
-        /*
-        g_signal_emit(G_OBJECT(idata.obj),
-                MOTO_OBJECT_NODE_GET_CLASS(idata.obj)->button_press_signal_id,
-                0, NULL);
-                */
-        gfloat *om = moto_object_node_get_matrix(idata.obj, TRUE);
+        gfloat *om  = moto_object_node_get_matrix(idata.obj, TRUE);
         gfloat *iom = moto_object_node_get_inverse_matrix(idata.obj, TRUE);
 
         MotoTransformInfo tinfo2 = tinfo;

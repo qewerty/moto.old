@@ -4,6 +4,7 @@
 
 #include "moto-sler-material-node.h"
 #include "moto-messager.h"
+#include "libmotoutil/moto-gl.h"
 
 /* Temporary GLSL shader sources. */
 
@@ -228,19 +229,25 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
 
     glColor4f(1, 1, 1, 1);
 
-    if(1) /* TEMP */
-        return;
-
-    if( ! slernode->priv->shader_made)
-        slernode->priv->shader_made = make_shader(slernode);
-
-    if(slernode->priv->shader_made)
+    if(moto_gl_is_glsl_supported())
     {
-        glUniform3fARB(get_uni_loc(slernode->priv->prog, "lightPosition"),
-                0.3, 0.15, 0.15);
-        glUniform1fARB(get_uni_loc(slernode->priv->prog, "Kd"), 1);
-        glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.3);
-        glUseProgramObjectARB(slernode->priv->prog);
+        if( ! slernode->priv->shader_made)
+            slernode->priv->shader_made = make_shader(slernode);
+
+        if(slernode->priv->shader_made)
+        {
+            glUniform3fARB(get_uni_loc(slernode->priv->prog, "lightPosition"),
+                    0.3, 0.15, 0.15);
+            glUniform1fARB(get_uni_loc(slernode->priv->prog, "Kd"), 1);
+            glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.3);
+            glUseProgramObjectARB(slernode->priv->prog);
+        }
+    }
+    else
+    {
+        GLfloat mat_specular[] = {1.0,1.0,1.0,1.0};
+        glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_specular);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     }
 }
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include "libmotoutil/moto-gl.h"
@@ -375,7 +376,9 @@ inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     for(i = 0; i < mesh->v_num; i++)
     {
         if(moto_mesh_selection_is_vertex_selected(selection, i))
+        {
             glVertex3fv((GLfloat *)(& mesh->v_coords[i]));
+        }
     }
     glEnd();
 
