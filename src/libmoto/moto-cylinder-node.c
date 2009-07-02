@@ -55,11 +55,11 @@ moto_cylinder_node_init(MotoCylinderNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Size",
-            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Size",
-            "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Size",
-            "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Size",
-            "screw_s", "Screw S", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Size",
+            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Form",
+            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
+            "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Form",
+            "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Form",
+            "screw_s", "Screw S", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
             "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
