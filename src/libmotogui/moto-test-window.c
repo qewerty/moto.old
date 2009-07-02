@@ -344,13 +344,22 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_scrolled_window_add_with_viewport(sw, (GtkWidget *)self->priv->param_editor);
     GtkPaned *vp = (GtkPaned *)gtk_vpaned_new();
     gtk_paned_pack1(vp, (GtkWidget *)sw, TRUE, FALSE);
+
+    GtkNotebook *notebook = (GtkNotebook*)gtk_notebook_new();
+
+    self->priv->graph_area = (MotoGraphArea *)moto_graph_area_new(self->priv->system);
     GtkScrolledWindow *sw0 = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(sw0, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    self->priv->outliner   = (MotoOutliner *)moto_outliner_new(self, self->priv->world); // FIXME: Temp unused!!!
-    // gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->outliner);
-    self->priv->graph_area = (MotoGraphArea *)moto_graph_area_new(self->priv->system);
     gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->graph_area);
-    gtk_paned_pack2(vp, (GtkWidget *)sw0, FALSE, FALSE);
+    gtk_notebook_append_page(notebook, sw0, gtk_label_new("Graph"));
+
+    self->priv->outliner = (MotoOutliner *)moto_outliner_new(self, self->priv->world);
+    sw0 = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(sw0, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->outliner);
+    gtk_notebook_append_page(notebook, sw0, gtk_label_new("Outliner"));
+
+    gtk_paned_pack2(vp, (GtkWidget *)notebook, FALSE, FALSE);
     gtk_paned_pack2(hp, (GtkWidget *)vp, FALSE, FALSE);
     // gtk_box_pack_start(hbox, self->priv->param_editor, FALSE, FALSE, 0);
 
