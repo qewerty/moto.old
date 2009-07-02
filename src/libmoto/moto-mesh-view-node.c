@@ -10,15 +10,14 @@
 #include "moto-mesh.h"
 #include "moto-world.h"
 
-#define VBUF_NUMBER 4
-
-enum
+typedef enum
 {
     VBUF_VERTEX,
     VBUF_NORMAL,
     VBUF_ELEMENT,
-    VBUF_LINE_ELEMENT
-};
+    VBUF_LINE_ELEMENT,
+    VBUF_NUMBER
+} MotoVBufs;
 
 /* forwards */
 
@@ -206,6 +205,7 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
 
     glColor4f(1, 1, 1, 1);
 
+    glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -267,6 +267,8 @@ inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT);
 
+    if(moto_gl_is_glsl_supported())
+        glUseProgramObjectARB(0);
     glDisable(GL_LIGHTING);
     glEnableClientState(GL_VERTEX_ARRAY);
     glDepthFunc(GL_LEQUAL);
@@ -393,6 +395,8 @@ inline static void draw_mesh_as_edges(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
 
+    if(moto_gl_is_glsl_supported())
+        glUseProgramObjectARB(0);
     glDisable(GL_LIGHTING);
     glColor4f(1, 1, 1, 0.25);
 
