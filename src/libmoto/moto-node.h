@@ -98,10 +98,10 @@ gboolean moto_node_is_valid(MotoNode *self);
 void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *group);
 #define moto_node_add_param(self, param, group) \
     moto_node_add_dynamic_param(self, param, group)
-void moto_node_add_params(MotoNode *self, ...);
+void moto_node_add_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 
 void moto_node_add_static_param(MotoNode *self, MotoParam *param, const gchar *group);
-void moto_node_add_static_params(MotoNode *self, ...);
+void moto_node_add_static_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
@@ -166,8 +166,8 @@ void moto_node_set_param_4fv(MotoNode *self, const gchar *name, const gfloat *v)
 
 void moto_node_set_param_Nfv(MotoNode *self, const gchar *name, const gfloat *v, gsize N);
 
-void moto_node_get_params(MotoNode *self, ...);
-void moto_node_set_params(MotoNode *self, ...);
+void moto_node_get_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
+void moto_node_set_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 
 void moto_node_foreach_param(MotoNode *self,
         MotoNodeForeachParamFunc func, gpointer user_data);
