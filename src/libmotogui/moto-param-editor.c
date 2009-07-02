@@ -3,6 +3,7 @@
 #include "libmoto/moto-types.h"
 #include "libmoto/moto-param-spec.h"
 #include "libmoto/moto-filename.h"
+#include "libmoto/moto-messager.h"
 #include "moto-param-editor.h"
 
 /*  */
@@ -25,6 +26,9 @@ static void __on_button_inout(GtkButton* button, MotoParamEditor *pe);
 static void __on_button_all(GtkButton* button, MotoParamEditor *pe);
 
 /* class MotoParamEditor */
+
+#define MOTO_PARAM_EDITOR_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_PARAM_EDITOR, MotoParamEditorPriv)
 
 static GObjectClass *param_editor_parent_class = NULL;
 
@@ -59,11 +63,11 @@ struct _MotoParamEditorPriv
 static void
 moto_param_editor_dispose(GObject *obj)
 {
-    MotoParamEditor *self = (MotoParamEditor *)obj;
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(obj);
 
-    if(self->priv->disposed)
+    if(priv->disposed)
         return;
-    self->priv->disposed = TRUE;
+    priv->disposed = TRUE;
 
     param_editor_parent_class->dispose(obj);
 }
@@ -71,34 +75,34 @@ moto_param_editor_dispose(GObject *obj)
 static void
 moto_param_editor_finalize(GObject *obj)
 {
-    g_slice_free(MotoParamEditorPriv, ((MotoParamEditor *)obj)->priv);
     param_editor_parent_class->finalize(obj);
 }
 
 static void
 moto_param_editor_init(MotoParamEditor *self)
 {
-    self->priv = g_slice_new(MotoParamEditorPriv);
-    self->priv->disposed = FALSE;
+    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
 
-    self->priv->box         = (GtkBox *)gtk_vbox_new(FALSE, 0);
-    self->priv->menu_bar    = create_menu_bar(self);
-    self->priv->gbox        = (GtkBox *)gtk_vbox_new(FALSE, 0);
-    self->priv->bbox        = (GtkBox *)gtk_hbox_new(FALSE, 0);
+    priv->disposed = FALSE;
 
-    GtkWidget *button_back = self->priv->button_prev = \
+    priv->box         = (GtkBox *)gtk_vbox_new(FALSE, 0);
+    priv->menu_bar    = create_menu_bar(self);
+    priv->gbox        = (GtkBox *)gtk_vbox_new(FALSE, 0);
+    priv->bbox        = (GtkBox *)gtk_hbox_new(FALSE, 0);
+
+    GtkWidget *button_back = priv->button_prev = \
         (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_BACK);
-    GtkWidget *button_forw = self->priv->button_next = \
+    GtkWidget *button_forw = priv->button_next = \
         (GtkWidget *)gtk_tool_button_new_from_stock(GTK_STOCK_GO_FORWARD);
-    gtk_widget_set_sensitive(self->priv->button_prev, FALSE);
-    gtk_widget_set_sensitive(self->priv->button_next, FALSE);
+    gtk_widget_set_sensitive(priv->button_prev, FALSE);
+    gtk_widget_set_sensitive(priv->button_next, FALSE);
     g_signal_connect(G_OBJECT(button_back), "clicked", G_CALLBACK(__on_button_prev), self);
     g_signal_connect(G_OBJECT(button_forw), "clicked", G_CALLBACK(__on_button_next), self);
 
-    GtkWidget *button_in    = self->priv->button_in    = (GtkWidget *)gtk_tool_button_new(NULL, "IN");
-    GtkWidget *button_out   = self->priv->button_out   = (GtkWidget *)gtk_tool_button_new(NULL, "OUT");
-    GtkWidget *button_inout = self->priv->button_inout = (GtkWidget *)gtk_tool_button_new(NULL, "INOUT");
-    GtkWidget *button_all   = self->priv->button_all   = (GtkWidget *)gtk_tool_button_new(NULL, "ALL");
+    GtkWidget *button_in    = priv->button_in    = (GtkWidget *)gtk_tool_button_new(NULL, "IN");
+    GtkWidget *button_out   = priv->button_out   = (GtkWidget *)gtk_tool_button_new(NULL, "OUT");
+    GtkWidget *button_inout = priv->button_inout = (GtkWidget *)gtk_tool_button_new(NULL, "INOUT");
+    GtkWidget *button_all   = priv->button_all   = (GtkWidget *)gtk_tool_button_new(NULL, "ALL");
     gtk_widget_set_sensitive(button_in,    FALSE);
     gtk_widget_set_sensitive(button_out,   FALSE);
     gtk_widget_set_sensitive(button_inout, FALSE);
@@ -108,29 +112,29 @@ moto_param_editor_init(MotoParamEditor *self)
     g_signal_connect(G_OBJECT(button_inout), "clicked", G_CALLBACK(__on_button_inout), self);
     g_signal_connect(G_OBJECT(button_all),   "clicked", G_CALLBACK(__on_button_all),   self);
 
-    gtk_box_pack_start(self->priv->bbox, button_back,  FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_forw,  FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_in,    FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_out,   FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_inout, FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->bbox, button_all,   FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_back,  FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_forw,  FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_in,    FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_out,   FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_inout, FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->bbox, button_all,   FALSE, FALSE, 0);
 
-    gtk_container_add((GtkContainer *)self, (GtkWidget *)self->priv->box);
-    gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->menu_bar,  FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->bbox,     FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->box,     gtk_hseparator_new(),  FALSE, FALSE, 0);
-    gtk_box_pack_start(self->priv->box,     (GtkWidget *)self->priv->gbox,     TRUE, TRUE, 4);
+    gtk_container_add((GtkContainer *)self, (GtkWidget *)priv->box);
+    gtk_box_pack_start(priv->box,     (GtkWidget *)priv->menu_bar,  FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->box,     (GtkWidget *)priv->bbox,     FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->box,     gtk_hseparator_new(),  FALSE, FALSE, 0);
+    gtk_box_pack_start(priv->box,     (GtkWidget *)priv->gbox,     TRUE, TRUE, 4);
 
-    self->priv->window = NULL;
-    self->priv->num = 0;
-    self->priv->gnum = 0;
+    priv->window = NULL;
+    priv->num = 0;
+    priv->gnum = 0;
 
-    self->priv->node = NULL;
-    self->priv->prev_nodes = NULL;
-    self->priv->next_nodes = NULL;
+    priv->node = NULL;
+    priv->prev_nodes = NULL;
+    priv->next_nodes = NULL;
 
-    self->priv->param_mode = MOTO_PARAM_MODE_IN;
-    self->priv->show_all = FALSE;
+    priv->param_mode = MOTO_PARAM_MODE_IN;
+    priv->show_all = FALSE;
 }
 
 static void
@@ -142,6 +146,8 @@ moto_param_editor_class_init(MotoParamEditorClass *klass)
 
     goclass->dispose    = moto_param_editor_dispose;
     goclass->finalize   = moto_param_editor_finalize;
+
+    g_type_class_add_private(goclass, sizeof(MotoParamEditorPriv));
 }
 
 G_DEFINE_TYPE(MotoParamEditor, moto_param_editor, GTK_TYPE_VBOX);
@@ -150,7 +156,8 @@ GtkWidget *moto_param_editor_new(MotoTestWindow *window)
 {
     MotoParamEditor *self = (MotoParamEditor *)g_object_new(MOTO_TYPE_PARAM_EDITOR, NULL);
 
-    self->priv->window = window;
+    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    priv->window = window;
 
     return (GtkWidget *)self;
 }
@@ -710,7 +717,7 @@ static
 void on_enum_changed(GtkComboBox *combo_box,
                      OnChangedData *data)
 {
-    gint value = gtk_combo_box_get_active((GtkEntry *)combo_box);
+    gint value = gtk_combo_box_get_active((GtkComboBox *)combo_box);
 
     g_signal_handler_block(combo_box, data->handler_id);
     moto_param_set_enum(data->param, value);
@@ -837,6 +844,8 @@ void destroy_filename_data(gpointer data, GClosure *closure)
 
 static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 {
+    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+
     GtkWidget *widget = NULL;
     OnChangedData *data;
     GType ptype = moto_param_get_value_type(param);
@@ -850,7 +859,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_expression_key_press_event), data);
@@ -870,7 +879,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = \
@@ -885,7 +894,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolean_changed), data);
@@ -906,7 +915,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_float_changed), data);
@@ -936,7 +945,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_2_changed_0), data);
@@ -954,7 +963,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_2_changed_1), data);
@@ -984,7 +993,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_0), data);
@@ -1002,7 +1011,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_1), data);
@@ -1020,7 +1029,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_2), data);
@@ -1050,7 +1059,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_0), data);
@@ -1068,7 +1077,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_1), data);
@@ -1086,7 +1095,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_2), data);
@@ -1104,7 +1113,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_2), data);
@@ -1139,7 +1148,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_2_changed_0), data);
@@ -1159,7 +1168,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_2_changed_1), data);
@@ -1194,7 +1203,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_0), data);
@@ -1214,7 +1223,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_1), data);
@@ -1234,7 +1243,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_2), data);
@@ -1269,7 +1278,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_0), data);
@@ -1289,7 +1298,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_1), data);
@@ -1310,7 +1319,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_2), data);
@@ -1330,7 +1339,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_3), data);
@@ -1339,7 +1348,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_2 == ptype)
     {
-        MotoParamSpecInt_2 *pspec = \
+        MotoParamSpecFloat_2 *pspec = \
             MOTO_PARAM_SPEC_FLOAT_2(moto_param_get_spec(param));
 
         GtkWidget *entry;
@@ -1366,7 +1375,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_2_changed_0), data);
@@ -1387,7 +1396,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_2_changed_1), data);
@@ -1396,7 +1405,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_3 == ptype)
     {
-        MotoParamSpecInt_3 *pspec = \
+        MotoParamSpecFloat_3 *pspec = \
             MOTO_PARAM_SPEC_FLOAT_3(moto_param_get_spec(param));
 
         GtkWidget *entry;
@@ -1423,7 +1432,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_0), data);
@@ -1444,7 +1453,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_1), data);
@@ -1465,7 +1474,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_2), data);
@@ -1474,7 +1483,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_FLOAT_4 == ptype)
     {
-        MotoParamSpecInt_4 *pspec = \
+        MotoParamSpecFloat_4 *pspec = \
             MOTO_PARAM_SPEC_FLOAT_4(moto_param_get_spec(param));
 
         GtkWidget *entry;
@@ -1501,7 +1510,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_0), data);
@@ -1522,7 +1531,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_1), data);
@@ -1543,7 +1552,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_2), data);
@@ -1564,7 +1573,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_2), data);
@@ -1579,7 +1588,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
@@ -1608,7 +1617,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(on_string_changed), data);
@@ -1631,7 +1640,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         data = g_slice_new(OnChangedData);
         data->param = param;
-        data->window = pe->priv->window;
+        data->window = pe_priv->window;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(combo_box), "changed", G_CALLBACK(on_enum_changed), data);
         data->param_handler_id = 0;
@@ -1661,7 +1670,8 @@ gboolean on_label_button_press_event(GtkLabel       *label,
     {
         moto_param_set_use_expression(data->param, ! moto_param_get_use_expression(data->param));
 
-        __moto_param_editor_update_full(data->pe, data->pe->priv->node, TRUE);
+        MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(data->pe);
+        __moto_param_editor_update_full(data->pe, pe_priv->node, TRUE);
     }
 
     return TRUE;
@@ -1669,7 +1679,8 @@ gboolean on_label_button_press_event(GtkLabel       *label,
 
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
-    if(moto_param_get_mode(param) != data->pe->priv->param_mode && ! data->pe->priv->show_all)
+    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(data->pe);
+    if(moto_param_get_mode(param) != pe_priv->param_mode && ! pe_priv->show_all)
         return;
 
     const gchar *title = moto_param_get_title(param);
@@ -1694,7 +1705,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
 
     gtk_table_attach((GtkTable *)data->table,
             label,
-            0, 1, data->pe->priv->num, data->pe->priv->num + 1,
+            0, 1, pe_priv->num, pe_priv->num + 1,
             GTK_FILL, GTK_SHRINK, 8, 1);
 
     GtkWidget *pwidget = create_widget_for_param(data->pe, param);
@@ -1702,7 +1713,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
     {
         gtk_table_attach((GtkTable *)data->table,
                 pwidget,
-                1, 2, data->pe->priv->num, data->pe->priv->num + 1,
+                1, 2, pe_priv->num, pe_priv->num + 1,
                 GTK_EXPAND | GTK_FILL, GTK_SHRINK, 2, 0);
 
         GtkWidget *button = gtk_button_new();
@@ -1712,64 +1723,69 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
 
         gtk_table_attach((GtkTable *)data->table,
                 button,
-                2, 3, data->pe->priv->num, data->pe->priv->num + 1,
+                2, 3, pe_priv->num, pe_priv->num + 1,
                 GTK_SHRINK, GTK_SHRINK, 0, 0);
     }
 
-    data->pe->priv->num++;
+    pe_priv->num++;
 }
 
 static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
 {
+    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
     GtkExpander *exp = (GtkExpander *)gtk_expander_new(group);
-    if(pe->priv->gnum < 4)
+    if(pe_priv->gnum < 4)
         gtk_expander_set_expanded(exp, TRUE);
 
     GtkTable *table = (GtkTable *)gtk_table_new(5, 3, FALSE);
     gtk_container_add((GtkContainer *)exp, (GtkWidget *)table);
-    gtk_box_pack_start(pe->priv->gbox, (GtkWidget *)exp, FALSE, FALSE, 2);
+    gtk_box_pack_start(pe_priv->gbox, (GtkWidget *)exp, FALSE, FALSE, 2);
 
     AddWidgetData data = {pe, table};
     moto_node_foreach_param_in_group(node, group, (MotoNodeForeachParamInGroupFunc)add_param_widget, & data);
 
-    pe->priv->gnum++;
+    pe_priv->gnum++;
 }
 
 void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
 {
-    if(self->priv->node)
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+
+    if(priv->node)
     {
-        self->priv->prev_nodes = g_list_prepend(self->priv->prev_nodes, self->priv->node);
-        gtk_widget_set_sensitive(self->priv->button_prev, TRUE);
+        priv->prev_nodes = g_list_prepend(priv->prev_nodes, priv->node);
+        gtk_widget_set_sensitive(priv->button_prev, TRUE);
     }
 
-    if( ! g_list_find(self->priv->prev_nodes, node) && ! g_list_find(self->priv->next_nodes, node))
+    if( ! g_list_find(priv->prev_nodes, node) && ! g_list_find(priv->next_nodes, node))
     {
         g_object_weak_ref(G_OBJECT(node), (GWeakNotify)__on_node_destroy, self);
     }
 
-    g_list_free(self->priv->next_nodes);
-    self->priv->next_nodes = NULL;
-    gtk_widget_set_sensitive(self->priv->button_next, FALSE);
+    g_list_free(priv->next_nodes);
+    priv->next_nodes = NULL;
+    gtk_widget_set_sensitive(priv->button_next, FALSE);
 
     __moto_param_editor_update(self, node);
 }
 
 static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *node, gboolean force)
 {
-    if(node == self->priv->node && ! force)
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+
+    if(node == priv->node && ! force)
         return;
 
-    if(self->priv->node)
+    if(priv->node)
     {
-        g_object_weak_unref(G_OBJECT(self->priv->node), (GWeakNotify)node_delete_notify, self);
-        self->priv->node = NULL;
-        self->priv->num = 0;
-        self->priv->gnum = 0;
+        g_object_weak_unref(G_OBJECT(priv->node), (GWeakNotify)node_delete_notify, self);
+        priv->node = NULL;
+        priv->num = 0;
+        priv->gnum = 0;
 
-        GList *ch = gtk_container_get_children(GTK_CONTAINER(self->priv->gbox));
+        GList *ch = gtk_container_get_children(GTK_CONTAINER(priv->gbox));
         for(; ch; ch = g_list_next(ch))
-            gtk_container_remove((GtkContainer *)self->priv->gbox, (GtkWidget *)ch->data);
+            gtk_container_remove((GtkContainer *)priv->gbox, (GtkWidget *)ch->data);
     }
     if( ! node)
     {
@@ -1779,7 +1795,7 @@ static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *nod
     __moto_param_editor_set_node_buttons(self, TRUE);
 
     g_object_weak_ref(G_OBJECT(node), (GWeakNotify)node_delete_notify, self);
-    self->priv->node = node;
+    priv->node = node;
 
     moto_node_foreach_group(node, (MotoNodeForeachGroupFunc)make_group, self);
 
@@ -1835,48 +1851,54 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
 
 gboolean moto_param_editor_has_prev_node(MotoParamEditor *self)
 {
-    return NULL != self->priv->prev_nodes;
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    return NULL != priv->prev_nodes;
 }
 
 gboolean moto_param_editor_has_next_node(MotoParamEditor *self)
 {
-    return NULL != self->priv->next_nodes;
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    return NULL != priv->next_nodes;
 }
 
 void moto_param_editor_goto_prev_node(MotoParamEditor *self)
 {
-    GList *first = g_list_first(self->priv->prev_nodes);
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+
+    GList *first = g_list_first(priv->prev_nodes);
     if( ! first)
         return;
 
     MotoNode *node = MOTO_NODE(first->data);
 
-    self->priv->prev_nodes = g_list_delete_link(self->priv->prev_nodes, first);
-    if(self->priv->node)
-        self->priv->next_nodes = g_list_prepend(self->priv->next_nodes, self->priv->node);
+    priv->prev_nodes = g_list_delete_link(priv->prev_nodes, first);
+    if(priv->node)
+        priv->next_nodes = g_list_prepend(priv->next_nodes, priv->node);
 
     if( ! moto_param_editor_has_prev_node(self))
-        gtk_widget_set_sensitive(self->priv->button_prev, FALSE);
-    gtk_widget_set_sensitive(self->priv->button_next, TRUE);
+        gtk_widget_set_sensitive(priv->button_prev, FALSE);
+    gtk_widget_set_sensitive(priv->button_next, TRUE);
 
     __moto_param_editor_update(self, node);
 }
 
 void moto_param_editor_goto_next_node(MotoParamEditor *self)
 {
-    GList *first = g_list_first(self->priv->next_nodes);
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+
+    GList *first = g_list_first(priv->next_nodes);
     if( ! first)
         return;
 
     MotoNode *node = MOTO_NODE(first->data);
 
-    self->priv->next_nodes = g_list_delete_link(self->priv->next_nodes, first);
-    if(self->priv->node)
-        self->priv->prev_nodes = g_list_prepend(self->priv->prev_nodes, self->priv->node);
+    priv->next_nodes = g_list_delete_link(priv->next_nodes, first);
+    if(priv->node)
+        priv->prev_nodes = g_list_prepend(priv->prev_nodes, priv->node);
 
     if( ! moto_param_editor_has_next_node(self))
-        gtk_widget_set_sensitive(self->priv->button_next, FALSE);
-    gtk_widget_set_sensitive(self->priv->button_prev, TRUE);
+        gtk_widget_set_sensitive(priv->button_next, FALSE);
+    gtk_widget_set_sensitive(priv->button_prev, TRUE);
 
     __moto_param_editor_update(self, node);
 }
@@ -1905,10 +1927,12 @@ static void __on_button_next(GtkButton* button, MotoParamEditor *pe)
 
 static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was)
 {
-    pe->priv->prev_nodes = g_list_remove_all(pe->priv->prev_nodes, where_the_object_was);
-    pe->priv->next_nodes = g_list_remove_all(pe->priv->next_nodes, where_the_object_was);
+    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
 
-    if(pe->priv->node == where_the_object_was)
+    pe_priv->prev_nodes = g_list_remove_all(pe_priv->prev_nodes, where_the_object_was);
+    pe_priv->next_nodes = g_list_remove_all(pe_priv->next_nodes, where_the_object_was);
+
+    if(pe_priv->node == where_the_object_was)
     {
         if(moto_param_editor_has_prev_node(pe))
         {
@@ -1923,38 +1947,45 @@ static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_wa
 
 static void __moto_param_editor_set_param_mode(MotoParamEditor *self, MotoParamMode mode)
 {
-    self->priv->param_mode = mode;
-    __moto_param_editor_update_full(self, self->priv->node, TRUE);
+    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    priv->param_mode = mode;
+    __moto_param_editor_update_full(self, priv->node, TRUE);
 }
 
 static void __on_button_in(GtkButton* button, MotoParamEditor *pe)
 {
-    pe->priv->show_all = FALSE;
+    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    pe_priv->show_all = FALSE;
     __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_IN);
 }
 
 static void __on_button_out(GtkButton* button, MotoParamEditor *pe)
 {
-    pe->priv->show_all = FALSE;
+    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    pe_priv->show_all = FALSE;
     __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_OUT);
 }
 
 static void __on_button_inout(GtkButton* button, MotoParamEditor *pe)
 {
-    pe->priv->show_all = FALSE;
+    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    pe_priv->show_all = FALSE;
     __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
 }
 
 static void __on_button_all(GtkButton* button, MotoParamEditor *pe)
 {
-    pe->priv->show_all = TRUE;
+    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    pe_priv->show_all = TRUE;
     __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
 }
 
 static void __moto_param_editor_set_node_buttons(MotoParamEditor *self, gboolean sensitive)
 {
-    gtk_widget_set_sensitive(self->priv->button_in,    sensitive);
-    gtk_widget_set_sensitive(self->priv->button_out,   sensitive);
-    gtk_widget_set_sensitive(self->priv->button_inout, sensitive);
-    gtk_widget_set_sensitive(self->priv->button_all,   sensitive);
+    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+
+    gtk_widget_set_sensitive(priv->button_in,    sensitive);
+    gtk_widget_set_sensitive(priv->button_out,   sensitive);
+    gtk_widget_set_sensitive(priv->button_inout, sensitive);
+    gtk_widget_set_sensitive(priv->button_all,   sensitive);
 }

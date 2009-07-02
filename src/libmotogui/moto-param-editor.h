@@ -40,8 +40,6 @@ typedef struct _MotoParamEditorPriv MotoParamEditorPriv;
 struct _MotoParamEditor
 {
     GtkVBox parent;
-
-    MotoParamEditorPriv *priv;
 };
 
 struct _MotoParamEditorClass
