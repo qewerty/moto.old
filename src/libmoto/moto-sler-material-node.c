@@ -93,7 +93,7 @@ moto_sler_material_node_init(MotoSlerMaterialNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "material", "Material", MOTO_TYPE_SLER_MATERIAL_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Material",
+            "material", "Material", MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Material",
             NULL);
 
     // TODO: Temporary! When internal Sler editor is integrated 'use_external' default value will be FALSE.
@@ -247,7 +247,7 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
     {
         GLfloat mat_specular[] = {1.0,1.0,1.0,1.0};
         glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_specular);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        // glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     }
 }
 
