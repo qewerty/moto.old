@@ -34,7 +34,7 @@ typedef void (*MotoPointCloudForeachPointFunc)(MotoPointCloud *ptc,
 typedef void (*MotoPointCloudForeachPointMethod)(MotoPointCloud *self,
         MotoPointCloudForeachPointFunc func, gpointer user_data);
 typedef gboolean (*MotoPointCloudCanProvidePlainDataMethod)(MotoPointCloud *self);
-typedef gfloat *(*MotoPointCloudGetPlainDataMethod)(MotoPointCloud *self,
+typedef void (*MotoPointCloudGetPlainDataMethod)(MotoPointCloud *self,
         gfloat **points, gfloat **normals, gsize *size);
 
 struct _MotoPointCloudIface
