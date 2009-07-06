@@ -24,6 +24,6 @@
 
 #include <glib.h>
 
-void moto_collect_test_cases();
+void moto_collect_test_cases(void);
 
 #endif /* __MOTO_TEST_H__ */
