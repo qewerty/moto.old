@@ -204,7 +204,7 @@ struct _MotoHalfEdge32
 };
 
 #define moto_half_edge_pair(he) ((he%2) ? (he)-1 : (he)+1)
-#define moto_half_edge_edge(he) ((he%2) ? (he-1)/2 : (he)/2 )
+#define moto_half_edge_edge(he) ((he%2) ? (he-1)/2 : (he)/2)
 
 #define moto_half_edge_v_dest(self, mesh) \
     (moto_half_edge_origin(& moto_half_edge_pair(self, mesh)), mesh)
@@ -344,6 +344,18 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
 
 void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound);
 MotoBound* moto_mesh_create_bound(MotoMesh* self);
+
+MotoMesh* moto_mesh_extrude(MotoMesh *self,
+    MotoMeshSelection *selection,
+    gfloat tx, gfloat ty, gfloat tz,
+    gfloat rx, gfloat ry, gfloat rz,
+    gfloat sx, gfloat sy, gfloat sz);
+
+MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
+    MotoMeshSelection *selection,
+    gfloat tx, gfloat ty, gfloat tz,
+    gfloat rx, gfloat ry, gfloat rz,
+    gfloat sx, gfloat sy, gfloat sz);
 
 G_END_DECLS
 

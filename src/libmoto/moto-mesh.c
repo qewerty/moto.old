@@ -898,7 +898,7 @@ gboolean moto_mesh_update_he_data(MotoMesh *self)
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)self->f_data;
         MotoHalfEdge32 *he_data = (MotoHalfEdge32*)self->he_data;
         guint32 *e_verts = (guint32*)self->e_verts;
-        guint32 *f_verts = (guint32 *)self->f_verts;
+        guint32 *f_verts = (guint32*)self->f_verts;
 
         MotoEdgeList* v_edges[self->v_num];
         memset(v_edges, 0, sizeof(gpointer)*self->v_num);
@@ -2231,7 +2231,7 @@ __moto_mesh_can_provide_plain_data(MotoPointCloud *self)
     return TRUE;
 }
 
-static gfloat *
+static void
 __moto_mesh_get_plain_data(MotoPointCloud *self,
     gfloat **points, gfloat **normals, gsize *size)
 {
