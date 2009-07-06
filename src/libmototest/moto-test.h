@@ -22,8 +22,7 @@
 #ifndef __MOTO_TEST_H__
 #define __MOTO_TEST_H__
 
-#include <glib.h>
-
-void moto_collect_test_cases(void);
+void moto_collect_tests(void);
+void moto_test_run(int *argc, char **argv[]);
 
 #endif /* __MOTO_TEST_H__ */

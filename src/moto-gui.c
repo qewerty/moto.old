@@ -76,30 +76,19 @@ int main(int argc, char *argv[])
     if(argc > 1 && ((0 == g_strcmp0(argv[1], "--test")) || (0 == g_strcmp0(argv[1], "-t"))))
     {
         g_print("Testing ... \n");
-        g_test_init(& argc, & argv, NULL);
-        moto_collect_test_cases();
-        g_test_run();
+        moto_test_run(& argc, & argv);
         exit(0);
     }
 
     g_print("Initializing Moto ...\n");
     moto_types_init();
 
-    // g_print("s: %s\n", g_find_program_in_path(argv[0]));
-
     GtkWindow *win = moto_test_window_new();
     gtk_widget_show_all((GtkWidget *)win);
-
-    // moto_glext_print_list();
-
-    // print_enum();
-    // g_print("g_type_name(G_TYPE_STRING): %s\n", g_type_name(G_TYPE_STRING));
 
     g_print("\nRegistered node types:\n\n");
     print_type_tree(MOTO_TYPE_NODE);
     g_print("\n... OK\n");
-
-    // g_idle_add(test_idle, NULL);
 
     gtk_main();
 
