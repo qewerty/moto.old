@@ -25,9 +25,9 @@ static MotoMesh *create_mesh_cube(void)
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    gint div_x = 10;
-    gint div_y = 10;
-    gint div_z = 10;
+    gint div_x = 100;
+    gint div_y = 100;
+    gint div_z = 100;
 
     guint v_num = (div_x + div_y)*2 * (div_z + 1) + (((div_x+1)*(div_y+1) - (div_x + div_y)*2) * 2);
     guint e_num = (div_x + div_y)*2 * (div_z + 1) + (div_x + div_y)*2*div_z + div_x*(div_y-1)*2 + div_y*(div_x-1)*2;
@@ -254,22 +254,115 @@ static void moto_test_mesh_he_invariants(void)
     g_assert(mesh != NULL);
     g_assert(moto_mesh_prepare(mesh));
 
-    MotoHalfEdge16* he_data = (MotoHalfEdge16*)mesh->he_data;
-    guint16* e_verts = (guint16*)mesh->e_verts;
-
-    guint16 he;
-    for(he = 0; he < mesh->e_num*2; ++he)
+    if(mesh->b32)
     {
-        g_assert(pair(pair(he)) == he);
-        g_assert(origin(next(he)) == destination(he));
-        g_assert(origin(he) == destination(prev(he)));
-        g_assert(edge(he) == edge(pair(he)));
-        g_assert(left(he) == left(next(he)));
-        g_assert(left(he) == left(prev(he)));
-        g_assert(next(prev(he)) == he);
-        g_assert(prev(next(he)) == he);
-        g_assert(vertex_next(vertex_prev(he)) == he);
-        g_assert(vertex_prev(vertex_next(he)) == he);
+        MOTO_DECLARE_MESH_DATA_32(mesh);
+
+        guint32 he;
+        for(he = 0; he < mesh->e_num*2; ++he)
+        {
+            g_assert(pair(pair(he)) == he);
+            g_assert(origin(next(he)) == destination(he));
+            g_assert(origin(he) == destination(prev(he)));
+            g_assert(edge(he) == edge(pair(he)));
+            g_assert(left(he) == left(next(he)));
+            g_assert(left(he) == left(prev(he)));
+            g_assert(next(prev(he)) == he);
+            g_assert(prev(next(he)) == he);
+            g_assert(vertex_next(vertex_prev(he)) == he);
+            g_assert(vertex_prev(vertex_next(he)) == he);
+
+            guint32 fi = left(he);
+            guint32 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
+            guint32 v_num = f_data[fi].v_offset - start;
+            guint32 l = he;
+            guint32 i;
+            for(i = 0; i < v_num; ++i)
+            {
+                l = next(l);
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < v_num; ++i)
+            {
+                l = prev(l);
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < mesh->e_num; ++i)
+            {
+                l = vertex_next(l);
+                if(l == he)
+                    break;
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < mesh->e_num; ++i)
+            {
+                l = vertex_prev(l);
+                if(l == he)
+                    break;
+            }
+            g_assert(l == he);
+        }
+    }
+    else
+    {
+        MOTO_DECLARE_MESH_DATA_16(mesh);
+
+        guint16 he;
+        for(he = 0; he < mesh->e_num*2; ++he)
+        {
+            g_assert(pair(pair(he)) == he);
+            g_assert(origin(next(he)) == destination(he));
+            g_assert(origin(he) == destination(prev(he)));
+            g_assert(edge(he) == edge(pair(he)));
+            g_assert(left(he) == left(next(he)));
+            g_assert(left(he) == left(prev(he)));
+            g_assert(next(prev(he)) == he);
+            g_assert(prev(next(he)) == he);
+            g_assert(vertex_next(vertex_prev(he)) == he);
+            g_assert(vertex_prev(vertex_next(he)) == he);
+
+            guint16 fi = left(he);
+            guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
+            guint16 v_num = f_data[fi].v_offset - start;
+            guint16 l = he;
+            guint16 i;
+            for(i = 0; i < v_num; ++i)
+            {
+                l = next(l);
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < v_num; ++i)
+            {
+                l = prev(l);
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < mesh->e_num; ++i)
+            {
+                l = vertex_next(l);
+                if(l == he)
+                    break;
+            }
+            g_assert(l == he);
+
+            l = he;
+            for(i = 0; i < mesh->e_num; ++i)
+            {
+                l = vertex_prev(l);
+                if(l == he)
+                    break;
+            }
+            g_assert(l == he);
+        }
     }
 
     g_object_unref(mesh);
