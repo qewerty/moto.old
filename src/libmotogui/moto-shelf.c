@@ -61,12 +61,10 @@ static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cube_node = moto_world_create_node_by_name(w, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mod = moto_world_create_node_by_name(w, "MotoBendNode", "Bend", NULL);
     MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(mod, "in_pc", cube_node, "mesh");
-    moto_node_link(view_node, "mesh", mod, "out_pc");
+    moto_node_link(view_node, "mesh", cube_node, "mesh");
     moto_node_link(obj_node, "material", mat_node, "material");
 }
 
