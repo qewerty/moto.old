@@ -407,11 +407,8 @@ void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *
     moto_mapped_list_set(& priv->params, moto_param_get_name(param), param);
 }
 
-void moto_node_add_params(MotoNode *self, ...)
+static void moto_node_add_params_va(MotoNode *self, va_list ap)
 {
-    va_list ap;
-    va_start(ap, self);
-
     while(1)
     {
         gchar *pname    = va_arg(ap, gchar*);
@@ -552,6 +549,27 @@ void moto_node_add_params(MotoNode *self, ...)
         moto_node_add_param(self, p, group);
     }
 
+    va_end(ap);
+}
+
+void moto_node_add_params(MotoNode *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+    moto_node_add_params_va(self, ap);
+    va_end(ap);
+}
+
+void moto_node_add_static_param(MotoNode *self, MotoParam *param, const gchar *group)
+{
+    moto_node_add_param(self, param, group); // TODO: Implement static params.
+}
+
+void moto_node_add_static_params(MotoNode *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+    moto_node_add_params_va(self, ap); // TODO: Implement static params.
     va_end(ap);
 }
 
