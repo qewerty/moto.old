@@ -94,6 +94,7 @@ struct _MotoWorldPriv
     GThreadPool *thread_pool;
     gint max_thread_for_update;
     gboolean updating_done;
+    GList *updateable_nodes;
 };
 
 static void
@@ -115,6 +116,7 @@ moto_world_dispose(GObject *obj)
 
     if(priv->thread_pool)
         g_thread_pool_free(priv->thread_pool, TRUE, FALSE);
+    g_list_free(priv->updateable_nodes);
 
     G_OBJECT_CLASS(world_parent_class)->dispose(obj);
 }
@@ -575,12 +577,21 @@ static gboolean post_update_node(MotoNode *node)
 static void update_node(MotoNode *node, MotoWorld *world)
 {
     moto_node_update(node);
-    return node;
 }
 
-GList *moto_world_get_nodes_for_update(MotoWorld *self)
+void push_node(MotoNode *node, GThreadPool *tp)
 {
-    return NULL;
+    g_thread_pool_push(tp, node, NULL);
+}
+
+guint moto_world_get_update_complexity(MotoWorld *self)
+{
+    return 2000; // TODO: Implement
+}
+
+void moto_world_prepare_updateable_nodes(MotoWorld *self)
+{
+    
 }
 
 void moto_world_update(MotoWorld *self)
@@ -598,21 +609,16 @@ void moto_world_update(MotoWorld *self)
                               priv->max_thread_for_update,
                               TRUE, NULL);
 
+        moto_world_prepare_updateable_nodes(self);
         priv->updating_done = FALSE;
         while(1)
         {
-            GList *nodes = moto_world_get_nodes_for_update(self);
-            GList *node;
-            for(node = g_list_first(nodes); node; node = g_list_next(node))
-            {
-                g_thread_pool_push(priv->thread_pool, node->data, NULL);
-            }
-            g_list_free(nodes);
+            g_list_foreach(priv->updateable_nodes, (GFunc)push_node, priv->thread_pool);
+            g_list_free(priv->updateable_nodes);
+            priv->updateable_nodes = NULL;
 
             if(priv->updating_done)
                 break;
-
-            // g_usleep(1000);
         }
 
         g_thread_pool_free(priv->thread_pool, FALSE, TRUE);
