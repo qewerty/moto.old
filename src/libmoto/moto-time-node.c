@@ -5,6 +5,7 @@
 
 #include "moto-messager.h"
 #include "moto-world.h"
+#include "moto-types.h"
 #include "moto-time-node.h"
 
 /* forwards */
@@ -51,6 +52,10 @@ moto_time_node_init(MotoTimeNode *self)
 
     self->priv->time    = 0.0;
     self->priv->frame   = 1.0;
+
+    moto_node_add_params((MotoNode*)self,
+        "time", "Time", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_OUT, 0.0, NULL, "Time",
+        NULL);
 }
 
 static void
@@ -76,21 +81,6 @@ MotoTimeNode *moto_time_node_new(const gchar *name)
     MotoTimeNode *self = (MotoTimeNode *)g_object_new(MOTO_TYPE_TIME_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
     moto_node_set_name(node, name);
-
-    /* params */
-
-    /*
-    pb = moto_param_block_new("main", "Main", (MotoNode *)self);
-    moto_node_add_param_block(node, pb);
-
-    moto_param_new("time", "Time", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_float_param_data_new(0.0));
-    moto_param_data_set_cbs(pdata, NULL, NULL, NULL, NULL);
-
-    moto_param_new("frame", "Frame", MOTO_PARAM_MODE_OUT, pb,
-            pdata = moto_float_param_data_new(1.0));
-    moto_param_data_set_cbs(pdata, NULL, NULL, NULL, NULL);
-    */
 
     return self;
 }

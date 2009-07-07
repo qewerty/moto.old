@@ -90,23 +90,33 @@ struct _MotoWorldPriv
           prev_height;
 
     gboolean use_vbo;
+
+    GThreadPool *thread_pool;
+    gint max_thread_for_update;
+    gboolean updating_done;
+    GList *updateable_nodes;
 };
 
 static void
 moto_world_dispose(GObject *obj)
 {
     MotoWorld *self = (MotoWorld *)obj;
+    MotoWorldPriv *priv = self->priv;
 
-    g_timer_destroy(self->priv->timer);
+    g_timer_destroy(priv->timer);
 
-    moto_factory_free_all(& self->priv->mutex_factory);
+    moto_factory_free_all(& priv->mutex_factory);
 
-    g_slist_foreach(self->priv->nodes, unref_gobject, NULL);
-    g_slist_free(self->priv->nodes);
-    g_slist_free(self->priv->selected_nodes);
+    g_slist_foreach(priv->nodes, unref_gobject, NULL);
+    g_slist_free(priv->nodes);
+    g_slist_free(priv->selected_nodes);
 
-    g_string_free(self->priv->filename, TRUE);
-    g_slice_free(MotoWorldPriv, self->priv);
+    g_string_free(priv->filename, TRUE);
+    g_slice_free(MotoWorldPriv, priv);
+
+    if(priv->thread_pool)
+        g_thread_pool_free(priv->thread_pool, TRUE, FALSE);
+    g_list_free(priv->updateable_nodes);
 
     G_OBJECT_CLASS(world_parent_class)->dispose(obj);
 }
@@ -127,53 +137,57 @@ test_manip_button_press(MotoWorldManipulator *manip, MotoWorld *world,
 static void
 moto_world_init(MotoWorld *self)
 {
-    self->priv = g_slice_new(MotoWorldPriv);
+    MotoWorldPriv *priv = self->priv = g_slice_new(MotoWorldPriv);
 
-    self->priv->library = NULL;
-    self->priv->manipulator = moto_world_manipulator_new();
+    priv->library = NULL;
+    priv->manipulator = moto_world_manipulator_new();
 
     g_signal_connect(self->priv->manipulator, "button-press", G_CALLBACK(test_manip_button_press), NULL);
 
-    self->priv->name = g_string_new("");
-    self->priv->filename = g_string_new("");
-    self->priv->changed = FALSE;
+    priv->name = g_string_new("");
+    priv->filename = g_string_new("");
+    priv->changed = FALSE;
 
-    self->priv->nodes           = NULL;
-    self->priv->selected_nodes  = NULL;
-    self->priv->current_node    = NULL;
+    priv->nodes           = NULL;
+    priv->selected_nodes  = NULL;
+    priv->current_node    = NULL;
 
-    self->priv->current_object = NULL;
-    self->priv->root = NULL;
-    self->priv->camera = NULL;
-    self->priv->global_axes = NULL;
+    priv->current_object = NULL;
+    priv->root = NULL;
+    priv->camera = NULL;
+    priv->global_axes = NULL;
 
     /* Default camera settings */
-    self->priv->fovy = 60*RAD_PER_DEG;
-    self->priv->z_near = 0.3;
-    self->priv->z_far = 150;
+    priv->fovy = 60*RAD_PER_DEG;
+    priv->z_near = 0.3;
+    priv->z_far = 150;
 
-    self->priv->left_coords = FALSE;
-    self->priv->select_bound_extent = 0.2;
+    priv->left_coords = FALSE;
+    priv->select_bound_extent = 0.2;
 
-    moto_factory_init(& self->priv->mutex_factory, create_mutex, free_mutex, NULL);
+    moto_factory_init(& priv->mutex_factory, create_mutex, free_mutex, NULL);
 
-    self->priv->draw_mode = MOTO_DRAW_MODE_WIREFRAME;
+    priv->draw_mode = MOTO_DRAW_MODE_WIREFRAME;
 
     /* Animation */
-    self->priv->timer = g_timer_new();
+    priv->timer = g_timer_new();
 
     /* Misc */
-    self->priv->node_list_mutex      = get_mutex(& self->priv->mutex_factory, "node_list_mutex");
-    self->priv->current_object_mutex = get_mutex(& self->priv->mutex_factory, "current_object_mutex");
-    self->priv->root_object_mutex    = get_mutex(& self->priv->mutex_factory, "root_object_mutex");
-    self->priv->camera_object_mutex  = get_mutex(& self->priv->mutex_factory, "camera_object_mutex");
-    self->priv->axes_object_mutex    = get_mutex(& self->priv->mutex_factory, "axes_object_mutex");
+    priv->node_list_mutex      = get_mutex(& self->priv->mutex_factory, "node_list_mutex");
+    priv->current_object_mutex = get_mutex(& self->priv->mutex_factory, "current_object_mutex");
+    priv->root_object_mutex    = get_mutex(& self->priv->mutex_factory, "root_object_mutex");
+    priv->camera_object_mutex  = get_mutex(& self->priv->mutex_factory, "camera_object_mutex");
+    priv->axes_object_mutex    = get_mutex(& self->priv->mutex_factory, "axes_object_mutex");
 
     // cache
-    self->priv->prev_width = 640;
-    self->priv->prev_height = 480;
+    priv->prev_width = 640;
+    priv->prev_height = 480;
 
-    self->priv->use_vbo = FALSE;
+    priv->use_vbo = FALSE;
+
+    priv->thread_pool = NULL;
+    priv->max_thread_for_update = 4;
+    priv->updating_done = TRUE;
 }
 
 static void
@@ -183,8 +197,8 @@ moto_world_class_init(MotoWorldClass *klass)
 
     world_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_world_dispose;
-    goclass->finalize   = moto_world_finalize;
+    goclass->dispose  = moto_world_dispose;
+    goclass->finalize = moto_world_finalize;
 
     klass->updated_signal_id = g_signal_newv ("updated",
                  G_TYPE_FROM_CLASS (klass),
@@ -555,9 +569,61 @@ void moto_world_stop_anim(MotoWorld *self)
     g_timer_stop(self->priv->timer);
 }
 
+static gboolean post_update_node(MotoNode *node)
+{
+    MotoWorld *world = moto_node_get_world(node);
+}
+
+static void update_node(MotoNode *node, MotoWorld *world)
+{
+    moto_node_update(node);
+}
+
+void push_node(MotoNode *node, GThreadPool *tp)
+{
+    g_thread_pool_push(tp, node, NULL);
+}
+
+guint moto_world_get_update_complexity(MotoWorld *self)
+{
+    return 2000; // TODO: Implement
+}
+
+void moto_world_prepare_updateable_nodes(MotoWorld *self)
+{
+    
+}
+
 void moto_world_update(MotoWorld *self)
 {
-    // moto_node_update(self->priv->time_node);
+    MotoWorldPriv *priv = self->priv;
+
+    if(moto_world_get_update_complexity(self) < 1000)
+    {
+        // TODO
+    }
+    else
+    {
+        priv->thread_pool = \
+            g_thread_pool_new((GFunc)update_node, self,
+                              priv->max_thread_for_update,
+                              TRUE, NULL);
+
+        moto_world_prepare_updateable_nodes(self);
+        priv->updating_done = FALSE;
+        while(1)
+        {
+            g_list_foreach(priv->updateable_nodes, (GFunc)push_node, priv->thread_pool);
+            g_list_free(priv->updateable_nodes);
+            priv->updateable_nodes = NULL;
+
+            if(priv->updating_done)
+                break;
+        }
+
+        g_thread_pool_free(priv->thread_pool, FALSE, TRUE);
+        priv->thread_pool = NULL;
+    }
 }
 
 /*  */

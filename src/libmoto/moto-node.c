@@ -217,13 +217,13 @@ MotoNode *moto_create_node(GType type, const gchar *name)
 {
     if( ! g_type_is_a(type, MOTO_TYPE_NODE))
     {
-        // TODO: Error
+        moto_error("Can't create node for type '%s'", g_type_name(type));
         return NULL;
     }
 
     if(G_TYPE_IS_ABSTRACT(type))
     {
-        // TODO: Error
+        moto_error("Can't create node of abstract type '%s'", g_type_name(type));
         return NULL;
     }
 
@@ -239,16 +239,64 @@ MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name)
     GType type = g_type_from_name(type_name);
     if( ! type)
     {
-        // TODO: Error
+        moto_error("Can't create node of type '%s'. Type does not exist.", type_name);
         return NULL;
     }
 
     return moto_create_node(type, name);
 }
 
-MotoNode *moto_node_create_child(MotoNode *self, const gchar *child_name)
+MotoNode *moto_node_create_child(MotoNode *self, GType type, const gchar *name)
 {
-    // TODO
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    MotoNode *node = moto_create_node(type, name);
+    if(!node)
+        return node;
+
+    GString *new_name = g_string_new(name);
+    MotoNode *child;
+    gint count = 0;
+    while((child = moto_node_get_child(self, new_name->str)))
+    {
+        g_string_printf(new_name, "%s%i", name, count);
+        ++count;
+    }
+    moto_node_set_name(node, new_name->str);
+    g_string_free(new_name, TRUE);
+
+    MOTO_NODE_GET_PRIVATE(node)->parent = self;
+    priv->children = g_list_append(priv->children, node);
+    return node;
+}
+
+MotoNode *moto_node_create_child_by_name(MotoNode *self,
+    const gchar *type_name, const gchar *name)
+{
+    GType type = g_type_from_name(type_name);
+    if( ! type)
+    {
+        moto_error("Can't create node of type '%s'. Type does not exist.", type_name);
+        return NULL;
+    }
+
+    return moto_node_create_child(self, type, name);
+}
+
+MotoNode *moto_node_get_child(MotoNode *self, const gchar *name)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    GList *child = g_list_first(priv->children);
+    for(; child; child = g_list_next(child))
+    {
+        MotoNode *node = (MotoNode*)child->data;
+        if(g_utf8_collate(name, moto_node_get_name(node)) == 0)
+        {
+            return node;
+        }
+    }
+    return NULL;
 }
 
 guint moto_node_get_n_children(MotoNode *self)
@@ -275,13 +323,18 @@ void moto_node_set_parent(MotoNode *self, MotoNode *parent)
 
     if(parent)
     {
+        // Auto-renaming if farent already has child with this name.
         const gchar *name = moto_node_get_name(self);
-        /* MotoNode *child = moto_node_get_child(parent, self);
-        if(child)
+        GString *new_name = g_string_new(name);
+        gint count = 0;
+        MotoNode *child;
+        while((child = moto_node_get_child(parent, new_name->str)))
         {
-            // Parent already has child with this name. Auto-renaming.
+            g_string_printf(new_name, "%s%i", name, count);
+            ++count;
         }
-        */
+        moto_node_set_name(self, new_name->str);
+        g_string_free(new_name, TRUE);
     }
 
     priv->parent = parent;
@@ -293,7 +346,8 @@ void moto_node_do_action(MotoNode *self, const gchar *action_name)
         (MotoNodeActionFunc)g_datalist_get_data(& MOTO_NODE_GET_CLASS(self)->actions, action_name);
     if( ! func)
     {
-        // FIXME: Warning?
+        moto_error("Action '%s' of node '%s' is not implemented",
+            action_name, moto_node_get_name(self));
         return;
     }
 
@@ -311,10 +365,25 @@ const gchar *moto_node_get_name(MotoNode *self)
     return priv->name->str;
 }
 
+const gchar *moto_node_get_full_name(MotoNode *self)
+{
+    return moto_node_get_name(self); // TODO: Implement properly ;)
+}
+
+const gchar *moto_node_get_type_name(MotoNode *self)
+{
+    return g_type_name(G_TYPE_FROM_INSTANCE(self));
+}
+
 void moto_node_set_name(MotoNode *self, const gchar *name)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
     g_string_assign(priv->name, name);
+}
+
+gboolean moto_node_is_valid(MotoNode *self)
+{
+    return TRUE; // TODO: Implement
 }
 
 guint moto_node_get_id(MotoNode *self)
@@ -338,11 +407,8 @@ void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *
     moto_mapped_list_set(& priv->params, moto_param_get_name(param), param);
 }
 
-void moto_node_add_params(MotoNode *self, ...)
+static void moto_node_add_params_va(MotoNode *self, va_list ap)
 {
-    va_list ap;
-    va_start(ap, self);
-
     while(1)
     {
         gchar *pname    = va_arg(ap, gchar*);
@@ -486,6 +552,27 @@ void moto_node_add_params(MotoNode *self, ...)
     va_end(ap);
 }
 
+void moto_node_add_params(MotoNode *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+    moto_node_add_params_va(self, ap);
+    va_end(ap);
+}
+
+void moto_node_add_static_param(MotoNode *self, MotoParam *param, const gchar *group)
+{
+    moto_node_add_param(self, param, group); // TODO: Implement static params.
+}
+
+void moto_node_add_static_params(MotoNode *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+    moto_node_add_params_va(self, ap); // TODO: Implement static params.
+    va_end(ap);
+}
+
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
@@ -500,150 +587,151 @@ GValue *moto_node_get_param_value(MotoNode *self, const gchar *name)
     return moto_param_get_value(p);
 }
 
-gboolean moto_node_get_param_boolean(MotoNode *self, const gchar *name)
+gboolean moto_node_get_param_boolean(MotoNode *self, const gchar *name, gboolean *v)
 {
+
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        // return;
+        return FALSE;
     }
-    return moto_param_get_boolean(p);
+    *v = moto_param_get_boolean(p);
+    return TRUE;
 }
 
-gint moto_node_get_param_int(MotoNode *self, const gchar *name)
+gboolean moto_node_get_param_int(MotoNode *self, const gchar *name, gint *v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        // return;
+        return FALSE;
     }
-    return moto_param_get_int(p);
+    *v = moto_param_get_int(p);
+    return TRUE;
 }
 
-gfloat moto_node_get_param_float(MotoNode *self, const gchar *name)
+gfloat moto_node_get_param_float(MotoNode *self, const gchar *name, gfloat *v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        // return;
+        return FALSE;
     }
-    return moto_param_get_float(p);
+    *v = moto_param_get_float(p);
+    return TRUE;
 }
 
-const gchar *moto_node_get_param_string(MotoNode *self, const gchar *name)
+const gchar *moto_node_get_param_string(MotoNode *self, const gchar *name, const gchar **v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return NULL;
+        return FALSE;
     }
-    return moto_param_get_string(p);
+    *v = moto_param_get_string(p);
+    return TRUE;
 }
 
-gpointer moto_node_get_param_pointer(MotoNode *self, const gchar *name)
+gboolean moto_node_get_param_pointer(MotoNode *self, const gchar *name, gpointer *v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return NULL;
+        return FALSE;
     }
-    return moto_param_get_pointer(p);
+    *v = moto_param_get_pointer(p);
+    return TRUE;
 }
 
-gint moto_node_get_param_enum(MotoNode *self, const gchar *name)
+gboolean moto_node_get_param_enum(MotoNode *self, const gchar *name, gint *v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        // return;
+        return FALSE;
     }
-    return moto_param_get_enum(p);
+    *v = moto_param_get_enum(p);
+    return TRUE;
 }
 
-GObject *moto_node_get_param_object(MotoNode *self, const gchar *name)
+gboolean moto_node_get_param_object(MotoNode *self, const gchar *name, GObject **v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return NULL;
+        return FALSE;
     }
-    return moto_param_get_object(p);
+    *v = moto_param_get_object(p);
+    return TRUE;
 }
 
-void moto_node_set_param_boolean(MotoNode *self, const gchar *name, gboolean value)
+gboolean moto_node_set_param_boolean(MotoNode *self, const gchar *name, gboolean value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_boolean(p, value);
+    return TRUE;
 }
 
-void moto_node_set_param_int(MotoNode *self, const gchar *name, gint value)
+gboolean moto_node_set_param_int(MotoNode *self, const gchar *name, gint value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_int(p, value);
+    return TRUE;
 }
 
-void moto_node_set_param_float(MotoNode *self, const gchar *name, gfloat value)
+gboolean moto_node_set_param_float(MotoNode *self, const gchar *name, gfloat value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_float(p, value);
+    return TRUE;
 }
 
-void moto_node_set_param_pointer(MotoNode *self, const gchar *name, gpointer value)
+gboolean moto_node_set_param_pointer(MotoNode *self, const gchar *name, gpointer value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_pointer(p, value);
+    return TRUE;
 }
 
-void moto_node_set_param_enum(MotoNode *self, const gchar *name, gint value)
+gboolean moto_node_set_param_enum(MotoNode *self, const gchar *name, gint value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_enum(p, value);
+    return TRUE;
 }
 
-void moto_node_set_param_object(MotoNode *self, const gchar *name, GObject *value)
+gboolean moto_node_set_param_object(MotoNode *self, const gchar *name, GObject *value)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
-        // TODO: print error
-        return;
+        return FALSE;
     }
     moto_param_set_object(p, value);
+    return TRUE;
 }
 
-void moto_node_get_params(MotoNode *self, ...)
+gboolean moto_node_get_params(MotoNode *self, ...)
 {
     va_list ap;
     va_start(ap, self);
@@ -658,8 +746,8 @@ void moto_node_get_params(MotoNode *self, ...)
         p = moto_node_get_param(self, pname);
         if( ! p)
         {
-            // TODO: print error
-            return;
+            va_end(ap);
+            return FALSE;
         }
 
         GValue *v = moto_param_get_value(p);
@@ -708,9 +796,10 @@ void moto_node_get_params(MotoNode *self, ...)
     }
 
     va_end(ap);
+    return TRUE;
 }
 
-void moto_node_set_params(MotoNode *self, ...)
+gboolean moto_node_set_params(MotoNode *self, ...)
 {
     va_list ap;
     va_start(ap, self);
@@ -725,8 +814,8 @@ void moto_node_set_params(MotoNode *self, ...)
         p = moto_node_get_param(self, pname);
         if( ! p)
         {
-            // TODO: print error
-            return;
+            va_end(ap);
+            return FASLE;
         }
 
         GValue *v = moto_param_get_value(p);
@@ -799,6 +888,7 @@ void moto_node_set_params(MotoNode *self, ...)
     }
 
     va_end(ap);
+    return TRUE;
 }
 
 typedef struct _NodeParamData
@@ -1305,17 +1395,7 @@ void moto_param_set_boolean(MotoParam *self, gboolean value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
 
-    /*
-    GValue new_value = {0, };
-    g_value_init( & new_value, G_VALUE_TYPE( & priv->value));
-    g_value_set_boolean( & new_value, value);
-
-    MotoCommand *cmd = moto_command_change_param_value_new(self, & new_value);
-    moto_command_stack_do(moto_param_get_command_stack(self), cmd);
-    */
-
     g_value_set_boolean( & priv->value, value);
-
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
 }
 

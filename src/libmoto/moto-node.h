@@ -76,7 +76,10 @@ GType moto_node_get_type(void);
 MotoNode *moto_create_node(GType type, const gchar *name);
 MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name);
 
-MotoNode *moto_node_create_child(MotoNode *self, const gchar *child_name);
+MotoNode *moto_node_create_child(MotoNode *self, GType type, const gchar *name);
+MotoNode *moto_node_create_child_by_name(MotoNode *self,
+    const gchar *type_name, const gchar *name);
+MotoNode *moto_node_get_child(MotoNode *self, const gchar *name);
 guint moto_node_get_n_children(MotoNode *self);
 void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data);
 
@@ -84,13 +87,15 @@ MotoNode *moto_node_get_parent(MotoNode *self);
 void moto_node_set_parent(MotoNode *self, MotoNode *parent);
 
 void moto_node_do_action(MotoNode *self, const gchar *action_name);
+/* TODO: Make as moto_node_class_set_action */
 void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func);
 
 const gchar *moto_node_get_name(MotoNode *self);
 const gchar *moto_node_get_full_name(MotoNode *self);
-const gchar *moto_node_get_class_name(MotoNode *self);
+const gchar *moto_node_get_type_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
 
+/* Reimplement. */
 guint moto_node_get_id(MotoNode *self);
 
 gboolean moto_node_is_valid(MotoNode *self);
@@ -106,20 +111,20 @@ void moto_node_add_static_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 MotoParam *moto_node_get_param(MotoNode *self, const gchar *name);
 GValue *moto_node_get_param_value(MotoNode *self, const gchar *name);
 
-gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name);
-gint     moto_node_get_param_int(MotoNode *self,        const gchar *name);
-gfloat   moto_node_get_param_float(MotoNode *self,      const gchar *name);
-const gchar *moto_node_get_param_string(MotoNode *self,    const gchar *name);
-gpointer moto_node_get_param_pointer(MotoNode *self,    const gchar *name);
-gint     moto_node_get_param_enum(MotoNode *self,       const gchar *name);
-GObject *moto_node_get_param_object(MotoNode *self,     const gchar *name);
+gboolean moto_node_get_param_boolean(MotoNode *self,    const gchar *name, gboolean *v);
+gboolean moto_node_get_param_int(MotoNode *self,        const gchar *name, gint *v);
+gboolean moto_node_get_param_float(MotoNode *self,      const gchar *name, gfloat *v);
+gboolean moto_node_get_param_string(MotoNode *self, const gchar *name, const gchar **v);
+gboolean moto_node_get_param_pointer(MotoNode *self,    const gchar *name, gpointer *v);
+gboolean moto_node_get_param_enum(MotoNode *self,       const gchar *name, gint *v);
+gboolean moto_node_get_param_object(MotoNode *self,     const gchar *name, GObject **v);
 
-void moto_node_set_param_boolean(MotoNode *self,    const gchar *name, gboolean value);
-void moto_node_set_param_int(MotoNode *self,        const gchar *name, gint     value);
-void moto_node_set_param_float(MotoNode *self,      const gchar *name, gfloat   value);
-void moto_node_set_param_pointer(MotoNode *self,    const gchar *name, gpointer value);
-void moto_node_set_param_enum(MotoNode *self,       const gchar *name, gint     value);
-void moto_node_set_param_object(MotoNode *self,     const gchar *name, GObject *value);
+gboolean moto_node_set_param_boolean(MotoNode *self,    const gchar *name, gboolean value);
+gboolean moto_node_set_param_int(MotoNode *self,        const gchar *name, gint     value);
+gboolean moto_node_set_param_float(MotoNode *self,      const gchar *name, gfloat   value);
+gboolean moto_node_set_param_pointer(MotoNode *self,    const gchar *name, gpointer value);
+gboolean moto_node_set_param_enum(MotoNode *self,       const gchar *name, gint     value);
+gboolean moto_node_set_param_object(MotoNode *self,     const gchar *name, GObject *value);
 
 // boolean
 void moto_node_set_param_1b(MotoNode *self, const gchar *name, gboolean v);
@@ -166,8 +171,8 @@ void moto_node_set_param_4fv(MotoNode *self, const gchar *name, const gfloat *v)
 
 void moto_node_set_param_Nfv(MotoNode *self, const gchar *name, const gfloat *v, gsize N);
 
-void moto_node_get_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
-void moto_node_set_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
+gboolean moto_node_get_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
+gboolean moto_node_set_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 
 void moto_node_foreach_param(MotoNode *self,
         MotoNodeForeachParamFunc func, gpointer user_data);
