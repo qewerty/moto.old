@@ -350,6 +350,8 @@ void moto_mesh_hide_face(MotoMesh *self, guint32 index);
 void moto_mesh_show_face(MotoMesh *self, guint32 index);
 void moto_mesh_is_face_hidden(MotoMesh *self, guint32 index);
 
+guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi);
+
 gboolean moto_mesh_update_he_data(MotoMesh *self);
 
 gboolean moto_mesh_prepare(MotoMesh *self);
