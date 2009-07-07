@@ -176,9 +176,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     MotoMesh *mesh = priv->mesh;
 
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
-
     if(mesh->b32)
     {
         MotoMeshFace32 *f_data  = (MotoMeshFace32 *)mesh->f_data;
@@ -388,8 +385,20 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         }
     }
 
+    MotoMesh *old = mesh;
+    moto_mesh_prepare(old);
+    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(old);
+    moto_mesh_selection_select_face(selection, 4);
+    moto_mesh_selection_select_face(selection, 25);
+    mesh = moto_mesh_extrude_faces(old, selection, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    g_object_unref(old);
+    moto_mesh_selection_free(selection);
+
+    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
+    g_value_set_object(moto_param_get_value(pm), mesh);
+
     priv->bound_calculated = FALSE;
-    moto_mesh_prepare(mesh);
+    // moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }
 #undef get_v
