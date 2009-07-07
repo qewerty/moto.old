@@ -894,11 +894,7 @@ gboolean moto_mesh_update_he_data(MotoMesh *self)
 
     if(self->b32)
     {
-        MotoMeshVert32 *v_data  = (MotoMeshVert32*)self->v_data;
-        MotoMeshFace32 *f_data  = (MotoMeshFace32 *)self->f_data;
-        MotoHalfEdge32 *he_data = (MotoHalfEdge32*)self->he_data;
-        guint32 *e_verts = (guint32*)self->e_verts;
-        guint32 *f_verts = (guint32*)self->f_verts;
+        MOTO_DECLARE_MESH_DATA_32(self);
 
         MotoEdgeList* v_edges[self->v_num];
         memset(v_edges, 0, sizeof(gpointer)*self->v_num);
@@ -985,11 +981,7 @@ gboolean moto_mesh_update_he_data(MotoMesh *self)
     }
     else
     {
-        MotoMeshVert16 *v_data  = (MotoMeshVert16*)self->v_data;
-        MotoMeshFace16 *f_data  = (MotoMeshFace16 *)self->f_data;
-        MotoHalfEdge16 *he_data = (MotoHalfEdge16*)self->he_data;
-        guint16 *e_verts = (guint16*)self->e_verts;
-        guint16 *f_verts = (guint16 *)self->f_verts;
+        MOTO_DECLARE_MESH_DATA_16(self);
 
         MotoEdgeList16* v_edges[self->v_num];
         memset(v_edges, 0, sizeof(gpointer)*self->v_num);
@@ -2211,6 +2203,60 @@ void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh 
     moto_bitmask_inverse(self->faces);
 }
 
+
+MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
+    MotoMeshSelection *selection, guint sections,
+    gfloat tx, gfloat ty, gfloat tz,
+    gfloat rx, gfloat ry, gfloat rz,
+    gfloat sx, gfloat sy, gfloat sz)
+{
+    guint f_num = self->f_num;
+    guint e_num = self->e_num;
+    guint v_num = self->v_num;
+
+    MotoMeshFace16 *f_data = (MotoMeshFace16*)self->f_data;
+
+    guint16 i;
+    for(i = 0; i < self->f_num; i++)
+    {
+        if(moto_mesh_selection_is_face_selected(selection, i))
+        {
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint f_v_num = f_data[i].v_offset - start;
+
+            e_num += f_v_num;
+            v_num += f_v_num;
+            f_num += f_v_num;
+        }
+    }
+
+    MotoMesh *mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+
+    memcpy(mesh->v_data, self->v_data, sizeof(MotoMeshVert16)*self->v_num);
+    memcpy(mesh->e_data, self->e_data, sizeof(MotoMeshEdge16)*self->e_num);
+    memcpy(mesh->f_data, self->f_data, sizeof(MotoMeshFace16)*self->f_num);
+
+    memcpy(mesh->e_verts, self->e_verts, sizeof(guint16) * self->e_num * 2);
+    memcpy(mesh->f_verts, self->f_verts, sizeof(guint16) * self->f_v_num);
+
+    guint vi = v_num;
+    guint ei = e_num;
+    guint fi = f_num;
+
+    while(fi < mesh->f_num)
+    {
+        //f_data[];
+        //f_verts[fi];
+        ++fi;
+    }
+
+    if(!moto_mesh_prepare(mesh))
+    {
+        g_object_unref(mesh);
+        return NULL;
+    }
+    return mesh;
+}
 
 /* Implementation of MotoPointCloudIface for MotoMesh */
 

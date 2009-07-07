@@ -149,10 +149,6 @@ guint32 moto_mesh_selection_get_selected_v_num(MotoMeshSelection *self);
 guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
 guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
 
-guint32 moto_mesh_selection_get_selected_v_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
-
 void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
 void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index);
 void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self);
@@ -277,6 +273,24 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
 MotoMesh *moto_mesh_new_copy(MotoMesh *other);
 void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
+#define MOTO_DECLARE_MESH_DATA_16(mesh) \
+    MotoMeshVert16 *v_data  = (MotoMeshVert16*)mesh->v_data; \
+    MotoMeshEdge16 *e_data  = (MotoMeshFace16*)mesh->e_data; \
+    MotoMeshFace16 *f_data  = (MotoMeshFace16*)mesh->f_data; \
+    guint16 *f_verts        = (guint16*)mesh->f_verts; \
+    guint16 *f_tess_verts   = (guint16*)mesh->f_tess_verts; \
+    guint16 *e_verts        = (guint16*)mesh->e_verts; \
+    MotoHalfEdge16 *he_data = (MotoHalfEdge16*)mesh->he_data
+
+#define MOTO_DECLARE_MESH_DATA_32(mesh) \
+    MotoMeshVert32 *v_data  = (MotoMeshVert32*)mesh->v_data; \
+    MotoMeshEdge32 *e_data  = (MotoMeshFace32*)mesh->e_data; \
+    MotoMeshFace32 *f_data  = (MotoMeshFace32*)mesh->f_data; \
+    guint32 *f_verts        = (guint32*)mesh->f_verts; \
+    guint32 *f_tess_verts   = (guint32*)mesh->f_tess_verts; \
+    guint32 *e_verts        = (guint32*)mesh->e_verts; \
+    MotoHalfEdge32 *he_data = (MotoHalfEdge32*)mesh->he_data
+
 /**
  * moto_mesh_clear_e_data:
  * @self: a #MotoMesh.
@@ -345,14 +359,14 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
 void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound);
 MotoBound* moto_mesh_create_bound(MotoMesh* self);
 
-MotoMesh* moto_mesh_extrude(MotoMesh *self,
-    MotoMeshSelection *selection,
+MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
+    MotoMeshSelection *selection, guint sections,
     gfloat tx, gfloat ty, gfloat tz,
     gfloat rx, gfloat ry, gfloat rz,
     gfloat sx, gfloat sy, gfloat sz);
 
 MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
-    MotoMeshSelection *selection,
+    MotoMeshSelection *selection, guint sections,
     gfloat tx, gfloat ty, gfloat tz,
     gfloat rx, gfloat ry, gfloat rz,
     gfloat sx, gfloat sy, gfloat sz);
