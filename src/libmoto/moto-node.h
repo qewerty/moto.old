@@ -76,7 +76,10 @@ GType moto_node_get_type(void);
 MotoNode *moto_create_node(GType type, const gchar *name);
 MotoNode *moto_create_node_by_name(const gchar *type_name, const gchar *name);
 
-MotoNode *moto_node_create_child(MotoNode *self, const gchar *child_name);
+MotoNode *moto_node_create_child(MotoNode *self, GType type, const gchar *name);
+MotoNode *moto_node_create_child_by_name(MotoNode *self,
+    const gchar *type_name, const gchar *name);
+MotoNode *moto_node_get_child(MotoNode *self, const gchar *name);
 guint moto_node_get_n_children(MotoNode *self);
 void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data);
 
@@ -84,13 +87,15 @@ MotoNode *moto_node_get_parent(MotoNode *self);
 void moto_node_set_parent(MotoNode *self, MotoNode *parent);
 
 void moto_node_do_action(MotoNode *self, const gchar *action_name);
+/* TODO: Make as moto_node_class_set_action */
 void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func);
 
 const gchar *moto_node_get_name(MotoNode *self);
 const gchar *moto_node_get_full_name(MotoNode *self);
-const gchar *moto_node_get_class_name(MotoNode *self);
+const gchar *moto_node_get_type_name(MotoNode *self);
 void moto_node_set_name(MotoNode *self, const gchar *name);
 
+/* Reimplement. */
 guint moto_node_get_id(MotoNode *self);
 
 gboolean moto_node_is_valid(MotoNode *self);
