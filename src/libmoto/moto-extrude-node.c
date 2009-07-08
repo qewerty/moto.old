@@ -44,9 +44,9 @@ moto_extrude_node_init(MotoExtrudeNode *self)
 
     /* params */
 
-    MotoParamSpec *sections_spec = moto_param_spec_int_new(0, 1, 100000, 1, 2);
+    MotoParamSpec *sections_spec = moto_param_spec_int_new(1, 1, 100000, 1, 2);
     moto_node_add_params(node,
-            "sections",  "Sections",   G_TYPE_INT,   MOTO_PARAM_MODE_INOUT, 0.0f, sections_spec, "Arguments",
+            "sections",  "Sections",   G_TYPE_INT,   MOTO_PARAM_MODE_INOUT, 1, sections_spec, "Arguments",
             "length",    "Length",     MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.5f, NULL,          "Arguments",
             "in_mesh",  "Input Mesh",  MOTO_TYPE_MESH,  MOTO_PARAM_MODE_IN,    NULL, NULL,          "Geometry",
             "out_mesh", "Output Mesh", MOTO_TYPE_MESH,  MOTO_PARAM_MODE_OUT,   NULL, NULL,          "Geometry",
@@ -99,14 +99,25 @@ static void moto_extrude_node_update(MotoNode *self)
         return;
     }
 
+    MotoMesh *old = mesh;
+
     gint sections;
     moto_node_get_param_int(self, "sections", &sections);
+    if(sections < 1)
+    {
+        moto_node_set_param_object(self, "out_mesh", NULL);
+        MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
+        moto_param_update_dests(param);
+        return;
+    }
+
     gfloat length;
     moto_node_get_param_float(self, "length", &length);
 
-    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(mesh);
-    moto_mesh_selection_select_face(selection, 4);
-    mesh = moto_mesh_extrude_faces(mesh, selection, sections, length);
+    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(old);
+    moto_mesh_selection_select_faces(selection, 4, G_MAXUINT32);
+    mesh = moto_mesh_extrude_faces(old, selection, sections, length);
+
     moto_mesh_selection_free(selection);
 
     MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
