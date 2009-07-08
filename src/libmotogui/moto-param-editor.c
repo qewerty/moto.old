@@ -872,7 +872,13 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
     if(G_TYPE_INT == ptype)
     {
-        widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
+        MotoParamSpecInt *pspec = \
+            MOTO_PARAM_SPEC_INT(moto_param_get_spec(param));
+
+        if(pspec)
+            widget = gtk_spin_button_new_with_range(pspec->min, pspec->max, pspec->step);
+        else
+            widget = gtk_spin_button_new_with_range(-1000000, 1000000, 1);
         gtk_spin_button_set_value((GtkSpinButton *)widget, moto_param_get_int(param));
         gtk_editable_set_editable((GtkEditable *)widget, TRUE);
         gtk_spin_button_set_numeric((GtkSpinButton *)widget, FALSE);
