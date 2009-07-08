@@ -21,12 +21,17 @@ static GObjectClass *normal_move_node_parent_class = NULL;
 
 struct _MotoExtrudeNodePriv
 {
-    gint dummy;
+    MotoMeshSelection *selection;
 };
 
 static void
 moto_extrude_node_dispose(GObject *obj)
 {
+    MotoExtrudeNodePriv *priv = MOTO_EXTRUDE_NODE_GET_PRIVATE(obj);
+
+    if(priv->selection)
+        moto_mesh_selection_free(priv->selection);
+
     normal_move_node_parent_class->dispose(obj);
 }
 
@@ -41,6 +46,8 @@ moto_extrude_node_init(MotoExtrudeNode *self)
 {
     MotoNode *node = (MotoNode *)self;
     MotoExtrudeNodePriv *priv = MOTO_EXTRUDE_NODE_GET_PRIVATE(self);
+
+    priv->selection = NULL;
 
     /* params */
 
@@ -85,15 +92,36 @@ MotoExtrudeNode *moto_extrude_node_new(const gchar *name)
     return self;
 }
 
+void moto_extrude_node_set_mesh_selection(MotoExtrudeNode *self,
+    MotoMeshSelection *selection)
+{
+    MotoExtrudeNodePriv *priv = MOTO_EXTRUDE_NODE_GET_PRIVATE(self);
+    priv->selection = moto_mesh_selection_copy(selection);
+}
+
 static void moto_extrude_node_update(MotoNode *self)
 {
     MotoExtrudeNodePriv *priv = MOTO_EXTRUDE_NODE_GET_PRIVATE(self);
+
+    MotoMesh *old_mesh;
+    moto_node_get_param_object((MotoNode *)self, "out_mesh", (GObject**)&old_mesh);
+    if(old_mesh)
+        g_object_unref(old_mesh);
 
     MotoMesh *in_mesh;
     moto_node_get_param_object(self, "in_mesh", (GObject**)&in_mesh);
     if( ! in_mesh)
     {
         moto_node_set_param_object(self, "out_mesh", NULL);
+        MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
+        moto_param_update_dests(param);
+        return;
+    }
+
+    if( ! priv->selection)
+    {
+        MotoMesh *mesh = moto_mesh_new_copy(in_mesh);
+        moto_node_set_param_object(self, "out_mesh", mesh);
         MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
         moto_param_update_dests(param);
         return;
@@ -112,16 +140,7 @@ static void moto_extrude_node_update(MotoNode *self)
     gfloat length;
     moto_node_get_param_float(self, "length", &length);
 
-    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(in_mesh);
-    moto_mesh_selection_select_faces(selection, 4, G_MAXUINT32);
-    MotoMesh *mesh = moto_mesh_extrude_faces(in_mesh, selection, sections, length);
-
-    moto_mesh_selection_free(selection);
-
-    MotoMesh *old_mesh;
-    moto_node_get_param_object((MotoNode *)self, "out_mesh", (GObject**)&old_mesh);
-    if(old_mesh)
-        g_object_unref(old_mesh);
+    MotoMesh *mesh = moto_mesh_extrude_faces(in_mesh, priv->selection, sections, length);
 
     MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
     moto_param_set_object(param, (GObject *)mesh);

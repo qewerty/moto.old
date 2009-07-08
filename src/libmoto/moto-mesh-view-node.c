@@ -86,7 +86,6 @@ moto_mesh_view_node_dispose(GObject *obj)
         return;
     priv->disposed = TRUE;
 
-    g_print("moto_mesh_view_node_dispose\n");
     glDeleteLists(priv->dlist, 1);
     moto_mesh_view_node_delete_buffers((MotoMeshViewNode *)obj);
 

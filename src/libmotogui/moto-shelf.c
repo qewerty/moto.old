@@ -1,5 +1,7 @@
 #include "libmoto/moto-messager.h"
 #include "libmoto/moto-world.h"
+#include "libmoto/moto-mesh-view-node.h"
+#include "libmoto/moto-extrude-node.h"
 
 #include "moto-shelf.h"
 #include "moto-test-window.h"
@@ -61,12 +63,13 @@ static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cube_node = moto_world_create_node_by_name(w, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mod_node = moto_world_create_node_by_name(w, "MotoExtrudeNode", "Extrude", NULL);
+    // MotoNode *mod_node = moto_world_create_node_by_name(w, "MotoExtrudeNode", "Extrude", NULL);
     MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node,  "view", view_node, "view");
-    moto_node_link(mod_node,  "in_mesh", cube_node, "mesh");
-    moto_node_link(view_node, "mesh", mod_node, "out_mesh");
+    // moto_node_link(mod_node,  "in_mesh", cube_node, "mesh");
+    // moto_node_link(view_node, "mesh", mod_node, "out_mesh");
+    moto_node_link(view_node, "mesh", cube_node, "mesh");
     moto_node_link(obj_node,  "material", mat_node, "material");
 }
 
@@ -183,6 +186,65 @@ static void create_normal_move(MotoShelf *shelf, MotoSystem *system)
     MotoNode *node = moto_world_create_node_by_name(w, "MotoDisplaceNode", "NormalMove", NULL);
 }
 
+
+static void extrude_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+{
+    if( ! system)
+    {
+        moto_error("MotoShelf has no associated system.");
+        return;
+    }
+
+    MotoWorld *w = moto_system_get_current_world(system);
+    if( ! w)
+    {
+        moto_error("MotoSystem associated with the shelf has no current world.");
+        return;
+    }
+
+    MotoObjectNode *obj = moto_world_get_current_object(w);
+    if(!obj)
+    {
+        moto_error("No current object to apply extrude.");
+        return;
+    }
+
+    MotoMeshViewNode *view;
+    moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
+
+    if( ! view)
+    {
+        moto_error("Current object has no view.");
+        return;
+    }
+
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
+    {
+        moto_error("View of current object is not MotoMeshViewNode.");
+        return;
+    }
+
+    MotoParam *param  = moto_node_get_param((MotoNode*)view, "mesh");
+    MotoParam *source = moto_param_get_source(param);
+    if( ! source)
+    {
+        moto_error("View of current object has not associated geometry.");
+        return;
+    }
+
+    MotoExtrudeNode *extrude = \
+        (MotoExtrudeNode*)moto_world_create_node_by_name(w, "MotoExtrudeNode", "Extrude", NULL);
+
+    moto_extrude_node_set_mesh_selection(extrude, moto_mesh_view_node_get_selection(view));
+
+    MotoParam *in_mesh = moto_node_get_param((MotoNode*)extrude, "in_mesh");
+    moto_param_link(in_mesh, source);
+
+    MotoParam *out_mesh = moto_node_get_param((MotoNode*)extrude, "out_mesh");
+    moto_param_link(param, out_mesh);
+
+}
+
 /* class MotoShelf */
 
 static GObjectClass *shelf_parent_class = NULL;
@@ -259,7 +321,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Geom", "File",     create_mesh_file);
 
     moto_shelf_add_tab(self,  "Model");
-    moto_shelf_add_item(self, "Model", "Extrude",  NULL);
+    moto_shelf_add_item(self, "Model", "Extrude",  extrude_mesh_faces);
     moto_shelf_add_item(self, "Model", "Bevel",    NULL);
     moto_shelf_add_item(self, "Model", "Collapse", NULL);
 
