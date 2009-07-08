@@ -2418,11 +2418,8 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
             }
         }
 
-        // Value of v_offset for extruded face is not changed.
-        f_verts[f_data[si].v_offset-1] = vi - 1;
-        f_verts[f_data[si].v_offset-2] = vi - 2;
-        f_verts[f_data[si].v_offset-3] = vi - 3;
-        f_verts[f_data[si].v_offset-4] = vi - 4;
+        // Setting hat. Value of v_offset for extruded face is not changed.
+        memcpy(f_verts + f_data[si].v_offset - v_num, vloop, sizeof(guint16)*v_num);
     }
     g_assert(vi == mesh->v_num);
 
