@@ -356,6 +356,7 @@ void moto_mesh_show_face(MotoMesh *self, guint32 index);
 void moto_mesh_is_face_hidden(MotoMesh *self, guint32 index);
 
 guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi);
+guint moto_mesh_get_v_edges_num(MotoMesh *self, guint vi);
 
 gboolean moto_mesh_update_he_data(MotoMesh *self);
 
@@ -372,9 +373,11 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
 
 MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
-    gfloat tx, gfloat ty, gfloat tz,
-    gfloat rx, gfloat ry, gfloat rz,
-    gfloat sx, gfloat sy, gfloat sz);
+    gfloat length);
+
+MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
+    MotoMeshSelection *selection, guint sections,
+    gfloat length);
 
 G_END_DECLS
 

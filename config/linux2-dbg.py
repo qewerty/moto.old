@@ -4,7 +4,7 @@ CC  = 'gcc'
 CXX = 'g++'
 
 CFLAGS = ['-O0', '-g', '-pipe', '-Wall',
-          '-fopenmp']
+          '-fopenmp', '-Wno-unused-variable', '-Wno-unused-parameter']
 LIBS   = ['gomp', 'GL', 'GLU', 'GLEW']
 
 CPPFLAGS = ['-DMOTO_WITH_WOBJ_MESH_LOADER',
