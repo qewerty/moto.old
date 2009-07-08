@@ -2209,10 +2209,19 @@ guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi)
 
 MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
-    gfloat tx, gfloat ty, gfloat tz,
-    gfloat rx, gfloat ry, gfloat rz,
-    gfloat sx, gfloat sy, gfloat sz)
+    gfloat length)
 {
+    if(sections < 1)
+    {
+        MotoMesh *mesh = moto_mesh_new_copy(self);
+        if(!moto_mesh_prepare(mesh))
+        {
+            g_object_unref(mesh);
+            return NULL;
+        }
+        return mesh;
+    }
+
     guint f_num = self->f_num;
     guint e_num = self->e_num;
     guint v_num = self->v_num;
@@ -2273,7 +2282,7 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
             gfloat *c = (gfloat*)(self->v_coords + fvi);
             gfloat *p = (gfloat*)(mesh->v_coords + vi);
             vector3_copy(p, c);
-            point3_move(p, normal, 1.25);
+            point3_move(p, normal, length);
 
             guint16 nvi = (j < v_num-1) ? vi + 1 : vi0;
 
@@ -2310,10 +2319,10 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         verts[3] = vi - 1;
 
         // f_data[si].v_offset = v_offset + 4;
-        f_verts[f_data[si].v_offset-4] = vi - 1;
-        f_verts[f_data[si].v_offset-3] = vi - 2;
-        f_verts[f_data[si].v_offset-2] = vi - 3;
-        f_verts[f_data[si].v_offset-1] = vi - 4;
+        f_verts[f_data[si].v_offset-1] = vi - 1;
+        f_verts[f_data[si].v_offset-2] = vi - 2;
+        f_verts[f_data[si].v_offset-3] = vi - 3;
+        f_verts[f_data[si].v_offset-4] = vi - 4;
         // moto_mesh_set_face(mesh, si, self_f_data[si].v_offset, verts);
     }
     g_assert(vi == mesh->v_num);

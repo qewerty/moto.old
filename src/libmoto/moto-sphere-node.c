@@ -135,7 +135,8 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     rows = (rows < 3) ? 3 : rows;
     cols = (cols < 3) ? 3 : cols;
 
-    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    MotoAxis orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", (gint*)&orientation);
 
     guint v_num = (rows-2)*cols + 2;
     guint e_num = (rows-2)*cols + (rows-1)*cols;
@@ -330,7 +331,8 @@ static void calc_bound(MotoSphereNode *self)
     gfloat radius_x = radius[0];
     gfloat radius_y = radius[1];
     gfloat radius_z = radius[2];
-    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    MotoAxis orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", (gint)&orientation);
 
     gfloat rsx, rsy, rsz;
     switch(orientation)

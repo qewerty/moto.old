@@ -114,16 +114,20 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     gfloat radius_y_f = radius0[1];
     gfloat radius_x_s = radius1[0];
     gfloat radius_y_s = radius1[1];
-    gfloat height     = moto_node_get_param_float((MotoNode *)self, "height");
-    gfloat screw      = moto_node_get_param_float((MotoNode *)self, "screw");
-    gboolean screw_s  = moto_node_get_param_boolean((MotoNode *)self, "screw_s");
+
+    gfloat height, screw;
+    gboolean screw_s;
+    moto_node_get_param_float((MotoNode *)self, "height", &height);
+    moto_node_get_param_float((MotoNode *)self, "screw", &screw);
+    moto_node_get_param_boolean((MotoNode *)self, "screw_s", &screw_s);
     guint rows        = rc[0];
     guint cols        = rc[1];
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
 
-    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    MotoAxis orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
 
     guint v_num = rows*cols;// + 2;
     guint e_num = rows*cols + (rows-1)*cols;// + cols*2;
@@ -275,8 +279,10 @@ static void calc_bound(MotoCylinderNode *self)
 
     gfloat radius_x      = max(radius0[0], radius1[0]);
     gfloat radius_y      = max(radius0[1], radius1[1]);
-    gfloat height        = moto_node_get_param_float((MotoNode *)self, "height");
-    MotoAxis orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    gfloat height;
+    moto_node_get_param_float((MotoNode *)self, "height", &height);
+    MotoAxis orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
 
     gfloat rsx, rsy, rsz;
     switch(orientation)

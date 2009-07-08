@@ -610,7 +610,7 @@ gboolean moto_node_get_param_int(MotoNode *self, const gchar *name, gint *v)
     return TRUE;
 }
 
-gfloat moto_node_get_param_float(MotoNode *self, const gchar *name, gfloat *v)
+gboolean moto_node_get_param_float(MotoNode *self, const gchar *name, gfloat *v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
@@ -621,11 +621,12 @@ gfloat moto_node_get_param_float(MotoNode *self, const gchar *name, gfloat *v)
     return TRUE;
 }
 
-const gchar *moto_node_get_param_string(MotoNode *self, const gchar *name, const gchar **v)
+gboolean moto_node_get_param_string(MotoNode *self, const gchar *name, const gchar **v)
 {
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
+        *v = NULL;
         return FALSE;
     }
     *v = moto_param_get_string(p);
@@ -637,6 +638,7 @@ gboolean moto_node_get_param_pointer(MotoNode *self, const gchar *name, gpointer
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
+        *v = NULL;
         return FALSE;
     }
     *v = moto_param_get_pointer(p);
@@ -659,6 +661,7 @@ gboolean moto_node_get_param_object(MotoNode *self, const gchar *name, GObject *
     MotoParam *p = moto_node_get_param(self, name);
     if( ! p)
     {
+        *v = NULL;
         return FALSE;
     }
     *v = moto_param_get_object(p);
@@ -815,7 +818,7 @@ gboolean moto_node_set_params(MotoNode *self, ...)
         if( ! p)
         {
             va_end(ap);
-            return FASLE;
+            return FALSE;
         }
 
         GValue *v = moto_param_get_value(p);
@@ -1565,7 +1568,7 @@ void moto_param_unlink_dests(MotoParam *self)
         GString *msg = g_string_new("You are trying to clear destinations of input parameter (\"");
         g_string_append(msg, moto_param_get_name(self));
         g_string_append(msg, "\"). Inputs may not have destinations.");
-        moto_warning(msg->str);
+        moto_warning("%s", msg->str);
         g_string_free(msg, TRUE);
         return;
     }

@@ -111,7 +111,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv = (MotoGeomViewNode*)moto_node_get_param_object((MotoNode *)ob, "view");
+        MotoGeomViewNode *gv;
+        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
 
@@ -126,7 +127,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv = (MotoGeomViewNode *)moto_node_get_param_object((MotoNode *)ob, "view");
+        MotoGeomViewNode *gv;
+        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
         moto_geom_view_node_select_less(gv);
@@ -140,7 +142,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv = (MotoGeomViewNode *)moto_node_get_param_object((MotoNode *)ob, "view");
+        MotoGeomViewNode *gv;
+        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
         moto_geom_view_node_invert_selection(gv);
@@ -155,7 +158,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv = (MotoGeomViewNode *)moto_node_get_param_object((MotoNode *)ob, "view");
+        MotoGeomViewNode *gv;
+        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
         MotoParam *p = moto_node_get_param((MotoNode *)gv, "mesh");
@@ -199,7 +203,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv = (MotoGeomViewNode*)moto_node_get_param_object((MotoNode *)ob, "view");
+        MotoGeomViewNode *gv;
+        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
         moto_geom_view_node_goto_next_state(gv);
@@ -445,7 +450,8 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
     if( ! obj)
         return;
 
-    MotoNode *view = (MotoNode *)moto_node_get_param_object(obj, "view");
+    MotoNode *view;
+    moto_node_get_param_object(obj, "view", (GObject**)&view);
     if( ! view)
         return;
 

@@ -363,9 +363,7 @@ MotoBound* moto_mesh_create_bound(MotoMesh* self);
 
 MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
-    gfloat tx, gfloat ty, gfloat tz,
-    gfloat rx, gfloat ry, gfloat rz,
-    gfloat sx, gfloat sy, gfloat sz);
+    gfloat length);
 
 MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,

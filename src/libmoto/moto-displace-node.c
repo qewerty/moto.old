@@ -101,7 +101,8 @@ static void moto_displace_node_update(MotoNode *self)
 {
     MotoDisplaceNodePriv *priv = MOTO_DISPLACE_NODE_GET_PRIVATE(self);
 
-    MotoPointCloud *in_pc = (MotoPointCloud *)moto_node_get_param_object(self, "in_pc");
+    MotoPointCloud *in_pc;
+    moto_node_get_param_object(self, "in_pc", (GObject**)&in_pc);
     if( ! in_pc)
     {
         if(priv->pc)
@@ -125,7 +126,8 @@ static void moto_displace_node_update(MotoNode *self)
         MotoPointCloud *pc = priv->pc;
         priv->prev_pc = in_pc;
 
-        gfloat scale = moto_node_get_param_float(self, "scale");
+        gfloat scale;
+        moto_node_get_param_float(self, "scale", &scale);
         if(fabs(scale-priv->prev_scale) <= MICRO)
             return;
         priv->prev_scale = scale;

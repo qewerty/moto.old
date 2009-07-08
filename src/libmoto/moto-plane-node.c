@@ -158,7 +158,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     div_x = max(div_x, 1);
     div_y = max(div_y, 1);
 
-    MotoOrientation orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    MotoOrientation orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
 
     guint v_num = (div_x+1)*(div_y+1);
     guint e_num = div_x*(div_y+1) + (div_x+1)*div_y;
@@ -350,7 +351,8 @@ static void calc_bound(MotoPlaneNode *self)
     gfloat *size = g_value_peek_pointer(vsize);
     gfloat size_x = size[0];
     gfloat size_y = size[1];
-    MotoOrientation orientation = moto_node_get_param_enum((MotoNode *)self, "orientation");
+    MotoOrientation orientation;
+    moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
 
     gfloat hsx, hsy, hsz;
     switch(orientation)

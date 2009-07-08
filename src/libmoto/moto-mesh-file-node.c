@@ -159,7 +159,8 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 {
     MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
-    const gchar *filename = moto_node_get_param_string((MotoNode *)self, "filename");
+    const gchar *filename;
+    moto_node_get_param_string((MotoNode *)self, "filename", &filename);
 
     if(priv->mesh)
         g_object_unref(priv->mesh);

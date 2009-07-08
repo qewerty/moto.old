@@ -454,7 +454,9 @@ void moto_object_node_set_transform_order(MotoObjectNode *self, MotoTransformOrd
 
 MotoRotateOrder moto_object_node_get_rotate_order(MotoObjectNode *self)
 {
-    return moto_node_get_param_enum((MotoNode*)self, "ro");
+    MotoRotateOrder r;
+    moto_node_get_param_enum((MotoNode*)self, "ro", (gint*)&r);
+    return r;
 }
 
 void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder order)
@@ -479,12 +481,13 @@ void moto_object_node_set_rotate_order(MotoObjectNode *self, MotoRotateOrder ord
 
 gboolean moto_object_node_get_keep_transform(MotoObjectNode *self)
 {
-    return moto_node_get_param_boolean((MotoNode*)self, "kt");
+    gboolean r = moto_node_get_param_boolean((MotoNode*)self, "kt", &r);
+    return r;
 }
 
 void moto_object_node_set_keep_transform(MotoObjectNode *self, gboolean kt)
 {
-    if(kt != moto_node_get_param_boolean((MotoNode*)self, "kt"))
+    if(kt != moto_object_node_get_keep_transform(self))
     {
         self->priv->transform_calculated = FALSE;
         moto_node_set_param_boolean((MotoNode *)self, "kt", kt);
@@ -641,11 +644,15 @@ static void apply_global_transform(MotoObjectNode *self)
 void moto_object_node_draw_full(MotoObjectNode *self,
         gboolean recursive, gboolean use_global)
 {
-    if( ! moto_node_get_param_boolean((MotoNode *)self, "visible"))
+    gboolean visible;
+    moto_node_get_param_boolean((MotoNode *)self, "visible", &visible);
+    if( ! visible)
         return;
 
-    MotoMaterialNode *mat  = moto_node_get_param_object((MotoNode *)self, "material");
-    MotoGeomViewNode *view = moto_node_get_param_object((MotoNode *)self, "view");
+    MotoMaterialNode *mat;
+    moto_node_get_param_object((MotoNode *)self, "material", (GObject **)&mat);
+    MotoGeomViewNode *view;
+    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     glPushMatrix();
 
@@ -1065,7 +1072,8 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    MotoCameraNode *cam = moto_node_get_param_object((MotoNode *)self, "camera");
+    MotoCameraNode *cam;
+    moto_node_get_param_object((MotoNode *)self, "camera", (GObject**)&cam);
 
     if(cam)
     {
@@ -1093,7 +1101,9 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
 
 gboolean moto_object_node_get_visible(MotoObjectNode *self)
 {
-    return moto_node_get_param_boolean((MotoNode *)self, "visible");
+    gboolean r;
+    moto_node_get_param_boolean((MotoNode *)self, "visible", &r);
+    return r;
 }
 
 void moto_object_node_set_visible(MotoObjectNode *self, gboolean visible)
@@ -1116,7 +1126,8 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
     MotoTransformInfo *tinfo)
 {
-    MotoGeomViewNode *view = moto_node_get_param_object((MotoNode *)self, "view");
+    MotoGeomViewNode *view;
+    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     if(view)
     {
@@ -1132,7 +1143,8 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoGeomViewNode *view = moto_node_get_param_object((MotoNode *)self, "view");
+    MotoGeomViewNode *view;
+    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     if(view)
         if(moto_geom_view_node_process_button_release(view, x, y, width, height))
@@ -1152,7 +1164,8 @@ gboolean moto_object_node_button_release(MotoObjectNode *self,
 gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoGeomViewNode *view = moto_node_get_param_object((MotoNode *)self, "view");
+    MotoGeomViewNode *view;
+    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     if(view)
         if(moto_geom_view_node_process_motion(view, x, y, width, height))
