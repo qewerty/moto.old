@@ -391,7 +391,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     moto_mesh_selection_select_face(selection, 4);
     moto_mesh_selection_select_face(selection, 25);
     moto_mesh_selection_select_face(selection, 33);
-    mesh = moto_mesh_extrude_faces(old, selection, 1, 1.25);
+    mesh = moto_mesh_extrude_faces(old, selection, 6, 1.25);
     g_object_unref(old);
     moto_mesh_selection_free(selection);
 
@@ -427,7 +427,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     moto_mesh_selection_select_face(selection, 4);
     moto_mesh_selection_select_face(selection, 25);
     moto_mesh_selection_select_face(selection, 33);
-    mesh = moto_mesh_extrude_faces(old, selection, 1, 0.25);
+    mesh = moto_mesh_extrude_faces(old, selection, 10, 0.25);
     g_object_unref(old);
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");

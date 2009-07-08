@@ -2239,9 +2239,10 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
             guint start = (0 == i) ? 0: self_f_data[i-1].v_offset;
             guint f_v_num = self_f_data[i].v_offset - start;
 
-            v_num += f_v_num;
-            e_num += f_v_num*2;
-            f_num += f_v_num;
+            guint16 num = f_v_num*sections;
+            v_num += num;
+            e_num += num*2;
+            f_num += num;
         }
     }
 
@@ -2258,6 +2259,8 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
 
     MOTO_DECLARE_MESH_DATA_16(mesh);
 
+    gfloat section_length = length/sections;
+
     guint16 fi = self->f_num;
     guint16 ei = self->e_num;
     guint16 vi = self->v_num;
@@ -2269,61 +2272,55 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         guint v_num = moto_mesh_get_face_v_num(mesh, si);
         guint16 vs = self_f_data[si].v_offset - v_num;
         gfloat *normal = (gfloat*)(self->f_normals + si);
-        g_print("normal(%f, %f, %f)\n", normal[0], normal[1], normal[2]);
 
-        guint16 vi0 = vi;
-        guint j;
-        for(j = 0; j < v_num; ++j)
+        guint16 prev_vloop[v_num];
+        guint16 vloop[v_num];
+        guint16 prev_vloop_v0, prev_vloop_v1;
+        guint16 vloop_v0, vloop_v1;
+
+        // Fill initial vloop with vertex indecies of extruded face.
+        size_t loop_size = sizeof(guint16)*v_num;
+        memcpy(vloop, self_f_verts + vs, loop_size);
+
+        guint j, k;
+        for(j = 0; j < sections; ++j)
         {
-            guint16 fvi  = self_f_verts[vs + j];
-            // guint16 nfvi = (j < v_num-1) ? self_f_verts[vs + j + 1] : self_f_verts[vs];
-            guint16 nfvi = self_f_verts[vs + ((j + 1)%v_num)];
+            // Update vertex loops.
+            memcpy(prev_vloop, vloop, loop_size);
+            for(k = 0; k < v_num; ++k)
+            {
+                vloop[k] = vi++;
+            }
 
-            gfloat *c = (gfloat*)(self->v_coords + fvi);
-            gfloat *p = (gfloat*)(mesh->v_coords + vi);
-            vector3_copy(p, c);
-            point3_move(p, normal, length);
+            // Calculating side faces and moving verts.
+            for(k = 0; k < v_num; ++k)
+            {
+                prev_vloop_v0 = prev_vloop[k];
+                prev_vloop_v1 = prev_vloop[(k+1)%v_num];
+                vloop_v0      = vloop[k];
+                vloop_v1      = vloop[(k+1)%v_num];
 
-            guint16 nvi = (j < v_num-1) ? vi + 1 : vi0;
+                gfloat *c = (gfloat*)(mesh->v_coords + prev_vloop_v0);
+                gfloat *p = (gfloat*)(mesh->v_coords + vloop_v0);
+                vector3_copy(p, c);
+                point3_move(p, normal, section_length);
 
-            guint16 verts[4];
-            verts[3] = fvi;
-            verts[2] = vi;
-            verts[1] = nvi;
-            verts[0] = fvi;
-            // moto_mesh_set_face(mesh, fi, v_offset, verts);
-            f_data[fi].v_offset = v_offset + 4;
-            f_verts[v_offset+3] = fvi;
-            f_verts[v_offset+2] = vi;
-            f_verts[v_offset+1] = nvi;
-            f_verts[v_offset] = nfvi;
-            v_offset += 4;
-            ++fi;
+                f_data[fi].v_offset = v_offset + 4;
+                f_verts[v_offset+3] = prev_vloop_v0;
+                f_verts[v_offset+2] = vloop_v0;
+                f_verts[v_offset+1] = vloop_v1;
+                f_verts[v_offset]   = prev_vloop_v1;
+                v_offset += 4;
 
-            /*
-            e_verts[ei*2] = fvi;
-            e_verts[ei*2+1] = vi;
-            ++ei;
-            e_verts[ei*2] = vi;
-            e_verts[ei*2+1] = nvi;
-            ++ei;
-            */
-
-            ++vi;
+                ++fi;
+            }
         }
 
-        guint16 verts[4];
-        verts[0] = vi - 4;
-        verts[1] = vi - 3;
-        verts[2] = vi - 2;
-        verts[3] = vi - 1;
-
-        // f_data[si].v_offset = v_offset + 4;
+        // Value of v_offset for extruded face is not changed.
         f_verts[f_data[si].v_offset-1] = vi - 1;
         f_verts[f_data[si].v_offset-2] = vi - 2;
         f_verts[f_data[si].v_offset-3] = vi - 3;
         f_verts[f_data[si].v_offset-4] = vi - 4;
-        // moto_mesh_set_face(mesh, si, self_f_data[si].v_offset, verts);
     }
     g_assert(vi == mesh->v_num);
 
