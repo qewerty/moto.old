@@ -13,6 +13,7 @@
 #include "moto-displace-node.h"
 #include "moto-twist-node.h"
 #include "moto-bend-node.h"
+#include "moto-extrude-node.h"
 #include "moto-object-node.h"
 #include "moto-camera-node.h"
 #include "moto-sler-material-node.h"
@@ -162,6 +163,7 @@ moto_system_class_init(MotoSystemClass *klass)
         MOTO_TYPE_DISPLACE_NODE;
         MOTO_TYPE_TWIST_NODE;
         MOTO_TYPE_BEND_NODE;
+        MOTO_TYPE_EXTRUDE_NODE;
 }
 
 G_DEFINE_TYPE(MotoSystem, moto_system, G_TYPE_OBJECT);

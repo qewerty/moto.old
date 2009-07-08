@@ -385,51 +385,6 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
         }
     }
 
-    MotoMesh *old = mesh;
-    moto_mesh_prepare(old);
-    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(old);
-    moto_mesh_selection_select_face(selection, 4);
-    moto_mesh_selection_select_face(selection, 25);
-    moto_mesh_selection_select_face(selection, 33);
-    mesh = moto_mesh_extrude_faces(old, selection, 6, 1.25);
-    g_object_unref(old);
-    moto_mesh_selection_free(selection);
-
-    old = mesh;
-    selection = moto_mesh_selection_new_for_mesh(old);
-    moto_mesh_selection_select_face(selection, 4);
-    moto_mesh_selection_select_face(selection, 25);
-    moto_mesh_selection_select_face(selection, 33);
-    mesh = moto_mesh_extrude_faces(old, selection, 1, 0.5);
-    g_object_unref(old);
-    moto_mesh_selection_free(selection);
-
-    old = mesh;
-    selection = moto_mesh_selection_new_for_mesh(old);
-    moto_mesh_selection_select_face(selection, old->f_num-1);
-    moto_mesh_selection_select_face(selection, old->f_num-2);
-    moto_mesh_selection_select_face(selection, old->f_num-3);
-    moto_mesh_selection_select_face(selection, old->f_num-4);
-    moto_mesh_selection_select_face(selection, old->f_num-5);
-    moto_mesh_selection_select_face(selection, old->f_num-6);
-    moto_mesh_selection_select_face(selection, old->f_num-7);
-    moto_mesh_selection_select_face(selection, old->f_num-8);
-    moto_mesh_selection_select_face(selection, old->f_num-9);
-    moto_mesh_selection_select_face(selection, old->f_num-10);
-    moto_mesh_selection_select_face(selection, old->f_num-11);
-    moto_mesh_selection_select_face(selection, old->f_num-12);
-    mesh = moto_mesh_extrude_faces(old, selection, 1, 0.5);
-    g_object_unref(old);
-    moto_mesh_selection_free(selection);
-
-    old = mesh;
-    selection = moto_mesh_selection_new_for_mesh(old);
-    moto_mesh_selection_select_face(selection, 4);
-    moto_mesh_selection_select_face(selection, 25);
-    moto_mesh_selection_select_face(selection, 33);
-    mesh = moto_mesh_extrude_faces(old, selection, 10, 0.25);
-    g_object_unref(old);
-
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
     g_value_set_object(moto_param_get_value(pm), mesh);
 

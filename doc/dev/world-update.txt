@@ -29,3 +29,20 @@ More
 
 DAG may be decomposed on independent parts and each part may be updated on
 separate thread
+
+MMMM =)
+-------
+
+Data
+****
+
+Graph always hols info useful not or not.
+
+Algo
+****
+
+ * Build the updating queue from independent useful nodes.
+ * Send each node to the free worker thread, wait if all workes are busy.
+ * When node is up to date, all nodes depending on it go to updating queue.
+ * Begin from second  step;
+ 
