@@ -150,18 +150,23 @@ guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
 guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
 
 void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_select_verts(MotoMeshSelection *self, ...);
 void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_verts(MotoMeshSelection *self, ...);
 void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self);
 void moto_mesh_selection_toggle_vertex_selection(MotoMeshSelection *self, guint index);
 gboolean moto_mesh_selection_is_vertex_selected(MotoMeshSelection *self, guint index);
 
 void moto_mesh_selection_select_edge(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_select_edges(MotoMeshSelection *self, ...);
 void moto_mesh_selection_deselect_edge(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_deselect_edges(MotoMeshSelection *self, ...);
 void moto_mesh_selection_deselect_all_edges(MotoMeshSelection *self);
 void moto_mesh_selection_toggle_edge_selection(MotoMeshSelection *self, guint index);
 gboolean moto_mesh_selection_is_edge_selected(MotoMeshSelection *self, guint index);
 
 void moto_mesh_selection_select_face(MotoMeshSelection *self, guint index);
+void moto_mesh_selection_select_faces(MotoMeshSelection *self, ...);
 void moto_mesh_selection_deselect_face(MotoMeshSelection *self, guint index);
 void moto_mesh_selection_deselect_all_faces(MotoMeshSelection *self);
 void moto_mesh_selection_toggle_face_selection(MotoMeshSelection *self, guint index);

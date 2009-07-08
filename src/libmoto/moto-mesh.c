@@ -1252,9 +1252,43 @@ void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index)
     moto_bitmask_set(self->verts, index);
 }
 
+void moto_mesh_selection_select_verts(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_select_vertex(self, index);
+    }
+
+    va_end(ap);
+}
+
 void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index)
 {
     moto_bitmask_unset(self->verts, index);
+}
+
+void moto_mesh_selection_deselect_verts(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_deselect_vertex(self, index);
+    }
+
+    va_end(ap);
 }
 
 void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self)
@@ -1279,9 +1313,43 @@ void moto_mesh_selection_select_edge(MotoMeshSelection *self, guint index)
     moto_bitmask_set(self->edges, index);
 }
 
+void moto_meshV_selection_select_edges(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_select_edge(self, index);
+    }
+
+    va_end(ap);
+}
+
 void moto_mesh_selection_deselect_edge(MotoMeshSelection *self, guint index)
 {
     moto_bitmask_unset(self->edges, index);
+}
+
+void moto_mesh_selection_deselect_edges(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_deselect_edge(self, index);
+    }
+
+    va_end(ap);
 }
 
 void moto_mesh_selection_deselect_all_edges(MotoMeshSelection *self)
@@ -1306,9 +1374,43 @@ void moto_mesh_selection_select_face(MotoMeshSelection *self, guint index)
     moto_bitmask_set(self->faces, index);
 }
 
+void moto_mesh_selection_select_faces(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_select_face(self, index);
+    }
+
+    va_end(ap);
+}
+
 void moto_mesh_selection_deselect_face(MotoMeshSelection *self, guint index)
 {
     return moto_bitmask_unset(self->faces, index);
+}
+
+void moto_mesh_selection_deselect_faces(MotoMeshSelection *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    while(1)
+    {
+        guint32 index = va_arg(ap, guint);
+        if(G_MAXUINT32 == index)
+            break;
+
+        moto_mesh_selection_deselect_face(self, index);
+    }
+
+    va_end(ap);
 }
 
 void moto_mesh_selection_deselect_all_faces(MotoMeshSelection *self)
