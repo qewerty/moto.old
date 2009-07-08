@@ -389,7 +389,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     g_value_set_object(moto_param_get_value(pm), mesh);
 
     priv->bound_calculated = FALSE;
-    // moto_mesh_prepare(mesh);
+    moto_mesh_prepare(mesh);
     moto_param_update_dests(pm);
 }
 #undef get_v
