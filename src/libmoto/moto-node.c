@@ -112,6 +112,8 @@ struct _MotoParamPriv
 {
     gboolean disposed;
 
+    gboolean is_static;
+
     guint id;
 
     GValue value;
@@ -123,6 +125,7 @@ struct _MotoParamPriv
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
     GPtrArray *depends_on_params;
 
+    gboolean scriptable; // Only hint for param editor
     gboolean use_expression;
     GString *expression;
     PyObject *expression_function;
@@ -407,7 +410,7 @@ void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *
     moto_mapped_list_set(& priv->params, moto_param_get_name(param), param);
 }
 
-static void moto_node_add_params_va(MotoNode *self, va_list ap)
+static void moto_node_add_params_va(MotoNode *self, gboolean is_static, va_list ap)
 {
     while(1)
     {
@@ -545,6 +548,7 @@ static void moto_node_add_params_va(MotoNode *self, va_list ap)
         gchar         *group = va_arg(ap, gchar*);
 
         MotoParam *p = moto_param_new(pname, ptitle, pmode, &v, pspec, self);
+        MOTO_PARAM_GET_PRIVATE(p)->is_static = is_static;
 
         moto_node_add_param(self, p, group);
     }
@@ -556,20 +560,21 @@ void moto_node_add_params(MotoNode *self, ...)
 {
     va_list ap;
     va_start(ap, self);
-    moto_node_add_params_va(self, ap);
+    moto_node_add_params_va(self, FALSE, ap);
     va_end(ap);
 }
 
 void moto_node_add_static_param(MotoNode *self, MotoParam *param, const gchar *group)
 {
-    moto_node_add_param(self, param, group); // TODO: Implement static params.
+    MOTO_PARAM_GET_PRIVATE(param)->is_static = TRUE;
+    moto_node_add_param(self, param, group);
 }
 
 void moto_node_add_static_params(MotoNode *self, ...)
 {
     va_list ap;
     va_start(ap, self);
-    moto_node_add_params_va(self, ap); // TODO: Implement static params.
+    moto_node_add_params_va(self, TRUE, ap);
     va_end(ap);
 }
 
@@ -1162,6 +1167,8 @@ moto_param_init(MotoParam *self)
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     priv->disposed = FALSE;
 
+    priv->is_static = FALSE;
+
     static guint id = 0;
     // FIXME: Implement generating unique ids correcly even when
     // scene loaded from file and params are saved in variations.
@@ -1172,6 +1179,7 @@ moto_param_init(MotoParam *self)
 
     priv->depends_on_params = NULL;
 
+    priv->scriptable     = TRUE;
     priv->use_expression = FALSE;
     priv->expression = g_string_new("");
     priv->expression_function = NULL;
@@ -1635,8 +1643,23 @@ MotoNode *moto_param_get_node(MotoParam *self)
     return priv->node;
 }
 
+gboolean moto_param_is_static(MotoParam *self)
+{
+    return MOTO_PARAM_GET_PRIVATE(self)->is_static;
+}
+
 // Dealing with expressions
-// ------------------------
+
+void moto_param_set_scriptable(MotoParam *self, gboolean scriptable)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    priv->scriptable = scriptable;
+}
+
+gboolean moto_param_get_scriptable(MotoParam *self)
+{
+    return MOTO_PARAM_GET_PRIVATE(self)->scriptable;
+}
 
 void moto_param_set_use_expression(MotoParam *self, gboolean use)
 {
