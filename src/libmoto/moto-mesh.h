@@ -188,6 +188,10 @@ void moto_mesh_selection_select_more_faces(MotoMeshSelection *self, MotoMesh *me
 void moto_mesh_selection_select_less_faces(MotoMeshSelection *self, MotoMesh *mesh);
 void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh *mesh);
 
+void moto_mesh_selection_update_from_verts(MotoMeshSelection *self, MotoMesh *mesh);
+void moto_mesh_selection_update_from_edges(MotoMeshSelection *self, MotoMesh *mesh);
+void moto_mesh_selection_update_from_faces(MotoMeshSelection *self, MotoMesh *mesh);
+
 struct _MotoHalfEdge16
 {
     guint16 next;

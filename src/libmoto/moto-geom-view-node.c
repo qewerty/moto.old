@@ -184,8 +184,10 @@ void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_na
             MotoGeomViewState *s = (MotoGeomViewState *)state->data;
             if(s != self->priv->state)
             {
-                 self->priv->state = s;
-                 moto_geom_view_node_set_prepared(self, FALSE);
+                if(self->priv->state)
+                    moto_geom_view_state_leave(self->priv->state, self);
+                self->priv->state = s;
+                moto_geom_view_node_set_prepared(self, FALSE);
             }
             return;
         }
@@ -304,11 +306,13 @@ struct _MotoGeomViewStatePriv
 {
     GString *name;
     GString *title;
+
     MotoGeomViewStateDrawFunc draw;
     MotoGeomViewStateSelectFunc select;
     MotoGeomViewStateGrowSelectionFunc grow_selection;
     MotoGeomViewStateSelectLessFunc select_less;
     MotoGeomViewStateInvertSelectionFunc invert_selection;
+    MotoGeomViewStateLeaveFunc leave;
 };
 
 static void
@@ -363,18 +367,20 @@ moto_geom_view_state_new(const gchar *name, const gchar *title,
         MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
         MotoGeomViewStateGrowSelectionFunc grow_selection,
         MotoGeomViewStateSelectLessFunc select_less,
-        MotoGeomViewStateInvertSelectionFunc invert_selection)
+        MotoGeomViewStateInvertSelectionFunc invert_selection,
+        MotoGeomViewStateLeaveFunc leave)
 {
     MotoGeomViewState *self = (MotoGeomViewState *)g_object_new(MOTO_TYPE_GEOM_VIEW_STATE, NULL);
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);
 
-    self->priv->draw = draw;
-    self->priv->select = select;
-    self->priv->grow_selection = grow_selection;
-    self->priv->select_less = select_less;
+    self->priv->draw             = draw;
+    self->priv->select           = select;
+    self->priv->grow_selection   = grow_selection;
+    self->priv->select_less      = select_less;
     self->priv->invert_selection = invert_selection;
+    self->priv->leave            = leave;
 
     return self;
 }
@@ -419,4 +425,10 @@ void moto_geom_view_state_invert_selection(MotoGeomViewState *self, MotoGeomView
 {
     if(self->priv->invert_selection)
         return self->priv->invert_selection(self, geom);
+}
+
+void moto_geom_view_state_leave(MotoGeomViewState *self, MotoGeomViewNode *geom)
+{
+    if(self->priv->leave)
+        return self->priv->leave(self, geom);
 }

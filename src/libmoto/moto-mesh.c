@@ -2289,6 +2289,272 @@ void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh 
     moto_bitmask_inverse(self->faces);
 }
 
+void moto_mesh_selection_update_from_verts(MotoMeshSelection *self, MotoMesh *mesh)
+{
+    moto_bitmask_unset_all(self->edges);
+    moto_bitmask_unset_all(self->faces);
+
+    if(moto_bitmask_get_set_num(self->verts) < 1)
+        return;
+
+    if(mesh->b32)
+    {
+        MOTO_DECLARE_MESH_DATA_32(mesh);
+
+        guint selected_v_num = moto_bitmask_get_set_num(self->verts);
+        guint32 *selected    = moto_bitmask_create_array_32(self->verts);
+
+        guint32 i;
+        for(i = 0; i < selected_v_num; ++i)
+        {
+            guint32 si = selected[i];
+            guint32 he = v_data[si].half_edge;
+            if(G_MAXUINT32 == he)
+                continue;
+
+            gboolean broken = FALSE;
+            guint32 begin = he;
+            do
+            {
+                guint32 pair = moto_half_edge_pair(he);
+
+                moto_bitmask_set(self->edges, moto_half_edge_edge(he)); // edge always valid
+                if(G_MAXUINT32 != he_data[he].f_left)
+                    moto_bitmask_set(self->faces, he_data[he].f_left);
+                if(G_MAXUINT32 != he_data[pair].f_left)
+                    moto_bitmask_set(self->faces, he_data[pair].f_left);
+
+                guint32 next = he_data[pair].next;
+                if(G_MAXUINT32 == next)
+                {
+                    broken = TRUE;
+                    break;
+                }
+
+                he = next;
+            }
+            while(he != begin);
+
+            if(broken)
+            {
+                he = he_data[v_data[si].half_edge].prev;
+                if(G_MAXUINT32 == he)
+                    continue;
+                begin = he;
+                do
+                {
+                    guint32 pair = moto_half_edge_pair(he);
+
+                    moto_bitmask_set(self->edges, moto_half_edge_edge(he)); // edge always valid
+                    if(G_MAXUINT32 != he_data[he].f_left)
+                        moto_bitmask_set(self->faces, he_data[he].f_left);
+                    if(G_MAXUINT32 != he_data[pair].f_left)
+                        moto_bitmask_set(self->faces, he_data[pair].f_left);
+
+                    guint32 prev = he_data[pair].prev;
+                    if(G_MAXUINT32 == prev)
+                        break;
+                    he = prev;
+                }
+                while(he != begin);
+            }
+        }
+
+        g_free(selected);
+    }
+    else
+    {
+        MOTO_DECLARE_MESH_DATA_16(mesh);
+
+        guint selected_v_num = moto_bitmask_get_set_num(self->verts);
+        guint16 *selected    = moto_bitmask_create_array_16(self->verts);
+
+        guint16 i;
+        for(i = 0; i < selected_v_num; ++i)
+        {
+            guint16 si = selected[i];
+            guint16 he = v_data[si].half_edge;
+            if(G_MAXUINT16 == he)
+                continue;
+
+            gboolean broken = FALSE;
+            guint16 begin = he;
+            do
+            {
+                guint16 pair = moto_half_edge_pair(he);
+
+                moto_bitmask_set(self->edges, moto_half_edge_edge(he)); // edge always valid
+                if(G_MAXUINT16 != he_data[he].f_left)
+                    moto_bitmask_set(self->faces, he_data[he].f_left);
+                if(G_MAXUINT16 != he_data[pair].f_left)
+                    moto_bitmask_set(self->faces, he_data[pair].f_left);
+
+                guint16 next = he_data[pair].next;
+                if(G_MAXUINT16 == next)
+                {
+                    broken = TRUE;
+                    break;
+                }
+
+                he = next;
+            }
+            while(he != begin);
+
+            if(broken)
+            {
+                he = he_data[v_data[si].half_edge].prev;
+                if(G_MAXUINT16 == he)
+                    continue;
+                begin = he;
+                do
+                {
+                    guint16 pair = moto_half_edge_pair(he);
+
+                    moto_bitmask_set(self->edges, moto_half_edge_edge(he)); // edge always valid
+                    if(G_MAXUINT16 != he_data[he].f_left)
+                        moto_bitmask_set(self->faces, he_data[he].f_left);
+                    if(G_MAXUINT16 != he_data[pair].f_left)
+                        moto_bitmask_set(self->faces, he_data[pair].f_left);
+
+                    guint16 prev = he_data[pair].prev;
+                    if(G_MAXUINT16 == prev)
+                        break;
+                    he = prev;
+                }
+                while(he != begin);
+            }
+        }
+
+        g_free(selected);
+    }
+}
+
+void moto_mesh_selection_update_from_edges(MotoMeshSelection *self, MotoMesh *mesh)
+{
+    moto_bitmask_unset_all(self->verts);
+    moto_bitmask_unset_all(self->faces);
+
+    if(moto_bitmask_get_set_num(self->edges) < 1)
+        return;
+
+    if(mesh->b32)
+    {
+        MOTO_DECLARE_MESH_DATA_32(mesh);
+
+        guint selected_e_num = moto_bitmask_get_set_num(self->edges);
+        guint32 *selected    = moto_bitmask_create_array_32(self->edges);
+
+        guint32 i;
+        for(i = 0; i < selected_e_num; ++i)
+        {
+            guint32 si   = selected[i];
+            guint32 he   = si*2;
+            guint32 pair = si*2+1;
+
+            moto_bitmask_set(self->verts, e_verts[he]);
+            moto_bitmask_set(self->verts, e_verts[pair]);
+
+            if(G_MAXUINT32 != he_data[he].f_left)
+                moto_bitmask_set(self->faces, he_data[he].f_left);
+            if(G_MAXUINT32 != he_data[pair].f_left)
+                moto_bitmask_set(self->faces, he_data[pair].f_left);
+        }
+
+        g_free(selected);
+    }
+    else
+    {
+        MOTO_DECLARE_MESH_DATA_16(mesh);
+
+        guint selected_e_num = moto_bitmask_get_set_num(self->edges);
+        guint16 *selected    = moto_bitmask_create_array_16(self->edges);
+
+        guint16 i;
+        for(i = 0; i < selected_e_num; ++i)
+        {
+            guint16 si   = selected[i];
+            guint16 he   = si*2;
+            guint16 pair = si*2+1;
+
+            moto_bitmask_set(self->verts, e_verts[he]);
+            moto_bitmask_set(self->verts, e_verts[pair]);
+
+            if(G_MAXUINT16 != he_data[he].f_left)
+                moto_bitmask_set(self->faces, he_data[he].f_left);
+            if(G_MAXUINT16 != he_data[pair].f_left)
+                moto_bitmask_set(self->faces, he_data[pair].f_left);
+        }
+
+        g_free(selected);
+    }
+}
+
+void moto_mesh_selection_update_from_faces(MotoMeshSelection *self, MotoMesh *mesh)
+{
+    moto_bitmask_unset_all(self->verts);
+    moto_bitmask_unset_all(self->edges);
+
+    if(moto_bitmask_get_set_num(self->faces) < 1)
+        return;
+
+    if(mesh->b32)
+    {
+        MOTO_DECLARE_MESH_DATA_32(mesh);
+
+        guint32 selected_f_num = moto_bitmask_get_set_num(self->faces);
+        guint32 *selected      = moto_bitmask_create_array_32(self->faces);
+
+        guint32 i;
+        for(i = 0; i < selected_f_num; ++i)
+        {
+            guint32 si = selected[i];
+            guint32 he = f_data[si].half_edge;
+            guint32 begin = he;
+            do
+            {
+                moto_bitmask_set(self->verts, e_verts[he]);
+                moto_bitmask_set(self->edges, moto_half_edge_edge(he));
+
+                guint32 next = he_data[he].next;;
+                if(G_MAXUINT32 == next)
+                    break;
+                he = next;
+            }
+            while(he != begin);
+        }
+
+        g_free(selected);
+    }
+    else
+    {
+        MOTO_DECLARE_MESH_DATA_16(mesh);
+
+        guint16 selected_f_num = moto_bitmask_get_set_num(self->faces);
+        guint16 *selected      = moto_bitmask_create_array_16(self->faces);
+
+        guint16 i;
+        for(i = 0; i < selected_f_num; ++i)
+        {
+            guint16 si = selected[i];
+            guint16 he = f_data[si].half_edge;
+            guint16 begin = he;
+            do
+            {
+                moto_bitmask_set(self->verts, e_verts[he]);
+                moto_bitmask_set(self->edges, moto_half_edge_edge(he));
+
+                guint16 next = he_data[he].next;;
+                if(G_MAXUINT16 == next)
+                    break;
+                he = next;
+            }
+            while(he != begin);
+        }
+
+        g_free(selected);
+    }
+}
+
 guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi)
 {
     guint result = 0;
