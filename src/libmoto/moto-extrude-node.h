@@ -24,6 +24,7 @@
 
 #include "moto-node.h"
 #include "moto-mesh.h"
+#include "moto-mesh-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -34,12 +35,12 @@ typedef struct _MotoExtrudeNodeClass MotoExtrudeNodeClass;
 
 struct _MotoExtrudeNode
 {
-    MotoNode parent;
+    MotoMeshOpNode parent;
 };
 
 struct _MotoExtrudeNodeClass
 {
-    MotoNodeClass parent;
+    MotoMeshOpNodeClass parent;
 };
 
 GType moto_extrude_node_get_type(void);
@@ -52,9 +53,6 @@ GType moto_extrude_node_get_type(void);
 #define MOTO_EXTRUDE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_EXTRUDE_NODE, MotoExtrudeNodeClass))
 
 MotoExtrudeNode *moto_extrude_node_new(const gchar *name);
-
-void moto_extrude_node_set_mesh_selection(MotoExtrudeNode *self,
-        MotoMeshSelection *selection);
 
 G_END_DECLS
 

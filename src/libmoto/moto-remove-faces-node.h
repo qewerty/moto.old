@@ -24,6 +24,7 @@
 
 #include "moto-node.h"
 #include "moto-mesh.h"
+#include "moto-mesh-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -34,12 +35,12 @@ typedef struct _MotoRemoveFacesNodeClass MotoRemoveFacesNodeClass;
 
 struct _MotoRemoveFacesNode
 {
-    MotoNode parent;
+    MotoMeshOpNode parent;
 };
 
 struct _MotoRemoveFacesNodeClass
 {
-    MotoNodeClass parent;
+    MotoMeshOpNodeClass parent;
 };
 
 GType moto_remove_faces_node_get_type(void);
@@ -52,9 +53,6 @@ GType moto_remove_faces_node_get_type(void);
 #define MOTO_REMOVE_FACES_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_REMOVE_FACES_NODE, MotoRemoveFacesNodeClass))
 
 MotoRemoveFacesNode *moto_remove_faces_node_new(const gchar *name);
-
-void moto_remove_faces_node_set_mesh_selection(MotoRemoveFacesNode *self,
-        MotoMeshSelection *selection);
 
 G_END_DECLS
 

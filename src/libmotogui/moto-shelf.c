@@ -187,64 +187,7 @@ static void create_normal_move(MotoShelf *shelf, MotoSystem *system)
     MotoNode *node = moto_world_create_node_by_name(w, "MotoDisplaceNode", "NormalMove", NULL);
 }
 
-static void extrude_mesh_faces(MotoShelf *shelf, MotoSystem *system)
-{
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoWorld *w = moto_system_get_current_world(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current world.");
-        return;
-    }
-
-    MotoObjectNode *obj = moto_world_get_current_object(w);
-    if(!obj)
-    {
-        moto_error("No current object to apply extrude.");
-        return;
-    }
-
-    MotoMeshViewNode *view;
-    moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
-
-    if( ! view)
-    {
-        moto_error("Current object has no view.");
-        return;
-    }
-
-    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
-    {
-        moto_error("View of current object is not MotoMeshViewNode.");
-        return;
-    }
-
-    MotoParam *param  = moto_node_get_param((MotoNode*)view, "mesh");
-    MotoParam *source = moto_param_get_source(param);
-    if( ! source)
-    {
-        moto_error("View of current object has not associated geometry.");
-        return;
-    }
-
-    MotoExtrudeNode *extrude = \
-        (MotoExtrudeNode*)moto_world_create_node_by_name(w, "MotoExtrudeNode", "Extrude", NULL);
-
-    moto_extrude_node_set_mesh_selection(extrude, moto_mesh_view_node_get_selection(view));
-
-    MotoParam *in_mesh = moto_node_get_param((MotoNode*)extrude, "in_mesh");
-    moto_param_link(in_mesh, source);
-
-    MotoParam *out_mesh = moto_node_get_param((MotoNode*)extrude, "out_mesh");
-    moto_param_link(param, out_mesh);
-}
-
-static void remove_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+static void perform_mesh_op(MotoShelf *shelf, MotoSystem *system, const gchar *op_node_name)
 {
     if( ! system)
     {
@@ -290,9 +233,13 @@ static void remove_mesh_faces(MotoShelf *shelf, MotoSystem *system)
     }
 
     MotoRemoveFacesNode *op = \
-        (MotoRemoveFacesNode*)moto_world_create_node_by_name(w, "MotoRemoveFacesNode", "RemoveFaces", NULL);
+        (MotoRemoveFacesNode*)moto_world_create_node_by_name(w, op_node_name, "Op", NULL);
+    if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_MESH_OP_NODE))
+        return;
 
-    moto_remove_faces_node_set_mesh_selection(op, moto_mesh_view_node_get_selection(view));
+    MotoMeshSelection *selection = moto_mesh_view_node_get_selection(view);
+    moto_mesh_op_node_set_selection((MotoMeshOpNode*)op, selection);
+    moto_mesh_selection_deselect_all(selection);
 
     MotoParam *in_mesh = moto_node_get_param((MotoNode*)op, "in_mesh");
     moto_param_link(in_mesh, source);
@@ -300,6 +247,16 @@ static void remove_mesh_faces(MotoShelf *shelf, MotoSystem *system)
     MotoParam *out_mesh = moto_node_get_param((MotoNode*)op, "out_mesh");
     moto_param_link(param, out_mesh);
 
+}
+
+static void extrude_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+{
+    perform_mesh_op(shelf, system, "MotoExtrudeNode");
+}
+
+static void remove_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+{
+    perform_mesh_op(shelf, system, "MotoRemoveFacesNode");
 }
 
 /* class MotoShelf */
