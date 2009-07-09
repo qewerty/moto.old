@@ -42,6 +42,14 @@ void on_help_about_activate(GtkMenuItem *item, gpointer user_data)
     g_object_unref(glade);
 }
 
+void open_script_editor(GtkMenuItem *item, gpointer user_data)
+{
+    /*
+    GtkWidget *se = moto_script_editor_new();
+    gtk_widget_show_all(se);
+    */
+}
+
 /* class MainMenu */
 
 static GObjectClass *main_menu_parent_class = NULL;
@@ -73,6 +81,8 @@ moto_main_menu_finalize(GObject *obj)
     main_menu_parent_class->finalize(obj);
 }
 
+
+
 static void
 moto_main_menu_init(MotoMainMenu *self)
 {
@@ -86,12 +96,14 @@ moto_main_menu_init(MotoMainMenu *self)
     GtkWidget *world = gtk_menu_item_new_with_label("World");
     GtkWidget *node = gtk_menu_item_new_with_label("Node");
     GtkWidget *render = gtk_menu_item_new_with_label("Render");
+    GtkWidget *window = gtk_menu_item_new_with_label("Window");
     GtkWidget *help = gtk_menu_item_new_with_label("Help");
     gtk_menu_bar_append(menu_bar, file);
     gtk_menu_bar_append(menu_bar, project);
     gtk_menu_bar_append(menu_bar, world);
     gtk_menu_bar_append(menu_bar, node);
     gtk_menu_bar_append(menu_bar, render);
+    gtk_menu_bar_append(menu_bar, window);
     gtk_menu_bar_append(menu_bar, help);
 
     GtkMenuItem *item;
@@ -121,6 +133,14 @@ moto_main_menu_init(MotoMainMenu *self)
     gtk_menu_append(project_menu, (GtkWidget *)item);
     item = (GtkMenuItem *)gtk_menu_item_new_with_label("Set");
     gtk_menu_append(project_menu, (GtkWidget *)item);
+
+    /* Window menu */
+    GtkMenu *window_menu = (GtkMenu *)gtk_menu_new();
+    gtk_menu_item_set_submenu((GtkMenuItem *)window, (GtkWidget *)window_menu);
+    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(open_script_editor), NULL);
+
+    item = (GtkMenuItem *)gtk_menu_item_new_with_label("Script Editor");
+    gtk_menu_append(window_menu, (GtkWidget *)item);
 
     /* Help menu */
     GtkMenu *help_menu = (GtkMenu *)gtk_menu_new();
