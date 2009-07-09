@@ -165,6 +165,7 @@ GtkWidget *moto_param_editor_new(MotoTestWindow *window)
 typedef struct _OnChangedData
 {
     MotoParam *param;
+    MotoParamEditor *pe;
     MotoTestWindow *window;
     GtkWidget *widget;
     gulong handler_id;
@@ -842,6 +843,15 @@ void destroy_filename_data(gpointer data, GClosure *closure)
     g_slice_free(FilenameDialogData, data);
 }
 
+static void on_source_button_clicked(GtkButton *button, OnChangedData *data)
+{
+    MotoParam* source = moto_param_get_source(data->param);
+    if( ! source)
+        return;
+
+    moto_param_editor_set_node(data->pe, moto_param_get_node(source));
+}
+
 static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 {
     MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
@@ -867,6 +877,29 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
             g_signal_connect(G_OBJECT(widget), "focus-out-event", G_CALLBACK(on_expression_focus_out_event), data);
         data->param_handler_id = 0;
 
+        return widget;
+    }
+
+    MotoParam *source = moto_param_get_source(param);
+    if(source)
+    {
+        GString *name = g_string_new("");
+        g_string_printf(name, "%s.%s",
+            moto_node_get_name(moto_param_get_node(source)),
+            moto_param_get_name(source));
+        widget = gtk_button_new_with_label(name->str);
+        // gtk_button_set_relief((GtkButton*)widget, GTK_RELIEF_NONE);
+        g_string_free(name, TRUE);
+
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->pe = pe;
+        data->window = pe_priv->window;
+        data->widget = widget;
+        data->param_handler_id = 0;
+
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        g_signal_connect(widget, "clicked", on_source_button_clicked, data);
         return widget;
     }
 
@@ -1682,6 +1715,121 @@ gboolean on_label_button_press_event(GtkLabel       *label,
 
     return TRUE;
 }
+void on_menu_destroy(gpointer data, GObject *where_the_object_was)
+{
+    g_print("Menu destroyed\n");
+}
+
+typedef struct _MotoCheckParamData
+{
+    gboolean has;
+    GType type;
+} MotoCheckParamData;
+
+typedef struct _MotoMakeNodeMenuData
+{
+    GtkMenu *menu;
+    GType type;
+    MotoNode *node;
+} MotoMakeNodeMenuData;
+
+static gboolean check_types(GType ptype, GType source)
+{
+    if(ptype == source)
+        return TRUE;
+
+    if(G_TYPE_IS_ENUM(ptype) && G_TYPE_IS_ENUM(source))
+        return (ptype == source);
+
+    if(g_type_is_a(ptype, G_TYPE_OBJECT) || g_type_is_a(ptype, G_TYPE_INTERFACE))
+    {
+        if(g_type_is_a(source, ptype))
+            return TRUE;
+    }
+    else
+    {
+        if(g_type_is_a(source, G_TYPE_OBJECT) || g_type_is_a(source, G_TYPE_INTERFACE))
+            return FALSE;
+        if(g_value_type_transformable(source, ptype))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static void check_param(MotoNode *node, MotoParam *param, MotoCheckParamData *data)
+{
+    if(data->has)
+        return;
+
+    if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT)
+        return;
+
+    GType ptype = moto_param_get_value_type(param);
+    data->has = check_types(ptype, data->type);
+}
+
+static void add_param_to_menu(MotoNode *node, MotoParam *param, MotoMakeNodeMenuData *data)
+{
+    if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT)
+        return;
+
+    GType ptype = moto_param_get_value_type(param);
+    gboolean compatible = check_types(ptype, data->type);
+
+    if(compatible)
+    {
+        GtkMenuItem *item = gtk_menu_item_new_with_label(moto_param_get_name(param));
+        gtk_menu_shell_append((GtkMenuShell*)data->menu, item);
+    }
+}
+
+static gboolean make_submenu_for_node(MotoWorld *world, MotoNode *node, MotoMakeNodeMenuData *data)
+{
+    if(node == data->node)
+        return;
+
+    MotoCheckParamData data0 = {FALSE, data->type};
+    moto_node_foreach_param(node, (MotoNodeForeachParamFunc)check_param, &data0);
+    if( ! data0.has)
+    {
+        g_print("Drop '%s'\n", moto_node_get_name(node));
+        return TRUE;
+    }
+
+    GtkMenu *menu = data->menu;
+
+    GtkMenuItem *item = gtk_menu_item_new_with_label(moto_node_get_name(node));
+    gtk_menu_shell_append((GtkMenuShell*)menu, item);
+
+    GtkMenu *submenu = gtk_menu_new();
+    gtk_menu_item_set_submenu(item, (GtkWidget*)submenu);
+
+    MotoMakeNodeMenuData data1 = {submenu, data->type, NULL};
+    moto_node_foreach_param(node, (MotoNodeForeachParamFunc)add_param_to_menu, &data1);
+
+    return TRUE;
+}
+
+static void on_connect_button_clicked(GtkButton *button, MotoParam *param)
+{
+    MotoNode *node = moto_param_get_node(param);
+    if( ! node)
+        return;
+    MotoWorld *world = moto_node_get_world(node);
+    if( ! world)
+        return;
+
+    GtkMenu *menu = gtk_menu_new();
+    g_object_weak_ref(G_OBJECT(menu), (GWeakNotify)on_menu_destroy, NULL);
+
+    MotoMakeNodeMenuData data = {menu, moto_param_get_value_type(param), node};
+    moto_world_foreach_node(world, MOTO_TYPE_NODE,
+        (MotoWorldForeachNodeFunc)make_submenu_for_node, & data);
+
+    gtk_widget_show_all((GtkWidget*)menu);
+    gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 2, 0);
+}
 
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
@@ -1731,6 +1879,8 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
                 button,
                 2, 3, pe_priv->num, pe_priv->num + 1,
                 GTK_SHRINK, GTK_SHRINK, 0, 0);
+
+        g_signal_connect(button, "clicked", on_connect_button_clicked, param);
     }
 
     pe_priv->num++;
