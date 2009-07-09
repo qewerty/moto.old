@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include "moto-types.h"
+#include "moto-enums.h"
 #include "moto-param-spec.h"
 #include "moto-mesh.h"
 #include "moto-extrude-node.h"
@@ -53,10 +54,11 @@ moto_extrude_node_init(MotoExtrudeNode *self)
 
     MotoParamSpec *sections_spec = moto_param_spec_int_new(1, 1, 100000, 1, 2);
     moto_node_add_params(node,
-            "sections",  "Sections",   G_TYPE_INT,   MOTO_PARAM_MODE_INOUT, 1, sections_spec, "Arguments",
-            "length",    "Length",     MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.5f, NULL,          "Arguments",
-            "in_mesh",  "Input Mesh",  MOTO_TYPE_MESH,  MOTO_PARAM_MODE_IN,    NULL, NULL,          "Geometry",
-            "out_mesh", "Output Mesh", MOTO_TYPE_MESH,  MOTO_PARAM_MODE_OUT,   NULL, NULL,          "Geometry",
+            "mode",     "Mode",        MOTO_TYPE_EXTRUDE_MODE, MOTO_PARAM_MODE_INOUT, MOTO_EXTRUDE_MODE_FACES, NULL, "Arguments",
+            "sections", "Sections",    MOTO_TYPE_INT,          MOTO_PARAM_MODE_INOUT, 1, sections_spec, "Arguments",
+            "length",   "Length",      MOTO_TYPE_FLOAT,        MOTO_PARAM_MODE_INOUT, 0.5f, NULL,       "Arguments",
+            "in_mesh",  "Input Mesh",  MOTO_TYPE_MESH,         MOTO_PARAM_MODE_IN,    NULL, NULL,       "Geometry",
+            "out_mesh", "Output Mesh", MOTO_TYPE_MESH,         MOTO_PARAM_MODE_OUT,   NULL, NULL,       "Geometry",
             NULL);
 
     g_object_unref(sections_spec);
@@ -121,7 +123,7 @@ static void moto_extrude_node_update(MotoNode *self)
     if( ! priv->selection)
     {
         MotoMesh *mesh = moto_mesh_new_copy(in_mesh);
-        moto_node_set_param_object(self, "out_mesh", mesh);
+        moto_node_set_param_object(self, "out_mesh", (GObject*)mesh);
         MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
         moto_param_update_dests(param);
         return;
