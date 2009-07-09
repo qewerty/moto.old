@@ -1260,6 +1260,13 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
         MotoNode *node)
 {
+    return moto_param_new_full(name, title, mode, value, pspec, node, TRUE, FALSE);
+}
+
+MotoParam *moto_param_new_full(const gchar *name, const gchar *title,
+        MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
+        MotoNode *node, gboolean scriptable, gboolean is_static)
+{
     if( ! node)
         return NULL;
     if( ! value)
@@ -1302,6 +1309,9 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
     {
         priv->pspec = NULL;
     }
+
+    priv->scriptable = scriptable;
+    priv->is_static  = is_static;
 
     return self;
 }
@@ -1450,6 +1460,16 @@ void moto_param_set_object(MotoParam *self, GObject *value)
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_object(& priv->value, value);
     g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+}
+
+void moto_param_set_1b(MotoParam *self, gboolean v)
+{
+    moto_param_set_boolean(self, v);
+}
+
+void moto_param_set_1bv(MotoParam *self, const gboolean *v)
+{
+    moto_param_set_boolean(self, *v);
 }
 
 MotoParam *moto_param_get_source(MotoParam *self)

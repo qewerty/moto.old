@@ -257,6 +257,10 @@ MotoParam *moto_param_new(const gchar *name, const gchar *title,
         MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
         MotoNode *node);
 
+MotoParam *moto_param_new_full(const gchar *name, const gchar *title,
+        MotoParamMode mode, GValue *value, MotoParamSpec *pspec,
+        MotoNode *node, gboolean scriptable, gboolean is_static);
+
 const gchar *moto_param_get_name(MotoParam *self);
 const gchar *moto_param_get_title(MotoParam *self);
 MotoNode *moto_param_get_node(MotoParam *self);
@@ -332,37 +336,6 @@ void moto_param_set_4f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2, gfloat 
 void moto_param_set_4fv(MotoParam *self, const gfloat *v);
 
 void moto_param_set_Nfv(MotoParam *self, const gchar *name, const gfloat *v, gsize N);
-
-gboolean moto_param_is_array(MotoParam *self);
-gboolean moto_param_is_array_unsized(MotoParam *self);
-
-// Variability can hols following values:
-//      MOTO_PARAM_VARIABILITY_CONSTANT, // Not animated
-//      MOTO_PARAM_VARIABILITY_UNIFORM,  // Animated, value changes from frame to frame
-//      MOTO_PARAM_VARIABILITY_VARYING   // Animated, value can change from frame to frame
-//                                       // and also in one frame from component to component
-// void moto_param_set_variability(MotoParam *self), MotoParamVariability variability);
-// MotoParamVariability moto_param_get_variability(MotoParam *self);
-
-// Only for unsized arrays
-void moto_param_set_array_size(MotoParam *self, gsize size);
-void moto_param_set_array_multi_dim_size(MotoParam *self, gsize *sizes);
-
-gboolean moto_param_is_struct(MotoParam *self);
-
-// Returns base type of array and matrix
-GType moto_param_get_base_type(MotoParam *self);
-
-// Retuns the number of rows. Same as moto_param_get_dim_size(param, 0)
-gint moto_param_get_rows(MotoParam *self);
-// Retuns the number of columns. Same as moto_param_get_dim_size(param, 1)
-gint moto_param_get_cols(MotoParam *self);
-// Returns the number of dimensions
-gint moto_param_get_dims(MotoParam *self);
-// Returns the number of elements in the given dimension
-gint moto_param_get_dim_size(MotoParam *self, gint dimension);
-// Returns the total number of elements
-gint moto_param_get_total_size(MotoParam *self);
 
 gboolean moto_param_is_static(MotoParam *self);
 
