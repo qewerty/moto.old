@@ -103,7 +103,7 @@ moto_mesh_class_init(MotoMeshClass *klass)
     goclass->finalize   = moto_mesh_finalize;
 }
 
-G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_BREP,
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_COPYABLE,
                                               moto_mesh_copyable_init);
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINT_CLOUD,

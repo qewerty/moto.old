@@ -28,6 +28,7 @@
 #include "moto-ray.h"
 #include "moto-bitmask.h"
 #include "moto-bound.h"
+#include "moto-brep.h"
 
 G_BEGIN_DECLS
 
@@ -222,7 +223,7 @@ struct _MotoMesh
     /* WARNING! All members are private but opened for performance reasons.
      *          Don't use them directly! */
 
-    GObject parent;
+    MotoBRep parent;
 
     gboolean b32; // 16bit or 32bit are used for indecies
     GLenum index_gl_type;
@@ -266,7 +267,7 @@ struct _MotoMesh
 
 struct _MotoMeshClass
 {
-    GObjectClass parent;
+    MotoBRepClass parent;
 };
 
 GType moto_mesh_get_type(void);
