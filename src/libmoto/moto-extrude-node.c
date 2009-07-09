@@ -142,7 +142,25 @@ static void moto_extrude_node_update(MotoNode *self)
     gfloat length;
     moto_node_get_param_float(self, "length", &length);
 
-    MotoMesh *mesh = moto_mesh_extrude_faces(in_mesh, priv->selection, sections, length);
+    MotoExtrudeMode mode;
+    moto_node_get_param_enum(self, "mode", (gint*)&mode);
+
+    MotoMesh *mesh;
+    switch(mode)
+    {
+        case MOTO_EXTRUDE_MODE_VERTS:
+            mesh = moto_mesh_extrude_verts(in_mesh, priv->selection, sections, length);
+        break;
+        case MOTO_EXTRUDE_MODE_EDGES:
+            ;// mesh = moto_mesh_extrude_edges(in_mesh, priv->selection, sections, length);
+        break;
+        case MOTO_EXTRUDE_MODE_FACES:
+            mesh = moto_mesh_extrude_faces(in_mesh, priv->selection, sections, length);
+        break;
+        case MOTO_EXTRUDE_MODE_REGION:
+            ; // mesh = moto_mesh_extrude_region(in_mesh, priv->selection, sections, length);
+        break;
+    }
 
     MotoParam *param = moto_node_get_param((MotoNode *)self, "out_mesh");
     moto_param_set_object(param, (GObject *)mesh);
