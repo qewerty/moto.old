@@ -2672,7 +2672,6 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     gfloat length)
 {
     guint selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
-
     if(sections < 1 || selected_f_num < 1)
     {
         return moto_mesh_new_copy(self);
@@ -2787,7 +2786,6 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     gfloat length)
 {
     guint selected_v_num = moto_mesh_selection_get_selected_v_num(selection);
-
     if(sections < 1 || selected_v_num  < 1)
     {
         return moto_mesh_new_copy(self);
@@ -2850,6 +2848,92 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     g_assert(fi == mesh->f_num);
 
     g_free(selected);
+    if(!moto_mesh_prepare(mesh))
+    {
+        g_object_unref(mesh);
+        return NULL;
+    }
+    return mesh;
+}
+
+MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
+    MotoMeshSelection *selection)
+{
+    guint selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
+    if(selected_f_num  < 1)
+    {
+        return moto_mesh_new_copy(self);
+    }
+
+    guint16 v_num = self->v_num;
+    guint16 e_num = self->e_num;
+    guint16 f_num = self->f_num - selected_f_num;
+
+    guint16 *selected = moto_bitmask_create_array_16(selection->faces);
+
+    MOTO_DECLARE_MESH_DATA_16(self);
+
+    MotoMeshSelection *for_removing = moto_mesh_selection_new_for_mesh(self);
+
+    guint i;
+    for(i = 0; i < selected_f_num; ++i)
+    {
+        guint16 si = selected[i];
+        guint16 he = f_data[si].half_edge;
+
+        guint16 begin = he;
+        do
+        {
+            gint16 ei = moto_half_edge_edge(he);
+            guint16 pair = moto_half_edge_pair(he);
+            guint16 fi   = he_data[pair].f_left;
+            if(G_MAXUINT16 == fi)
+            {
+                if( ! moto_mesh_selection_is_edge_selected(for_removing, ei))
+                    --e_num;
+                moto_mesh_selection_select_edge(for_removing, ei);
+            }
+            else if(moto_mesh_selection_is_face_selected(selection, fi))
+            {
+                if( ! moto_mesh_selection_is_edge_selected(for_removing, ei))
+                    --e_num;
+                moto_mesh_selection_select_edge(for_removing, ei);
+            }
+
+            guint16 next = he_data[he].next;
+            if(G_MAXUINT16 == next)
+                break;
+            he = next;
+        }
+        while(he != begin);
+    }
+
+    moto_mesh_selection_free(for_removing);
+    g_free(selected);
+
+    MotoMesh *mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+
+    memcpy(mesh->v_coords, self->v_coords, sizeof(MotoVector) * self->v_num);
+
+    guint16 fi = 0;
+    guint16 v_offset = 0;
+    for(i = 0; i < self->f_num; ++i)
+    {
+        if(moto_mesh_selection_is_face_selected(selection, i))
+            continue;
+
+        guint f_v_num = moto_mesh_get_face_v_num(self, i);
+
+        guint16 *f_verts = (guint16*)mesh->f_verts;
+        memcpy(f_verts + v_offset,
+               ((guint16*)self->f_verts) + f_data[i].v_offset - f_v_num,
+               sizeof(guint16)*f_v_num);
+
+        v_offset += f_v_num;
+        ((MotoMeshFace16*)mesh->f_data)[fi].v_offset = v_offset;
+        ++fi;
+    }
+
     if(!moto_mesh_prepare(mesh))
     {
         g_object_unref(mesh);
