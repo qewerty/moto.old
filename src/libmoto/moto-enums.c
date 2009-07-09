@@ -53,3 +53,22 @@ GType moto_draw_mode_get_type(void)
     return type;
 }
 
+/* MotoExtrudeMode */
+
+GType moto_extrude_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_EXTRUDE_MODE_VERTS,  "EXTRUDE_MODE_VERTS",  "Verts"},
+            {MOTO_EXTRUDE_MODE_EDGES,  "EXTRUDE_MODE_EDGES",  "Edges"},
+            {MOTO_EXTRUDE_MODE_FACES,  "EXTRUDE_MODE_FACES",  "Faces"},
+            {MOTO_EXTRUDE_MODE_REGION, "EXTRUDE_MODE_REGION", "Region"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoExtrudeMode", values);
+    }
+    return type;
+}
+
