@@ -237,6 +237,10 @@ static void perform_mesh_op(MotoShelf *shelf, MotoSystem *system, const gchar *o
     if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_MESH_OP_NODE))
         return;
 
+    MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode*)view);
+    if(state)
+        moto_geom_view_state_leave(state, (MotoGeomViewNode*)view);
+
     MotoMeshSelection *selection = moto_mesh_view_node_get_selection(view);
     moto_mesh_op_node_set_selection((MotoMeshOpNode*)op, selection);
     moto_mesh_selection_deselect_all(selection);
@@ -246,17 +250,88 @@ static void perform_mesh_op(MotoShelf *shelf, MotoSystem *system, const gchar *o
 
     MotoParam *out_mesh = moto_node_get_param((MotoNode*)op, "out_mesh");
     moto_param_link(param, out_mesh);
-
 }
 
-static void extrude_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+static void perform_pc_op(MotoShelf *shelf, MotoSystem *system, const gchar *op_node_name)
+{
+    if( ! system)
+    {
+        moto_error("MotoShelf has no associated system.");
+        return;
+    }
+
+    MotoWorld *w = moto_system_get_current_world(system);
+    if( ! w)
+    {
+        moto_error("MotoSystem associated with the shelf has no current world.");
+        return;
+    }
+
+    MotoObjectNode *obj = moto_world_get_current_object(w);
+    if(!obj)
+    {
+        moto_error("No current object to apply extrude.");
+        return;
+    }
+
+    MotoMeshViewNode *view;
+    moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
+
+    if( ! view)
+    {
+        moto_error("Current object has no view.");
+        return;
+    }
+
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
+    {
+        moto_error("View of current object is not MotoMeshViewNode.");
+        return;
+    }
+
+    MotoParam *param  = moto_node_get_param((MotoNode*)view, "mesh");
+    MotoParam *source = moto_param_get_source(param);
+    if( ! source)
+    {
+        moto_error("View of current object has not associated geometry.");
+        return;
+    }
+
+    MotoRemoveFacesNode *op = \
+        (MotoRemoveFacesNode*)moto_world_create_node_by_name(w, op_node_name, "Op", NULL);
+    if( ! op)
+        return;
+
+    MotoParam *in = moto_node_get_param((MotoNode*)op, "in_pc");
+    moto_param_link(in, source);
+
+    MotoParam *out = moto_node_get_param((MotoNode*)op, "out_pc");
+    moto_param_link(param, out);
+}
+
+static void perform_extrude(MotoShelf *shelf, MotoSystem *system)
 {
     perform_mesh_op(shelf, system, "MotoExtrudeNode");
 }
 
-static void remove_mesh_faces(MotoShelf *shelf, MotoSystem *system)
+static void perform_remove_faces(MotoShelf *shelf, MotoSystem *system)
 {
     perform_mesh_op(shelf, system, "MotoRemoveFacesNode");
+}
+
+static void perform_twist(MotoShelf *shelf, MotoSystem *system)
+{
+    perform_pc_op(shelf, system, "MotoTwistNode");
+}
+
+static void perform_bend(MotoShelf *shelf, MotoSystem *system)
+{
+    perform_pc_op(shelf, system, "MotoBendNode");
+}
+
+static void perform_displace(MotoShelf *shelf, MotoSystem *system)
+{
+    perform_pc_op(shelf, system, "MotoDisplaceNode");
 }
 
 /* class MotoShelf */
@@ -335,8 +410,8 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Geom", "File",     create_mesh_file);
 
     moto_shelf_add_tab(self,  "Model");
-    moto_shelf_add_item(self, "Model", "Remove Faces",  remove_mesh_faces);
-    moto_shelf_add_item(self, "Model", "Extrude",  extrude_mesh_faces);
+    moto_shelf_add_item(self, "Model", "Remove",  perform_remove_faces);
+    moto_shelf_add_item(self, "Model", "Extrude",  perform_extrude);
     moto_shelf_add_item(self, "Model", "Bevel",    NULL);
     moto_shelf_add_item(self, "Model", "Collapse", NULL);
 
@@ -349,10 +424,9 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Render", "Light", NULL);
 
     moto_shelf_add_tab(self, "Deform");
-    moto_shelf_add_item(self, "Deform", "Twist", NULL);
-    moto_shelf_add_item(self, "Deform", "Bend", NULL);
-    moto_shelf_add_item(self, "Deform", "Displace", NULL);
-    moto_shelf_add_item(self, "Deform", "Normal", create_normal_move);
+    moto_shelf_add_item(self, "Deform", "Twist", perform_twist);
+    moto_shelf_add_item(self, "Deform", "Bend", perform_bend);
+    moto_shelf_add_item(self, "Deform", "Displace", perform_displace);
 
     return (GtkWidget *)self;
 }

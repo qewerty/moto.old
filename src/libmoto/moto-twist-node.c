@@ -115,8 +115,8 @@ static void moto_twist_node_update(MotoNode *self)
     gfloat *orig = (gfloat *)g_value_peek_pointer(vorig);
     gfloat *dir  = (gfloat *)g_value_peek_pointer(vdir);
 
-    MotoPointCloud *in_pc;
-    moto_node_get_param_object(self, "in_pc", (GObject**)in_pc);
+    MotoPointCloud *in_pc = NULL;
+    moto_node_get_param_object(self, "in_pc", (GObject**)&in_pc);
     if( ! in_pc)
     {
         if(priv->pc)
