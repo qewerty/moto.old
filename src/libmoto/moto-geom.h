@@ -22,7 +22,7 @@
 #ifndef __MOTO_GEOM_H__
 #define __MOTO_GEOM_H__
 
-#include "moto-brep.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -31,8 +31,6 @@ typedef struct _MotoGeomClass MotoGeomClass;
 
 typedef struct _MotoGeomCreator MotoGeomCreator;
 typedef struct _MotoGeomCreatorClass MotoGeomCreatorClass;
-
-typedef void (*MotoGeomForeachBRepFunc)(MotoBRep *brep, gpointer user_data);
 
 /* class MotoGeom */
 
@@ -55,14 +53,7 @@ GType moto_geom_get_type(void);
 #define MOTO_IS_GEOM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM))
 #define MOTO_GEOM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM, MotoGeomClass))
 
-MotoGeom *moto_geom_new(gsize n, GType brep_types);
-
-MotoBRep *moto_geom_get_brep(MotoGeom *self, GType brep_type);
-
 void moto_geom_update(MotoGeom *self);
-
-void moto_geom_foreach_brep(MotoGeom *self,
-    MotoGeomForeachBRepFunc func, gpointer user_data);
 
 G_END_DECLS
 

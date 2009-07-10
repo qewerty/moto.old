@@ -25,8 +25,3 @@ moto_geom_class_init(MotoGeomClass *klass)
 G_DEFINE_ABSTRACT_TYPE(MotoGeom, moto_geom, G_TYPE_INITIALLY_UNOWNED);
 
 /* Methods of class MotoGeom */
-
-void moto_geom_update(MotoGeom *self)
-{
-
-}
