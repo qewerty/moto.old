@@ -326,7 +326,7 @@ static void perform_twist(MotoShelf *shelf, MotoSystem *system)
 
 static void perform_bend(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_pc_op(shelf, system, "MotoBendNode");
+    perform_geom_op(shelf, system, "MotoBendNode");
 }
 
 static void perform_displace(MotoShelf *shelf, MotoSystem *system)

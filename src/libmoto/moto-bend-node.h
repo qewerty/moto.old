@@ -22,7 +22,7 @@
 #ifndef __MOTO_BEND_NODE_H__
 #define __MOTO_BEND_NODE_H__
 
-#include "moto-geom-view-node.h"
+#include "moto-geom-op-node.h"
 
 G_BEGIN_DECLS
 
