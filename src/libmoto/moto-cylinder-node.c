@@ -105,23 +105,24 @@ MotoCylinderNode *moto_cylinder_node_new(const gchar *name)
 
 static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 {
-    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
-    gfloat *radius0 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius0"));
-    gfloat *radius1 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius1"));
-    gint *rc        = (gint *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "rc"));
+    MotoNode *node = (MotoNode*)self;
 
-    gfloat radius_x_f = radius0[0];
-    gfloat radius_y_f = radius0[1];
-    gfloat radius_x_s = radius1[0];
-    gfloat radius_y_s = radius1[1];
+    gfloat radius_x_f, radius_y_f;
+    moto_node_get_param_2f(node, "radius0", &radius_x_f, &radius_y_f);
+    gfloat radius_x_s, radius_y_s;
+    moto_node_get_param_2f(node, "radius1", &radius_x_s, &radius_y_s);
 
-    gfloat height, screw;
-    gboolean screw_s;
+    gfloat height;
     moto_node_get_param_float((MotoNode *)self, "height", &height);
+
+    gfloat screw;
     moto_node_get_param_float((MotoNode *)self, "screw", &screw);
+
+    gboolean screw_s;
     moto_node_get_param_boolean((MotoNode *)self, "screw_s", &screw_s);
-    guint rows        = rc[0];
-    guint cols        = rc[1];
+
+    guint rows, cols;
+    moto_node_get_param_2i(node, "rc", &rows, &cols);
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
@@ -246,10 +247,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     }
 
     self->priv->bound_calculated = FALSE;
-    moto_mesh_prepare(mesh);
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
+    moto_geom_prepare((MotoGeom*)mesh);
+    moto_node_set_param_object(node, "mesh", (GObject*)mesh);
 }
 #undef get_v
 

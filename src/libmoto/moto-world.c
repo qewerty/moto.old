@@ -586,12 +586,32 @@ void push_node(MotoNode *node, GThreadPool *tp)
 
 guint moto_world_get_update_complexity(MotoWorld *self)
 {
-    return 2000; // TODO: Implement
+    return 0; // TODO: Implement
 }
 
 void moto_world_prepare_updateable_nodes(MotoWorld *self)
 {
     
+}
+
+static void world_update(MotoWorld *self)
+{
+    MotoWorldPriv *priv = self->priv;
+
+    gboolean smth_updated = FALSE;
+    GSList *l = priv->nodes;
+    for(; l; l = g_slist_next(l))
+    {
+        MotoNode *node = (MotoNode*)l->data;
+        if(moto_node_is_ready_to_update(node) && moto_node_needs_update(self))
+        {
+            moto_node_update(node);
+            smth_updated = TRUE;
+        }
+    }
+
+    if(smth_updated)
+        world_update(self);
 }
 
 void moto_world_update(MotoWorld *self)
@@ -600,7 +620,7 @@ void moto_world_update(MotoWorld *self)
 
     if(moto_world_get_update_complexity(self) < 1000)
     {
-        // TODO
+        world_update(self);
     }
     else
     {

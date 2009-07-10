@@ -119,16 +119,12 @@ static void moto_geom_op_node_update(MotoNode *self)
     if( ! in)
     {
         moto_node_set_param_object(self, "out", NULL);
-        MotoParam *param = moto_node_get_param(self, "out");
-        moto_param_update_dests(param);
         return;
     }
 
     if( ! priv->selection)
     {
         moto_node_set_param_object(self, "out", (GObject*)in);
-        MotoParam *param = moto_node_get_param(self, "out");
-        moto_param_update_dests(param);
         return;
     }
 
@@ -139,9 +135,7 @@ static void moto_geom_op_node_update(MotoNode *self)
     if(active)
         geom = moto_geom_op_node_perform((MotoGeomOpNode*)self, in);
 
-    MotoParam *param = moto_node_get_param(self, "out");
-    moto_param_set_object(param, (GObject *)geom);
-    moto_param_update_dests(param);
+    moto_node_set_param_object(self, "out", (GObject *)geom);
 }
 
 MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in)

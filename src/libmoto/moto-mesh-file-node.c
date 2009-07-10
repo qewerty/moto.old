@@ -157,6 +157,7 @@ static MotoMesh *moto_mesh_file_node_load(MotoMeshFileNode *self, const gchar *f
 
 static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 
     const gchar *filename;
@@ -168,11 +169,8 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
     priv->mesh = moto_mesh_file_node_load(self, filename);
 
     priv->bound_calculated = FALSE;
-
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    moto_param_set_object(pm, G_OBJECT(priv->mesh));
-    moto_param_update_dests(pm);
-
+    moto_geom_prepare((MotoGeom*)priv->mesh);
+    moto_node_set_param_object(node, "mesh", (GObject*)priv->mesh);
 }
 
 static void moto_mesh_file_node_update(MotoNode *self)

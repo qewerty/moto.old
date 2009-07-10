@@ -119,18 +119,18 @@ MotoSphereNode *moto_sphere_node_new(const gchar *name)
 
 static void moto_sphere_node_update_mesh(MotoSphereNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
 
     // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
     gfloat *radius = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius"));
     gint   *rc     = (gint *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "rc"));
 
-    gfloat radius_x = radius[0];
-    gfloat radius_y = radius[1];
-    gfloat radius_z = radius[2];
+    gfloat radius_x, radius_y, radius_z;
+    moto_node_get_param_3f(node, "radius", &radius_x, &radius_y, &radius_z);
 
-    guint rows = rc[0];
-    guint cols = rc[1];
+    guint rows, cols;
+    moto_node_get_param_2i(node, "rc", &rows, &cols);
 
     rows = (rows < 3) ? 3 : rows;
     cols = (cols < 3) ? 3 : cols;
@@ -296,10 +296,8 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     }
 
     priv->bound_calculated = FALSE;
-    moto_mesh_prepare(mesh);
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
+    moto_geom_prepare((MotoGeom*)mesh);
+    moto_node_set_param_object((MotoNode*)self, "mesh", (GObject*)mesh);
 }
 #undef get_v
 
@@ -323,14 +321,12 @@ static void moto_sphere_node_update(MotoNode *self)
 
 static void calc_bound(MotoSphereNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
 
-    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
-    gfloat *radius = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius"));
+    gfloat radius_x, radius_y, radius_z;
+    moto_node_get_param_3f(node, "radius", &radius_x, &radius_y, &radius_z);
 
-    gfloat radius_x = radius[0];
-    gfloat radius_y = radius[1];
-    gfloat radius_z = radius[2];
     MotoAxis orientation;
     moto_node_get_param_enum((MotoNode *)self, "orientation", (gint)&orientation);
 

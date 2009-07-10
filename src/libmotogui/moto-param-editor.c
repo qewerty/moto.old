@@ -1791,7 +1791,7 @@ static void add_param_to_menu(MotoNode *node, MotoParam *param, MotoMakeNodeMenu
 static gboolean make_submenu_for_node(MotoWorld *world, MotoNode *node, MotoMakeNodeMenuData *data)
 {
     if(node == data->node)
-        return;
+        return TRUE;
 
     MotoCheckParamData data0 = {FALSE, data->type};
     moto_node_foreach_param(node, (MotoNodeForeachParamFunc)check_param, &data0);

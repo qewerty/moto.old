@@ -139,21 +139,17 @@ MotoPlaneNode *moto_plane_node_new(const gchar *name)
 
 static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 
-    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
-    GValue *vsize = moto_node_get_param_value((MotoNode *)self, "size");
-    gfloat *size = (gfloat *)g_value_peek_pointer(vsize);
-    GValue *vdivs = moto_node_get_param_value((MotoNode *)self, "divs");
-    gint *divs = (gint *)g_value_peek_pointer(vdivs);
+    gfloat size_x, size_y;
+    moto_node_get_param_2f(node, "size", &size_x, &size_y);
 
-    gfloat size_x = size[0];
-    gfloat size_y = size[1];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
 
-    gint div_x = divs[0];
-    gint div_y = divs[1];
+    gint div_x, div_y;
+    moto_node_get_param_2i(node, "divs", &div_x, &div_y);
 
     div_x = max(div_x, 1);
     div_y = max(div_y, 1);
@@ -315,10 +311,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
     }
 
     priv->bound_calculated = FALSE;
-    moto_mesh_prepare(mesh);
-    MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
-    moto_param_update_dests(pm);
+    moto_geom_prepare((MotoGeom*)mesh);
+    moto_node_set_param_object(node, "mesh", (GObject*)mesh);
 }
 #undef e_x_num
 #undef e_y_num
@@ -344,13 +338,12 @@ static void moto_plane_node_update(MotoNode *self)
 
 static void calc_bound(MotoPlaneNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 
-    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
-    GValue *vsize = moto_node_get_param_value((MotoNode *)self, "size");
-    gfloat *size = g_value_peek_pointer(vsize);
-    gfloat size_x = size[0];
-    gfloat size_y = size[1];
+    gfloat size_x, size_y;
+    moto_node_get_param_2f(node, "size", &size_x, &size_y);
+
     MotoOrientation orientation;
     moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
 

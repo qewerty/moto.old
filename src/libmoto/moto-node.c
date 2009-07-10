@@ -13,6 +13,12 @@
 #include "moto-messager.h"
 #include "moto-variation.h"
 
+/* forwards */
+
+static void moto_param_update(MotoParam *self);
+static void moto_param_notify_dests(MotoParam *self);
+static void moto_param_mark_for_update(MotoParam *self);
+
 /* enums */
 
 GType moto_param_mode_get_type(void)
@@ -123,7 +129,7 @@ struct _MotoParamPriv
     MotoParam *source;
     GSList *dests;
 
-    gboolean updated;
+    gboolean changed;
 
     /* Used for determing which IN params this OUT depends on.
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
@@ -393,6 +399,51 @@ void moto_node_set_name(MotoNode *self, const gchar *name)
 gboolean moto_node_is_valid(MotoNode *self)
 {
     return TRUE; // TODO: Implement
+}
+
+static void check_param_source(MotoParam *param, gboolean *has)
+{
+    if(*has)
+        return;
+
+    *has = moto_param_get_source(param) != NULL;
+}
+
+gboolean moto_node_is_independent(MotoNode *self)
+{
+    gboolean has_sources = FALSE;
+    moto_mapped_list_foreach(& MOTO_NODE_GET_PRIVATE(self)->params,
+        (GFunc)check_param_source, & has_sources);
+    return has_sources;
+}
+
+static void check_param_source_ready(MotoParam *param, gboolean *ready)
+{
+    if( ! *ready)
+        return;
+
+    MotoParam *source = moto_param_get_source(param);
+    if(source)
+    {
+        MotoNode *src_node = moto_param_get_node(source);
+        if(src_node)
+        {
+            *ready = MOTO_NODE_GET_PRIVATE(src_node)->updated;
+        }
+    }
+}
+
+gboolean moto_node_is_ready_to_update(MotoNode *self)
+{
+    gboolean ready = TRUE;
+    moto_mapped_list_foreach(& MOTO_NODE_GET_PRIVATE(self)->params,
+        (GFunc)check_param_source_ready, & ready);
+    return ready;
+}
+
+gboolean moto_node_needs_update(MotoNode *self)
+{
+    return ! MOTO_NODE_GET_PRIVATE(self)->updated;
 }
 
 guint moto_node_get_id(MotoNode *self)
@@ -743,6 +794,414 @@ gboolean moto_node_set_param_object(MotoNode *self, const gchar *name, GObject *
     }
     moto_param_set_object(p, value);
     return TRUE;
+}
+
+// boolean
+
+gboolean moto_node_set_param_2b(MotoNode *self,  const gchar *name, gboolean v0, gboolean v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2b(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_2bv(MotoNode *self, const gchar *name, const gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3b(MotoNode *self,  const gchar *name, gboolean v0, gboolean v1, gboolean v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3b(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3bv(MotoNode *self, const gchar *name, const gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4b(MotoNode *self,  const gchar *name, gboolean v0, gboolean v1, gboolean v2, gboolean v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4b(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4bv(MotoNode *self, const gchar *name, const gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// int
+
+gboolean moto_node_set_param_2i(MotoNode *self,  const gchar *name, gint v0, gint v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2i(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_2iv(MotoNode *self, const gchar *name, const gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3i(MotoNode *self,  const gchar *name, gint v0, gint v1, gint v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3i(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3iv(MotoNode *self, const gchar *name, const gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4i(MotoNode *self,  const gchar *name, gint v0, gint v1, gint v2, gint v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4i(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4iv(MotoNode *self, const gchar *name, const gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// float
+
+gboolean moto_node_set_param_2f(MotoNode *self,  const gchar *name, gfloat v0, gfloat v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2f(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_2fv(MotoNode *self, const gchar *name, const gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_2fv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3f(MotoNode *self,  const gchar *name, gfloat v0, gfloat v1, gfloat v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3f(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_3fv(MotoNode *self, const gchar *name, const gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_3fv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4f(MotoNode *self,  const gchar *name, gfloat v0, gfloat v1, gfloat v2, gfloat v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4f(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_set_param_4fv(MotoNode *self, const gchar *name, const gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_set_4fv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// boolean
+
+gboolean moto_node_get_param_2b(MotoNode *self, const gchar *name, gboolean *v0, gboolean *v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2b(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_2bv(MotoNode *self, const gchar *name, gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3b(MotoNode *self,  const gchar *name, gboolean *v0, gboolean *v1, gboolean *v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3b(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3bv(MotoNode *self, const gchar *name, gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4b(MotoNode *self,  const gchar *name, gboolean *v0, gboolean *v1, gboolean *v2, gboolean *v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4b(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4bv(MotoNode *self, const gchar *name, gboolean *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// int
+
+gboolean moto_node_get_param_2i(MotoNode *self, const gchar *name, gint *v0, gint *v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2i(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_2iv(MotoNode *self, const gchar *name, gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3i(MotoNode *self,  const gchar *name, gint *v0, gint *v1, gint *v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3i(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3iv(MotoNode *self, const gchar *name, gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4i(MotoNode *self,  const gchar *name, gint *v0, gint *v1, gint *v2, gint *v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4i(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4iv(MotoNode *self, const gchar *name, gint *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4iv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// float
+
+gboolean moto_node_get_param_2f(MotoNode *self, const gchar *name, gfloat *v0, gfloat *v1)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2b(param, v0, v1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_2fv(MotoNode *self, const gchar *name, gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_2bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3f(MotoNode *self,  const gchar *name, gfloat *v0, gfloat *v1, gfloat *v2)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3b(param, v0, v1, v2);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_3fv(MotoNode *self, const gchar *name, gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_3bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4f(MotoNode *self,  const gchar *name, gfloat *v0, gfloat *v1, gfloat *v2, gfloat *v3)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4b(param, v0, v1, v2, v3);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean moto_node_get_param_4fv(MotoNode *self, const gchar *name, gfloat *v)
+{
+    MotoParam *param = moto_node_get_param(self, name);
+    if(param)
+    {
+        moto_param_get_4bv(param, v);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 gboolean moto_node_get_params(MotoNode *self, ...)
@@ -1192,7 +1651,7 @@ moto_param_init(MotoParam *self)
     priv->source = NULL;
     priv->dests = NULL;
 
-    priv->updated = FALSE;
+    priv->changed = TRUE;
 
     priv->depends_on_params = NULL;
 
@@ -1369,16 +1828,10 @@ guint moto_param_get_id(MotoParam *self)
     return priv->id;
 }
 
-GValue * moto_param_get_value(MotoParam *self)
+GValue *moto_param_get_value(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     return & priv->value;
-}
-
-gpointer moto_param_get_value_pointer(MotoParam *self)
-{
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return priv->value.data;
 }
 
 GType moto_param_get_value_type(MotoParam *self)
@@ -1429,65 +1882,263 @@ GObject *moto_param_get_object(MotoParam *self)
     return g_value_get_object(& priv->value);
 }
 
+// boolean
+
+void moto_param_get_2b(MotoParam *self,  gboolean *v0, gboolean *v1)
+{
+    moto_value_get_boolean_2(moto_param_get_value(self), v0, v1);
+}
+
+void moto_param_get_2bv(MotoParam *self, gboolean *v)
+{
+    moto_value_get_boolean_2_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_3b(MotoParam *self,  gboolean *v0, gboolean *v1, gboolean *v2)
+{
+    moto_value_get_boolean_3(moto_param_get_value(self), v0, v1, v2);
+}
+
+void moto_param_get_3bv(MotoParam *self, gboolean *v)
+{
+    moto_value_get_boolean_3_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_4b(MotoParam *self,  gboolean *v0, gboolean *v1, gboolean *v2, gboolean *v3)
+{
+    moto_value_get_boolean_4(moto_param_get_value(self), v0, v1, v2, v3);
+}
+
+void moto_param_get_4bv(MotoParam *self, gboolean *v)
+{
+    moto_value_get_boolean_4_v(moto_param_get_value(self), v);
+}
+
+// int
+
+void moto_param_get_2i(MotoParam *self, gint *v0, gint *v1)
+{
+    moto_value_get_int_2(moto_param_get_value(self), v0, v1);
+}
+
+void moto_param_get_2iv(MotoParam *self, gint *v)
+{
+    moto_value_get_int_2_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_3i(MotoParam *self, gint *v0, gint *v1, gint *v2)
+{
+    moto_value_get_int_3(moto_param_get_value(self), v0, v1, v2);
+}
+
+void moto_param_get_3iv(MotoParam *self, gint *v)
+{
+    moto_value_get_int_3_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_4i(MotoParam *self, gint *v0, gint *v1, gint *v2, gint *v3)
+{
+    moto_value_get_int_4(moto_param_get_value(self), v0, v1, v2, v3);
+}
+
+void moto_param_get_4iv(MotoParam *self, gint *v)
+{
+    moto_value_get_int_4_v(moto_param_get_value(self), v);
+}
+
+// float
+
+void moto_param_get_2f(MotoParam *self,  gfloat *v0, gfloat *v1)
+{
+    moto_value_get_float_2(moto_param_get_value(self), v0, v1);
+}
+
+void moto_param_get_2fv(MotoParam *self, gfloat *v)
+{
+    moto_value_get_float_2_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_3f(MotoParam *self,  gfloat *v0, gfloat *v1, gfloat *v2)
+{
+    moto_value_get_float_3(moto_param_get_value(self), v0, v1, v2);
+}
+
+void moto_param_get_3fv(MotoParam *self, gfloat *v)
+{
+    moto_value_get_float_3_v(moto_param_get_value(self), v);
+}
+
+void moto_param_get_4f(MotoParam *self,  gfloat *v0, gfloat *v1, gfloat *v2, gfloat *v3)
+{
+    moto_value_get_float_4(moto_param_get_value(self), v0, v1, v2, v3);
+}
+
+void moto_param_get_4fv(MotoParam *self, gfloat *v)
+{
+    moto_value_get_float_4_v(moto_param_get_value(self), v);
+}
+
 void moto_param_set_boolean(MotoParam *self, gboolean value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-
     g_value_set_boolean( & priv->value, value);
-
-    moto_param_update_dests(self);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_int(MotoParam *self, gint value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_int(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_float(MotoParam *self, gfloat value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_float(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_string(MotoParam *self, const gchar *value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_string(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_pointer(MotoParam *self, gpointer value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_pointer(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_enum(MotoParam *self, gint value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_enum(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
 void moto_param_set_object(MotoParam *self, GObject *value)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
     g_value_set_object(& priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+    moto_param_notify_dests(self);
 }
 
-void moto_param_set_1b(MotoParam *self, gboolean v)
+// boolean
+
+void moto_param_set_2b(MotoParam *self, gboolean v0, gboolean v1)
 {
-    moto_param_set_boolean(self, v);
+    moto_value_set_boolean_2(moto_param_get_value(self), v0, v1);
+    moto_param_notify_dests(self);
 }
 
-void moto_param_set_1bv(MotoParam *self, const gboolean *v)
+void moto_param_set_2bv(MotoParam *self, const gboolean *v)
 {
-    moto_param_set_boolean(self, *v);
+    moto_value_set_boolean_2_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3b(MotoParam *self, gboolean v0, gboolean v1, gboolean v2)
+{
+    moto_value_set_boolean_3(moto_param_get_value(self), v0, v1, v2);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3bv(MotoParam *self, const gboolean *v)
+{
+    moto_value_set_boolean_3_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4b(MotoParam *self, gboolean v0, gboolean v1, gboolean v2, gboolean v3)
+{
+    moto_value_set_boolean_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4bv(MotoParam *self, const gboolean *v)
+{
+    moto_value_set_boolean_4_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+// int
+
+void moto_param_set_2i(MotoParam *self, gint v0, gint v1)
+{
+    moto_value_set_int_2(moto_param_get_value(self), v0, v1);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_2iv(MotoParam *self, const gint *v)
+{
+    moto_value_set_int_2_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3i(MotoParam *self, gint v0, gint v1, gint v2)
+{
+    moto_value_set_int_3(moto_param_get_value(self), v0, v1, v2);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3iv(MotoParam *self, const gint *v)
+{
+    moto_value_set_int_3_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4i(MotoParam *self, gint v0, gint v1, gint v2, gint v3)
+{
+    moto_value_set_int_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4iv(MotoParam *self, const gint *v)
+{
+    moto_value_set_int_4_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+// float
+
+void moto_param_set_2f(MotoParam *self, gfloat v0, gfloat v1)
+{
+    moto_value_set_float_2(moto_param_get_value(self), v0, v1);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_2fv(MotoParam *self, const gfloat *v)
+{
+    moto_value_set_float_2_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2)
+{
+    moto_value_set_float_3(moto_param_get_value(self), v0, v1, v2);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_3fv(MotoParam *self, const gfloat *v)
+{
+    moto_value_set_float_3_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2, gfloat v3)
+{
+    moto_value_set_float_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_param_notify_dests(self);
+}
+
+void moto_param_set_4fv(MotoParam *self, const gfloat *v)
+{
+    moto_value_set_float_4_v(moto_param_get_value(self), v);
+    moto_param_notify_dests(self);
 }
 
 MotoParam *moto_param_get_source(MotoParam *self)
@@ -1501,7 +2152,6 @@ disconnect_on_source_deleted(MotoParam *param, GObject *where_the_object_was)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(param);
     priv->source = NULL;
-    g_signal_emit(param, MOTO_PARAM_GET_CLASS(param)->source_changed_signal_id, 0);
 }
 
 static void
@@ -1511,7 +2161,6 @@ exclude_from_dests_on_dest_deleted(gpointer data, GObject *where_the_object_was)
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(param);
 
     priv->dests = g_slist_remove(priv->dests, where_the_object_was);
-    g_signal_emit(param, MOTO_PARAM_GET_CLASS(param)->dest_removed_signal_id, 0);
 }
 
 void moto_param_link(MotoParam *self, MotoParam *src)
@@ -1558,9 +2207,7 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
     {
         if( ! g_type_is_a(src_type, self_type))
-        {
-            //return; // FIXME
-        }
+            return;
     }
     else
     {
@@ -1570,37 +2217,32 @@ void moto_param_link(MotoParam *self, MotoParam *src)
             return;
     }
 
-    g_object_weak_ref(G_OBJECT(src), (GWeakNotify)disconnect_on_source_deleted, self);
+    g_object_weak_ref(G_OBJECT(src),  (GWeakNotify)disconnect_on_source_deleted,       self);
     g_object_weak_ref(G_OBJECT(self), (GWeakNotify)exclude_from_dests_on_dest_deleted, src);
 
     priv->source = src;
     src_priv->dests = g_slist_append(src_priv->dests, self);
-    g_signal_emit(src, MOTO_PARAM_GET_CLASS(src)->dest_added_signal_id, 0);
 
-    moto_node_update(moto_param_get_node(src));
-    moto_param_update(self);
-
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->source_changed_signal_id, 0);
+    moto_param_mark_for_update(self);
 }
 
 void moto_param_unlink_source(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+
+    if( ! priv->source)
+        return;
+
     MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(priv->source);
 
-    if(src_priv)
-    {
-        g_object_weak_unref(G_OBJECT(priv->source), (GWeakNotify)disconnect_on_source_deleted, self);
-        g_object_weak_unref(G_OBJECT(self), (GWeakNotify)exclude_from_dests_on_dest_deleted, priv->source);
+    g_object_weak_unref(G_OBJECT(priv->source), (GWeakNotify)disconnect_on_source_deleted,       self);
+    g_object_weak_unref(G_OBJECT(self),         (GWeakNotify)exclude_from_dests_on_dest_deleted, priv->source);
 
-        src_priv->dests = g_slist_remove(src_priv->dests, self);
-        g_signal_emit(priv->source, MOTO_PARAM_GET_CLASS(priv->source)->dest_removed_signal_id, 0);
-    }
+    src_priv->dests = g_slist_remove(src_priv->dests, self);
     priv->source = NULL;
 }
 
-static void
-null_source(gpointer data, gpointer user_data)
+static void null_source(gpointer data, gpointer user_data)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(data);
     priv->source = NULL;
@@ -1609,13 +2251,11 @@ null_source(gpointer data, gpointer user_data)
 void moto_param_unlink_dests(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+
     if(priv->mode == MOTO_PARAM_MODE_IN)
     {
-        GString *msg = g_string_new("You are trying to clear destinations of input parameter (\"");
-        g_string_append(msg, moto_param_get_name(self));
-        g_string_append(msg, "\"). Inputs may not have destinations.");
-        moto_warning("%s", msg->str);
-        g_string_free(msg, TRUE);
+        moto_warning("You are trying to clear destinations of input parameter '%s'. Inputs may not have destinations.",
+            moto_param_get_name(self));
         return;
     }
 
@@ -1690,8 +2330,7 @@ gboolean moto_param_is_static(MotoParam *self)
 
 void moto_param_set_scriptable(MotoParam *self, gboolean scriptable)
 {
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    priv->scriptable = scriptable;
+    MOTO_PARAM_GET_PRIVATE(self)->scriptable = scriptable;
 }
 
 gboolean moto_param_get_scriptable(MotoParam *self)
@@ -1701,17 +2340,14 @@ gboolean moto_param_get_scriptable(MotoParam *self)
 
 void moto_param_set_use_expression(MotoParam *self, gboolean use)
 {
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    priv->use_expression = use;
-
+    MOTO_PARAM_GET_PRIVATE(self)->use_expression = use;
     if(use)
         moto_param_eval(self);
 }
 
 gboolean moto_param_get_use_expression(MotoParam *self)
 {
-    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    return priv->use_expression;
+    return MOTO_PARAM_GET_PRIVATE(self)->use_expression;
 }
 
 void moto_param_set_expression(MotoParam *self, const gchar *body)
@@ -1769,9 +2405,7 @@ gboolean moto_param_eval(MotoParam *self)
     return status;
 }
 
-// ------------------------
-
-void moto_param_update(MotoParam *self)
+static void moto_param_update(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
 
@@ -1779,9 +2413,6 @@ void moto_param_update(MotoParam *self)
 
     if(priv->use_expression && moto_param_eval(self)) // Always update if expression is used
         use_source = FALSE;
-
-    if(use_source && priv->updated)
-        return;
 
     if(use_source && priv->source)
     {
@@ -1792,17 +2423,15 @@ void moto_param_update(MotoParam *self)
     MotoNode *node = moto_param_get_node(self);
     if(node)
         MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
-
-    priv->updated = TRUE;
 }
 
 static void moto_param_mark_for_update(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    priv->updated = FALSE;
+    priv->changed = TRUE;
 }
 
-void moto_param_update_dests(MotoParam *self)
+static void moto_param_notify_dests(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
 

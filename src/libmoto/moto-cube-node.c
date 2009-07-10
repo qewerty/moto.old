@@ -128,22 +128,18 @@ MotoCubeNode *moto_cube_node_new(const gchar *name)
 
 static void moto_cube_node_update_mesh(MotoCubeNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 
-    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
-    gfloat *size = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "size"));
-    gint   *divs = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "divs"));
+    gfloat size_x, size_y, size_z;
+    moto_node_get_param_3f(node, "size", &size_x, &size_y, &size_z);
 
-    gfloat size_x = size[0];
-    gfloat size_y = size[1];
-    gfloat size_z = size[2];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
 
-    gint div_x = max(divs[0], 1);
-    gint div_y = max(divs[1], 1);
-    gint div_z = max(divs[2], 1);
+    gint div_x, div_y, div_z;
+    moto_node_get_param_3i(node, "divs", &div_x, &div_y, &div_z);
 
     /* TODO: Implement.
     gboolean side_px = moto_node_get_param_boolean((MotoNode *)self, "side_px");
@@ -386,11 +382,10 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     }
 
     MotoParam *pm = moto_node_get_param((MotoNode *)self, "mesh");
-    g_value_set_object(moto_param_get_value(pm), mesh);
+    moto_param_set_object(pm, (GObject*)mesh);
 
     priv->bound_calculated = FALSE;
-    moto_mesh_prepare(mesh);
-    moto_param_update_dests(pm);
+    moto_geom_prepare((MotoGeom*)mesh);
 }
 #undef get_v
 
@@ -403,25 +398,16 @@ static void moto_cube_node_update(MotoNode *self)
     param = moto_node_get_param(self, "mesh");
     if(param && moto_param_has_dests(param))
         moto_cube_node_update_mesh(cube);
-
-    /* TODO: Implement NURBS objects =) */
-    /*
-    param = moto_node_get_param(self, "main", "nurbs");
-    if(param && moto_param_has_dests(param))
-        moto_cube_update_nurbs(cube);
-    */
 }
 
 static void calc_bound(MotoCubeNode *self)
 {
+    MotoNode *node = (MotoNode*)self;
     MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 
-    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
-    gfloat *size = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "size"));
+    gfloat size_x, size_y, size_z;
+    moto_node_get_param_3f(node, "size", &size_x, &size_y, &size_z);
 
-    gfloat size_x = size[0];
-    gfloat size_y = size[1];
-    gfloat size_z = size[2];
     gfloat hsx = size_x / 2;
     gfloat hsy = size_y / 2;
     gfloat hsz = size_z / 2;
