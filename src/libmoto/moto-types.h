@@ -181,85 +181,85 @@ gboolean moto_value_get_as_float_4x4(GValue *value, gfloat *mem);
 // Setting values
 
 void moto_value_set_boolean_1(GValue *value, gboolean v0);
-void moto_value_set_boolean_1_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_1_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_2(GValue *value, gboolean v0, gboolean v1);
-void moto_value_set_boolean_2_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_2_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_3(GValue *value, gboolean v0, gboolean v1, gboolean v2);
-void moto_value_set_boolean_3_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_3_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_4(GValue *value, gboolean v0, gboolean v1, gboolean v2, gboolean v3);
-void moto_value_set_boolean_4_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_4_v(GValue *value, const gboolean *v);
 
 void moto_value_set_int_1(GValue *value, gint v0);
-void moto_value_set_int_1_v(GValue *value, gint *v);
+void moto_value_set_int_1_v(GValue *value, const gint *v);
 void moto_value_set_int_2(GValue *value, gint v0, gint v1);
-void moto_value_set_int_2_v(GValue *value, gint *v);
+void moto_value_set_int_2_v(GValue *value, const gint *v);
 void moto_value_set_int_3(GValue *value, gint v0, gint v1, gint v2);
-void moto_value_set_int_3_v(GValue *value, gint *v);
+void moto_value_set_int_3_v(GValue *value, const gint *v);
 void moto_value_set_int_4(GValue *value, gint v0, gint v1, gint v2, gint v3);
-void moto_value_set_int_4_v(GValue *value, gint *v);
+void moto_value_set_int_4_v(GValue *value, const gint *v);
 
 void moto_value_set_float_1(GValue *value, gfloat v0);
-void moto_value_set_float_1_v(GValue *value, gfloat *v);
+void moto_value_set_float_1_v(GValue *value, const gfloat *v);
 void moto_value_set_float_2(GValue *value, gfloat v0, gfloat v1);
-void moto_value_set_float_2_v(GValue *value, gfloat *v);
+void moto_value_set_float_2_v(GValue *value, const gfloat *v);
 void moto_value_set_float_3(GValue *value, gfloat v0, gfloat v1, gfloat v2);
-void moto_value_set_float_3_v(GValue *value, gfloat *v);
+void moto_value_set_float_3_v(GValue *value, const gfloat *v);
 void moto_value_set_float_4(GValue *value, gfloat v0, gfloat v1, gfloat v2, gfloat v3);
-void moto_value_set_float_4_v(GValue *value, gfloat *v);
+void moto_value_set_float_4_v(GValue *value, const gfloat *v);
 
 void moto_value_set_boolean_1x1(GValue *value, gboolean v0);
-void moto_value_set_boolean_1x1_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_1x1_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_2x2(GValue *value,
         gboolean v00, gboolean v01,
         gboolean v10, gboolean v11);
-void moto_value_set_boolean_2x2_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_2x2_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_3x3(GValue *value,
         gboolean v00, gboolean v01, gboolean v02,
         gboolean v10, gboolean v11, gboolean v12,
         gboolean v20, gboolean v21, gboolean v22);
-void moto_value_set_boolean_3x3_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_3x3_v(GValue *value, const gboolean *v);
 void moto_value_set_boolean_4x4(GValue *value,
         gboolean v00, gboolean v01, gboolean v02, gboolean v03,
         gboolean v10, gboolean v11, gboolean v12, gboolean v13,
         gboolean v20, gboolean v21, gboolean v22, gboolean v23,
         gboolean v30, gboolean v31, gboolean v32, gboolean v33);
-void moto_value_set_boolean_4x4_v(GValue *value, gboolean *v);
+void moto_value_set_boolean_4x4_v(GValue *value, const gboolean *v);
 
 void moto_value_set_int_1x1(GValue *value, gint v0);
-void moto_value_set_int_1x1_v(GValue *value, gint *v);
+void moto_value_set_int_1x1_v(GValue *value, const gint *v);
 void moto_value_set_int_2x2(GValue *value,
         gint v00, gint v01,
         gint v10, gint v11);
-void moto_value_set_int_2x2_v(GValue *value, gint *v);
+void moto_value_set_int_2x2_v(GValue *value, const gint *v);
 void moto_value_set_int_3x3(GValue *value,
         gint v00, gint v01, gint v02,
         gint v10, gint v11, gint v12,
         gint v20, gint v21, gint v22);
-void moto_value_set_int_3x3_v(GValue *value, gint *v);
+void moto_value_set_int_3x3_v(GValue *value, const gint *v);
 void moto_value_set_int_4x4(GValue *value,
         gint v00, gint v01, gint v02, gint v03,
         gint v10, gint v11, gint v12, gint v13,
         gint v20, gint v21, gint v22, gint v23,
         gint v30, gint v31, gint v32, gint v33);
-void moto_value_set_int_4x4_v(GValue *value, gint *v);
+void moto_value_set_int_4x4_v(GValue *value, const gint *v);
 
 void moto_value_set_float_1x1(GValue *value, gfloat v0);
-void moto_value_set_float_1x1_v(GValue *value, gfloat *v);
+void moto_value_set_float_1x1_v(GValue *value, const gfloat *v);
 void moto_value_set_float_2x2(GValue *value,
         gfloat v00, gfloat v01,
         gfloat v10, gfloat v11);
-void moto_value_set_float_2x2_v(GValue *value, gfloat *v);
+void moto_value_set_float_2x2_v(GValue *value, const gfloat *v);
 void moto_value_set_float_3x3(GValue *value,
         gfloat v00, gfloat v01, gfloat v02,
         gfloat v10, gfloat v11, gfloat v12,
         gfloat v20, gfloat v21, gfloat v22);
-void moto_value_set_float_3x3_v(GValue *value, gfloat *v);
+void moto_value_set_float_3x3_v(GValue *value, const gfloat *v);
 void moto_value_set_float_4x4(GValue *value,
         gfloat v00, gfloat v01, gfloat v02, gfloat v03,
         gfloat v10, gfloat v11, gfloat v12, gfloat v13,
         gfloat v20, gfloat v21, gfloat v22, gfloat v23,
         gfloat v30, gfloat v31, gfloat v32, gfloat v33);
-void moto_value_set_float_4x4_v(GValue *value, gfloat *v);
+void moto_value_set_float_4x4_v(GValue *value, const gfloat *v);
 
 // Setting individual element of vector or matrix
 
