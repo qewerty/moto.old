@@ -91,6 +91,8 @@ struct _MotoNodePriv
     MotoNode *parent;
     GList *children;
 
+    gboolean updated;
+
     guint id;
 
     GString *name;
@@ -120,6 +122,8 @@ struct _MotoParamPriv
     MotoParamSpec *pspec;
     MotoParam *source;
     GSList *dests;
+
+    gboolean updated;
 
     /* Used for determing which IN params this OUT depends on.
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
@@ -179,6 +183,8 @@ moto_node_init(MotoNode *self)
 
     priv->parent   = NULL;
     priv->children = NULL;
+
+    priv->updated = FALSE;
 
     static guint id = 0;
     priv->id = ++id;
@@ -1004,14 +1010,23 @@ void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation)
     moto_mapped_list_foreach(& priv->params, (GFunc)restore_param, variation);
 }
 
+static void update_param(MotoParam *param, gpointer user_data)
+{
+    moto_param_update(param);
+}
+
 void moto_node_update(MotoNode *self)
 {
+    MotoNodePriv  *priv  = MOTO_NODE_GET_PRIVATE(self);
     MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
+
+    moto_mapped_list_foreach( & priv->params, (GFunc)update_param, NULL);
 
     if(klass->update)
         klass->update(self);
 
     moto_node_update_last_modified(self);
+    priv->updated = TRUE;
 }
 
 const GTimeVal *moto_node_get_last_modified(MotoNode *self)
@@ -1176,6 +1191,8 @@ moto_param_init(MotoParam *self)
 
     priv->source = NULL;
     priv->dests = NULL;
+
+    priv->updated = FALSE;
 
     priv->depends_on_params = NULL;
 
@@ -1417,7 +1434,8 @@ void moto_param_set_boolean(MotoParam *self, gboolean value)
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
 
     g_value_set_boolean( & priv->value, value);
-    g_signal_emit(self, MOTO_PARAM_GET_CLASS(self)->value_changed_signal_id, 0);
+
+    moto_param_update_dests(self);
 }
 
 void moto_param_set_int(MotoParam *self, gint value)
@@ -1759,12 +1777,11 @@ void moto_param_update(MotoParam *self)
 
     gboolean use_source = TRUE;
 
-    if(priv->use_expression)
-    {
+    if(priv->use_expression && moto_param_eval(self)) // Always update if expression is used
         use_source = FALSE;
-        if( ! moto_param_eval(self))
-            use_source = TRUE;
-    }
+
+    if(use_source && priv->updated)
+        return;
 
     if(use_source && priv->source)
     {
@@ -1772,7 +1789,17 @@ void moto_param_update(MotoParam *self)
         g_value_transform(& src_priv->value, & priv->value);
     }
 
-    moto_node_update(moto_param_get_node(self));
+    MotoNode *node = moto_param_get_node(self);
+    if(node)
+        MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
+
+    priv->updated = TRUE;
+}
+
+static void moto_param_mark_for_update(MotoParam *self)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    priv->updated = FALSE;
 }
 
 void moto_param_update_dests(MotoParam *self)
@@ -1785,7 +1812,7 @@ void moto_param_update_dests(MotoParam *self)
     GSList *dest = priv->dests;
     for(; dest; dest = g_slist_next(dest))
     {
-        moto_param_update((MotoParam *)dest->data);
+        moto_param_mark_for_update((MotoParam *)dest->data);
     }
 }
 
