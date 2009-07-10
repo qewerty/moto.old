@@ -78,15 +78,15 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in)
     if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
         return in;
 
+    MotoPointCloud *in_pc = (MotoPointCloud*)in;
+    MotoPointCloud *geom  = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+    MotoGeom *out = (MotoGeom*)geom;
+
     // FIXME
     GValue *vorig = moto_node_get_param_value(node, "orig");
     GValue *vdir  = moto_node_get_param_value(node, "dir");
     gfloat *orig = (gfloat *)g_value_peek_pointer(vorig);
     gfloat *dir  = (gfloat *)g_value_peek_pointer(vdir);
-
-    MotoPointCloud *in_pc = (MotoPointCloud*)in;
-    MotoPointCloud *geom  = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
-    MotoGeom *out = (MotoGeom*)geom;
 
     gfloat angle;
     moto_node_get_param_float(node, "angle", &angle);
