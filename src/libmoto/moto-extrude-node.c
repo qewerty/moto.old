@@ -11,7 +11,7 @@
 
 /* forwards */
 
-static MotoMesh *moto_extrude_node_perform(MotoMeshOpNode *self, MotoMesh *in_mesh);
+static MotoMesh *moto_extrude_node_perform(MotoGeomOpNode *self, MotoGeom *in);
 
 /* class MotoExtrudeNode */
 
@@ -37,11 +37,11 @@ moto_extrude_node_class_init(MotoExtrudeNodeClass *klass)
 {
     extrude_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoMeshOpNodeClass *moclass = (MotoMeshOpNodeClass *)klass;
+    MotoGeomOpNodeClass *moclass = (MotoGeomOpNodeClass *)klass;
     moclass->perform = moto_extrude_node_perform;
 }
 
-G_DEFINE_TYPE(MotoExtrudeNode, moto_extrude_node, MOTO_TYPE_MESH_OP_NODE);
+G_DEFINE_TYPE(MotoExtrudeNode, moto_extrude_node, MOTO_TYPE_GEOM_OP_NODE);
 
 /* Methods of class MotoExtrudeNode */
 
@@ -55,9 +55,16 @@ MotoExtrudeNode *moto_extrude_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_extrude_node_perform(MotoMeshOpNode *self, MotoMesh *in_mesh)
+static MotoMesh *moto_extrude_node_perform(MotoGeomOpNode *self, MotoGeom *in)
 {
     MotoNode *node = (MotoNode *)self;
+
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_MESH))
+    {
+        return in;
+    }
+
+    MotoMesh *in_mesh = (MotoMesh*)in;
 
     gint sections;
     moto_node_get_param_int(node, "sections", &sections);
@@ -70,7 +77,7 @@ static MotoMesh *moto_extrude_node_perform(MotoMeshOpNode *self, MotoMesh *in_me
     MotoExtrudeMode mode;
     moto_node_get_param_enum(node, "mode", (gint*)&mode);
 
-    MotoMeshSelection *selection = moto_mesh_op_node_get_selection(self);
+    MotoMeshSelection *selection = moto_geom_op_node_get_selection(self);
 
     MotoMesh *mesh = NULL;
     switch(mode)

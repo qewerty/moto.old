@@ -11,7 +11,7 @@
 
 /* forwards */
 
-static MotoMesh *moto_remove_faces_node_perform(MotoMeshOpNode *self, MotoMesh *in_mesh);
+static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in);
 
 /* class MotoRemoveFacesNode */
 
@@ -26,12 +26,12 @@ moto_remove_faces_node_class_init(MotoRemoveFacesNodeClass *klass)
 {
     remove_faces_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoMeshOpNodeClass *moclass = (MotoMeshOpNodeClass *)klass;
+    MotoGeomOpNodeClass *moclass = (MotoGeomOpNodeClass *)klass;
 
     moclass->perform = moto_remove_faces_node_perform;
 }
 
-G_DEFINE_TYPE(MotoRemoveFacesNode, moto_remove_faces_node, MOTO_TYPE_MESH_OP_NODE);
+G_DEFINE_TYPE(MotoRemoveFacesNode, moto_remove_faces_node, MOTO_TYPE_GEOM_OP_NODE);
 
 /* Methods of class MotoRemoveFacesNode */
 
@@ -45,7 +45,12 @@ MotoRemoveFacesNode *moto_remove_faces_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_remove_faces_node_perform(MotoMeshOpNode *self, MotoMesh *in_mesh)
+static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in)
 {
-    return moto_mesh_remove_faces(in_mesh, moto_mesh_op_node_get_selection(self));
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_MESH))
+        return in;
+
+    MotoMesh *in_mesh = (MotoMesh*)in;
+
+    return moto_mesh_remove_faces(in_mesh, moto_geom_op_node_get_selection(self));
 }

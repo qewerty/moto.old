@@ -65,7 +65,7 @@ typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self,
         gpointer vert, gpointer user_data);
 */
 
-typedef struct _MotoMeshOp MotoMeshOp;
+typedef struct _MotoGeomOp MotoGeomOp;
 
 /* class MotoMesh */
 
@@ -364,8 +364,6 @@ guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi);
 guint moto_mesh_get_v_edges_num(MotoMesh *self, guint vi);
 
 gboolean moto_mesh_update_he_data(MotoMesh *self);
-
-gboolean moto_mesh_prepare(MotoMesh *self);
 
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist);
 

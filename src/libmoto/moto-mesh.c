@@ -12,6 +12,8 @@
 static void moto_mesh_copyable_init(MotoCopyableIface *iface);
 static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
 
+gboolean moto_mesh_prepare(MotoMesh *self);
+
 /* MotoMesh */
 
 static GObjectClass *mesh_parent_class = NULL;
@@ -101,6 +103,9 @@ moto_mesh_class_init(MotoMeshClass *klass)
 
     goclass->dispose    = moto_mesh_dispose;
     goclass->finalize   = moto_mesh_finalize;
+
+    MotoGeomClass *geomclass = (MotoGeomClass*)klass;
+    geomclass->prepare = (MotoGeomPrepareMethod)moto_mesh_prepare;
 }
 
 G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_GEOM,

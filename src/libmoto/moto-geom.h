@@ -32,6 +32,8 @@ typedef struct _MotoGeomClass MotoGeomClass;
 typedef struct _MotoGeomCreator MotoGeomCreator;
 typedef struct _MotoGeomCreatorClass MotoGeomCreatorClass;
 
+typedef gboolean (*MotoGeomPrepareMethod)(MotoGeom *self);
+
 /* class MotoGeom */
 
 struct _MotoGeom
@@ -42,6 +44,8 @@ struct _MotoGeom
 struct _MotoGeomClass
 {
     GInitiallyUnownedClass parent;
+
+    MotoGeomPrepareMethod prepare;
 };
 
 GType moto_geom_get_type(void);
@@ -54,6 +58,8 @@ GType moto_geom_get_type(void);
 #define MOTO_GEOM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM, MotoGeomClass))
 
 void moto_geom_update(MotoGeom *self);
+
+gboolean moto_geom_prepare(MotoGeom *self);
 
 G_END_DECLS
 

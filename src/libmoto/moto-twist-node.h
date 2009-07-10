@@ -22,7 +22,7 @@
 #ifndef __MOTO_TWIST_NODE_H__
 #define __MOTO_TWIST_NODE_H__
 
-#include "moto-geom-view-node.h"
+#include "moto-geom-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -33,12 +33,12 @@ typedef struct _MotoTwistNodeClass MotoTwistNodeClass;
 
 struct _MotoTwistNode
 {
-    MotoNode parent;
+    MotoGeomOpNode parent;
 };
 
 struct _MotoTwistNodeClass
 {
-    MotoNodeClass parent;
+    MotoGeomOpNodeClass parent;
 };
 
 GType moto_twist_node_get_type(void);

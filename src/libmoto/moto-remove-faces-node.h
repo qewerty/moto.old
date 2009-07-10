@@ -24,7 +24,7 @@
 
 #include "moto-node.h"
 #include "moto-mesh.h"
-#include "moto-mesh-op-node.h"
+#include "moto-geom-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -35,12 +35,12 @@ typedef struct _MotoRemoveFacesNodeClass MotoRemoveFacesNodeClass;
 
 struct _MotoRemoveFacesNode
 {
-    MotoMeshOpNode parent;
+    MotoGeomOpNode parent;
 };
 
 struct _MotoRemoveFacesNodeClass
 {
-    MotoMeshOpNodeClass parent;
+    MotoGeomOpNodeClass parent;
 };
 
 GType moto_remove_faces_node_get_type(void);
