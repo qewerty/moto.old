@@ -60,7 +60,7 @@ void moto_geom_op_node_set_selection(MotoGeomOpNode *self,
     MotoMeshSelection *selection);
 MotoMeshSelection *moto_geom_op_node_get_selection(MotoGeomOpNode *self);
 
-MotoGeom *moto_geom_op_perform(MotoGeomOpNode *self, MotoGeom *in);
+MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in);
 
 G_END_DECLS
 

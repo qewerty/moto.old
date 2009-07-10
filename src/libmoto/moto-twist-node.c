@@ -18,15 +18,23 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in);
 
 static GObjectClass *twist_node_parent_class = NULL;
 
+typedef struct _MotoTwistNodePriv
+{
+    MotoGeom *in;
+} MotoTwistNodePriv;
+
 static void
 moto_twist_node_init(MotoTwistNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
+
+    priv->in = NULL;
 
     /* params */
 
     gfloat orig[3] = {0, 0, 0};
-    gfloat dir[3]  = {1, 1, 0};
+    gfloat dir[3]  = {0, 1, 0};
 
     MotoParamSpec *angle_spec = moto_param_spec_float_new(0, -1000000, 1000000, 0.1, 1);
     moto_node_add_params(node,
@@ -40,10 +48,12 @@ moto_twist_node_init(MotoTwistNode *self)
 static void
 moto_twist_node_class_init(MotoTwistNodeClass *klass)
 {
+    g_type_class_add_private(klass, sizeof(MotoTwistNodePriv));
+
     twist_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     MotoGeomOpNodeClass *gopclass = (MotoGeomOpNodeClass *)klass;
-    gopclass->perform = moto_twist_node_perform;
+    gopclass->perform   = moto_twist_node_perform;
 }
 
 G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_GEOM_OP_NODE);
@@ -63,6 +73,7 @@ MotoTwistNode *moto_twist_node_new(const gchar *name)
 static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in)
 {
     MotoNode *node = (MotoNode*)self;
+    MotoTwistNodePriv *priv = MOTO_TWIST_NODE_GET_PRIVATE(self);
 
     if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
         return in;
@@ -75,7 +86,7 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in)
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom  = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
-    MotoGeom *out         = (MotoGeom*)geom;
+    MotoGeom *out = (MotoGeom*)geom;
 
     gfloat angle;
     moto_node_get_param_float(node, "angle", &angle);

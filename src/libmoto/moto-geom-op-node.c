@@ -68,7 +68,7 @@ moto_geom_op_node_class_init(MotoGeomOpNodeClass *klass)
     goclass->dispose    = moto_geom_op_node_dispose;
     goclass->finalize   = moto_geom_op_node_finalize;
 
-    klass->perform = NULL;
+    klass->perform   = NULL;
 
     nclass->update = moto_geom_op_node_update;
 }
@@ -114,6 +114,7 @@ static void moto_geom_op_node_update(MotoNode *self)
     moto_node_get_param_object((MotoNode *)self, "out", (GObject**)&old_geom);
     if(old_geom && old_geom != in)
         g_object_unref(old_geom);
+    moto_node_set_param_object((MotoNode *)self, "out", NULL);
 
     if( ! in)
     {
@@ -136,14 +137,14 @@ static void moto_geom_op_node_update(MotoNode *self)
     gboolean active;
     moto_node_get_param_boolean(self, "active", &active);
     if(active)
-        geom = moto_geom_op_perform((MotoGeomOpNode*)self, in);
+        geom = moto_geom_op_node_perform((MotoGeomOpNode*)self, in);
 
     MotoParam *param = moto_node_get_param(self, "out");
     moto_param_set_object(param, (GObject *)geom);
     moto_param_update_dests(param);
 }
 
-MotoGeom *moto_geom_op_perform(MotoGeomOpNode *self, MotoGeom *in)
+MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in)
 {
     MotoGeomOpNodeClass *klass = MOTO_GEOM_OP_NODE_GET_CLASS(self);
 
