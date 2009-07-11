@@ -378,6 +378,8 @@ void moto_world_redraw(MotoWorld *self)
 
 void moto_world_draw(MotoWorld *self, gint width, gint height)
 {
+    moto_world_update(self);
+
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.3, 0.3, 0.3, 1);
@@ -603,7 +605,7 @@ static void world_update(MotoWorld *self)
     for(; l; l = g_slist_next(l))
     {
         MotoNode *node = (MotoNode*)l->data;
-        if(moto_node_is_ready_to_update(node) && moto_node_needs_update(self))
+        if(moto_node_is_ready_to_update(node) && moto_node_needs_update(node))
         {
             moto_node_update(node);
             smth_updated = TRUE;

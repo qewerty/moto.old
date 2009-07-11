@@ -33,12 +33,12 @@ typedef struct _MotoBendNodeClass MotoBendNodeClass;
 
 struct _MotoBendNode
 {
-    MotoNode parent;
+    MotoGeomOpNode parent;
 };
 
 struct _MotoBendNodeClass
 {
-    MotoNodeClass parent;
+    MotoGeomOpNodeClass parent;
 };
 
 GType moto_bend_node_get_type(void);

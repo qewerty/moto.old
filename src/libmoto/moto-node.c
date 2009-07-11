@@ -129,7 +129,7 @@ struct _MotoParamPriv
     MotoParam *source;
     GSList *dests;
 
-    gboolean changed;
+    gboolean updated;
 
     /* Used for determing which IN params this OUT depends on.
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
@@ -1143,7 +1143,7 @@ gboolean moto_node_get_param_2f(MotoNode *self, const gchar *name, gfloat *v0, g
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_2b(param, v0, v1);
+        moto_param_get_2f(param, v0, v1);
         return TRUE;
     }
     return FALSE;
@@ -1154,7 +1154,7 @@ gboolean moto_node_get_param_2fv(MotoNode *self, const gchar *name, gfloat *v)
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_2bv(param, v);
+        moto_param_get_2fv(param, v);
         return TRUE;
     }
     return FALSE;
@@ -1165,7 +1165,7 @@ gboolean moto_node_get_param_3f(MotoNode *self,  const gchar *name, gfloat *v0, 
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_3b(param, v0, v1, v2);
+        moto_param_get_3f(param, v0, v1, v2);
         return TRUE;
     }
     return FALSE;
@@ -1176,7 +1176,7 @@ gboolean moto_node_get_param_3fv(MotoNode *self, const gchar *name, gfloat *v)
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_3bv(param, v);
+        moto_param_get_3fv(param, v);
         return TRUE;
     }
     return FALSE;
@@ -1187,7 +1187,7 @@ gboolean moto_node_get_param_4f(MotoNode *self,  const gchar *name, gfloat *v0, 
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_4b(param, v0, v1, v2, v3);
+        moto_param_get_4f(param, v0, v1, v2, v3);
         return TRUE;
     }
     return FALSE;
@@ -1198,7 +1198,7 @@ gboolean moto_node_get_param_4fv(MotoNode *self, const gchar *name, gfloat *v)
     MotoParam *param = moto_node_get_param(self, name);
     if(param)
     {
-        moto_param_get_4bv(param, v);
+        moto_param_get_4fv(param, v);
         return TRUE;
     }
     return FALSE;
@@ -1471,11 +1471,14 @@ void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation)
 
 static void update_param(MotoParam *param, gpointer user_data)
 {
-    moto_param_update(param);
+    if( ! MOTO_PARAM_GET_PRIVATE(param)->updated)
+        moto_param_update(param);
 }
 
 void moto_node_update(MotoNode *self)
 {
+    g_print("moto_node_update: %s\n", moto_node_get_name(self));
+
     MotoNodePriv  *priv  = MOTO_NODE_GET_PRIVATE(self);
     MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
 
@@ -1651,7 +1654,7 @@ moto_param_init(MotoParam *self)
     priv->source = NULL;
     priv->dests = NULL;
 
-    priv->changed = TRUE;
+    priv->updated = FALSE;
 
     priv->depends_on_params = NULL;
 
@@ -2207,12 +2210,19 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
     {
         if( ! g_type_is_a(src_type, self_type))
+        {
+            moto_error("Can't link param of not derived type (src: %s; dest: %s)",
+                g_type_name(src_type), g_type_name(self_type));
             return;
+        }
     }
     else
     {
         if(g_type_is_a(src_type, G_TYPE_OBJECT) || g_type_is_a(src_type, G_TYPE_INTERFACE))
+        {
+
             return;
+        }
         if( ! g_value_type_transformable(src_type, self_type))
             return;
     }
@@ -2428,7 +2438,11 @@ static void moto_param_update(MotoParam *self)
 static void moto_param_mark_for_update(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    priv->changed = TRUE;
+    priv->updated = FALSE;
+
+    MotoNode *node = moto_param_get_node(self);
+    if(node)
+        MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
 }
 
 static void moto_param_notify_dests(MotoParam *self)

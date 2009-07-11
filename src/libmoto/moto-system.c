@@ -10,6 +10,8 @@
 #include "moto-mesh-loader.h"
 
 /* nodes */
+#include "moto-render-node.h"
+#include "moto-rman-node.h"
 #include "moto-displace-node.h"
 #include "moto-twist-node.h"
 #include "moto-bend-node.h"
@@ -147,6 +149,8 @@ moto_system_class_init(MotoSystemClass *klass)
 
     /* init node types */
     MOTO_TYPE_NODE;
+        MOTO_TYPE_RENDER_NODE;
+            MOTO_TYPE_RMAN_NODE;
         MOTO_TYPE_OBJECT_NODE;
         MOTO_TYPE_GEOMETRY_NODE;
             MOTO_TYPE_PLANE_NODE;

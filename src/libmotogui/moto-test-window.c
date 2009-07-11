@@ -336,6 +336,8 @@ moto_test_window_init(MotoTestWindow *self)
             GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
+    moto_world_update(self->priv->world);
+
     GtkBox *hbox = (GtkBox *)gtk_hbox_new(FALSE, 1);
 
     gtk_box_pack_start(hbox, moto_tool_box_new(self->priv->system), FALSE, FALSE, 0);
