@@ -152,8 +152,10 @@ moto_graph_area_dispose(GObject *obj)
     priv->disposed = TRUE;
 
     if(priv->system)
+    {
         g_object_remove_weak_pointer(G_OBJECT(priv->system), (gpointer *)( & priv->system));
-    g_signal_handler_disconnect(priv->system, priv->node_created_handler_id);
+        g_signal_handler_disconnect(priv->system, priv->node_created_handler_id);
+    }
 
     graph_area_parent_class->dispose(obj);
 }
