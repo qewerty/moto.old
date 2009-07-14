@@ -39,16 +39,11 @@ typedef struct _MotoVector MotoVector;
 
 typedef struct _MotoMeshVert16 MotoMeshVert16;
 typedef struct _MotoMeshVert32 MotoMeshVert32;
-typedef struct _MotoMeshEdge16 MotoMeshEdge16;
-typedef struct _MotoMeshEdge32 MotoMeshEdge32;
 typedef struct _MotoMeshFace16 MotoMeshFace16;
 typedef struct _MotoMeshFace32 MotoMeshFace32;
 
 typedef struct _MotoHalfEdge16 MotoHalfEdge16;
 typedef struct _MotoHalfEdge32 MotoHalfEdge32;
-
-typedef struct _MotoMeshFaceHole MotoMeshFaceHole;
-typedef struct _MotoTriangle MotoTriangle;
 
 typedef struct _MotoMeshVertAttr MotoMeshVertAttr;
 
@@ -60,12 +55,6 @@ typedef void (*MotoMeshForeachEdgeFunc)(MotoMesh *self,
         gpointer edge, gpointer user_data);
 typedef void (*MotoMeshForeachFaceFunc)(MotoMesh *self,
         gpointer face, gpointer user_data);
-/*
-typedef void (*MotoMeshFaceForeachVertexFunc)(MotoMeshFace *self,
-        gpointer vert, gpointer user_data);
-*/
-
-typedef struct _MotoGeomOp MotoGeomOp;
 
 /* class MotoMesh */
 
@@ -84,32 +73,6 @@ struct _MotoVector
 {
     gfloat x, y, z;
 };
-
-struct _MotoMeshEdge16
-{
-    guint16 half_edge;
-};
-
-struct _MotoMeshEdge32
-{
-    guint32 half_edge;
-};
-
-/*
-struct _MotoMeshFaceHole
-{
-    guint v_num;
-    guint *indecies;
-    union
-    {
-        guint16 *v16;
-        guint32 *v32;
-        guint64 *v64;
-    };
-};
-*/
-
-void moto_mesh_face_hole_init(MotoMeshFaceHole *self, guint v_num);
 
 struct _MotoMeshFace16
 {
@@ -230,15 +193,24 @@ struct _MotoMesh
 
     // Verts
     guint v_num;
-    gpointer v_data;
+    union
+    {
+        gpointer         v_data;
+        MotoMeshVert16  *v_data16;
+        MotoMeshVert32  *v_data32;
+    };
     MotoVector *v_coords;
     MotoVector *v_normals;
     GData *v_attrs;
 
     // Edges
     guint e_num;
-    gpointer e_data; // FIXME: Remove?
-    gpointer e_verts;
+    union
+    {
+        gpointer  e_verts;
+        guint16  *e_verts16;
+        guint32  *e_verts32;
+    };
     guint32 *e_hard_flags;
 
     gboolean e_use_creases;
@@ -247,12 +219,27 @@ struct _MotoMesh
     // Faces
     guint f_num;
     guint f_v_num;
-    gpointer f_data;
-    gpointer f_verts;
+    union
+    {
+        gpointer         f_data;
+        MotoMeshFace16  *f_data16;
+        MotoMeshFace32  *f_data32;
+    };
+    union
+    {
+        gpointer f_verts;
+        guint16 *f_verts16;
+        guint32 *f_verts32;
+    };
 
     guint f_tess_num;
     gboolean tesselated;
-    gpointer f_tess_verts;
+    union
+    {
+        gpointer f_tess_verts;
+        guint16 *f_tess_verts16;
+        guint32 *f_tess_verts32;
+    };
 
     gboolean f_use_normals;
     MotoVector *f_normals;
@@ -262,7 +249,12 @@ struct _MotoMesh
 
     // Half-edge data
     gboolean he_calculated;
-    gpointer he_data;
+    union
+    {
+        gpointer        he_data;
+        MotoHalfEdge16 *he_data16;
+        MotoHalfEdge32 *he_data32;
+    };
 };
 
 struct _MotoMeshClass
@@ -285,7 +277,6 @@ void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
 #define MOTO_DECLARE_MESH_DATA_16(mesh) \
     MotoMeshVert16 *v_data  = (MotoMeshVert16*)mesh->v_data; \
-    MotoMeshEdge16 *e_data  = (MotoMeshFace16*)mesh->e_data; \
     MotoMeshFace16 *f_data  = (MotoMeshFace16*)mesh->f_data; \
     guint16 *f_verts        = (guint16*)mesh->f_verts; \
     guint16 *f_tess_verts   = (guint16*)mesh->f_tess_verts; \
@@ -294,20 +285,11 @@ void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
 #define MOTO_DECLARE_MESH_DATA_32(mesh) \
     MotoMeshVert32 *v_data  = (MotoMeshVert32*)mesh->v_data; \
-    MotoMeshEdge32 *e_data  = (MotoMeshFace32*)mesh->e_data; \
     MotoMeshFace32 *f_data  = (MotoMeshFace32*)mesh->f_data; \
     guint32 *f_verts        = (guint32*)mesh->f_verts; \
     guint32 *f_tess_verts   = (guint32*)mesh->f_tess_verts; \
     guint32 *e_verts        = (guint32*)mesh->e_verts; \
     MotoHalfEdge32 *he_data = (MotoHalfEdge32*)mesh->he_data
-
-/**
- * moto_mesh_clear_e_data:
- * @self: a #MotoMesh.
- *
- * Clears all edge data to invalid values.
- */
-void moto_mesh_clear_e_data(MotoMesh *self);
 
 /**
  * moto_mesh_clear_he_data:
