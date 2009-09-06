@@ -2591,8 +2591,6 @@ guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi)
     }
     else
     {
-        guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
-        result = f_data[fi].v_offset - start;
         guint16 start = (0 == fi) ? 0: self->f_data16[fi-1].v_offset;
         result = self->f_data16[fi].v_offset - start;
     }
