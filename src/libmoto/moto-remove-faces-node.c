@@ -11,7 +11,7 @@
 
 /* forwards */
 
-static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in);
+static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoRemoveFacesNode */
 
@@ -45,8 +45,10 @@ MotoRemoveFacesNode *moto_remove_faces_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in)
+static MotoMesh *moto_remove_faces_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same)
 {
+    *the_same = FALSE;
+
     if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_MESH))
         return in;
 

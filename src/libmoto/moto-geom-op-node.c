@@ -108,42 +108,47 @@ static void moto_geom_op_node_update(MotoNode *self)
     MotoGeomOpNodePriv *priv = MOTO_GEOM_OP_NODE_GET_PRIVATE(self);
 
     MotoGeom *in;
-    moto_node_get_param_object(self, "in", (GObject**)&in);
-
     MotoGeom *old_geom;
+    moto_node_get_param_object(self, "in", (GObject**)&in);
     moto_node_get_param_object((MotoNode *)self, "out", (GObject**)&old_geom);
-    if(old_geom && old_geom != in)
-        g_object_unref(old_geom);
-    moto_node_set_param_object((MotoNode *)self, "out", NULL);
-
     if( ! in)
     {
-        moto_node_set_param_object(self, "out", NULL);
+        if(old_geom)
+            g_object_unref(old_geom);
+        moto_node_set_param_object((MotoNode *)self, "out", NULL);
         return;
     }
-
     if( ! priv->selection)
     {
-        moto_node_set_param_object(self, "out", (GObject*)in);
+        if(old_geom && old_geom != in)
+        {
+            g_object_unref(old_geom);
+            moto_node_set_param_object(self, "out", (GObject*)in);
+        }
         return;
     }
 
     MotoGeom *geom = in;
 
+    gboolean the_same = FALSE;
     gboolean active;
     moto_node_get_param_boolean(self, "active", &active);
     if(active)
-        geom = moto_geom_op_node_perform((MotoGeomOpNode*)self, in);
+    {
+        geom = moto_geom_op_node_perform((MotoGeomOpNode*)self, in, &the_same);
+        if(!the_same && old_geom)
+            g_object_unref(old_geom);
+    }
 
     moto_node_set_param_object(self, "out", (GObject *)geom);
 }
 
-MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in)
+MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same)
 {
     MotoGeomOpNodeClass *klass = MOTO_GEOM_OP_NODE_GET_CLASS(self);
 
     if(klass->perform)
-        return klass->perform(self, in);
+        return klass->perform(self, in, the_same);
 
     return NULL;
 }

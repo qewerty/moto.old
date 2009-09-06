@@ -82,7 +82,7 @@ struct _MotoMeshVert32
 // WARNING: Must be convertable to float*!
 struct _MotoVector
 {
-    gfloat x, y, z;
+    gfloat x, y, z, w;
 };
 
 struct _MotoMeshEdge16
@@ -176,6 +176,8 @@ gboolean moto_mesh_selection_is_face_selected(MotoMeshSelection *self, guint ind
 void moto_mesh_selection_deselect_all(MotoMeshSelection *self);
 
 gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
+
+MotoMeshSelection *moto_mesh_selection_adapt(MotoMeshSelection *self, MotoMesh *mesh);
 
 void moto_mesh_selection_select_more_verts(MotoMeshSelection *self, MotoMesh *mesh);
 void moto_mesh_selection_select_less_verts(MotoMeshSelection *self, MotoMesh*mesh);
@@ -285,7 +287,7 @@ void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
 #define MOTO_DECLARE_MESH_DATA_16(mesh) \
     MotoMeshVert16 *v_data  = (MotoMeshVert16*)mesh->v_data; \
-    MotoMeshEdge16 *e_data  = (MotoMeshFace16*)mesh->e_data; \
+    MotoMeshEdge16 *e_data  = (MotoMeshEdge16*)mesh->e_data; \
     MotoMeshFace16 *f_data  = (MotoMeshFace16*)mesh->f_data; \
     guint16 *f_verts        = (guint16*)mesh->f_verts; \
     guint16 *f_tess_verts   = (guint16*)mesh->f_tess_verts; \
@@ -294,7 +296,7 @@ void moto_mesh_copy(MotoMesh *self, MotoMesh *other);
 
 #define MOTO_DECLARE_MESH_DATA_32(mesh) \
     MotoMeshVert32 *v_data  = (MotoMeshVert32*)mesh->v_data; \
-    MotoMeshEdge32 *e_data  = (MotoMeshFace32*)mesh->e_data; \
+    MotoMeshEdge32 *e_data  = (MotoMeshEdge32*)mesh->e_data; \
     MotoMeshFace32 *f_data  = (MotoMeshFace32*)mesh->f_data; \
     guint32 *f_verts        = (guint32*)mesh->f_verts; \
     guint32 *f_tess_verts   = (guint32*)mesh->f_tess_verts; \

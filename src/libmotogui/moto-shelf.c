@@ -31,9 +31,9 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w,  "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *plane_node = moto_world_create_node_by_name(w, "MotoPlaneNode", "Plane", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w,   "MotoSlerMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", plane_node, "mesh");

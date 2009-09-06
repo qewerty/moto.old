@@ -73,6 +73,7 @@ void moto_bitmask_copy_smth(MotoBitmask *self, MotoBitmask *other)
         guint full_bytes_num = BYTES_NUM(min_bits_num) - sizeof(guint32);
         guint full_bits_num  = full_bytes_num << 3;
 
+        memset(self->bits, 0, BYTES_NUM(self->bits_num));
         memcpy(self->bits, other->bits, full_bytes_num);
         guint i;
         for(i = full_bits_num; i < min_bits_num; i++)

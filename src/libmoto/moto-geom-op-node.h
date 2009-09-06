@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 typedef struct _MotoGeomOpNode MotoGeomOpNode;
 typedef struct _MotoGeomOpNodeClass MotoGeomOpNodeClass;
 
-typedef MotoGeom* (*MotoGeomOpPerformMethod)(MotoGeomOpNode *self, MotoGeom *in);
+typedef MotoGeom* (*MotoGeomOpPerformMethod)(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoGeomOpNode */
 
@@ -60,7 +60,7 @@ void moto_geom_op_node_set_selection(MotoGeomOpNode *self,
     MotoMeshSelection *selection);
 MotoMeshSelection *moto_geom_op_node_get_selection(MotoGeomOpNode *self);
 
-MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in);
+MotoGeom *moto_geom_op_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
 
 G_END_DECLS
 

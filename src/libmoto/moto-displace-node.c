@@ -1,5 +1,9 @@
 #include <math.h>
 
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -13,7 +17,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in);
+static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoDisplaceNode */
 
@@ -55,15 +59,28 @@ MotoDisplaceNode *moto_displace_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in)
+static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboolean *the_same)
 {
+    *the_same = TRUE;
+
     MotoNode *node = (MotoNode*)self;
 
     if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
         return in;
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
-    MotoPointCloud *geom  = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+    MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
+    if(!geom)
+    {
+        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        g_object_set_data((GObject*)self, "_prev_geom", geom);
+    }
+    else if(!moto_geom_is_struct_the_same(geom, in))
+    {
+        g_object_unref(geom);
+        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        g_object_set_data((GObject*)self, "_prev_geom", geom);
+    }
     MotoGeom *out = (MotoGeom*)geom;
 
     gfloat scale;
@@ -83,18 +100,62 @@ static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in)
 
         gint i;
         gfloat *pi, *ni, *po;
-        #pragma omp parallel for if(size_i > 400) private(i, pi, ni, po) \
-            shared(size_i, scale, points_i, normals_i, points_o)
-        for(i = 0; i < size_i; i++)
+#ifndef __SSE__
+        for(i = 0; i < size_i; ++i)
         {
-            pi = points_i + i*3;
-            ni = normals_i + i*3;
-            po = points_o + i*3;
-
+            gint ii = i*3;
+            pi = points_i + ii;
+            ni = normals_i + ii;
+            po = points_o + ii;
             po[0] = pi[0] + ni[0]*scale;
             po[1] = pi[1] + ni[1]*scale;
             po[2] = pi[2] + ni[2]*scale;
         }
+#else
+        float scale_sse[4] __attribute__((aligned(16))) = {scale, scale, scale, scale};
+        gsize size_sse = size_i*4/16;
+
+        pi = points_i;
+        ni = normals_i;
+        po = points_o;
+
+        asm("movaps (%0), %%xmm0\n\t" : : "r" (scale_sse) : "xmm0");
+
+        _mm_prefetch(points_i, _MM_HINT_T0);
+        _mm_prefetch(normals_i, _MM_HINT_T0);
+        for(i = 0; i < size_sse; ++i)
+        {
+            asm("movaps   (%0), %%xmm1\n\t"
+                "movaps 16(%0), %%xmm2\n\t"
+                "movaps 32(%0), %%xmm3\n\t"
+                "movaps 48(%0), %%xmm4\n\t"
+                "mulps  %%xmm0, %%xmm1\n\t" // xmm0 loaded before cycle.
+                "mulps  %%xmm0, %%xmm2\n\t"
+                "mulps  %%xmm0, %%xmm3\n\t"
+                "mulps  %%xmm0, %%xmm4\n\t"
+                "addps    (%1), %%xmm1\n\t"
+                "addps  16(%1), %%xmm2\n\t"
+                "addps  32(%1), %%xmm3\n\t"
+                "addps  48(%1), %%xmm4\n\t"
+                "movaps %%xmm1, (%2)\n\t"
+                "movaps %%xmm2, 16(%2)\n\t"
+                "movaps %%xmm3, 32(%2)\n\t"
+                "movaps %%xmm4, 48(%2)\n\t"
+                : /* Nothing. */
+                : "r" (ni), "r" (pi), "r" (po)
+                : "xmm1", "xmm2", "xmm3", "xmm4"
+                );
+
+            pi += 16;
+            ni += 16;
+            po += 16;
+        }
+
+        for(i = 0; i < (size_i*4 - size_sse*16); ++i)
+        {
+            po[i] = pi[i]+ ni[i]*scale;
+        }
+#endif
     }
 
     moto_geom_prepare(out);

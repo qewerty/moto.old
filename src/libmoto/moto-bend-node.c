@@ -9,7 +9,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in);
+static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoBendNode */
 
@@ -56,15 +56,28 @@ MotoBendNode *moto_bend_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in)
+static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same)
 {
+    *the_same = TRUE;
+
     MotoNode *node = (MotoNode*)self;
 
     if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
         return in;
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
-    MotoPointCloud *geom  = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+    MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
+    if(!geom)
+    {
+        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        g_object_set_data((GObject*)self, "_prev_geom", geom);
+    }
+    else if(!moto_geom_is_struct_the_same(geom, in))
+    {
+        g_object_unref(geom);
+        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        g_object_set_data((GObject*)self, "_prev_geom", geom);
+    }
     MotoGeom *out = (MotoGeom*)geom;
 
     // FIXME

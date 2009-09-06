@@ -91,9 +91,11 @@ void moto_node_do_action(MotoNode *self, const gchar *action_name);
 void moto_node_set_action(MotoNode *self, const gchar *action_name, MotoNodeActionFunc func);
 
 const gchar *moto_node_get_name(MotoNode *self);
+void moto_node_set_name(MotoNode *self, const gchar *name);
 const gchar *moto_node_get_full_name(MotoNode *self);
 const gchar *moto_node_get_type_name(MotoNode *self);
-void moto_node_set_name(MotoNode *self, const gchar *name);
+
+const gchar *moto_node_get_type_alias(MotoNode *self);
 
 /* Reimplement. */
 guint moto_node_get_id(MotoNode *self);

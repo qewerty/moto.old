@@ -33,12 +33,12 @@ typedef struct _MotoRManNodeClass MotoRManNodeClass;
 
 struct _MotoRManNode
 {
-    MotoNode parent;
+    MotoRenderNode parent;
 };
 
 struct _MotoRManNodeClass
 {
-    MotoNodeClass parent;
+    MotoRenderNodeClass parent;
 };
 
 GType moto_rman_node_get_type(void);

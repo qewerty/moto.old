@@ -1,5 +1,9 @@
 #include <string.h>
 
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+
 #include "moto-mesh.h"
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
@@ -13,6 +17,7 @@ static void moto_mesh_copyable_init(MotoCopyableIface *iface);
 static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
 
 gboolean moto_mesh_prepare(MotoMesh *self);
+gboolean moto_mesh_is_struct_the_same(MotoMesh *self, MotoMesh *other);
 
 /* MotoMesh */
 
@@ -34,8 +39,13 @@ moto_mesh_dispose(GObject *obj)
 
     // Free verts
     g_free(self->v_data);
+#ifdef __SSE__
+    _mm_free(self->v_coords);
+    _mm_free(self->v_normals);
+#else
     g_free(self->v_coords);
     g_free(self->v_normals);
+#endif
     g_datalist_foreach(& self->v_attrs, free_attr, NULL);
     g_datalist_clear(& self->v_attrs);
 
@@ -106,6 +116,7 @@ moto_mesh_class_init(MotoMeshClass *klass)
 
     MotoGeomClass *geomclass = (MotoGeomClass*)klass;
     geomclass->prepare = (MotoGeomPrepareMethod)moto_mesh_prepare;
+    geomclass->is_struct_the_same = (MotoGeomIsStructTheSameMethod)moto_mesh_is_struct_the_same;
 }
 
 G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_GEOM,
@@ -137,10 +148,18 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
                                     g_try_malloc(sizeof(MotoMeshVert16) * v_num);
     if( ! self->v_data)
         ; // TODO
+#ifdef __SSE__
+    self->v_coords  = (MotoVector *)_mm_malloc(sizeof(MotoVector) * v_num, 16);
+#else
     self->v_coords  = (MotoVector *)g_try_malloc(sizeof(MotoVector) * v_num);
+#endif
     if( ! self->v_coords)
         ; // TODO
+#ifdef __SSE__
+    self->v_normals = (MotoVector *)_mm_malloc(sizeof(MotoVector) * v_num, 16);
+#else
     self->v_normals = (MotoVector *)g_try_malloc(sizeof(MotoVector) * v_num);
+#endif
     if( ! self->v_normals)
         ; // TODO
 
@@ -1082,6 +1101,17 @@ gboolean moto_mesh_prepare(MotoMesh *self)
     return TRUE;
 }
 
+gboolean moto_mesh_is_struct_the_same(MotoMesh *self, MotoMesh* other)
+{
+    if(self->v_num != other->v_num || self->e_num != other->e_num ||
+       self->f_num != other->f_num)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat *dist)
 {
     if(self->b32)
@@ -1445,6 +1475,13 @@ gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh)
         return FALSE;
 
     return TRUE;
+}
+
+MotoMeshSelection *moto_mesh_selection_adapt(MotoMeshSelection *self, MotoMesh *mesh)
+{
+    MotoMeshSelection *selection = moto_mesh_selection_new_for_mesh(mesh);
+    moto_mesh_selection_copy_smth(selection, self);
+    return selection;
 }
 
 void moto_mesh_selection_select_more_verts(MotoMeshSelection *self, MotoMesh *mesh)
@@ -2567,7 +2604,7 @@ guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi)
     }
     else
     {
-        MotoMeshFace16 *f_data = (MotoMeshFace32*)self->f_data;
+        MotoMeshFace16 *f_data = (MotoMeshFace16*)self->f_data;
 
         guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
         result = f_data[fi].v_offset - start;
@@ -2677,6 +2714,8 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         return moto_mesh_new_copy(self);
     }
 
+    selection = moto_mesh_selection_adapt(selection, self);
+
     guint f_num = self->f_num;
     guint e_num = self->e_num;
     guint v_num = self->v_num;
@@ -2773,6 +2812,7 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     g_assert(fi == mesh->f_num);
 
     g_free(selected);
+    moto_mesh_selection_free(selection);
     if(!moto_mesh_prepare(mesh))
     {
         g_object_unref(mesh);
@@ -2790,6 +2830,8 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     {
         return moto_mesh_new_copy(self);
     }
+
+    selection = moto_mesh_selection_adapt(selection, self);
 
     guint v_num   = self->v_num;
     guint e_num   = self->e_num;
@@ -2848,6 +2890,7 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     g_assert(fi == mesh->f_num);
 
     g_free(selected);
+    moto_mesh_selection_free(selection);
     if(!moto_mesh_prepare(mesh))
     {
         g_object_unref(mesh);
@@ -2859,8 +2902,23 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
 MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
     MotoMeshSelection *selection)
 {
-    guint selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
-    if(selected_f_num  < 1)
+    guint selected_f_num = 0;
+    if(selection)
+    {
+        selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
+        if(selected_f_num  < 1)
+        {
+            return moto_mesh_new_copy(self);
+        }
+        selection = moto_mesh_selection_adapt(selection, self);
+        selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
+        if(selected_f_num  < 1)
+        {
+            moto_mesh_selection_free(selection);
+            return moto_mesh_new_copy(self);
+        }
+    }
+    else
     {
         return moto_mesh_new_copy(self);
     }
@@ -3014,9 +3072,9 @@ MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
         }
     }
 
-    moto_mesh_selection_free(for_removing);
     g_free(selected);
-
+    moto_mesh_selection_free(for_removing);
+    moto_mesh_selection_free(selection);
     if(!moto_mesh_prepare(mesh))
     {
         g_object_unref(mesh);

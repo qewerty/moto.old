@@ -33,6 +33,7 @@ typedef struct _MotoGeomCreator MotoGeomCreator;
 typedef struct _MotoGeomCreatorClass MotoGeomCreatorClass;
 
 typedef gboolean (*MotoGeomPrepareMethod)(MotoGeom *self);
+typedef gboolean (*MotoGeomIsStructTheSameMethod)(MotoGeom *self, MotoGeom *other);
 
 /* class MotoGeom */
 
@@ -46,6 +47,7 @@ struct _MotoGeomClass
     GInitiallyUnownedClass parent;
 
     MotoGeomPrepareMethod prepare;
+    MotoGeomIsStructTheSameMethod is_struct_the_same;
 };
 
 GType moto_geom_get_type(void);
@@ -60,6 +62,7 @@ GType moto_geom_get_type(void);
 void moto_geom_update(MotoGeom *self);
 
 gboolean moto_geom_prepare(MotoGeom *self);
+gboolean moto_geom_is_struct_the_same(MotoGeom *self, MotoGeom *other);
 
 G_END_DECLS
 

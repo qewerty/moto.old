@@ -380,6 +380,12 @@ const gchar *moto_node_get_name(MotoNode *self)
     return priv->name->str;
 }
 
+void moto_node_set_name(MotoNode *self, const gchar *name)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+    g_string_assign(priv->name, name);
+}
+
 const gchar *moto_node_get_full_name(MotoNode *self)
 {
     return moto_node_get_name(self); // TODO: Implement properly ;)
@@ -390,10 +396,10 @@ const gchar *moto_node_get_type_name(MotoNode *self)
     return g_type_name(G_TYPE_FROM_INSTANCE(self));
 }
 
-void moto_node_set_name(MotoNode *self, const gchar *name)
+const gchar *moto_node_get_type_alias(MotoNode *self)
 {
-    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    g_string_assign(priv->name, name);
+    // return moto_get_type_alias(G_TYPE_FROM_INSTANCE(self));
+    return NULL;
 }
 
 gboolean moto_node_is_valid(MotoNode *self)
@@ -411,6 +417,7 @@ static void check_param_source(MotoParam *param, gboolean *has)
 
 gboolean moto_node_is_independent(MotoNode *self)
 {
+    // TODO: Rewrite. Params should notify node on dis/connecting.
     gboolean has_sources = FALSE;
     moto_mapped_list_foreach(& MOTO_NODE_GET_PRIVATE(self)->params,
         (GFunc)check_param_source, & has_sources);

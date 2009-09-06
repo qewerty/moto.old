@@ -601,6 +601,13 @@ Examples:
     (r)[2] = (v)[2] + (v2)[2];\
     (r)[3] = (v)[3] + (v2)[3]
 
+// You must before include <xmmintrin.h>
+#define vector4_sum_INTRIN(r, v, v2)\
+    _mm_store_ps(r, _mm_add_ps(_mm_load_ps(v), _mm_load_ps(v2)));
+
+#define vector4_mul_INTRIN(r, v, v2)\
+    _mm_store_ps(r, _mm_mul_ps(_mm_load_ps(v), _mm_load_ps(v2)));
+
 #define vector3_sum(r, v, v2)\
     (r)[0] = (v)[0] + (v2)[0];\
     (r)[1] = (v)[1] + (v2)[1];\

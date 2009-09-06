@@ -246,10 +246,10 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
         }
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
-        glNormalPointer(GL_FLOAT, 0, 0);
+        glNormalPointer(GL_FLOAT, sizeof(MotoVector), 0);
 
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
         glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, 0);
@@ -259,8 +259,8 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
     }
     else // Vertex arrays
     {
-        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-        glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
+        glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
         glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
     }
 
@@ -343,7 +343,7 @@ inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
             g_print("OK\n");
 
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-            glVertexPointer(3, GL_FLOAT, 0, 0);
+            glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
 
             glColor4f(0.6, 0.6, 0.6, 1.0);
             glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
@@ -368,7 +368,7 @@ inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
 
     if( ! using_vbo)
     {
-        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
 
         glColor4f(0.6, 0.6, 0.6, 1.0);
         glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
@@ -435,7 +435,7 @@ inline static void draw_mesh_as_edges(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
         g_print("OK\n");
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
 
         glDisable(GL_DEPTH_TEST);
         glLineWidth(1.0);
@@ -449,7 +449,7 @@ inline static void draw_mesh_as_edges(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     }
     else // vertex arrays
     {
-        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
 
         glDisable(GL_DEPTH_TEST);
         glLineWidth(1.0);
@@ -537,10 +537,10 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
         g_print("OK\n");
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
 
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
-        glNormalPointer(GL_FLOAT, 0, 0);
+        glNormalPointer(GL_FLOAT, sizeof(MotoVector), 0);
 
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
         glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, 0);
@@ -551,8 +551,8 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     }
     else
     {
-        glVertexPointer(3, GL_FLOAT, 0, mesh->v_coords);
-        glNormalPointer(GL_FLOAT, 0, mesh->v_normals);
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
+        glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
 
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(2.0, 1.0);
@@ -1193,9 +1193,7 @@ static void moto_mesh_view_node_update(MotoNode *self)
     if( ! moto_mesh_selection_is_valid(priv->selection, mesh))
     {
         MotoMeshSelection *old = priv->selection;
-        priv->selection = moto_mesh_selection_new_for_mesh(mesh);
-        moto_mesh_selection_copy_smth(priv->selection, old);
-
+        priv->selection = moto_mesh_selection_adapt(old, mesh);
         moto_mesh_selection_free(old);
     }
 }
