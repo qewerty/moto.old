@@ -17,6 +17,8 @@
 #include "libmotoutil/sse_mathfun.h"
 #endif
 
+#define MOTO_ALIGNED16 __attribute__((aligned(16)))
+
 /* forwards */
 
 static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
@@ -92,14 +94,9 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
-    if(!geom)
+    if(!geom || !moto_geom_is_struct_the_same(geom, in))
     {
-        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
-        g_object_set_data((GObject*)self, "_prev_geom", geom);
-    }
-    else if(!moto_geom_is_struct_the_same(geom, in))
-    {
-        g_object_unref(geom);
+        *the_same = FALSE;
         geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
@@ -111,16 +108,16 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
     GValue *vorig = moto_node_get_param_value(node, "orig");
     GValue *vdir  = moto_node_get_param_value(node, "dir");
 
-    gfloat orig[4] __attribute__((aligned(16)));
+    gfloat orig[4] MOTO_ALIGNED16;
     memcpy(orig, (gfloat *)g_value_peek_pointer(vorig), 16);
     orig[3] = 0;
 
-    gfloat dir[4]  __attribute__((aligned(16)));
+    gfloat dir[4]  MOTO_ALIGNED16;
     memcpy(dir,  (gfloat *)g_value_peek_pointer(vdir), 16);
     dir[3] = 0;
     vector3_normalize(dir, tmp);
 
-    gfloat angle[4] __attribute__((aligned(16)));
+    gfloat angle[4] MOTO_ALIGNED16;
     moto_node_get_param_float(node, "angle", angle);
     angle[0] *= RAD_PER_DEG;
     angle[1]  = angle[0];
@@ -143,29 +140,23 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
         gfloat *pi, *po, *ni, *no;
         if(fabs(angle[0]) >= MICRO)
         {
-            float axis[4] __attribute__((aligned(16)));
-            memcpy(axis, dir, sizeof(float)*3);
-            axis[3] = 0;
-            gfloat lenbuf;
-            vector3_normalize(axis, lenbuf);
-
             gsize size_sse = size_i/4;
 
             pi = points_i;
             po = points_o;
 
 #ifdef __SSE__
-            float tmp0[16] __attribute__((aligned(16)));
-            float tmp1[16] __attribute__((aligned(16)));
-            float dots[16] __attribute__((aligned(16)));
-            float a[4] __attribute__((aligned(16)));
-            float s[4] __attribute__((aligned(16)));
-            float c[4] __attribute__((aligned(16)));
+            float tmp0[16] MOTO_ALIGNED16;
+            float tmp1[16] MOTO_ALIGNED16;
+            float dots[16] MOTO_ALIGNED16;
+            float a[4] MOTO_ALIGNED16;
+            float s[4] MOTO_ALIGNED16;
+            float c[4] MOTO_ALIGNED16;
 
-            gfloat m0[16] __attribute__((aligned(16)));
-            gfloat m1[16] __attribute__((aligned(16)));
-            gfloat m2[16] __attribute__((aligned(16)));
-            gfloat m3[16] __attribute__((aligned(16)));
+            gfloat m0[16] MOTO_ALIGNED16;
+            gfloat m1[16] MOTO_ALIGNED16;
+            gfloat m2[16] MOTO_ALIGNED16;
+            gfloat m3[16] MOTO_ALIGNED16;
 
             _mm_prefetch(points_i, _MM_HINT_T0);
             for(i = 0; i < size_sse; ++i)
@@ -219,10 +210,10 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
                 _mm_store_ps(s, ss);
                 _mm_store_ps(c, cc);
 
-                matrix44_rotate_from_axis(m0, a[0], dir[0], dir[1], dir[2]);
-                matrix44_rotate_from_axis(m1, a[1], dir[0], dir[1], dir[2]);
-                matrix44_rotate_from_axis(m2, a[2], dir[0], dir[1], dir[2]);
-                matrix44_rotate_from_axis(m3, a[3], dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m0, s[0], c[0], dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m1, s[1], c[1], dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m2, s[2], c[2], dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m3, s[3], c[3], dir[0], dir[1], dir[2]);
                 point3_transform(po,    m0, tmp0);
                 point3_transform(po+4,  m1, tmp0+4);
                 point3_transform(po+8,  m2, tmp0+8);
@@ -259,7 +250,7 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
                 float s = sin(a);
                 float c = cos(a);
 
-                matrix44_rotate_from_axis(m0, a, dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m0, s, c, dir[0], dir[1], dir[2]);
                 point3_transform(po, m0, to_p);
 
                 po[0] += orig[0];
@@ -280,7 +271,7 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
                 float s = sin(a);
                 float c = cos(a);
 
-                matrix44_rotate_from_axis(m, a, dir[0], dir[1], dir[2]);
+                matrix44_rotate_from_axis_sincos(m, s, c, dir[0], dir[1], dir[2]);
                 point3_transform(po, m, to_p);
 
                 po[0] += orig[0];

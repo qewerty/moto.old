@@ -67,14 +67,9 @@ static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboo
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
-    if(!geom)
+    if(!geom || !moto_geom_is_struct_the_same(geom, in))
     {
-        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
-        g_object_set_data((GObject*)self, "_prev_geom", geom);
-    }
-    else if(!moto_geom_is_struct_the_same(geom, in))
-    {
-        g_object_unref(geom);
+        *the_same = FALSE;
         geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
