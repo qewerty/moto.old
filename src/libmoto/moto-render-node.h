@@ -56,6 +56,8 @@ GType moto_render_node_get_type(void);
 
 gboolean moto_render_node_render(MotoRenderNode *self);
 
+gboolean moto_render_node_check_time(MotoRenderNode *self, const GTimeVal *tv);
+
 G_END_DECLS
 
 #endif /* __MOTO_RENDER_NODE_H__ */

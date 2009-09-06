@@ -50,7 +50,6 @@ moto_mesh_dispose(GObject *obj)
     g_datalist_clear(& self->v_attrs);
 
     // Free edges
-    g_free(self->e_data);
     g_free(self->e_verts);
     g_free(self->e_hard_flags);
     g_free(self->e_creases);
@@ -84,7 +83,6 @@ moto_mesh_init(MotoMesh *self)
     g_datalist_init(& self->v_attrs);
 
     self->e_num     = 0;
-    self->e_data    = NULL;
     self->e_verts   = NULL;
     self->e_hard_flags = NULL;
     self->e_use_creases = FALSE;
@@ -201,10 +199,6 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
     {
         num = e_num/32 + 1;
         self->e_num     = e_num;
-        self->e_data        = (self->b32) ? g_try_malloc(sizeof(MotoMeshEdge32) * e_num):
-                                            g_try_malloc(sizeof(MotoMeshEdge16) * e_num);
-        if( ! self->e_data)
-            ; // TODO
         self->e_verts = g_try_malloc(moto_mesh_get_index_size(self) * e_num * 2);
         self->e_hard_flags  = (guint32 *)g_try_malloc(sizeof(guint32) * num);
         if( ! self->e_verts)
@@ -255,7 +249,6 @@ MotoMesh *moto_mesh_new_copy(MotoMesh *other)
     if(self->b32)
     {
         memcpy(self->v_data, other->v_data, sizeof(MotoMeshVert32)*self->v_num);
-        memcpy(self->e_data, other->e_data, sizeof(MotoMeshEdge32)*self->e_num);
         memcpy(self->f_data, other->f_data, sizeof(MotoMeshFace32)*self->f_num);
         memcpy(self->e_verts, other->e_verts, sizeof(guint32) * self->e_num * 2);
         memcpy(self->f_verts, other->f_verts, sizeof(guint32) * self->f_v_num);
@@ -266,7 +259,6 @@ MotoMesh *moto_mesh_new_copy(MotoMesh *other)
     else
     {
         memcpy(self->v_data, other->v_data, sizeof(MotoMeshVert16)*self->v_num);
-        memcpy(self->e_data, other->e_data, sizeof(MotoMeshEdge16)*self->e_num);
         memcpy(self->f_data, other->f_data, sizeof(MotoMeshFace16)*self->f_num);
         memcpy(self->e_verts, other->e_verts, sizeof(guint16) * self->e_num * 2);
         memcpy(self->f_verts, other->f_verts, sizeof(guint16) * self->f_v_num);
@@ -792,7 +784,6 @@ static gboolean moto_mesh_calc_e_data(MotoMesh *self)
         guint32 he_num = e_num*2;
 
         self->e_num   = e_num;
-        self->e_data  = g_try_malloc(sizeof(MotoMeshEdge32) * e_num);
         self->e_verts = g_try_malloc(moto_mesh_get_index_size(self) * e_num * 2);
 
         guint32 num = e_num/32 + 1;
@@ -861,7 +852,6 @@ static gboolean moto_mesh_calc_e_data(MotoMesh *self)
             // Converting mesh from 16bit to 32bit indecies.
             moto_mesh_convert_16to32(self);
 
-            self->e_data = g_try_malloc(sizeof(MotoMeshEdge32) * e_num);
             self->e_verts = g_try_malloc(moto_mesh_get_index_size(self) * e_num * 2);
 
             guint32 num = e_num/32 + 1;
@@ -879,7 +869,6 @@ static gboolean moto_mesh_calc_e_data(MotoMesh *self)
         else
         {
             self->e_num   = e_num;
-            self->e_data  = g_try_malloc(sizeof(MotoMeshEdge16) * e_num);
             self->e_verts = g_try_malloc(moto_mesh_get_index_size(self) * e_num * 2);
 
             guint16 num = e_num/16 + 1;
@@ -2597,17 +2586,15 @@ guint moto_mesh_get_face_v_num(MotoMesh *self, guint fi)
     guint result = 0;
     if(self->b32)
     {
-        MotoMeshFace32 *f_data = (MotoMeshFace32*)self->f_data;
-
-        guint32 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
-        result = f_data[fi].v_offset - start;
+        guint32 start = (0 == fi) ? 0: self->f_data32[fi-1].v_offset;
+        result = self->f_data32[fi].v_offset - start;
     }
     else
     {
-        MotoMeshFace16 *f_data = (MotoMeshFace16*)self->f_data;
-
         guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
         result = f_data[fi].v_offset - start;
+        guint16 start = (0 == fi) ? 0: self->f_data16[fi-1].v_offset;
+        result = self->f_data16[fi].v_offset - start;
     }
     return result;
 }
@@ -2743,18 +2730,15 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     memcpy(mesh->v_coords, self->v_coords, sizeof(MotoVector) * self->v_num);
 
     memcpy(mesh->v_data, self->v_data,   sizeof(MotoMeshVert16)*self->v_num);
-    memcpy(mesh->e_data, self->e_data,   sizeof(MotoMeshEdge16)*self->e_num);
     memcpy(mesh->f_data, self->f_data,   sizeof(MotoMeshFace16)*self->f_num);
     memcpy(mesh->e_verts, self->e_verts, sizeof(guint16)*self->e_num*2);
     memcpy(mesh->f_verts, self->f_verts, sizeof(guint16)*self->f_v_num);
-
-    MOTO_DECLARE_MESH_DATA_16(mesh);
 
     gfloat section_length = length/sections;
 
     guint16 fi = self->f_num;
     guint16 vi = self->v_num;
-    guint16 v_offset = f_data[self->f_num - 1].v_offset;
+    guint16 v_offset = mesh->f_data16[self->f_num - 1].v_offset;
     for(i = 0; i < selected_f_num; ++i)
     {
         guint16 si = selected[i];
@@ -2794,11 +2778,11 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
                 vector3_copy(p, c);
                 point3_move(p, normal, section_length);
 
-                f_data[fi].v_offset = v_offset + 4;
-                f_verts[v_offset+3] = prev_vloop_v0;
-                f_verts[v_offset+2] = vloop_v0;
-                f_verts[v_offset+1] = vloop_v1;
-                f_verts[v_offset]   = prev_vloop_v1;
+                mesh->f_data16[fi].v_offset = v_offset + 4;
+                mesh->f_verts16[v_offset+3] = prev_vloop_v0;
+                mesh->f_verts16[v_offset+2] = vloop_v0;
+                mesh->f_verts16[v_offset+1] = vloop_v1;
+                mesh->f_verts16[v_offset]   = prev_vloop_v1;
                 v_offset += 4;
 
                 ++fi;
@@ -2806,7 +2790,7 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         }
 
         // Setting hat. Value of v_offset for extruded face is not changed.
-        memcpy(f_verts + f_data[si].v_offset - v_num, vloop, loop_size);
+        memcpy(mesh->f_verts16 + mesh->f_data16[si].v_offset - v_num, vloop, loop_size);
     }
     g_assert(vi == mesh->v_num);
     g_assert(fi == mesh->f_num);
@@ -2857,7 +2841,6 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     MotoMesh *mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
 
     memcpy(mesh->v_data, self->v_data,   sizeof(MotoMeshVert16)*self->v_num);
-    memcpy(mesh->e_data, self->e_data,   sizeof(MotoMeshEdge16)*self->e_num);
     memcpy(mesh->f_data, self->f_data,   sizeof(MotoMeshFace16)*self->f_num);
     memcpy(mesh->e_verts, self->e_verts, sizeof(guint16)*self->e_num * 2);
     memcpy(mesh->f_verts, self->f_verts, sizeof(guint16)*self->f_v_num);

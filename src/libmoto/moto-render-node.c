@@ -9,31 +9,45 @@
 
 /* forwards */
 
+
 static gboolean moto_render_node_render_default(MotoRenderNode *self);
 
 /* class MotoRenderNode */
 
 static GObjectClass *render_node_parent_class = NULL;
 
+typedef struct _MotoRenderNodePriv MotoRenderNodePriv;
+
+#define MOTO_RENDER_NODE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_RENDER_NODE, MotoRenderNodePriv)
+
+struct _MotoRenderNodePriv
+{
+    gboolean rendered;
+    GTimeVal last_render;
+};
+
 static void
 moto_render_node_init(MotoRenderNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoRenderNodePriv *priv = MOTO_RENDER_NODE_GET_PRIVATE(self);
+
+    priv->rendered = FALSE;
+    g_get_current_time( & priv->last_render);
 
     /* params */
 
-    /*
     moto_node_add_params(node,
-            "angle",  "Angle",     G_TYPE_FLOAT,      MOTO_PARAM_MODE_INOUT, 0.0f, angle_spec, "Arguments",
-            "orig",   "Origin",    MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, orig, NULL,       "Arguments",
-            "dir",    "Direction", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, dir,  NULL,       "Arguments",
+            "skip_not_modified",  "Skip not modified nodes", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
             NULL);
-    */
 }
 
 static void
 moto_render_node_class_init(MotoRenderNodeClass *klass)
 {
+    g_type_class_add_private(klass, sizeof(MotoRenderNodePriv));
+
     render_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     klass->render = moto_render_node_render_default;
@@ -46,13 +60,32 @@ G_DEFINE_ABSTRACT_TYPE(MotoRenderNode, moto_render_node, MOTO_TYPE_NODE);
 gboolean moto_render_node_render(MotoRenderNode *self)
 {
     MotoRenderNodeClass *klass = MOTO_RENDER_NODE_GET_CLASS(self);
+    MotoRenderNodePriv  *priv  = MOTO_RENDER_NODE_GET_PRIVATE(self);
 
+    gboolean result = FALSE;
     if(klass->render)
-        return klass->render(self);
+        result = klass->render(self);
 
-    return FALSE;
+    priv->rendered = TRUE;
+    g_get_current_time( & priv->last_render);
+    return result;
 }
 
 static gboolean moto_render_node_render_default(MotoRenderNode *self)
-{}
+{
+    return FALSE;
+}
+
+gboolean moto_render_node_check_time(MotoRenderNode *self, const GTimeVal *tv)
+{
+    gboolean skip_not_modified;
+    moto_node_get_param_boolean((MotoNode*)self, "skip_not_modified", &skip_not_modified);
+    if(!skip_not_modified)
+        return TRUE;
+
+    MotoRenderNodePriv *priv = MOTO_RENDER_NODE_GET_PRIVATE(self);
+    if(!priv->rendered)
+        return FALSE;
+    return (tv->tv_sec > priv->last_render.tv_sec);
+}
 
