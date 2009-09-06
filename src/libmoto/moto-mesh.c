@@ -366,6 +366,8 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     // FIXME: Temporary only for quads!
 
     guint mem_size = moto_mesh_get_index_size(self) * self->f_num * 3 * 2;
+    if(self->f_tess_verts)
+        g_free(self->f_tess_verts);
     self->f_tess_verts = g_try_malloc(mem_size);
 
     self->f_tess_num = 0;
