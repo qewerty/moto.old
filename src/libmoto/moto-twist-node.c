@@ -140,12 +140,13 @@ static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gbo
         gfloat *pi, *po, *ni, *no;
         if(fabs(angle[0]) >= MICRO)
         {
-            gsize size_sse = size_i/4;
-
             pi = points_i;
             po = points_o;
 
 #ifdef __SSE__
+            // Computing four points at once.
+            gsize size_sse = size_i/4;
+
             float tmp0[16] MOTO_ALIGNED16;
             float tmp1[16] MOTO_ALIGNED16;
             float dots[16] MOTO_ALIGNED16;
