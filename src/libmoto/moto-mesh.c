@@ -434,6 +434,8 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 /* Newell's method */
 void moto_mesh_calc_faces_normals(MotoMesh *self)
 {
+    gfloat tmp;
+
     if(self->b32)
     {
         guint32 fi;
@@ -453,7 +455,7 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             for(vi = 0; vi < v_num-1; vi++)
             {
                 vert  = & self->v_coords[f_verts[start + vi]];
-                nvert = & self->v_coords[f_verts[start + vi+1]];
+                nvert = & self->v_coords[f_verts[start + (vi + 1)%v_num]];
 
                 self->f_normals[fi].x += (vert->y - nvert->y)*(vert->z + nvert->z);
                 self->f_normals[fi].y += (vert->z - nvert->z)*(vert->x + nvert->x);
@@ -461,19 +463,7 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             }
 
             gfloat *normal = (gfloat *)(self->f_normals + fi);
-
-            // FIXME: Temporary! Newell's method should be reimplemented.
-            gfloat a[3], b[3];
-            vector3_set(a, self->v_coords[f_verts[start + 1]].x - self->v_coords[f_verts[start + 0]].x,
-                           self->v_coords[f_verts[start + 1]].y - self->v_coords[f_verts[start + 0]].y,
-                           self->v_coords[f_verts[start + 1]].z - self->v_coords[f_verts[start + 0]].z);
-            vector3_set(b, self->v_coords[f_verts[start + 2]].x - self->v_coords[f_verts[start + 1]].x,
-                           self->v_coords[f_verts[start + 2]].y - self->v_coords[f_verts[start + 1]].y,
-                           self->v_coords[f_verts[start + 2]].z - self->v_coords[f_verts[start + 1]].z);
-            vector3_cross(normal, a, b);
-
-            gfloat lenbuf;
-            vector3_normalize(normal, lenbuf);
+            vector3_normalize(normal, tmp);
         }
     }
     else
@@ -492,10 +482,10 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             guint16 *f_verts = (guint16 *)self->f_verts;
             guint start = (0 == fi) ? 0: f_data[fi-1].v_offset;
             guint v_num = f_data[fi].v_offset - start;
-            for(vi = 0; vi < v_num-1; vi++)
+            for(vi = 0; vi < v_num; vi++)
             {
                 vert  = & self->v_coords[f_verts[start + vi]];
-                nvert = & self->v_coords[f_verts[start + vi+1]];
+                nvert = & self->v_coords[f_verts[start + (vi + 1)%v_num]];
 
                 self->f_normals[fi].x += (vert->y - nvert->y)*(vert->z + nvert->z);
                 self->f_normals[fi].y += (vert->z - nvert->z)*(vert->x + nvert->x);
@@ -503,19 +493,7 @@ void moto_mesh_calc_faces_normals(MotoMesh *self)
             }
 
             gfloat *normal = (gfloat *)(self->f_normals + fi);
-
-            // FIXME: Temporary! Newell's method should be reimplemented.
-            gfloat a[3], b[3];
-            vector3_set(a, self->v_coords[f_verts[start + 1]].x - self->v_coords[f_verts[start + 0]].x,
-                           self->v_coords[f_verts[start + 1]].y - self->v_coords[f_verts[start + 0]].y,
-                           self->v_coords[f_verts[start + 1]].z - self->v_coords[f_verts[start + 0]].z);
-            vector3_set(b, self->v_coords[f_verts[start + 2]].x - self->v_coords[f_verts[start + 1]].x,
-                           self->v_coords[f_verts[start + 2]].y - self->v_coords[f_verts[start + 1]].y,
-                           self->v_coords[f_verts[start + 2]].z - self->v_coords[f_verts[start + 1]].z);
-            vector3_cross(normal, a, b);
-
-            gfloat lenbuf;
-            vector3_normalize(normal, lenbuf);
+            vector3_normalize(normal, tmp);
         }
     }
 }
@@ -2880,6 +2858,26 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
         return NULL;
     }
     return mesh;
+}
+
+MotoMesh* moto_mesh_bevel_faces(MotoMesh *self, MotoMeshSelection *selection)
+{
+    guint selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
+    if(selected_f_num  < 1)
+    {
+        return moto_mesh_new_copy(self);
+    }
+
+    selection = moto_mesh_selection_adapt(selection, self);
+
+    guint v_num   = self->v_num;
+    guint e_num   = self->e_num;
+    guint f_num   = self->f_num;
+    guint f_v_num = self->f_v_num;
+
+    guint16 *selected = moto_bitmask_create_array_16(selection->faces);
+
+
 }
 
 MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
