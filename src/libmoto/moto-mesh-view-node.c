@@ -570,19 +570,44 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
 
     glColor4f(0, 1, 0, 1);
     guint i, j;
-    for(i = 0; i < mesh->f_num; i++)
+    for(i = 0; i < mesh->f_num; ++i)
     {
+        guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+        guint v_num = f_data[i].v_offset - start;
+
         if(moto_mesh_selection_is_face_selected(selection, i))
         {
             glBegin(GL_POLYGON);
-            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
-            guint v_num = f_data[i].v_offset - start;
             for(j = 0; j < v_num; j++)
             {
                 glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
             }
             glEnd();
         }
+
+        gfloat ox = 0;
+        gfloat oy = 0;
+        gfloat oz = 0;
+
+        for(j = 0; j < v_num; ++j)
+        {
+            ox += mesh->v_coords[f_verts[start + j]].x;
+            oy += mesh->v_coords[f_verts[start + j]].y;
+            oz += mesh->v_coords[f_verts[start + j]].z;
+        }
+        ox /= v_num;
+        oy /= v_num;
+        oz /= v_num;
+
+        gfloat nx = ox + mesh->f_normals[i].x;
+        gfloat ny = oy + mesh->f_normals[i].y;
+        gfloat nz = oz + mesh->f_normals[i].z;
+
+        glColor3f(0, 0, 1);
+        glBegin(GL_LINES);
+        glVertex3f(ox, oy, oz);
+        glVertex3f(nx, ny, nz);
+        glEnd();
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
