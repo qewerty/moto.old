@@ -45,15 +45,20 @@ def make_tags(target, source, env):
         return
 
     filename = '.pkg-config~'
-    os.system(pkg_config + ' > "%s"' % filename)
+    os.system('echo "" > "%s"' % filename)
+    if not isinstance(pkg_config, str):
+        for p in pkg_config:
+            os.system(p + ' >> "%s"' % filename)
+    else:
+        os.system(pkg_config + ' >> "%s"' % filename)
     f = file(filename)
     includes = f.read().replace('-I', '').split(' ')
     f.close()
     os.unlink(filename)
 
-    cmd = 'ctags-exuberant -R src %s' % \
+    cmd = 'ctags-exuberant -R --exclude=build -h .h.hpp.c.cpp --c++-kinds=+p --fields=+iaS --extra=+q src %s' % \
         (' '.join([i for i in includes if os.path.exists(i)]))
     print cmd
     os.system(cmd)
 
-# env.Command('tags', None, make_tags)
+env.Command('tags', None, make_tags)

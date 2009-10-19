@@ -39,9 +39,16 @@ moto_render_node_init(MotoRenderNode *self)
     /* params */
 
     moto_node_add_params(node,
-            "skip_not_modified",  "Skip not modified nodes", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
-            NULL);
+        "skip_not_modified",  "Skip not modified nodes", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
+        NULL);
 }
+
+/*
+static MotoNodeActionResult *render(MotoRenderNode *node)
+{
+    moto_render_node_render(node);
+}
+*/
 
 static void
 moto_render_node_class_init(MotoRenderNodeClass *klass)
@@ -51,6 +58,8 @@ moto_render_node_class_init(MotoRenderNodeClass *klass)
     render_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
     klass->render = moto_render_node_render_default;
+
+    // TODO: moto_node_class_add_action(moto_node_action_new("render", "Render", (MotoNodeActionFunc)render));
 }
 
 G_DEFINE_ABSTRACT_TYPE(MotoRenderNode, moto_render_node, MOTO_TYPE_NODE);

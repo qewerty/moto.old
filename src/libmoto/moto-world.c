@@ -364,7 +364,7 @@ void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
     g_mutex_unlock(self->priv->axes_object_mutex);
 }
 
-gboolean __draw_object(MotoWorld *world, MotoNode *node, gpointer user_data)
+static gboolean __draw_object(MotoWorld *world, MotoNode *node, gpointer user_data)
 {
     moto_object_node_draw_full((MotoObjectNode *)node, FALSE, TRUE);
 
@@ -899,6 +899,8 @@ void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld 
 void moto_world_set_draw_mode(MotoWorld *self, MotoDrawMode draw_mode)
 {
     self->priv->draw_mode = draw_mode;
+    moto_world_reset(self);
+    moto_world_redraw(self);
 }
 
 MotoDrawMode moto_world_get_draw_mode(MotoWorld *self)

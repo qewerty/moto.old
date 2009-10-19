@@ -71,6 +71,8 @@ moto_geom_op_node_class_init(MotoGeomOpNodeClass *klass)
     klass->perform   = NULL;
 
     nclass->update = moto_geom_op_node_update;
+
+    // TODO: moto_node_class_add_action(moto_node_action_new("reselect", "Reselect"));
 }
 
 G_DEFINE_ABSTRACT_TYPE(MotoGeomOpNode, moto_geom_op_node, MOTO_TYPE_NODE);

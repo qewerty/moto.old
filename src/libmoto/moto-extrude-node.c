@@ -4,6 +4,7 @@
 #include "moto-enums.h"
 #include "moto-param-spec.h"
 #include "moto-mesh.h"
+#include "moto-object-node.h"
 #include "moto-extrude-node.h"
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/matrix.h"
@@ -28,6 +29,8 @@ moto_extrude_node_init(MotoExtrudeNode *self)
             "mode",     "Mode",        MOTO_TYPE_EXTRUDE_MODE, MOTO_PARAM_MODE_INOUT, MOTO_EXTRUDE_MODE_FACES, NULL, "Arguments",
             "sections", "Sections",    MOTO_TYPE_INT,          MOTO_PARAM_MODE_INOUT, 1, sections_spec, "Arguments",
             "length",   "Length",      MOTO_TYPE_FLOAT,        MOTO_PARAM_MODE_INOUT, 0.5f, NULL,       "Arguments",
+            "path",     "Path",        MOTO_TYPE_OBJECT_NODE,  MOTO_PARAM_MODE_INOUT, NULL, NULL,       "Path",
+            "global",   "Global",      MOTO_TYPE_BOOLEAN,      MOTO_PARAM_MODE_INOUT, TRUE, NULL,       "Path",
             NULL);
     g_object_unref(sections_spec);
 }

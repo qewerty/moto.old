@@ -214,7 +214,8 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
     glColor4f(1, 1, 1, 1);
 
     glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
+    // glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_FLAT);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
@@ -259,9 +260,35 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
     }
     else // Vertex arrays
     {
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-        glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
-        glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+        MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+        if(MOTO_DRAW_MODE_SOLID == draw_mode)
+        {
+            MotoMeshFace16 *f_data = mesh->f_data16;
+            guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+            guint i;
+            for(i = 0; i < mesh->f_num; ++i)
+            {
+                guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+                guint v_num = f_data[i].v_offset - start;
+
+                glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
+                guint j;
+                glBegin(GL_POLYGON);
+                for(j = 0; j < v_num; ++j)
+                {
+                    glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
+                }
+                glEnd();
+            }
+        }
+        else
+        {
+            glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
+            glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
+            glShadeModel(GL_FLAT);
+            glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+        }
     }
 
     glPopAttrib();
@@ -557,7 +584,33 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(2.0, 1.0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+
+        MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+        if(MOTO_DRAW_MODE_SOLID == draw_mode)
+        {
+            MotoMeshFace16 *f_data = mesh->f_data16;
+            guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+            guint i;
+            for(i = 0; i < mesh->f_num; ++i)
+            {
+                guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+                guint v_num = f_data[i].v_offset - start;
+
+                glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
+                guint j;
+                glBegin(GL_POLYGON);
+                for(j = 0; j < v_num; ++j)
+                {
+                    glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
+                }
+                glEnd();
+            }
+        }
+        else
+        {
+            glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+        }
     }
 
     glPolygonOffset(1.5, 1.0);
@@ -640,6 +693,7 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
     moto_node_get_param_object((MotoNode*)self, "mesh", (GObject**)&mesh);
     if( ! mesh)
         return;
+    glShadeModel(GL_FLAT);
 
     MotoWorld* world = moto_node_get_world(MOTO_NODE(self));
     MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
@@ -694,9 +748,6 @@ static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self,
     moto_node_get_param_object((MotoNode*)self, "mesh", (GObject**)&mesh);
     if( ! mesh)
         return TRUE;
-
-    if( ! glIsList(priv->dlist))
-        priv->dlist = glGenLists(1);
 
     MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode *)self);
     if(state)

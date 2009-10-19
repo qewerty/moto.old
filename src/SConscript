@@ -7,7 +7,3 @@ env.SConscript(['libmotoutil/SConscript',
 env.Program('$MOTO_GUI', 'moto-gui.c',
             LIBS=['moto', 'motoutil', 'motogui', 'mototest'],
             LIBPATH='./lib')
-
-# env.Program('moto', 'moto.c',
-#            LIBS=['moto', 'motoutil', 'motogui', 'mototest'],
-#            LIBPATH='./lib')

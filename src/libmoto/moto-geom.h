@@ -67,4 +67,3 @@ gboolean moto_geom_is_struct_the_same(MotoGeom *self, MotoGeom *other);
 G_END_DECLS
 
 #endif /* __MOTO_GEOM_H__ */
-

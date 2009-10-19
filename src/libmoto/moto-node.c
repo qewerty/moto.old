@@ -193,7 +193,6 @@ moto_node_init(MotoNode *self)
     priv->updated = FALSE;
 
     static guint id = 0;
-    priv->id = ++id;
 
     priv->name = g_string_new("");
     priv->world = NULL;
