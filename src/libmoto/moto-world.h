@@ -289,6 +289,9 @@ gboolean moto_world_get_use_arrays(MotoWorld *self);
 void moto_world_set_show_normals(MotoWorld *self, gboolean show);
 gboolean moto_world_get_show_normals(MotoWorld *self);
 
+void moto_world_set_cull_faces(MotoWorld *self, gboolean cull);
+gboolean moto_world_get_cull_faces(MotoWorld *self);
+
 void moto_world_reset(MotoWorld *self);
 
 /* Animation */

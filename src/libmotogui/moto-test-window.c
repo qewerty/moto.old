@@ -227,6 +227,22 @@ gboolean on_key_press_event(GtkWidget   *widget,
         moto_world_reset(w);
         moto_test_window_redraw_3dview(self);
     }
+    else if(0 == g_utf8_collate(event->string, "c"))
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return FALSE;
+
+        moto_world_set_cull_faces(w, ! moto_world_get_cull_faces(w));
+
+        if(moto_world_get_cull_faces(w))
+            moto_info("Cull enabled");
+        else
+            moto_info("Cull disabled");
+
+        moto_world_reset(w);
+        moto_test_window_redraw_3dview(self);
+    }
     else if(65289 == event->keyval && (GDK_CONTROL_MASK & event->state))
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);

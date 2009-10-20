@@ -68,6 +68,7 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
     moto_node_add_params(node,
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General",
             "lock",     "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
+            "watch",    "Watch", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
             "mesh",     "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
             NULL);
 

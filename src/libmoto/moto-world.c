@@ -92,6 +92,7 @@ struct _MotoWorldPriv
     gboolean use_vbo;
     gboolean use_arrays;
     gboolean show_normals;
+    gboolean cull_faces;
 
     GThreadPool *thread_pool;
     gint max_thread_for_update;
@@ -527,6 +528,16 @@ void moto_world_set_show_normals(MotoWorld *self, gboolean show)
 gboolean moto_world_get_show_normals(MotoWorld *self)
 {
     return self->priv->show_normals;
+}
+
+void moto_world_set_cull_faces(MotoWorld *self, gboolean cull)
+{
+    self->priv->cull_faces = cull;
+}
+
+gboolean moto_world_get_cull_faces(MotoWorld *self)
+{
+    return self->priv->cull_faces;
 }
 
 static gboolean

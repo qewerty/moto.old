@@ -239,7 +239,7 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
             glUniform3fARB(get_uni_loc(slernode->priv->prog, "lightPosition"),
                     0.3, 0.15, 0.15);
             glUniform1fARB(get_uni_loc(slernode->priv->prog, "Kd"), 1);
-            glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.3);
+            glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.1);
             glUseProgramObjectARB(slernode->priv->prog);
         }
     }
