@@ -282,6 +282,13 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
 
 void moto_world_set_use_vbo(MotoWorld *self, gboolean use);
 gboolean moto_world_get_use_vbo(MotoWorld *self);
+
+void moto_world_set_use_arrays(MotoWorld *self, gboolean use);
+gboolean moto_world_get_use_arrays(MotoWorld *self);
+
+void moto_world_set_show_normals(MotoWorld *self, gboolean show);
+gboolean moto_world_get_show_normals(MotoWorld *self);
+
 void moto_world_reset(MotoWorld *self);
 
 /* Animation */

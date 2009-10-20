@@ -90,6 +90,8 @@ struct _MotoWorldPriv
           prev_height;
 
     gboolean use_vbo;
+    gboolean use_arrays;
+    gboolean show_normals;
 
     GThreadPool *thread_pool;
     gint max_thread_for_update;
@@ -505,6 +507,26 @@ void moto_world_set_use_vbo(MotoWorld *self, gboolean use)
 gboolean moto_world_get_use_vbo(MotoWorld *self)
 {
     return self->priv->use_vbo;
+}
+
+void moto_world_set_use_arrays(MotoWorld *self, gboolean use)
+{
+    self->priv->use_arrays = use;
+}
+
+gboolean moto_world_get_use_arrays(MotoWorld *self)
+{
+    return self->priv->use_arrays;
+}
+
+void moto_world_set_show_normals(MotoWorld *self, gboolean show)
+{
+    self->priv->show_normals = show;
+}
+
+gboolean moto_world_get_show_normals(MotoWorld *self)
+{
+    return self->priv->show_normals;
 }
 
 static gboolean

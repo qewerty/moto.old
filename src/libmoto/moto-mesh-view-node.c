@@ -284,10 +284,36 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
         }
         else
         {
-            glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-            glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
-            glShadeModel(GL_FLAT);
-            glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+            if(!moto_world_get_use_arrays(world))
+            {
+                moto_info("Using simple face cycles");
+                MotoMeshFace16 *f_data = mesh->f_data16;
+                guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+                guint i;
+                for(i = 0; i < mesh->f_num; ++i)
+                {
+                    guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+                    guint v_num = f_data[i].v_offset - start;
+
+                    guint j;
+                    glBegin(GL_POLYGON);
+                    for(j = 0; j < v_num; ++j)
+                    {
+                        glNormal3fv((GLfloat*)( & mesh->v_normals[f_verts[start + j]]));
+                        glVertex3fv((GLfloat*)( & mesh->v_coords[f_verts[start + j]]));
+                    }
+                    glEnd();
+                }
+            }
+            else
+            {
+                moto_info("Using vertex arrays with glDrawElements");
+                glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
+                glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
+                glShadeModel(GL_FLAT);
+                glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+            }
         }
     }
 
@@ -521,8 +547,8 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
 {
     MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
 
-    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -530,6 +556,9 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     gboolean force_arrays = FALSE;
     MotoWorld *world = moto_node_get_world((MotoNode *)mv);
@@ -613,6 +642,8 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
         }
     }
 
+    glDisable(GL_CULL_FACE);
+
     glPolygonOffset(1.5, 1.0);
 
     MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
@@ -621,6 +652,7 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    gboolean show_normals = moto_world_get_show_normals(world);
     glColor4f(0, 1, 0, 1);
     guint i, j;
     for(i = 0; i < mesh->f_num; ++i)
@@ -638,29 +670,32 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
             glEnd();
         }
 
-        gfloat ox = 0;
-        gfloat oy = 0;
-        gfloat oz = 0;
-
-        for(j = 0; j < v_num; ++j)
+        if(show_normals)
         {
-            ox += mesh->v_coords[f_verts[start + j]].x;
-            oy += mesh->v_coords[f_verts[start + j]].y;
-            oz += mesh->v_coords[f_verts[start + j]].z;
+            gfloat ox = 0;
+            gfloat oy = 0;
+            gfloat oz = 0;
+
+            for(j = 0; j < v_num; ++j)
+            {
+                ox += mesh->v_coords[f_verts[start + j]].x;
+                oy += mesh->v_coords[f_verts[start + j]].y;
+                oz += mesh->v_coords[f_verts[start + j]].z;
+            }
+            ox /= v_num;
+            oy /= v_num;
+            oz /= v_num;
+
+            gfloat nx = ox + mesh->f_normals[i].x;
+            gfloat ny = oy + mesh->f_normals[i].y;
+            gfloat nz = oz + mesh->f_normals[i].z;
+
+            glColor3f(0, 0, 1);
+            glBegin(GL_LINES);
+            glVertex3f(ox, oy, oz);
+            glVertex3f(nx, ny, nz);
+            glEnd();
         }
-        ox /= v_num;
-        oy /= v_num;
-        oz /= v_num;
-
-        gfloat nx = ox + mesh->f_normals[i].x;
-        gfloat ny = oy + mesh->f_normals[i].y;
-        gfloat nz = oz + mesh->f_normals[i].z;
-
-        glColor3f(0, 0, 1);
-        glBegin(GL_LINES);
-        glVertex3f(ox, oy, oz);
-        glVertex3f(nx, ny, nz);
-        glEnd();
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -693,7 +728,6 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
     moto_node_get_param_object((MotoNode*)self, "mesh", (GObject**)&mesh);
     if( ! mesh)
         return;
-    glShadeModel(GL_FLAT);
 
     MotoWorld* world = moto_node_get_world(MOTO_NODE(self));
     MotoDrawMode draw_mode = moto_world_get_draw_mode(world);

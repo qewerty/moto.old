@@ -185,7 +185,10 @@ MotoMesh *moto_wobj_mesh_loader_load(MotoMeshLoader *self, const gchar *filename
                         while(' ' != *p2 || '\n' == *p2)
                         {
                             if('\n' == *p2)
+                            {
+                                ++j;
                                 break;
+                            }
                             p2++;
                         }
                     }

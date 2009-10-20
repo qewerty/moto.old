@@ -195,6 +195,38 @@ gboolean on_key_press_event(GtkWidget   *widget,
         moto_world_reset(w);
         moto_test_window_redraw_3dview(self);
     }
+    else if(0 == g_utf8_collate(event->string, "a"))
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return FALSE;
+
+        moto_world_set_use_arrays(w, ! moto_world_get_use_arrays(w));
+
+        if(moto_world_get_use_arrays(w))
+            moto_info("Arrays enabled");
+        else
+            moto_info("Arrays disabled");
+
+        moto_world_reset(w);
+        moto_test_window_redraw_3dview(self);
+    }
+    else if(0 == g_utf8_collate(event->string, "n"))
+    {
+        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        if( ! w)
+            return FALSE;
+
+        moto_world_set_show_normals(w, ! moto_world_get_show_normals(w));
+
+        if(moto_world_get_show_normals(w))
+            moto_info("Normals enabled");
+        else
+            moto_info("Normals disabled");
+
+        moto_world_reset(w);
+        moto_test_window_redraw_3dview(self);
+    }
     else if(65289 == event->keyval && (GDK_CONTROL_MASK & event->state))
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);

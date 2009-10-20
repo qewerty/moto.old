@@ -67,7 +67,8 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
+            "lock",     "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
+            "mesh",     "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -167,9 +168,13 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
         g_object_unref(priv->mesh);
 
     priv->mesh = moto_mesh_file_node_load(self, filename);
+    if(priv->mesh)
+    {
+        moto_info("Mesh '%s' loaded successfully", filename);
+        moto_geom_prepare((MotoGeom*)priv->mesh);
+    }
 
     priv->bound_calculated = FALSE;
-    moto_geom_prepare((MotoGeom*)priv->mesh);
     moto_node_set_param_object(node, "mesh", (GObject*)priv->mesh);
 }
 

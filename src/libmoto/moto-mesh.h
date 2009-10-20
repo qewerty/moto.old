@@ -204,6 +204,8 @@ struct _MotoMesh
     MotoVector *v_coords;
     MotoVector *v_normals;
     GData *v_attrs;
+    GData *e_attrs;
+    GData *f_attrs;
 
     // Edges
     guint e_num;
