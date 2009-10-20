@@ -11,6 +11,10 @@
 #include "moto-messager.h"
 #include "libmotoutil/matrix.h"
 
+#ifndef CALLBACK
+#define CALLBACK
+#endif
+
 /* forwards */
 
 static void moto_mesh_copyable_init(MotoCopyableIface *iface);
@@ -361,6 +365,51 @@ void moto_mesh_foreach_edge(MotoMesh *self,
 }
 */
 
+typedef struct _MotoTessData
+{
+    gint index_size;
+    union
+    {
+        guint16* tess_verts16;
+        guint32* tess_verts32;
+    };
+    guint tess_num;
+} MotoTessData;
+
+typedef struct _MotoTessVertexData
+{
+    GLdouble coords[3];
+    guint index;
+} MotoTessVertexData;
+
+void CALLBACK tess_cb_vertex_data(void* vertex_data, void* user_data)
+{
+    MotoTessData* td = (MotoTessData*)user_data;
+    MotoTessVertexData* vtd = (MotoTessVertexData*)vertex_data;
+
+    ++td->tess_num;
+
+    if(1 == td->index_size)
+    {
+        *td->tess_verts16 = (guint16)vtd->index;
+        ++td->tess_verts16;
+    }
+    else if(2 == td->index_size)
+    {
+        *td->tess_verts32 = vtd->index;
+        ++td->tess_verts32;
+    }
+    else
+    {
+        // TODO: Error.
+    }
+}
+
+static void tess_cb_edge_flag(GLboolean flag)
+{
+    // Just do nothing to force GL_TRIANGLES.
+}
+
 void moto_mesh_tesselate_faces(MotoMesh *self)
 {
     // FIXME: Temporary only for quads!
@@ -395,9 +444,57 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     }
     else
     {
+        
         MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
         guint16 *f_verts = (guint16 *)self->f_verts;
         guint16 *f_tess_verts = (guint16 *)self->f_tess_verts;
+
+        GLUtesselator* tess = gluNewTess();
+
+        gluTessCallback(tess, GLU_TESS_VERTEX_DATA, tess_cb_vertex_data);
+        gluTessCallback(tess, GLU_TESS_EDGE_FLAG, tess_cb_edge_flag); // Force GL_TRIANGLES.
+        // gluTessCallback(tess, GLU_TESS_BEGIN, tess_cb_begin);
+        // gluTessCallback(tess, GLU_TESS_END, tess_cb_end);
+        // gluTessCallback(tess, GLU_TESS_ERROR, tess_cb_error);
+        // gluTessCallback(tess, GLU_TESS_COMBINE, tess_cb_combine);
+
+        MotoTessData td = {1, f_tess_verts, 0};
+
+        for(i = 0; i < self->f_num; i++)
+        {
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
+
+            guint16 *f  = f_verts + start;
+            guint16 *tf = td.tess_verts16;
+
+            MotoTessVertexData tess_verts[v_num];
+
+            gluTessBeginPolygon(tess, &td);
+            gluTessBeginContour(tess);
+
+            guint j;
+            for(j = 0; j < v_num; ++j)
+            {
+                MotoTessVertexData* tv = tess_verts + j;
+                tv->index = f[j];
+                float* v = (float*) & self->v_coords[tv->index];
+                tv->coords[0] = v[0];
+                tv->coords[1] = v[1];
+                tv->coords[2] = v[2];
+
+                gluTessVertex(tess, tv, tv);
+            }
+
+            gluTessEndContour(tess);
+            gluTessEndPolygon(tess);
+        }
+
+        gluDeleteTess(tess);
+
+        self->f_tess_num = td.tess_num;
+
+        /*
         for(i = 0; i < self->f_num; i++)
         {
             guint start = (0 == i) ? 0: f_data[i-1].v_offset;
@@ -427,6 +524,7 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 
             self->f_tess_num += 2;
         }
+        */
     }
     self->tesselated = TRUE;
 }

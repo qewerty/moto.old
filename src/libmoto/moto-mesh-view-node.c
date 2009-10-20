@@ -543,6 +543,26 @@ inline static void draw_mesh_as_edges(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glPopClientAttrib();
 }
 
+static void tessCallbackVertex(void* vertex_data)
+{
+    glVertex3dv(vertex_data);
+}
+
+static void tessCallbackBegin(GLenum which)
+{
+    glBegin(which);
+}
+
+static void tessCallbackEnd(void)
+{
+    glEnd();
+}
+
+static void tessCallbackError(GLenum errno)
+{
+    g_print("Tesselation error: %d\n", errno);
+}
+
 inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
@@ -617,9 +637,42 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
         MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
         if(MOTO_DRAW_MODE_SOLID == draw_mode)
         {
+            GLUtesselator* tess = gluNewTess();
+
+            gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertex);
+            gluTessCallback(tess, GLU_TESS_BEGIN, tessCallbackBegin);
+            gluTessCallback(tess, GLU_TESS_END, tessCallbackEnd);
+            gluTessCallback(tess, GLU_TESS_ERROR, tessCallbackError);
+            // gluTessCallback(tess, GLU_TESS_COMBINE, tessCallbackCombine);
+
             MotoMeshFace16 *f_data = mesh->f_data16;
             guint16 *f_verts = (guint16 *)mesh->f_verts;
 
+            guint i;
+            for(i = 0; i < mesh->f_num; ++i)
+            {
+                guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+                guint v_num = f_data[i].v_offset - start;
+
+                GLdouble verts[v_num*3];
+
+                glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
+                gluTessBeginPolygon(tess, NULL);
+                gluTessBeginContour(tess);
+                guint j;
+                for(j = 0; j < v_num; ++j)
+                {
+                    float* v0 = (float*) & mesh->v_coords[f_verts[start + j]];
+                    guint k;
+                    for(k = 0; k < 3; ++k)
+                        verts[j*3 + k] = v0[k];
+                    gluTessVertex(tess, verts + j*3, verts + j*3);
+                }
+                gluTessEndContour(tess);
+                gluTessEndPolygon(tess);
+            }
+
+            /*
             guint i;
             for(i = 0; i < mesh->f_num; ++i)
             {
@@ -635,6 +688,9 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
                 }
                 glEnd();
             }
+            */
+
+            gluDeleteTess(tess);
         }
         else
         {
