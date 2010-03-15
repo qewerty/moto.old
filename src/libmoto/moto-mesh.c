@@ -186,6 +186,8 @@ MotoMesh *moto_mesh_new(guint v_num, guint e_num, guint f_num, guint f_verts_num
         self->f_hidden_flags[i] = 0;
     */
 
+    self->f_tess_verts = NULL;
+
     if(self->b32)
     {
         MotoMeshVert32 *v_data = (MotoMeshVert32 *)self->v_data;
@@ -257,7 +259,12 @@ MotoMesh *moto_mesh_new_copy(MotoMesh *other)
         memcpy(self->e_verts, other->e_verts, sizeof(guint32) * self->e_num * 2);
         memcpy(self->f_verts, other->f_verts, sizeof(guint32) * self->f_v_num);
         memcpy(self->f_normals, other->f_normals, sizeof(MotoVector) * self->f_num);
-        // memcpy(self->f_tess_verts, other->f_tess_verts, sizeof(guint32) * self->f_num * 3 * 2);
+        if(self->f_tess_num > 0)
+        {
+            guint mem_size =  sizeof(guint32) * self->f_tess_num * 3;
+            self->f_tess_verts = g_try_malloc(mem_size);
+            memcpy(self->f_tess_verts, other->f_tess_verts, mem_size);
+        }
         memcpy(self->he_data, other->he_data, sizeof(MotoHalfEdge32) * self->e_num * 2);
     }
     else
@@ -267,7 +274,12 @@ MotoMesh *moto_mesh_new_copy(MotoMesh *other)
         memcpy(self->e_verts, other->e_verts, sizeof(guint16) * self->e_num * 2);
         memcpy(self->f_verts, other->f_verts, sizeof(guint16) * self->f_v_num);
         memcpy(self->f_normals, other->f_normals, sizeof(MotoVector) * self->f_num);
-        // memcpy(self->f_tess_verts, other->f_tess_verts, sizeof(guint16) * self->f_num * 3 * 2);
+        if(self->f_tess_num > 0)
+        {
+            guint mem_size =  sizeof(guint32) * self->f_tess_num * 3;
+            self->f_tess_verts = g_try_malloc(mem_size);
+            memcpy(self->f_tess_verts, other->f_tess_verts, mem_size);
+        }
         memcpy(self->he_data, other->he_data, sizeof(MotoHalfEdge16) * self->e_num * 2);
     }
 
@@ -382,6 +394,12 @@ typedef struct _MotoTessVertexData
     guint index;
 } MotoTessVertexData;
 
+void CALLBACK tess_cb_vertex_data_count(void* vertex_data, void* user_data)
+{
+    MotoTessData* td = (MotoTessData*)user_data;
+    ++td->tess_num;
+}
+
 void CALLBACK tess_cb_vertex_data(void* vertex_data, void* user_data)
 {
     MotoTessData* td        = (MotoTessData*)user_data;
@@ -421,11 +439,11 @@ static void tess_cb_begin_data(GLenum type, void* user_data)
 
 void moto_mesh_tesselate_faces(MotoMesh *self)
 {
-    guint mem_size = moto_mesh_get_index_size(self) * self->f_num * 3 * 2;
     if(self->f_tess_verts)
+    {
         g_free(self->f_tess_verts);
-    self->f_tess_verts = g_try_malloc(mem_size);
-
+        self->f_tess_verts = NULL;
+    }
     self->f_tess_num = 0;
 
     guint i;
@@ -436,18 +454,17 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     {
         MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
         guint16 *f_verts = self->f_verts16;
-        guint16 *f_tess_verts = self->f_tess_verts16;
 
         GLUtesselator* tess = gluNewTess();
 
-        gluTessCallback(tess, GLU_TESS_VERTEX_DATA, tess_cb_vertex_data);
+        gluTessCallback(tess, GLU_TESS_VERTEX_DATA, tess_cb_vertex_data_count);
         gluTessCallback(tess, GLU_TESS_EDGE_FLAG, tess_cb_edge_flag); // Force GL_TRIANGLES.
         // gluTessCallback(tess, GLU_TESS_BEGIN_DATA, tess_cb_begin_data);
         // gluTessCallback(tess, GLU_TESS_END, tess_cb_end);
         // gluTessCallback(tess, GLU_TESS_ERROR, tess_cb_error);
         // gluTessCallback(tess, GLU_TESS_COMBINE, tess_cb_combine);
 
-        MotoTessData td = {1, f_tess_verts, 0};
+        MotoTessData td = {1, NULL, 0};
 
         for(i = 0; i < self->f_num; i++)
         {
@@ -456,6 +473,53 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 
             guint16 *f  = f_verts + start;
             guint16 *tf = td.tess_verts16;
+
+            MotoTessVertexData tess_verts[v_num];
+
+            gluTessBeginPolygon(tess, &td);
+            gluTessBeginContour(tess);
+
+            guint j;
+            for(j = 0; j < v_num; ++j)
+            {
+                MotoTessVertexData* tv = tess_verts + j;
+                tv->index = f[j];
+                float* v = (float*) & self->v_coords[tv->index];
+                tv->coords[0] = v[0];
+                tv->coords[1] = v[1];
+                tv->coords[2] = v[2];
+
+                gluTessVertex(tess, tv, tv);
+            }
+
+            gluTessEndContour(tess);
+            gluTessEndPolygon(tess);
+        }
+
+        guint mem_size = moto_mesh_get_index_size(self) * td.tess_num;
+        g_print("td.tess_num: %d\n", td.tess_num);
+        self->f_tess_verts = g_try_malloc(mem_size);
+        guint16 *f_tess_verts = self->f_tess_verts16;
+
+        gluTessCallback(tess, GLU_TESS_VERTEX_DATA, tess_cb_vertex_data);
+        gluTessCallback(tess, GLU_TESS_EDGE_FLAG, tess_cb_edge_flag); // Force GL_TRIANGLES.
+        // gluTessCallback(tess, GLU_TESS_BEGIN_DATA, tess_cb_begin_data);
+        // gluTessCallback(tess, GLU_TESS_END, tess_cb_end);
+        // gluTessCallback(tess, GLU_TESS_ERROR, tess_cb_error);
+        // gluTessCallback(tess, GLU_TESS_COMBINE, tess_cb_combine);
+
+        td.index_size = 1;
+        td.tess_verts16 = f_tess_verts;
+        td.tess_num = 0;
+
+        for(i = 0; i < self->f_num; i++)
+        {
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
+
+            guint16 *f  = f_verts + start;
+            guint16 *tf = td.tess_verts16;
+
 
             MotoTessVertexData tess_verts[v_num];
 
@@ -2731,6 +2795,7 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     guint f_num = self->f_num;
     guint e_num = self->e_num;
     guint v_num = self->v_num;
+    guint f_v_num = self->f_v_num;
 
     guint16 *selected = moto_bitmask_create_array_16(selection->faces);
 
@@ -2742,15 +2807,15 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     {
         if(moto_mesh_selection_is_face_selected(selection, i))
         {
-            guint f_v_num = moto_mesh_get_face_v_num(self, i);
-            guint16 num = f_v_num*sections;
+            guint16 num = moto_mesh_get_face_v_num(self, i)*sections;
             v_num += num;
             e_num += num*2;
             f_num += num;
+            f_v_num += num*4;
         }
     }
 
-    MotoMesh *mesh = moto_mesh_new(v_num, e_num, f_num, f_num*4);
+    MotoMesh *mesh = moto_mesh_new(v_num, e_num, f_num, f_v_num);
 
     memcpy(mesh->v_coords, self->v_coords, sizeof(MotoVector) * self->v_num);
 
