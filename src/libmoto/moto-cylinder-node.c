@@ -55,8 +55,7 @@ moto_cylinder_node_init(MotoCylinderNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius0", "Radius 0", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius0, pspec, "Form",
-            "radius1", "Radius 1", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
+            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
             "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Form",
             "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Form",
             "screw_s", "Screw S", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
@@ -109,10 +108,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 {
     MotoNode *node = (MotoNode*)self;
 
-    gfloat radius_x_f, radius_y_f;
-    moto_node_get_param_2f(node, "radius0", &radius_x_f, &radius_y_f);
-    gfloat radius_x_s, radius_y_s;
-    moto_node_get_param_2f(node, "radius1", &radius_x_s, &radius_y_s);
+    gfloat radius_x_f, radius_y_f, radius_x_s, radius_y_s;
+    moto_node_get_param_4f(node, "radius", &radius_x_f, &radius_y_f, &radius_x_s, &radius_y_s);
 
     gfloat height;
     moto_node_get_param_float((MotoNode *)self, "height", &height);
