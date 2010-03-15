@@ -520,7 +520,6 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
             guint16 *f  = f_verts + start;
             guint16 *tf = td.tess_verts16;
 
-
             MotoTessVertexData tess_verts[v_num];
 
             gluTessBeginPolygon(tess, &td);
