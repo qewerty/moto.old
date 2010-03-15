@@ -384,7 +384,7 @@ typedef struct _MotoTessVertexData
 
 void CALLBACK tess_cb_vertex_data(void* vertex_data, void* user_data)
 {
-    MotoTessData* td = (MotoTessData*)user_data;
+    MotoTessData* td        = (MotoTessData*)user_data;
     MotoTessVertexData* vtd = (MotoTessVertexData*)vertex_data;
 
     ++td->tess_num;
@@ -412,8 +412,6 @@ static void tess_cb_edge_flag(GLboolean flag)
 
 void moto_mesh_tesselate_faces(MotoMesh *self)
 {
-    // FIXME: Temporary only for quads!
-
     guint mem_size = moto_mesh_get_index_size(self) * self->f_num * 3 * 2;
     if(self->f_tess_verts)
         g_free(self->f_tess_verts);
@@ -446,8 +444,8 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     {
         
         MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
-        guint16 *f_verts = (guint16 *)self->f_verts;
-        guint16 *f_tess_verts = (guint16 *)self->f_tess_verts;
+        guint16 *f_verts = self->f_verts16;
+        guint16 *f_tess_verts = self->f_tess_verts16;
 
         GLUtesselator* tess = gluNewTess();
 
@@ -492,39 +490,12 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 
         gluDeleteTess(tess);
 
-        self->f_tess_num = td.tess_num;
-
-        /*
-        for(i = 0; i < self->f_num; i++)
+        if((td.tess_num % 3) != 0)
         {
-            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
-            guint v_num = f_data[i].v_offset - start;
-
-            guint16 *f  = f_verts + start;
-            guint16 *tf = f_tess_verts + i*6;
-            if(3 == v_num)
-            {
-                tf[0] = f[0];
-                tf[1] = f[1];
-                tf[2] = f[2];
-                tf[3] = f[0];
-                tf[4] = f[1];
-                tf[5] = f[2];
-            }
-            else
-            {
-                tf[0] = f[0];
-                tf[1] = f[1];
-                tf[2] = f[2];
-
-                tf[3] = f[0];
-                tf[4] = f[2];
-                tf[5] = f[3];
-            }
-
-            self->f_tess_num += 2;
+            // TODO: Error.
         }
-        */
+
+        self->f_tess_num = td.tess_num/3;
     }
     self->tesselated = TRUE;
 }
