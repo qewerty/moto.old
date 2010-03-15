@@ -1619,7 +1619,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_3), data);
         data->param_handler_id = \
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
     }
