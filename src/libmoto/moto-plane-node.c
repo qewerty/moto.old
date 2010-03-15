@@ -235,10 +235,10 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                             v1 = get_v(i+1, j),
                             v2 = get_v(i+1, j+1),
                             v3 = get_v(i, j+1);
-                    f_verts[fi*4]   = v0;
-                    f_verts[fi*4+1] = v1;
-                    f_verts[fi*4+2] = v2;
-                    f_verts[fi*4+3] = v3;
+                    f_verts[fi*4+3] = v0;
+                    f_verts[fi*4+2] = v1;
+                    f_verts[fi*4+1] = v2;
+                    f_verts[fi*4]   = v3;
 
                     fi++;
                 }
@@ -300,10 +300,10 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
                             v1 = get_v(i+1, j),
                             v2 = get_v(i+1, j+1),
                             v3 = get_v(i, j+1);
-                    f_verts[fi*4]   = v0;
-                    f_verts[fi*4+1] = v1;
-                    f_verts[fi*4+2] = v2;
-                    f_verts[fi*4+3] = v3;
+                    f_verts[fi*4+3] = v0;
+                    f_verts[fi*4+2] = v1;
+                    f_verts[fi*4+1] = v2;
+                    f_verts[fi*4]   = v3;
 
                     fi++;
                 }
