@@ -548,6 +548,12 @@ static void tessCallbackVertex(void* vertex_data)
     glVertex3dv(vertex_data);
 }
 
+static void tessCallbackVertexNormal(void* vertex_data)
+{
+    glNormal3dv(((GLdouble*)vertex_data)+3);
+    glVertex3dv(vertex_data);
+}
+
 static void tessCallbackBegin(GLenum which)
 {
     glBegin(which);
@@ -572,88 +578,52 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glEnable(GL_LIGHTING);
     glColor3f(1, 1, 1);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
 
+    glDisable(GL_CULL_FACE);
     if(moto_world_get_cull_faces(world))
         glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    gboolean force_arrays = FALSE;
-    force_arrays = ! moto_world_get_use_vbo(world);
-    if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
+    MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
+    guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2, 1);
+
+    GLUtesselator* tess = gluNewTess();
+
+    gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertex);
+    gluTessCallback(tess, GLU_TESS_BEGIN, tessCallbackBegin);
+    gluTessCallback(tess, GLU_TESS_END, tessCallbackEnd);
+    gluTessCallback(tess, GLU_TESS_ERROR, tessCallbackError);
+    // gluTessCallback(tess, GLU_TESS_COMBINE, tessCallbackCombine);
+
+    gboolean show_normals = moto_world_get_show_normals(world);
+    MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+
+    glEnable(GL_LIGHTING);
+
+    guint i, j;
+    if(MOTO_DRAW_MODE_SOLID == draw_mode)
     {
-        g_print("Initializng VBO for 'face' drawing mode ... ");
-        if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
+        gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertex);
+        for(i = 0; i < mesh->f_num; ++i)
         {
-            glGenBuffersARB(VBUF_NUMBER, priv->vbufs);
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
 
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_coords,  GL_STATIC_DRAW_ARB);
+            glColor4f(1, 1, 1, 1);
 
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_normals, GL_STATIC_DRAW_ARB);
-
-            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
-            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                    moto_mesh_get_index_size(mesh) * mesh->f_tess_num * 3,
-                    mesh->f_tess_verts, GL_STATIC_DRAW_ARB);
-
-            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_LINE_ELEMENT]);
-            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                    moto_mesh_get_index_size(mesh) * mesh->e_num * 2,
-                    mesh->e_verts, GL_STATIC_DRAW_ARB);
-
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-            glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-        }
-        g_print("OK\n");
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_NORMAL]);
-        glNormalPointer(GL_FLOAT, sizeof(MotoVector), 0);
-
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
-        glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, 0);
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-
-    }
-    else
-    {
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-        glNormalPointer(GL_FLOAT, sizeof(MotoVector), mesh->v_normals);
-
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(2.0, 1.0);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
-        if(MOTO_DRAW_MODE_SOLID == draw_mode)
-        {
-            GLUtesselator* tess = gluNewTess();
-
-            gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertex);
-            gluTessCallback(tess, GLU_TESS_BEGIN, tessCallbackBegin);
-            gluTessCallback(tess, GLU_TESS_END, tessCallbackEnd);
-            gluTessCallback(tess, GLU_TESS_ERROR, tessCallbackError);
-            // gluTessCallback(tess, GLU_TESS_COMBINE, tessCallbackCombine);
-
-            MotoMeshFace16 *f_data = mesh->f_data16;
-            guint16 *f_verts = (guint16 *)mesh->f_verts;
-
-            guint i;
-            for(i = 0; i < mesh->f_num; ++i)
+            if(!moto_mesh_selection_is_face_selected(selection, i))
             {
-                guint start = (0 == i) ? 0: f_data[i-1].v_offset;
-                guint v_num = f_data[i].v_offset - start;
-
                 GLdouble verts[v_num*3];
 
                 glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
@@ -663,60 +633,94 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
                 for(j = 0; j < v_num; ++j)
                 {
                     float* v0 = (float*) & mesh->v_coords[f_verts[start + j]];
-                    guint k;
-                    for(k = 0; k < 3; ++k)
-                        verts[j*3 + k] = v0[k];
-                    gluTessVertex(tess, verts + j*3, verts + j*3);
+                    float* n0 = (float*) & mesh->f_normals[i];
+                    GLdouble* v = verts + j*3;
+                    v[0] = v0[0];
+                    v[1] = v0[1];
+                    v[2] = v0[2];
+                    gluTessVertex(tess, v, v);
                 }
                 gluTessEndContour(tess);
                 gluTessEndPolygon(tess);
             }
 
             /*
-            guint i;
-            for(i = 0; i < mesh->f_num; ++i)
+            if(show_normals)
             {
-                guint start = (0 == i) ? 0: f_data[i-1].v_offset;
-                guint v_num = f_data[i].v_offset - start;
+                gfloat ox = 0;
+                gfloat oy = 0;
+                gfloat oz = 0;
 
-                glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
-                guint j;
-                glBegin(GL_POLYGON);
                 for(j = 0; j < v_num; ++j)
                 {
-                    glVertex3fv((GLfloat *)( & mesh->v_coords[f_verts[start + j]]));
+                    ox += mesh->v_coords[f_verts[start + j]].x;
+                    oy += mesh->v_coords[f_verts[start + j]].y;
+                    oz += mesh->v_coords[f_verts[start + j]].z;
                 }
+                ox /= v_num;
+                oy /= v_num;
+                oz /= v_num;
+
+                gfloat nx = ox + mesh->f_normals[i].x;
+                gfloat ny = oy + mesh->f_normals[i].y;
+                gfloat nz = oz + mesh->f_normals[i].z;
+
+                glColor3f(1, 1, 0);
+                glBegin(GL_LINES);
+                glVertex3f(ox, oy, oz);
+                glVertex3f(nx, ny, nz);
                 glEnd();
             }
             */
-
-            gluDeleteTess(tess);
         }
-        else
+    }
+    else
+    {
+        gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertexNormal);
+        for(i = 0; i < mesh->f_num; ++i)
         {
-            glDrawElements(GL_TRIANGLES, 3*mesh->f_tess_num, mesh->index_gl_type, mesh->f_tess_verts);
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
+
+            glColor4f(1, 1, 1, 1);
+
+            if(!moto_mesh_selection_is_face_selected(selection, i))
+            {
+                GLdouble verts[v_num*6];
+
+                gluTessBeginPolygon(tess, NULL);
+                gluTessBeginContour(tess);
+                guint j;
+                for(j = 0; j < v_num; ++j)
+                {
+                    guint vi = f_verts[start + j];
+                    float* v0 = (float*) & mesh->v_coords[vi];
+                    float* n0 = (float*) & mesh->v_normals[vi];
+                    GLdouble* v = verts + j*6;
+                    v[0] = v0[0];
+                    v[1] = v0[1];
+                    v[2] = v0[2];
+                    v[3] = n0[0];
+                    v[4] = n0[1];
+                    v[5] = n0[2];
+                    gluTessVertex(tess, v, v);
+                }
+                gluTessEndContour(tess);
+                gluTessEndPolygon(tess);
+            }
         }
     }
 
-    glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHTING);
     if(moto_gl_is_glsl_supported())
         glUseProgramObjectARB(0);
 
-    glPolygonOffset(1.5, 1.0);
-
-    MotoMeshFace16 *f_data = (MotoMeshFace16 *)mesh->f_data;
-    guint16 *f_verts = (guint16 *)mesh->f_verts;
-
-    glDisable(GL_LIGHTING);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    gboolean show_normals = moto_world_get_show_normals(world);
-    guint i, j;
     for(i = 0; i < mesh->f_num; ++i)
     {
-        glColor4f(0, 1, 0, 1);
         guint start = (0 == i) ? 0: f_data[i-1].v_offset;
         guint v_num = f_data[i].v_offset - start;
+
+        glColor4f(0, 1, 0, 1);
 
         if(moto_mesh_selection_is_face_selected(selection, i))
         {
@@ -727,51 +731,15 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
             }
             glEnd();
         }
-
-        if(show_normals)
-        {
-            gfloat ox = 0;
-            gfloat oy = 0;
-            gfloat oz = 0;
-
-            for(j = 0; j < v_num; ++j)
-            {
-                ox += mesh->v_coords[f_verts[start + j]].x;
-                oy += mesh->v_coords[f_verts[start + j]].y;
-                oz += mesh->v_coords[f_verts[start + j]].z;
-            }
-            ox /= v_num;
-            oy /= v_num;
-            oz /= v_num;
-
-            gfloat nx = ox + mesh->f_normals[i].x;
-            gfloat ny = oy + mesh->f_normals[i].y;
-            gfloat nz = oz + mesh->f_normals[i].z;
-
-            glColor3f(1, 1, 0);
-            glBegin(GL_LINES);
-            glVertex3f(ox, oy, oz);
-            glVertex3f(nx, ny, nz);
-            glEnd();
-        }
     }
 
+    gluDeleteTess(tess);
+
     glDisable(GL_POLYGON_OFFSET_FILL);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glColor3f(0.2, 0.2, 0.2);
 
-    if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
-    {
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_LINE_ELEMENT]);
-        glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, 0);
-
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
-    else
-    {
-        glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
-    }
+    glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
     glPopAttrib();
     glPopClientAttrib();
