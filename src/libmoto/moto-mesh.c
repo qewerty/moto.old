@@ -410,6 +410,15 @@ static void tess_cb_edge_flag(GLboolean flag)
     // Just do nothing to force GL_TRIANGLES.
 }
 
+/*
+static void tess_cb_begin_data(GLenum type, void* user_data)
+{
+    MotoTessData* td = (MotoTessData*)user_data;
+    static int x = 0;
+    g_print("tess_cb_begin_data: %d\n", x++);
+}
+*/
+
 void moto_mesh_tesselate_faces(MotoMesh *self)
 {
     guint mem_size = moto_mesh_get_index_size(self) * self->f_num * 3 * 2;
@@ -422,27 +431,9 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
     guint i;
     if(self->b32)
     {
-        guint32 *f_verts = (guint32 *)self->f_verts;
-        guint32 *f_tess_verts = (guint32 *)self->f_tess_verts;
-        for(i = 0; i < self->f_num; i++)
-        {
-            guint32 *f  = f_verts + i*4;
-            guint32 *tf = f_tess_verts + i*6;
-
-            tf[0] = f[0];
-            tf[1] = f[1];
-            tf[2] = f[2];
-
-            tf[3] = f[0];
-            tf[4] = f[2];
-            tf[5] = f[3];
-
-            self->f_tess_num += 2;
-        }
     }
     else
     {
-        
         MotoMeshFace16 *f_data = (MotoMeshFace16 *)self->f_data;
         guint16 *f_verts = self->f_verts16;
         guint16 *f_tess_verts = self->f_tess_verts16;
@@ -451,7 +442,7 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 
         gluTessCallback(tess, GLU_TESS_VERTEX_DATA, tess_cb_vertex_data);
         gluTessCallback(tess, GLU_TESS_EDGE_FLAG, tess_cb_edge_flag); // Force GL_TRIANGLES.
-        // gluTessCallback(tess, GLU_TESS_BEGIN, tess_cb_begin);
+        // gluTessCallback(tess, GLU_TESS_BEGIN_DATA, tess_cb_begin_data);
         // gluTessCallback(tess, GLU_TESS_END, tess_cb_end);
         // gluTessCallback(tess, GLU_TESS_ERROR, tess_cb_error);
         // gluTessCallback(tess, GLU_TESS_COMBINE, tess_cb_combine);
@@ -486,6 +477,8 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
 
             gluTessEndContour(tess);
             gluTessEndPolygon(tess);
+
+            f_data[i].v_tess_offset = td.tess_num;
         }
 
         gluDeleteTess(tess);
@@ -1154,24 +1147,6 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
 {
     if(self->b32)
     {
-        MotoMeshFace32 *f_data  = (MotoMeshFace32 *)self->f_data;
-        guint32 *f_tess_verts  = (guint32 *)self->f_tess_verts;
-        MotoVector *v_coords  = (MotoVector *)self->v_coords;
-
-        guint32 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
-        guint32 v_num = f_data[fi].v_offset - start;
-
-        guint32 i;
-        for(i = 0; i < v_num - 2; i++)
-        {
-            if(moto_ray_intersect_triangle_dist(ray, dist,
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi]]),
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi+1]]),
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi+2]])))
-            {
-                return TRUE;
-            }
-        }
     }
     else
     {
@@ -1179,16 +1154,16 @@ gboolean moto_mesh_intersect_face(MotoMesh *self, guint fi, MotoRay *ray, gfloat
         guint16 *f_tess_verts  = (guint16 *)self->f_tess_verts;
         MotoVector *v_coords  = (MotoVector *)self->v_coords;
 
-        guint16 start = (0 == fi) ? 0: f_data[fi-1].v_offset;
-        guint16 v_num = f_data[fi].v_offset - start;
+        guint16 start = (0 == fi) ? 0: f_data[fi-1].v_tess_offset;
+        guint16 v_num = f_data[fi].v_tess_offset - start;
 
         guint16 i;
         for(i = 0; i < v_num - 2; i++)
         {
             if(moto_ray_intersect_triangle_dist(ray, dist,
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi]]),
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi+1]]),
-               (gfloat *)( & v_coords[f_tess_verts[3*i+6*fi+2]])))
+               (gfloat *)( & v_coords[f_tess_verts[start + i]]),
+               (gfloat *)( & v_coords[f_tess_verts[start + i + 1]]),
+               (gfloat *)( & v_coords[f_tess_verts[start + i + 2]])))
             {
                 return TRUE;
             }

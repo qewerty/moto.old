@@ -77,12 +77,14 @@ struct _MotoVector
 struct _MotoMeshFace16
 {
     guint16 v_offset;
+    guint16 v_tess_offset;
     guint16 half_edge;
 };
 
 struct _MotoMeshFace32
 {
     guint32 v_offset;
+    guint32 v_tess_offset;
     guint32 half_edge;
 };
 
