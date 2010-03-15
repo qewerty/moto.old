@@ -599,7 +599,7 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
 
             glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
             glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                    moto_mesh_get_index_size(mesh) * mesh->f_num * 3 * 2,
+                    moto_mesh_get_index_size(mesh) * mesh->f_tess_num * 3,
                     mesh->f_tess_verts, GL_STATIC_DRAW_ARB);
 
             glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_LINE_ELEMENT]);
@@ -771,7 +771,6 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     else
     {
         glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
-        glDisable(GL_POLYGON_OFFSET_LINE);
     }
 
     glPopAttrib();

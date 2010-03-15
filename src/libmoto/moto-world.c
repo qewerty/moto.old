@@ -406,11 +406,11 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
     }
 
-    GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
+    GLfloat light_position[] = {1.0, 1.0, 3.0, 1.0};
     GLfloat white_light[]    = {1.0,1.0,1.0,1.0};
-    // glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    //glLightfv(GL_LIGHT0, GL_DIFFUSE,  white_light);
-    //glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  white_light);
+    // glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
 
     if(self->priv->left_coords)
         glScalef(1, 1, -1);

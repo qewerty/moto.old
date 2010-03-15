@@ -245,7 +245,8 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
     }
     else
     {
-        GLfloat mat_specular[] = {1.0,1.0,1.0,1.0};
+        glColor4f(1, 1, 1, 1);
+        GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
         glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_specular);
         // glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     }
