@@ -60,6 +60,8 @@ moto_cylinder_node_init(MotoCylinderNode *self)
             "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Form",
             "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Form",
             "screw_s", "Screw S", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
+            "cap0", "First Cap", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
+            "cap1", "Second Cap", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
             "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, pspec, "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
@@ -121,6 +123,11 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     gboolean screw_s;
     moto_node_get_param_boolean((MotoNode *)self, "screw_s", &screw_s);
 
+    gboolean cap0;
+    moto_node_get_param_boolean((MotoNode *)self, "cap0", &cap0);
+    gboolean cap1;
+    moto_node_get_param_boolean((MotoNode *)self, "cap1", &cap1);
+
     guint rows, cols;
     moto_node_get_param_2i(node, "rc", &rows, &cols);
 
@@ -132,8 +139,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     guint v_num = rows*cols;// + 2;
     guint e_num = rows*cols + (rows-1)*cols;// + cols*2;
-    guint f_num = (rows-1)*cols;// + cols*2;
-    guint f_v_num = f_num*4;// - 2*cols;
+    guint f_num = (rows-1)*cols + ((cap0 ? 1 : 0) + (cap1 ? 1 : 0));// + cols*2;
+    guint f_v_num = f_num*4 + ((cap0 ? cols : 0) + (cap1 ? cols : 0));// - 2*cols;
 
     gboolean new_mesh = FALSE;
     if(self->priv->mesh)
@@ -243,6 +250,29 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 v_offset += 4;
                 fi++;
             }
+        }
+
+        guint32 v[cols];
+        if(cap0)
+        {
+            for(j = 0; j < cols; ++j)
+            {
+                guint32 jj = (j == cols-1) ? 0 : j+1;
+                v[j] = get_v(0, jj);
+            }
+            moto_mesh_set_face(mesh, fi, v_offset+cols, v);
+            v_offset += cols;
+            ++fi;
+        }
+
+        if(cap1)
+        {
+            for(j = 0; j < cols; ++j)
+            {
+                guint32 jj = (j == cols-1) ? 0 : j+1;
+                v[j] = get_v(rows-1, cols-jj-1);
+            }
+            moto_mesh_set_face(mesh, fi, v_offset+cols, v);
         }
     }
 
