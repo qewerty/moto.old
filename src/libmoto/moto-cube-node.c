@@ -394,7 +394,7 @@ static void moto_cube_node_update(MotoNode *self)
     MotoParam *param;
 
     param = moto_node_get_param(self, "mesh");
-    if(param && moto_param_has_dests(param))
+    if(param && 1)//moto_param_has_dests(param))
         moto_cube_node_update_mesh(cube);
 }
 
