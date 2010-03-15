@@ -138,7 +138,7 @@ static void moto_geom_op_node_update(MotoNode *self)
     if(active)
     {
         geom = moto_geom_op_node_perform((MotoGeomOpNode*)self, in, &the_same);
-        if(!the_same && old_geom)
+        if(!the_same && old_geom && (old_geom != in))
             g_object_unref(old_geom);
     }
 
