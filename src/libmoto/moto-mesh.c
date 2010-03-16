@@ -2954,13 +2954,8 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
                 vloop_v0      = vloop[k];
                 vloop_v1      = vloop[(k+1)%v_num];
 
-                // gfloat *c = (gfloat*)(mesh->v_coords + prev_vloop_v0);
                 gfloat *c = (gfloat*)(v_coords + k);
                 gfloat *p = (gfloat*)(mesh->v_coords + vloop_v0);
-                /*
-                vector3_copy(p, c);
-                point3_move(p, normal, sltz);
-                */
 
                 gfloat jj = j + 1;
                 gfloat fac = jj/sections;
