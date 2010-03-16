@@ -428,6 +428,14 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Model", "Bevel",    NULL);
     moto_shelf_add_item(self, "Model", "Collapse", NULL);
 
+    moto_shelf_add_tab(self, "Deform");
+    moto_shelf_add_item(self, "Deform", "Twist", perform_twist);
+    moto_shelf_add_item(self, "Deform", "Bend", perform_bend);
+    moto_shelf_add_item(self, "Deform", "Displace", perform_displace);
+
+    moto_shelf_add_tab(self,  "Paint");
+    moto_shelf_add_item(self, "Paint", "Instance", NULL);
+
     moto_shelf_add_tab(self, "Anim");
     moto_shelf_add_item(self, "Anim", "Morph", NULL);
     moto_shelf_add_item(self, "Anim", "Lattice", NULL);
@@ -436,11 +444,6 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Render", "Camera", NULL);
     moto_shelf_add_item(self, "Render", "Light", NULL);
     moto_shelf_add_item(self, "Render", "RenderMan", create_rman_node);
-
-    moto_shelf_add_tab(self, "Deform");
-    moto_shelf_add_item(self, "Deform", "Twist", perform_twist);
-    moto_shelf_add_item(self, "Deform", "Bend", perform_bend);
-    moto_shelf_add_item(self, "Deform", "Displace", perform_displace);
 
     return (GtkWidget *)self;
 }
