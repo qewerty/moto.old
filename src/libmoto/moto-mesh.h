@@ -360,7 +360,9 @@ MotoBound* moto_mesh_create_bound(MotoMesh* self);
 
 MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
-    gfloat length);
+    gfloat ltx, gfloat lty, gfloat ltz,
+    gfloat lrx, gfloat lry, gfloat lrz,
+    gfloat lsx, gfloat lsy, gfloat lsz);
 
 MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,

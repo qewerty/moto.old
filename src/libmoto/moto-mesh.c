@@ -2798,7 +2798,9 @@ guint moto_mesh_get_v_edges_num(MotoMesh *self, guint vi)
 
 MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
-    gfloat length)
+    gfloat ltx, gfloat lty, gfloat ltz,
+    gfloat lrx, gfloat lry, gfloat lrz,
+    gfloat lsx, gfloat lsy, gfloat lsz)
 {
     if(!selection)
         return moto_mesh_new_copy(self);
@@ -2849,11 +2851,18 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     memcpy(mesh->e_verts, self->e_verts, sizeof(guint16)*self->e_num*2);
     memcpy(mesh->f_verts, self->f_verts, sizeof(guint16)*self->f_v_num);
 
-    gfloat section_length = length/sections;
+    gfloat sltx = ltx/sections;
+    gfloat slty = lty/sections;
+    gfloat sltz = ltz/sections;
+
+    lrx *= RAD_PER_DEG;
+    lry *= RAD_PER_DEG;
+    lrz *= RAD_PER_DEG;
 
     guint16 fi = self->f_num;
     guint16 vi = self->v_num;
     guint16 v_offset = mesh->f_data16[self->f_num - 1].v_offset;
+    guint j, k;
     for(i = 0; i < selected_f_num; ++i)
     {
         guint16 si = selected[i];
@@ -2870,7 +2879,43 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         size_t loop_size = sizeof(guint16)*v_num;
         memcpy(vloop, self_f_verts + vs, loop_size);
 
-        guint j, k;
+        gfloat z[] = {0, 0, 1};
+        gfloat axis[3];
+        gfloat tmp;
+        vector3_cross(axis, normal, z);
+        vector3_normalize(axis, tmp);
+        gfloat c = vector3_dot(normal, z);
+        gfloat s = sin(acos(c));
+
+        gfloat m[16], im[16], tmpm[16];
+        matrix44_rotate_from_axis_sincos(m, s, c, axis[0], axis[1], axis[2]);
+        matrix44_inverse(im, m, tmpm, tmp);
+
+        MotoVector v_coords[v_num];
+        for(j = 0; j < v_num; ++j)
+        {
+            v_coords[j].x = mesh->v_coords[vloop[j]].x;
+            v_coords[j].y = mesh->v_coords[vloop[j]].y;
+            v_coords[j].z = mesh->v_coords[vloop[j]].z;
+        }
+
+        for(j = 0; j < v_num; ++j)
+        {
+            gfloat tmp[3] = {v_coords[j].x, v_coords[j].y, v_coords[j].z};
+            point3_transform((gfloat*)&v_coords[j], m, tmp);
+        }
+
+        gfloat lrxm[16];
+        matrix44_rotate_x(lrxm, lrx);
+        gfloat lrym[16];
+        matrix44_rotate_y(lrym, lry);
+        gfloat lrzm[16];
+        matrix44_rotate_z(lrzm, lrz);
+        gfloat lrm[16];
+        matrix44_mult(lrm, lrxm, lrym);
+        memcpy(tmpm, lrm, sizeof(gfloat)*16);
+        matrix44_mult(lrm, tmpm, lrzm);
+
         for(j = 0; j < sections; ++j)
         {
             // Update vertex loops.
@@ -2888,10 +2933,24 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
                 vloop_v0      = vloop[k];
                 vloop_v1      = vloop[(k+1)%v_num];
 
-                gfloat *c = (gfloat*)(mesh->v_coords + prev_vloop_v0);
+                // gfloat *c = (gfloat*)(mesh->v_coords + prev_vloop_v0);
+                gfloat *c = (gfloat*)(v_coords + k);
                 gfloat *p = (gfloat*)(mesh->v_coords + vloop_v0);
+                /*
                 vector3_copy(p, c);
-                point3_move(p, normal, section_length);
+                point3_move(p, normal, sltz);
+                */
+
+                gfloat jj = j + 1;
+                gfloat fac = jj/sections;
+
+                gfloat pp[3] = {c[0] + sltx*jj, c[1] + slty*jj, c[2] + sltz*jj};
+                point3_transform(p, lrm, pp);
+                pp[0] = (1-fac + fac*lsx)*p[0];
+                pp[1] = (1-fac + fac*lsy)*p[1];
+                pp[2] = (1-fac + fac*lsz)*p[2];
+
+                point3_transform(p, im, pp);
 
                 mesh->f_data16[fi].v_offset = v_offset + 4;
                 mesh->f_verts16[v_offset+3] = prev_vloop_v0;
