@@ -49,23 +49,30 @@ moto_cylinder_node_init(MotoCylinderNode *self)
 
     self->priv->mesh = NULL;
 
-    gfloat radius0[2] = {1,  1};
-    gfloat radius1[2] = {1,  1};
-    gint   rc[2]      = {10, 10};
-    gint   caps[2]    = {TRUE, TRUE};
+    gfloat radius[4] = {1, 1, 1, 1};
+    gint   divs[2] = {10, 10};
+    gint   caps[2] = {TRUE, TRUE};
+    gint   round_caps[2] = {FALSE, FALSE};
+    gint   cap_divisions[2] = {0, 0};
 
-    MotoParamSpec *rc_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
+    MotoParamSpec *divs_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
                                                        10, 3, 1000000, 1, 10);
+
+    MotoParamSpec *cap_divisions_spec = moto_param_spec_int_2_new(0, 0, 1000000, 1, 2,
+                                                                  0, 0, 1000000, 1, 2);
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "caps", "Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Form",
-            "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Form",
-            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
-            "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Form",
-            "screw_s", "Screw S", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
-            "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Divisions",
-            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation",
+            "height", "Height", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Basic",
+            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Basic",
+            "divs", "Divisions",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Basic",
+            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Basic",
+            "caps", "Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Caps",
+            "round_caps", "Round Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, round_caps, pspec, "Caps",
+            "cap_divs", "Cap Divisions", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, cap_divisions, cap_divisions_spec, "Caps",
+            "screw", "Screw", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Screw",
+            "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
+            "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
             NULL);
 
@@ -121,13 +128,13 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     moto_node_get_param_float((MotoNode *)self, "screw", &screw);
 
     gboolean screw_s;
-    moto_node_get_param_boolean((MotoNode *)self, "screw_s", &screw_s);
+    moto_node_get_param_boolean((MotoNode *)self, "screw_symmetry", &screw_s);
 
     gboolean cap0, cap1;
     moto_node_get_param_2b((MotoNode *)self, "caps", &cap0, &cap1);
 
     gint rows, cols;
-    moto_node_get_param_2i(node, "rc", &rows, &cols);
+    moto_node_get_param_2i(node, "divs", &rows, &cols);
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
@@ -158,8 +165,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     MotoMesh *mesh = self->priv->mesh;
 
-    guint32 i, j, v_offset = 0;
-    guint32 vi = 0, fi = 0;
+    guint32 i, j;
+    guint32 vi = 0;
     if(MOTO_AXIS_X == orientation)
     {
         for(i = 0; i < rows; i++)
@@ -233,6 +240,9 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     if(new_mesh)
     {
+        guint v_offset = 0;
+        guint fi = 0;
+
         guint32 verts[4];
         for(i = 0; i < rows-1; i++)
         {
