@@ -2810,6 +2810,11 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
     }
 
     selection = moto_mesh_selection_adapt(selection, self);
+    selected_f_num = moto_mesh_selection_get_selected_f_num(selection);
+    if(selected_f_num < 1)
+    {
+        return moto_mesh_new_copy(self);
+    }
 
     guint f_num = self->f_num;
     guint e_num = self->e_num;
