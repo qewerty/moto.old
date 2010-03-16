@@ -394,7 +394,7 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_paned_pack1(hp, (GtkWidget *)area, TRUE, FALSE);
     self->priv->param_editor = (MotoParamEditor *)moto_param_editor_new(self);
     GtkScrolledWindow *sw = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request((GtkWidget *)sw, 320, 36);
+    gtk_widget_set_size_request((GtkWidget *)sw, 380, 36);
     gtk_scrolled_window_set_policy(sw, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_add_with_viewport(sw, (GtkWidget *)self->priv->param_editor);
     GtkPaned *vp = (GtkPaned *)gtk_vpaned_new();
