@@ -256,36 +256,34 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 moto_mesh_set_face(mesh, fi, v_offset+4, verts);
 
                 v_offset += 4;
-                fi++;
+                ++fi;
             }
         }
 
-        guint32 v[cols];
-        if(cap0)
         {
-            for(j = 0; j < cols; ++j)
+            guint32 verts[cols];
+            if(cap0)
             {
-                guint32 jj = (j == cols-1) ? 0 : j+1;
-                v[j] = get_v(0, jj);
+                for(j = 0; j < cols; ++j)
+                    verts[j] = get_v(0, j);
+                moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
+                v_offset += cols;
+                ++fi;
             }
-            moto_mesh_set_face(mesh, fi, v_offset+cols, v);
-            v_offset += cols;
-            ++fi;
-        }
 
-        if(cap1)
-        {
-            for(j = 0; j < cols; ++j)
+            if(cap1)
             {
-                guint32 jj = (j == cols-1) ? 0 : j+1;
-                v[j] = get_v(rows-1, cols-jj-1);
+                for(j = 0; j < cols; ++j)
+                    verts[j] = get_v((rows-1), (cols-j-1));
+                moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
             }
-            moto_mesh_set_face(mesh, fi, v_offset+cols, v);
         }
     }
-
     self->priv->bound_calculated = FALSE;
-    moto_geom_prepare((MotoGeom*)mesh);
+    if(!moto_geom_prepare((MotoGeom*)mesh))
+    {
+        g_print("Error while preparing mesh of MotoCylinderNode\n");
+    }
     moto_node_set_param_object(node, "mesh", (GObject*)mesh);
 }
 #undef get_v
