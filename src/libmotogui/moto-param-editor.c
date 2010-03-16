@@ -552,10 +552,10 @@ void on_boolean_param_changed(MotoParam *param, OnChangedData *data)
 
 // boolean2
 
-void on_boolean_2_changed_0(GtkSpinButton *spinbutton,
-                          OnChangedData *data)
+void on_boolean_2_changed_0(GtkToggleButton *spinbutton,
+                            OnChangedData *data)
 {
-    gboolean value = gtk_spin_button_get_value(spinbutton);
+    gboolean value = gtk_toggle_button_get_active(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
     // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
@@ -568,17 +568,17 @@ void on_boolean_2_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_2_changed_1(GtkSpinButton *spinbutton,
-                          OnChangedData *data)
+void on_boolean_2_changed_1(GtkToggleButton *togglebutton,
+                            OnChangedData *data)
 {
-    gboolean value = gtk_spin_button_get_value(spinbutton);
+    gboolean value = gtk_toggle_button_get_active(togglebutton);
 
-    g_signal_handler_block(spinbutton, data->handler_id);
+    g_signal_handler_block(togglebutton, data->handler_id);
     // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[1] = value;
-    g_signal_handler_unblock(spinbutton, data->handler_id);
+    g_signal_handler_unblock(togglebutton, data->handler_id);
 
     moto_node_update(moto_param_get_node(data->param));
     moto_test_window_redraw_3dview(data->window);
@@ -967,9 +967,15 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
     }
     else if(MOTO_TYPE_BOOLEAN_2 == ptype)
     {
+        MotoParamSpecBoolean_2 *pspec = MOTO_PARAM_SPEC_BOOLEAN_2(moto_param_get_spec(param));
+
+        gboolean cap0 = pspec ? pspec->default_value[0] : FALSE;
+        gboolean cap1 = pspec ? pspec->default_value[1] : FALSE;
+        moto_param_get_2b(param, &cap0, &cap1);
+
         GtkWidget *entry;
 
-        widget = gtk_hbox_new(TRUE, 0);
+        widget = gtk_hbox_new(FALSE, 0);
 
         // FIXME: Rewrite with moto_value_get_boolean_3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
@@ -978,38 +984,32 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gint w = 32, h = -1;
 
         // 1
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        entry = gtk_check_button_new();
+        gtk_toggle_button_set_active((GtkToggleButton *)entry, cap0);
         gtk_widget_set_size_request(entry, w, h);
-        gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[0]);
-        gtk_editable_set_editable((GtkEditable *)entry, TRUE);
-        gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
-        gtk_spin_button_set_digits((GtkSpinButton *)entry, 3);
+        gtk_box_pack_start((GtkBox *)widget, entry, FALSE, FALSE, 0);
 
         data = g_slice_new(OnChangedData);
         data->param = param;
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_2_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_boolean_2_changed_0), data);
         data->param_handler_id = \
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
 
         // 2
-        entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
+        entry = gtk_check_button_new();
+        gtk_toggle_button_set_active((GtkToggleButton *)entry, cap1);
         gtk_widget_set_size_request(entry, w, h);
         gtk_box_pack_start((GtkBox *)widget, entry, TRUE, TRUE, 0);
-        gtk_spin_button_set_value((GtkSpinButton *)entry, vec[1]);
-        gtk_editable_set_editable((GtkEditable *)entry, TRUE);
-        gtk_spin_button_set_numeric((GtkSpinButton *)entry, FALSE);
-        gtk_spin_button_set_digits((GtkSpinButton *)entry, 3);
 
         data = g_slice_new(OnChangedData);
         data->param = param;
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_2_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_boolean_2_changed_1), data);
         data->param_handler_id = \
             g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
     }

@@ -52,18 +52,18 @@ moto_cylinder_node_init(MotoCylinderNode *self)
     gfloat radius0[2] = {1,  1};
     gfloat radius1[2] = {1,  1};
     gint   rc[2]      = {10, 10};
+    gint   caps[2]    = {TRUE, TRUE};
 
     MotoParamSpec *rc_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
                                                        10, 3, 1000000, 1, 10);
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
+            "caps", "Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Form",
             "height", "Height", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Form",
+            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius1, pspec, "Form",
             "screw", "Screw", G_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Form",
             "screw_s", "Screw S", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
-            "cap0", "First Cap", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
-            "cap1", "Second Cap", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Form",
             "rc", "Rows/Columns",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Divisions",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Orientation",
             "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
@@ -123,10 +123,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     gboolean screw_s;
     moto_node_get_param_boolean((MotoNode *)self, "screw_s", &screw_s);
 
-    gboolean cap0;
-    moto_node_get_param_boolean((MotoNode *)self, "cap0", &cap0);
-    gboolean cap1;
-    moto_node_get_param_boolean((MotoNode *)self, "cap1", &cap1);
+    gboolean cap0, cap1;
+    moto_node_get_param_2b((MotoNode *)self, "caps", &cap0, &cap1);
 
     gint rows, cols;
     moto_node_get_param_2i(node, "rc", &rows, &cols);
