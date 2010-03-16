@@ -2887,17 +2887,38 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         gfloat c = vector3_dot(normal, z);
         gfloat s = sin(acos(c));
 
-        gfloat m[16], im[16], tmpm[16];
-        matrix44_rotate_from_axis_sincos(m, s, c, axis[0], axis[1], axis[2]);
-        matrix44_inverse(im, m, tmpm, tmp);
-
         MotoVector v_coords[v_num];
+        MotoVector center = {0, 0, 0};
         for(j = 0; j < v_num; ++j)
         {
             v_coords[j].x = mesh->v_coords[vloop[j]].x;
             v_coords[j].y = mesh->v_coords[vloop[j]].y;
             v_coords[j].z = mesh->v_coords[vloop[j]].z;
+            center.x += v_coords[j].x;
+            center.y += v_coords[j].y;
+            center.z += v_coords[j].z;
         }
+        center.x /= v_num;
+        center.y /= v_num;
+        center.z /= v_num;
+
+        gfloat m[16], im[16], tmpm[16];
+        if(c == 1)
+        {
+            matrix44_identity(im);
+        }
+        else if(c == -1)
+        {
+            matrix44_rotate_from_axis_sincos(im, sin(acos(-1)), -1, 0, 1, 0);
+        }
+        else
+        {
+            matrix44_rotate_from_axis_sincos(im, s, c, axis[0], axis[1], axis[2]);
+        }
+        matrix44_translate(tmpm, -center.x, -center.y, -center.z);
+        matrix44_mult(m, im, tmpm);
+
+        matrix44_inverse(im, m, tmpm, tmp);
 
         for(j = 0; j < v_num; ++j)
         {
@@ -2944,11 +2965,12 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
                 gfloat jj = j + 1;
                 gfloat fac = jj/sections;
 
-                gfloat pp[3] = {c[0] + sltx*jj, c[1] + slty*jj, c[2] + sltz*jj};
+                // SRT
+                gfloat pp[3] = {(1-fac + fac*lsx)*c[0], (1-fac + fac*lsy)*c[1], (1-fac + fac*lsz)*c[2]};
                 point3_transform(p, lrm, pp);
-                pp[0] = (1-fac + fac*lsx)*p[0];
-                pp[1] = (1-fac + fac*lsy)*p[1];
-                pp[2] = (1-fac + fac*lsz)*p[2];
+                pp[0] = p[0] + sltx*jj;
+                pp[1] = p[1] + slty*jj;
+                pp[2] = p[2] + sltz*jj;
 
                 point3_transform(p, im, pp);
 
