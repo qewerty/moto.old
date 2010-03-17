@@ -5,6 +5,7 @@
 #include "moto-mesh.h"
 #include "moto-enums.h"
 #include "libmotoutil/numdef.h"
+#include "libmotoutil/matrix.h"
 
 /* forwards */
 
@@ -133,6 +134,9 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     gboolean cap0, cap1;
     moto_node_get_param_2b((MotoNode *)self, "caps", &cap0, &cap1);
 
+    gint cap0_divs, cap1_divs;
+    moto_node_get_param_2i((MotoNode *)self, "cap_divs", &cap0_divs, &cap1_divs);
+
     gint rows, cols;
     moto_node_get_param_2i(node, "divs", &rows, &cols);
 
@@ -144,8 +148,52 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     guint v_num = rows*cols;// + 2;
     guint e_num = rows*cols + (rows-1)*cols;// + cols*2;
-    guint f_num = (rows-1)*cols + ((cap0 ? 1 : 0) + (cap1 ? 1 : 0));// + cols*2;
-    guint f_v_num = f_num*4 + ((cap0 ? cols : 0) + (cap1 ? cols : 0));// - 2*cols;
+    guint f_num = (rows-1)*cols;// + cols*2;
+    guint f_v_num = f_num*4;// - 2*cols;
+
+    if(cap0)
+    {
+        if(0 == cap0_divs)
+        {
+            f_num += 1;
+            f_v_num += cols;
+        }
+        else
+        {
+            v_num += 1;
+            e_num += cols;
+            f_num += cols;
+            f_v_num += cols*3;
+
+            gint divs = cap0_divs - 1;
+            v_num += divs*cols;
+            e_num += divs*cols*2;
+            f_num += divs*cols;
+            f_v_num += divs*cols*4;
+        }
+    }
+
+    if(cap1)
+    {
+        if(0 == cap1_divs)
+        {
+            f_num += 1;
+            f_v_num += cols;
+        }
+        else
+        {
+            v_num += 1;
+            e_num += cols;
+            f_num += cols;
+            f_v_num += cols*3;
+
+            gint divs = cap1_divs - 1;
+            v_num += divs*cols;
+            e_num += divs*cols*2;
+            f_num += divs*cols;
+            f_v_num += divs*cols*4;
+        }
+    }
 
     gboolean new_mesh = FALSE;
     if(self->priv->mesh)
@@ -183,19 +231,9 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 mesh->v_coords[vi].y = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
                 mesh->v_coords[vi].x = len - height/2;
 
-                vi++;
+                ++vi;
             }
         }
-        /*
-        mesh->v_coords[vi].z = 0;
-        mesh->v_coords[vi].y = 0;
-        mesh->v_coords[vi].x = height/2;
-        vi++;
-        mesh->v_coords[vi].z = 0;
-        mesh->v_coords[vi].y = 0;
-        mesh->v_coords[vi].x = -height/2;
-        vi++;
-        */
     }
     else if(MOTO_AXIS_Y == orientation)
     {
@@ -213,7 +251,7 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 mesh->v_coords[vi].x = -(s*(radius_y_f*(len/height) + radius_y_s*(1-len/height)));
                 mesh->v_coords[vi].y = -(len - height/2);
 
-                vi++;
+                ++vi;
             }
         }
     }
@@ -233,12 +271,12 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 mesh->v_coords[vi].x = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
                 mesh->v_coords[vi].z = len - height/2;
 
-                vi++;
+                ++vi;
             }
         }
     }
 
-    if(new_mesh)
+    //if(new_mesh)
     {
         guint v_offset = 0;
         guint fi = 0;
@@ -266,19 +304,169 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
             {
                 for(j = 0; j < cols; ++j)
                     verts[j] = get_v(0, j);
-                moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
-                v_offset += cols;
-                ++fi;
+
+                if(0 == cap0_divs)
+                {
+                    moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
+                    v_offset += cols;
+                    ++fi;
+                }
+                else
+                {
+                    mesh->v_coords[vi].x = 0;
+                    mesh->v_coords[vi].y = 0;
+                    mesh->v_coords[vi].z = 0;
+                    for(j = 0; j < cols; ++j)
+                    {
+                        mesh->v_coords[vi].x += mesh->v_coords[verts[j]].x;
+                        mesh->v_coords[vi].y += mesh->v_coords[verts[j]].y;
+                        mesh->v_coords[vi].z += mesh->v_coords[verts[j]].z;
+                    }
+                    mesh->v_coords[vi].x /= cols;
+                    mesh->v_coords[vi].y /= cols;
+                    mesh->v_coords[vi].z /= cols;
+
+                    MotoVector center = mesh->v_coords[vi];
+                    guint16 vi0 = vi;
+                    ++vi;
+
+                    guint32 loop0[cols];
+                    guint32 loop1[cols];
+                    for(j = 0; j < cols; ++j)
+                        loop0[j] = loop1[j] = verts[j];
+
+                    gint divs = cap0_divs - 1;
+                    gint k;
+                    for(k = 0; k < divs; ++k)
+                    {
+                        guint16 v0 = vi;
+                        for(j = 0; j < cols; ++j)
+                        {
+                            guint32 v[4];
+                            v[0] = loop0[j];
+                            v[1] = loop0[(j + 1) % cols];
+                            v[2] = (j == (cols - 1)) ? v0 : vi + 1;
+                            v[3] = vi;
+                            loop1[j] = vi;
+
+                            gfloat fac = (k+1)/(gfloat)cap0_divs;
+                            gfloat one_minus_fac = 1 - fac;
+                            mesh->v_coords[vi].x = (one_minus_fac*mesh->v_coords[verts[j]].x + fac*center.x);
+                            mesh->v_coords[vi].y = (one_minus_fac*mesh->v_coords[verts[j]].y + fac*center.y);
+                            mesh->v_coords[vi].z = (one_minus_fac*mesh->v_coords[verts[j]].z + fac*center.z);
+
+                            moto_mesh_set_face(mesh, fi, v_offset + 4, v);
+                            v_offset += 4;
+                            ++fi;
+                            ++vi;
+                        }
+
+                        for(j = 0; j < cols; ++j)
+                            loop0[j] = loop1[j];
+                    }
+
+                    for(j = 0; j < cols; ++j)
+                    {
+                        guint32 v[3];
+                        v[0] = loop0[j];
+                        v[1] = loop0[(j + 1) % cols];
+                        v[2] = vi0;
+                        moto_mesh_set_face(mesh, fi, v_offset + 3, v);
+                        v_offset += 3;
+                        ++fi;
+                    }
+                }
             }
 
             if(cap1)
             {
                 for(j = 0; j < cols; ++j)
                     verts[j] = get_v((rows-1), (cols-j-1));
+
+                if(0 == cap1_divs)
+                {
+                    moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
+                    v_offset += cols;
+                    ++fi;
+                }
+                else
+                {
+                    mesh->v_coords[vi].x = 0;
+                    mesh->v_coords[vi].y = 0;
+                    mesh->v_coords[vi].z = 0;
+                    for(j = 0; j < cols; ++j)
+                    {
+                        mesh->v_coords[vi].x += mesh->v_coords[verts[j]].x;
+                        mesh->v_coords[vi].y += mesh->v_coords[verts[j]].y;
+                        mesh->v_coords[vi].z += mesh->v_coords[verts[j]].z;
+                    }
+                    mesh->v_coords[vi].x /= cols;
+                    mesh->v_coords[vi].y /= cols;
+                    mesh->v_coords[vi].z /= cols;
+
+                    MotoVector center = mesh->v_coords[vi];
+                    guint16 vi0 = vi;
+                    ++vi;
+
+                    guint32 loop0[cols];
+                    guint32 loop1[cols];
+                    for(j = 0; j < cols; ++j)
+                        loop0[j] = loop1[j] = verts[j];
+
+                    gint divs = cap1_divs - 1;
+                    gint k;
+                    for(k = 0; k < divs; ++k)
+                    {
+                        guint16 v0 = vi;
+                        for(j = 0; j < cols; ++j)
+                        {
+                            guint32 v[4];
+                            v[0] = loop0[j];
+                            v[1] = loop0[(j + 1) % cols];
+                            v[2] = (j == (cols - 1)) ? v0 : vi + 1;
+                            v[3] = vi;
+                            loop1[j] = vi;
+
+                            gfloat fac = (k+1)/(gfloat)cap1_divs;
+                            gfloat one_minus_fac = 1 - fac;
+                            mesh->v_coords[vi].x = (one_minus_fac*mesh->v_coords[verts[j]].x + fac*center.x);
+                            mesh->v_coords[vi].y = (one_minus_fac*mesh->v_coords[verts[j]].y + fac*center.y);
+                            mesh->v_coords[vi].z = (one_minus_fac*mesh->v_coords[verts[j]].z + fac*center.z);
+
+                            moto_mesh_set_face(mesh, fi, v_offset + 4, v);
+                            v_offset += 4;
+                            ++fi;
+                            ++vi;
+                        }
+
+                        for(j = 0; j < cols; ++j)
+                            loop0[j] = loop1[j];
+                    }
+
+                    for(j = 0; j < cols; ++j)
+                    {
+                        guint32 v[3];
+                        v[0] = loop0[j];
+                        v[1] = loop0[(j + 1) % cols];
+                        v[2] = vi0;
+                        moto_mesh_set_face(mesh, fi, v_offset + 3, v);
+                        v_offset += 3;
+                        ++fi;
+                    }
+                }
+            }
+
+            /*
+            if(cap1)
+            {
+                for(j = 0; j < cols; ++j)
+                    verts[j] = get_v((rows-1), (cols-j-1));
                 moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
             }
+            */
         }
     }
+
     self->priv->bound_calculated = FALSE;
     if(!moto_geom_prepare((MotoGeom*)mesh))
     {
