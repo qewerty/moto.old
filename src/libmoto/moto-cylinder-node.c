@@ -455,15 +455,6 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                     }
                 }
             }
-
-            /*
-            if(cap1)
-            {
-                for(j = 0; j < cols; ++j)
-                    verts[j] = get_v((rows-1), (cols-j-1));
-                moto_mesh_set_face(mesh, fi, v_offset+cols, verts);
-            }
-            */
         }
     }
 
