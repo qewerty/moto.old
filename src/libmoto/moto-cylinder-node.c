@@ -51,26 +51,28 @@ moto_cylinder_node_init(MotoCylinderNode *self)
     self->priv->mesh = NULL;
 
     gfloat radius[4] = {1, 1, 1, 1};
-    gint   divs[2] = {10, 10};
-    gint   caps[2] = {TRUE, TRUE};
-    gint   round_caps[2] = {FALSE, FALSE};
-    gint   cap_divisions[2] = {0, 0};
+    gint divs[2] = {10, 10};
+    gint caps[2] = {TRUE, TRUE};
+    gint round_caps[2] = {FALSE, FALSE};
+    gint cap_divs[2] = {0, 0};
+    gfloat cap_offsets[2] = {0, 0};
 
     MotoParamSpec *divs_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
                                                        10, 3, 1000000, 1, 10);
 
-    MotoParamSpec *cap_divisions_spec = moto_param_spec_int_2_new(0, 0, 1000000, 1, 2,
+    MotoParamSpec *cap_divs_spec = moto_param_spec_int_2_new(0, 0, 1000000, 1, 2,
                                                                   0, 0, 1000000, 1, 2);
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "height", "Height", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Basic",
-            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Basic",
-            "divs", "Divisions",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Basic",
-            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Basic",
+            "height", "Height", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Body",
+            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Body",
+            "divs", "Divisions",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Body",
+            "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Body",
             "caps", "Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Caps",
+            "cap_divs", "Cap Divisions", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, cap_divs, cap_divs_spec, "Caps",
+            "cap_offsets", "Cap Offsets", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, cap_offsets, pspec, "Caps",
             "round_caps", "Round Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, round_caps, pspec, "Caps",
-            "cap_divs", "Cap Divisions", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, cap_divisions, cap_divisions_spec, "Caps",
             "screw", "Screw", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Screw",
             "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
             "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
@@ -136,6 +138,9 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     gint cap0_divs, cap1_divs;
     moto_node_get_param_2i((MotoNode *)self, "cap_divs", &cap0_divs, &cap1_divs);
+
+    gfloat cap0_offset, cap1_offset;
+    moto_node_get_param_2f((MotoNode *)self, "cap_offsets", &cap0_offset, &cap1_offset);
 
     gint rows, cols;
     moto_node_get_param_2i(node, "divs", &rows, &cols);
@@ -242,14 +247,14 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
             for(j = 0; j < cols; j++)
             {
                 gfloat sa = (screw_s) ? screw*RAD_PER_DEG*((gfloat)i-rows/2)/(rows-1) : screw*RAD_PER_DEG*((gfloat)i)/(rows-1);
-                gfloat a = (PI2*j)/cols + sa;
+                gfloat a = PI2 - (PI2*j)/cols + sa;
                 gfloat s = sin(a);
                 gfloat c = cos(a);
 
                 gfloat len = (height*i)/(rows-1);
-                mesh->v_coords[vi].z = -(c*(radius_x_f*(len/height) + radius_x_s*(1-len/height)));
-                mesh->v_coords[vi].x = -(s*(radius_y_f*(len/height) + radius_y_s*(1-len/height)));
-                mesh->v_coords[vi].y = -(len - height/2);
+                mesh->v_coords[vi].z = c*(radius_x_f*(len/height) + radius_x_s*(1-len/height));
+                mesh->v_coords[vi].x = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
+                mesh->v_coords[vi].y = len - height/2;
 
                 ++vi;
             }
@@ -326,7 +331,15 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                     mesh->v_coords[vi].y /= cols;
                     mesh->v_coords[vi].z /= cols;
 
+                    if(MOTO_AXIS_X == orientation)
+                        mesh->v_coords[vi].x -= cap0_offset;
+                    else if(MOTO_AXIS_Y == orientation)
+                        mesh->v_coords[vi].y -= cap0_offset;
+                    else if(MOTO_AXIS_Z == orientation)
+                        mesh->v_coords[vi].z -= cap0_offset;
+
                     MotoVector center = mesh->v_coords[vi];
+
                     guint16 vi0 = vi;
                     ++vi;
 
@@ -404,7 +417,15 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                     mesh->v_coords[vi].y /= cols;
                     mesh->v_coords[vi].z /= cols;
 
+                    if(MOTO_AXIS_X == orientation)
+                        mesh->v_coords[vi].x += cap1_offset;
+                    else if(MOTO_AXIS_Y == orientation)
+                        mesh->v_coords[vi].y += cap1_offset;
+                    else if(MOTO_AXIS_Z == orientation)
+                        mesh->v_coords[vi].z += cap1_offset;
+
                     MotoVector center = mesh->v_coords[vi];
+
                     guint16 vi0 = vi;
                     ++vi;
 
