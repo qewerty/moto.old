@@ -389,7 +389,7 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_COLOR_MATERIAL);
 
     MotoObjectNode* cam = moto_world_get_camera(self);
 
@@ -423,11 +423,14 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     GLfloat light_direction[] = {0, 0, 1, 0};
     gfloat tmp;
     vector3_normalize(light_direction, tmp);
-    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat specular[] = {0, 0, 0, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+    GLfloat ambi[] = {1, 1, 1, 1};
+    GLfloat diff[] = {1, 1, 1, 1};
+    GLfloat spec[] = {1, 1, 1, 1};
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  ambi);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  diff);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
 
     glPopMatrix();
 
