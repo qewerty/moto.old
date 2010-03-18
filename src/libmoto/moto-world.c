@@ -391,9 +391,11 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
 
-    if(moto_world_get_camera(self))
+    MotoObjectNode* cam = moto_world_get_camera(self);
+
+    if(cam)
     {
-        moto_object_node_apply_camera_transform(moto_world_get_camera(self), width, height);
+        moto_object_node_apply_camera_transform(cam, width, height);
     }
     else
     {
@@ -406,14 +408,28 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
         gluLookAt(1.5, 2.0, 2.5, 0, 0, 0, 0, 0, 1);
     }
 
-    GLfloat light_position[] = {1.0, 1.0, 3.0, 1.0};
-    GLfloat white_light[]    = {1.0,1.0,1.0,1.0};
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  white_light);
-    // glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
-
     if(self->priv->left_coords)
         glScalef(1, 1, -1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
+    if(cam)
+    {
+        glMultMatrixf(moto_object_node_get_matrix(cam, TRUE));
+    }
+
+    GLfloat light_position[] = {0, 0, 0, 1};
+    GLfloat light_direction[] = {0, 0, 1, 0};
+    gfloat tmp;
+    vector3_normalize(light_direction, tmp);
+    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat specular[] = {0, 0, 0, 1.0};
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+    glPopMatrix();
 
     glColor4f(1, 1, 1, 1);
 

@@ -229,7 +229,7 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
 
     glColor4f(1, 1, 1, 1);
 
-    if(moto_gl_is_glsl_supported())
+    if(0)//moto_gl_is_glsl_supported())
     {
         if( ! slernode->priv->shader_made)
             slernode->priv->shader_made = make_shader(slernode);
@@ -237,7 +237,7 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
         if(slernode->priv->shader_made)
         {
             glUniform3fARB(get_uni_loc(slernode->priv->prog, "lightPosition"),
-                    0.3, 0.15, 0.15);
+                0.3, 0.15, 0.15);
             glUniform1fARB(get_uni_loc(slernode->priv->prog, "Kd"), 1);
             glUniform1fARB(get_uni_loc(slernode->priv->prog, "Ks"), 0.1);
             glUseProgramObjectARB(slernode->priv->prog);
@@ -245,10 +245,12 @@ static void moto_sler_material_node_use(MotoMaterialNode *self)
     }
     else
     {
-        glColor4f(1, 1, 1, 1);
-        GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
-        glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_specular);
-        // glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        GLfloat mat_ambient[] = {.1, .1, .1, 1.0};
+        GLfloat mat_diffuse[] = {.5, .5, .5, 1.0};
+        GLfloat mat_specular[] = {.5, .5, .5, 1.0};
+        glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_ambient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE,  mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     }
 }
 

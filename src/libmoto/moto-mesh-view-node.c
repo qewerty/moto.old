@@ -569,6 +569,17 @@ static void tessCallbackError(GLenum errno)
     g_print("Tesselation error: %d\n", errno);
 }
 
+static unsigned long stipple_mask[] = {
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+  0xAAAAAAAA, 0x55555555, 0xAAAAAAAA, 0x55555555,
+};
+
 inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
@@ -674,6 +685,11 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
             */
         }
     }
+    else if(MOTO_DRAW_MODE_WIREFRAME == draw_mode)
+    {
+        glEnable(GL_POLYGON_STIPPLE);
+        glPolygonStipple(stipple_mask);
+    }
     else
     {
         gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertexNormal);
@@ -712,8 +728,7 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     }
 
     glDisable(GL_LIGHTING);
-    if(moto_gl_is_glsl_supported())
-        glUseProgramObjectARB(0);
+    glDisable(GL_CULL_FACE);
 
     for(i = 0; i < mesh->f_num; ++i)
     {
