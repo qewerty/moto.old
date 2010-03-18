@@ -1362,7 +1362,7 @@ void moto_value_get_float_4(GValue *value, gfloat *v0, gfloat *v1, gfloat *v2, g
 
 void moto_value_get_float_4_v(GValue *value, gfloat *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_4);
     gfloat *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gfloat)*4);
 }
@@ -1486,7 +1486,7 @@ void moto_value_set_float_2_v(GValue *value, const gfloat *v)
 
 void moto_value_set_float_3(GValue *value, gfloat v0, gfloat v1, gfloat v2)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_3);
     gfloat *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1495,14 +1495,14 @@ void moto_value_set_float_3(GValue *value, gfloat v0, gfloat v1, gfloat v2)
 
 void moto_value_set_float_3_v(GValue *value, const gfloat *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_3);
     gfloat *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gfloat)*3);
 }
 
 void moto_value_set_float_4(GValue *value, gfloat v0, gfloat v1, gfloat v2, gfloat v3)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_4);
     gfloat *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1512,7 +1512,7 @@ void moto_value_set_float_4(GValue *value, gfloat v0, gfloat v1, gfloat v2, gflo
 
 void moto_value_set_float_4_v(GValue *value, const gfloat *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_4);
     gfloat *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gfloat)*4);
 }
