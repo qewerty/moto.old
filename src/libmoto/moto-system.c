@@ -19,7 +19,7 @@
 #include "moto-remove-faces-node.h"
 #include "moto-object-node.h"
 #include "moto-camera-node.h"
-#include "moto-sler-material-node.h"
+#include "moto-material-node.h"
 #include "moto-mesh-view-node.h"
 #include "moto-ray-view-node.h"
 #include "moto-grid-view-node.h"
@@ -164,7 +164,6 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_AXES_VIEW_NODE;
             MOTO_TYPE_RAY_VIEW_NODE;
         MOTO_TYPE_MATERIAL_NODE;
-            MOTO_TYPE_SLER_MATERIAL_NODE;
         MOTO_TYPE_DISPLACE_NODE;
         MOTO_TYPE_TWIST_NODE;
         MOTO_TYPE_BEND_NODE;

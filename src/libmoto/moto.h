@@ -38,7 +38,7 @@
 #include "moto-plane-node.h"
 #include "moto-cylinder-node.h"
 #include "moto-mesh-file-node.h"
-#include "moto-sler-material-node.h"
+#include "moto-material-node.h"
 #include "moto-ray-view-node.h"
 #include "moto-grid-view-node.h"
 #include "moto-axes-view-node.h"

@@ -33,7 +33,7 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w,  "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *plane_node = moto_world_create_node_by_name(w, "MotoPlaneNode", "Plane", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w,   "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w,   "MotoMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", plane_node, "mesh");
@@ -64,7 +64,7 @@ static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cube_node = moto_world_create_node_by_name(w, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node,  "view", view_node, "view");
     moto_node_link(view_node, "mesh", cube_node, "mesh");
@@ -95,7 +95,7 @@ static void create_mesh_sphere(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *sphere_node = moto_world_create_node_by_name(w, "MotoSphereNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", sphere_node, "mesh");
@@ -126,7 +126,7 @@ static void create_mesh_cylinder(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *cylinder_node = moto_world_create_node_by_name(w, "MotoCylinderNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", cylinder_node, "mesh");
@@ -157,7 +157,7 @@ static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
     MotoNode *mf_node = moto_world_create_node_by_name(w, "MotoMeshFileNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoSlerMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", mf_node, "mesh");
