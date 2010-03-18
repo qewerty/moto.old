@@ -28,7 +28,8 @@ moto_rman_node_init(MotoRManNode *self)
 
     moto_node_add_params(node,
             "variation", "Variation", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
-            "command",   "Command",   G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
+            "command", "Command", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
+            "target", "Target", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "3Delight", NULL, "Arguments",
             NULL);
 }
 
