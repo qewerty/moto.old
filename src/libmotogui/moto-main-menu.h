@@ -23,6 +23,7 @@
 #define __MOTO_MAIN_MENU_H__
 
 #include <gtk/gtk.h>
+#include "libmoto/moto-system.h"
 
 G_BEGIN_DECLS
 
@@ -53,7 +54,7 @@ GType moto_main_menu_get_type(void);
 #define MOTO_IS_MAIN_MENU_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_MAIN_MENU))
 #define MOTO_MAIN_MENU_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_MAIN_MENU, MotoMainMenuClass))
 
-GtkWidget *moto_main_menu_new();
+GtkWidget *moto_main_menu_new(MotoSystem* system);
 
 G_END_DECLS
 

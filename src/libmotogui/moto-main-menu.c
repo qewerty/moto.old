@@ -51,7 +51,37 @@ void open_script_editor(GtkMenuItem *item, gpointer user_data)
     */
 }
 
-void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data)
+typedef struct
+{
+    MotoSystem* system;
+    GType type;
+} MotoCreateRenderNodeData;
+
+static void create_render_node(GtkMenuItem* item, MotoCreateRenderNodeData* data)
+{
+    if(!data->system)
+    {
+        // TODO: Error.
+        return;
+    }
+
+    MotoWorld* w = moto_system_get_current_world(data->system);
+    if(!w)
+    {
+        // TODO: Error.
+        return;
+    }
+
+    MotoNode* node = \
+        moto_world_create_node_by_name(w, g_type_name(data->type), "RenderMan", NULL);
+}
+
+static void free_MotoCreateRenderNodeData(gpointer data, GClosure *closure)
+{
+    g_slice_free(MotoCreateRenderNodeData, data);
+}
+
+static void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data)
 {
     GtkMenuShell *menu = (GtkMenuShell*)gtk_menu_item_get_submenu(item);
 
@@ -67,7 +97,14 @@ void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data)
     {
         GtkWidget *item = gtk_menu_item_new_with_label(g_type_name(t[i]));
         gtk_menu_shell_append(menu, item);
+
+        MotoCreateRenderNodeData* data = g_slice_new(MotoCreateRenderNodeData);
+        data->type = t[i];
+        data->system = *((MotoSystem**)user_data);
+        g_signal_connect_data(G_OBJECT(item), "activate", G_CALLBACK(create_render_node),
+                              data, free_MotoCreateRenderNodeData, 0);
     }
+    g_free(t);
     gtk_widget_show_all((GtkWidget*)menu);
 }
 
@@ -78,6 +115,7 @@ static GObjectClass *main_menu_parent_class = NULL;
 struct _MotoMainMenuPriv
 {
     gboolean disposed;
+    MotoSystem* system;
 };
 
 static void
@@ -110,6 +148,7 @@ moto_main_menu_init(MotoMainMenu *self)
     GtkMenuShell *menu_bar = (GtkMenuShell *)self;
 
     self->priv = g_slice_new(MotoMainMenuPriv);
+    self->priv->system = NULL;
 
     /* Root menu items. */
     GtkWidget *file = gtk_menu_item_new_with_label("File");
@@ -162,7 +201,7 @@ moto_main_menu_init(MotoMainMenu *self)
     item = (GtkMenuItem *)gtk_menu_item_new_with_label("Create Render Node");
     gtk_menu_shell_append(render_menu, (GtkWidget *)item);
     gtk_menu_item_set_submenu((GtkMenuItem *)item, gtk_menu_new());
-    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(on_create_render_node_activate), NULL);
+    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(on_create_render_node_activate), &self->priv->system);
 
     item = (GtkMenuItem *)gtk_menu_item_new_with_label("Start Render");
     gtk_menu_shell_append(render_menu, (GtkWidget *)item);
@@ -203,9 +242,10 @@ G_DEFINE_TYPE(MotoMainMenu, moto_main_menu, GTK_TYPE_MENU_BAR);
 
 /* Methods of class MainMenu */
 
-GtkWidget *moto_main_menu_new()
+GtkWidget *moto_main_menu_new(MotoSystem* system)
 {
     GtkWidget *self = (GtkWidget *)g_object_new(MOTO_TYPE_MAIN_MENU, NULL);
+    ((MotoMainMenu*)self)->priv->system = system;
 
     return self;
 }

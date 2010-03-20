@@ -290,6 +290,13 @@ gboolean redraw_world_idle(gpointer data)
     return FALSE;
 }
 
+static void on_world_changed(MotoWorld* world, MotoTestWindow* window)
+{
+    moto_test_window_redraw_3dview(window);
+    moto_test_window_update_param_editor(window);
+    moto_test_window_update_outliner(window);
+}
+
 static void
 moto_test_window_init(MotoTestWindow *self)
 {
@@ -309,6 +316,7 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->system = moto_system_new();
     moto_system_get_library(self->priv->system);
     self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
+    g_signal_connect(G_OBJECT(self->priv->world), "changed", G_CALLBACK(on_world_changed), self);
     moto_system_add_world(self->priv->system, self->priv->world, TRUE);
 
     MotoNode *root_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Root", NULL);
@@ -420,7 +428,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     GtkBox *vbox = (GtkBox *)gtk_vbox_new(FALSE, 1);
 
-    gtk_box_pack_start(vbox, moto_main_menu_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, moto_main_menu_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system, (GtkWindow *)self), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(vbox, moto_timeline_new(self->priv->world), FALSE, FALSE, 0);
@@ -489,6 +497,9 @@ GtkWindow *moto_test_window_new()
 
 void moto_test_window_redraw_3dview(MotoTestWindow *self)
 {
+    if(!self->priv->area)
+        return;
+
     GdkEvent *event = gdk_event_new(GDK_NOTHING);
     g_signal_emit_by_name(self->priv->area, "expose-event",  self->priv->area, event, NULL);
     gdk_event_free(event);
@@ -496,6 +507,9 @@ void moto_test_window_redraw_3dview(MotoTestWindow *self)
 
 void moto_test_window_update_param_editor(MotoTestWindow *self)
 {
+    if(!self->priv->param_editor)
+        return;
+
     MotoNode *obj = (MotoNode *)moto_world_get_current_object(self->priv->world);
     if( ! obj)
         return;
@@ -522,6 +536,9 @@ void moto_test_window_update_param_editor_full(MotoTestWindow *self, MotoNode *n
 
 void moto_test_window_update_outliner(MotoTestWindow *self)
 {
+    if(!self->priv->outliner)
+        return;
+
     moto_outliner_update(self->priv->outliner);
 }
 

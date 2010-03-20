@@ -64,6 +64,7 @@ struct _MotoWorldClass
     guint motion_notify_signal_id;
 
     guint updated_signal_id;
+    guint changed_signal_id;
 };
 
 GType moto_world_get_type(void);

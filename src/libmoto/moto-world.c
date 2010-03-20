@@ -213,6 +213,17 @@ moto_world_class_init(MotoWorldClass *klass)
                  G_TYPE_NONE /* return_type */,
                  0     /* n_params */,
                  NULL  /* param_types */);
+
+    klass->changed_signal_id = g_signal_newv ("changed",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* class closure */,
+                 NULL /* accumulator */,
+                 NULL /* accu_data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
 }
 
 G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);
@@ -251,6 +262,8 @@ void moto_world_add_node(MotoWorld *self, MotoNode *node)
     g_mutex_lock(self->priv->node_list_mutex);
     self->priv->nodes = g_slist_append(self->priv->nodes, node);
     g_mutex_unlock(self->priv->node_list_mutex);
+
+    g_signal_emit_by_name(self, "changed");
 }
 
 MotoNode *moto_world_create_node(MotoWorld *self,
