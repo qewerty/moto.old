@@ -26,6 +26,17 @@
 
 G_BEGIN_DECLS
 
+typedef enum _MotoRManTarget
+{
+    MOTO_RMAN_TARGET_3DELIGHT,
+    MOTO_RMAN_TARGET_AQSIS,
+    MOTO_RMAN_TARGET_PIXIE,
+    MOTO_RMAN_TARGET_PRMAN,
+} MotoRManTarget;
+
+GType moto_rman_target_get_type(void);
+#define MOTO_TYPE_RMAN_TARGET (moto_rman_target_get_type())
+
 typedef struct _MotoRManNode MotoRManNode;
 typedef struct _MotoRManNodeClass MotoRManNodeClass;
 

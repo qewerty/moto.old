@@ -15,6 +15,25 @@
 
 static gboolean moto_rman_node_render(MotoRenderNode *self);
 
+/* MotoRManTarget */
+
+GType moto_rman_target_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_RMAN_TARGET_3DELIGHT, "MOTO_RMAN_TARGET_3DELIGHT", "3Delight"},
+            {MOTO_RMAN_TARGET_AQSIS, "MOTO_RMAN_TARGET_AQSIS", "Aqsis"},
+            {MOTO_RMAN_TARGET_PIXIE, "MOTO_RMAN_TARGET_PIXIE", "Pixie"},
+            {MOTO_RMAN_TARGET_PRMAN, "MOTO_RMAN_TARGET_PRMAN", "PRMan"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoRManTarget", values);
+    }
+    return type;
+}
+
 /* class MotoRManNode */
 
 static GObjectClass *rman_node_parent_class = NULL;
@@ -27,9 +46,8 @@ moto_rman_node_init(MotoRManNode *self)
     /* params */
 
     moto_node_add_params(node,
-            "variation", "Variation", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
-            "command", "Command", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
-            "target", "Target", G_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "3Delight", NULL, "Arguments",
+            "target", "Target", MOTO_TYPE_RMAN_TARGET, MOTO_PARAM_MODE_INOUT, MOTO_RMAN_TARGET_3DELIGHT, NULL, "Arguments",
+            // "command", "Command", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
             NULL);
 }
 
