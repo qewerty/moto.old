@@ -55,6 +55,12 @@ void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data)
 {
     GtkMenuShell *menu = (GtkMenuShell*)gtk_menu_item_get_submenu(item);
 
+    GList* child = gtk_container_get_children((GtkContainer*)menu);
+    for(; child; child = g_list_next(child))
+    {
+        gtk_container_remove((GtkContainer*)menu, child->data);
+    }
+
     guint i, num;
     GType *t = g_type_children(MOTO_TYPE_RENDER_NODE, &num);
     for(i = 0; i < num; ++i)
