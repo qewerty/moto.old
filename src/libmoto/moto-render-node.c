@@ -39,7 +39,8 @@ moto_render_node_init(MotoRenderNode *self)
     /* params */
 
     moto_node_add_params(node,
-        "skip_not_modified",  "Skip not modified nodes", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
+        "variation", "Variation", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
+        "skip_untouched",  "Skip Untouched", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
         NULL);
 }
 
