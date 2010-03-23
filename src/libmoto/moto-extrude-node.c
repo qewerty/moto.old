@@ -7,7 +7,7 @@
 #include "moto-object-node.h"
 #include "moto-extrude-node.h"
 #include "libmotoutil/moto-gl.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */

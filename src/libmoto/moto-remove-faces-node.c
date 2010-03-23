@@ -6,7 +6,7 @@
 #include "moto-mesh.h"
 #include "moto-remove-faces-node.h"
 #include "libmotoutil/moto-gl.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */

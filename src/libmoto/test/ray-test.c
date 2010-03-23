@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "common/matrix.h"
+#include "common/xform.h"
 #include "common/print-array.h"
 #include "motocore/moto-ray.h"
 

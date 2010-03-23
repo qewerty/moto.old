@@ -9,7 +9,7 @@
 #include "moto-point-cloud.h"
 #include "moto-edge-list.h"
 #include "moto-messager.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 #ifndef CALLBACK
 #define CALLBACK

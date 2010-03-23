@@ -2,7 +2,7 @@
 #include <assert.h>
 
 #include "numdef.h"
-#include "matrix.h"
+#include "xform.h"
 
 using namespace std;
 
@@ -341,7 +341,7 @@ void test_quaternion()
 
 int main(int argc, char *argv[])
 {
-    cout << "Testing \"matrix.h\" ... " << endl;
+    cout << "Testing \"xform.h\" ... " << endl;
 
     test_matrix_identity();
     test_copy_length_normalize();

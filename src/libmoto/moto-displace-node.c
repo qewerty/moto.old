@@ -12,7 +12,7 @@
 #include "moto-point-cloud.h"
 #include "moto-displace-node.h"
 #include "libmotoutil/moto-gl.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */

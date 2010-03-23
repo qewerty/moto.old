@@ -2,7 +2,7 @@
 #include <GL/glu.h>
 
 #include "libmotoutil/numdef.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 #include "moto-factory.h"
 #include "moto-marshal.h"

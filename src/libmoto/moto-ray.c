@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "moto-ray.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* macros */

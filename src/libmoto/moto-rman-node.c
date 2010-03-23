@@ -8,7 +8,7 @@
 #include "moto-rman-node.h"
 #include "moto-world.h"
 #include "moto-object-node.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */

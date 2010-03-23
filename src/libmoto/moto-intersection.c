@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include "moto-intersection.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 void moto_intersection_reset(MotoIntersection *self)
 {
