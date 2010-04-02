@@ -515,8 +515,6 @@ MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name)
 void moto_world_foreach_node(MotoWorld *self, GType type,
         MotoWorldForeachNodeFunc func, gpointer user_data)
 {
-    g_mutex_lock(self->priv->node_list_mutex);
-
     GSList *l = self->priv->nodes;
     for(; l; l=g_slist_next(l))
     {
@@ -528,8 +526,6 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
             }
         }
     }
-
-    g_mutex_unlock(self->priv->node_list_mutex);
 }
 
 void moto_world_set_use_vbo(MotoWorld *self, gboolean use)

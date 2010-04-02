@@ -36,9 +36,12 @@ moto_render_node_init(MotoRenderNode *self)
     priv->rendered = FALSE;
     g_get_current_time( & priv->last_render);
 
+    gint size[] = {640, 480};
+
     /* params */
 
     moto_node_add_params(node,
+        "size", "Widget/Height", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, size, NULL, "Arguments",
         "variation", "Variation", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
         "skip_untouched",  "Skip Untouched", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
         NULL);

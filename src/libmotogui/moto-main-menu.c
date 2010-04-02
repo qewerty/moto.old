@@ -108,6 +108,29 @@ static void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data
     gtk_widget_show_all((GtkWidget*)menu);
 }
 
+static gboolean render(MotoWorld *world, MotoRenderNode *node, gpointer user_data)
+{
+    g_print("render: %s\n", moto_node_get_name((MotoNode*)node));
+    moto_render_node_render(node);
+
+    return TRUE;
+}
+
+static void on_start_render_activate(GtkMenuItem *item, gpointer user_data)
+{
+    MotoSystem* system = *((MotoSystem**)user_data);
+
+    MotoWorld* w = moto_system_get_current_world(system);
+    if(!w)
+        return;
+
+    g_print("w: %p\n", w);
+
+    moto_world_foreach_node(w, MOTO_TYPE_RENDER_NODE,
+        (MotoWorldForeachNodeFunc)render, NULL);
+    g_print("---\n");
+}
+
 /* class MainMenu */
 
 static GObjectClass *main_menu_parent_class = NULL;
@@ -205,6 +228,7 @@ moto_main_menu_init(MotoMainMenu *self)
 
     item = (GtkMenuItem *)gtk_menu_item_new_with_label("Start Render");
     gtk_menu_shell_append(render_menu, (GtkWidget *)item);
+    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(on_start_render_activate), &self->priv->system);
 
     /* Window menu */
     GtkMenuShell *window_menu = (GtkMenuShell *)gtk_menu_new();

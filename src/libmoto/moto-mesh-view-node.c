@@ -124,6 +124,8 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
+            "subdiv", "Subdiv", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Geometry",
+            "subdiv_render", "Subdiv Render", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Geometry",
             "mesh", "Mesh", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
             "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
             NULL);
