@@ -9,7 +9,7 @@
 #include "moto-library.h"
 #include "moto-messager.h"
 #include "moto-mesh-loader.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 /* forwards */
 

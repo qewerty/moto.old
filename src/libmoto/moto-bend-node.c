@@ -4,7 +4,7 @@
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-bend-node.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
 /* forwards */

@@ -375,6 +375,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     // Window
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
+    GTK_WIDGET_SET_FLAGS(self->priv->area, GTK_CAN_FOCUS);
     gtk_widget_set_size_request((GtkWidget *)self->priv->area, 360, 240);
     GtkWidget *area = (GtkWidget *)self->priv->area;
     GdkGLConfig *gl_config =\
@@ -613,6 +614,8 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
 
     prev_x = event->x;
     prev_y = event->y;
+
+    gtk_widget_grab_focus(widget);
 
     switch(event->button)
     {

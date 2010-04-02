@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 
 #include "libmotoutil/numdef.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 #include "moto-messager.h"
 #include "moto-world.h"

@@ -5,7 +5,7 @@
 #include "moto-mesh.h"
 #include "moto-enums.h"
 #include "libmotoutil/numdef.h"
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 
 /* forwards */
 

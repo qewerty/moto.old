@@ -11,7 +11,7 @@
 #include "moto-camera-node.h"
 #include "moto-mesh-view-node.h"
 
-#include "libmotoutil/matrix.h"
+#include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 #include "libmotoutil/print-array.h"
 
