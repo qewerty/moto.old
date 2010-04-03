@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
 #include <glib/gprintf.h>
@@ -71,7 +72,8 @@ moto_rman_node_init(MotoRManNode *self)
             "gi_intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Global Illumination",
             "gi_samples", "Samples", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 64.0, NULL, "Global Illumination",
             "gi_max_dist", "Max Distance", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1e36, NULL, "Global Illumination",
-            // "command", "Command", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
+            "use_custom_command", "Use Custom Command", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Customization",
+            "custom_command", "Custom Command", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Customization",
             NULL);
 }
 
@@ -387,7 +389,7 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     }
 
     gboolean ao = FALSE;
-    moto_node_get_param_boolean(self, "ao", &ao);
+    moto_node_get_param_boolean(node, "ao", &ao);
 
     if(ao)
     {
@@ -395,9 +397,9 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
         gfloat gi_samples = 64;
         gfloat gi_max_dist = 1e36;
 
-        moto_node_get_param_float(self, "gi_intensity", &gi_intensity);
-        moto_node_get_param_float(self, "gi_samples", &gi_samples);
-        moto_node_get_param_float(self, "gi_max_dist", &gi_max_dist);
+        moto_node_get_param_float(node, "gi_intensity", &gi_intensity);
+        moto_node_get_param_float(node, "gi_samples", &gi_samples);
+        moto_node_get_param_float(node, "gi_max_dist", &gi_max_dist);
 
         moto_rman_node_writeln(rman, 0, "Attribute \"visibility\" \"trace\" [1]");
         moto_rman_node_writeln(rman, 0, "Attribute \"visibility\" \"transmission\" \"opaque\"");
@@ -439,7 +441,25 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     fclose(priv->out);
     priv->out = NULL;
 
-    system("renderdl last-render.rib");
+    GString* command = g_string_new("renderdl");
+
+    gboolean use_custom_command = FALSE;
+    moto_node_get_param_boolean(node, "use_custom_command", &use_custom_command);
+    if(use_custom_command)
+    {
+        const char* custom_command = NULL;
+        moto_node_get_param_string(node, "custom_command", &custom_command);
+
+        g_string_assign(command, custom_command);
+    }
+
+    GString* command_full = g_string_new("");
+    g_string_printf(command_full, "%s last-render.rib", command->str);
+
+    system(command_full->str);
+
+    g_string_free(command, TRUE);
+    g_string_free(command_full, TRUE);
 
     // moto_render_node_update_last_render_time(self);
 
