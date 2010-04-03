@@ -8,7 +8,6 @@
 #include "moto-messager.h"
 #include "moto-object-node.h"
 #include "moto-material-node.h"
-#include "moto-camera-node.h"
 #include "moto-mesh-view-node.h"
 
 #include "libmotoutil/xform.h"
@@ -160,6 +159,9 @@ moto_object_node_init(MotoObjectNode *self)
             "t", "Translate", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, translate, pspec, "Transform",
             "r", "Rotate",    MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, rotate, pspec, "Transform",
             "s", "Scale",     MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, scale, pspec, "Transform",
+            "fov", "Field of View", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 60.0, NULL, "Projection",
+            "near", "Near Plane", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1, NULL, "Projection",
+            "far", "Far Plane", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 100.0, NULL, "Projection",
             "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec, "Transform/Misc",
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec, "Transform/Misc",
             "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
@@ -167,8 +169,7 @@ moto_object_node_init(MotoObjectNode *self)
             "transform", "Transform",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Transform",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
             "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
-            "cam",  "Camera",   MOTO_TYPE_CAMERA_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
-            "material", "Material",   MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading/Material",
+            "material", "Material", MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading/Material",
             NULL);
 
     /* camera */
@@ -1072,30 +1073,17 @@ void moto_object_node_apply_camera_transform(MotoObjectNode *self, gint width, g
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    MotoCameraNode *cam;
-    moto_node_get_param_object((MotoNode *)self, "camera", (GObject**)&cam);
+    gfloat fov = 60;
+    gfloat near = 0.1;
+    gfloat far = 100;
+    moto_node_get_param_float((MotoNode *)self, "fov", &fov);
+    moto_node_get_param_float((MotoNode *)self, "near", &near);
+    moto_node_get_param_float((MotoNode *)self, "far", &far);
 
-    if(cam)
-    {
-        moto_camera_node_apply(cam, width, height);
-    }
-    else
-    {
-        MotoWorld *world = moto_node_get_world((MotoNode *)self);
-        if( ! world)
-        {
-            GString *msg = g_string_new("Object \"");
-             g_string_append(msg, moto_node_get_name((MotoNode *)self));
-            g_string_append(msg, "\" that is used as a camera has no associated world.");
-            moto_error(msg->str);
-            g_string_free(msg, TRUE);
-        }
-
-        moto_world_apply_default_camera(world, width, height);
-    }
+    gdouble aspect = width/((double)height);
+    gluPerspective(fov, aspect, near, far);
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     glLoadMatrixf(moto_object_node_get_inverse_matrix(self, TRUE));
 }
 

@@ -18,7 +18,6 @@
 #include "moto-extrude-node.h"
 #include "moto-remove-faces-node.h"
 #include "moto-object-node.h"
-#include "moto-camera-node.h"
 #include "moto-material-node.h"
 #include "moto-mesh-view-node.h"
 #include "moto-ray-view-node.h"

@@ -27,7 +27,6 @@
 #include "moto-world.h"
 #include "moto-node.h"
 #include "moto-object-node.h"
-#include "moto-camera-node.h"
 #include "moto-geom-view-node.h"
 #include "moto-mesh-view-node.h"
 #include "moto-wobj-mesh-loader.h"
