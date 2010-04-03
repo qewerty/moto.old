@@ -39,10 +39,21 @@ GType moto_rman_target_get_type(void)
 
 static GObjectClass *rman_node_parent_class = NULL;
 
+#define MOTO_RMAN_NODE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_RMAN_NODE, MotoRManNodePriv)
+
+typedef struct
+{
+    FILE* out;
+} MotoRManNodePriv;
+
 static void
 moto_rman_node_init(MotoRManNode *self)
 {
     MotoNode *node = (MotoNode *)self;
+    MotoRManNodePriv* priv = MOTO_RMAN_NODE_GET_PRIVATE(self);
+
+    priv->out = NULL;
 
     /* params */
 
@@ -56,6 +67,7 @@ static void
 moto_rman_node_class_init(MotoRManNodeClass *klass)
 {
     rman_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(MotoRManNodePriv));
 
     MotoRenderNodeClass *rclass = (MotoRenderNodeClass*)klass;
     rclass->render = moto_rman_node_render;
@@ -81,12 +93,12 @@ MotoRManNode *moto_rman_node_new(const gchar *name)
     return self;
 }
 
-static FILE* out = NULL;
-
 void moto_rman_node_write(MotoRManNode *self, guint indent_num, const gchar *fmt, ...)
 {
-    if(!out)
+    MotoRManNodePriv* priv = MOTO_RMAN_NODE_GET_PRIVATE(self);
+    if(!priv->out)
         return;
+    FILE* out = priv->out;
 
     GString *indent = g_string_new("");
     guint i;
@@ -104,8 +116,10 @@ void moto_rman_node_write(MotoRManNode *self, guint indent_num, const gchar *fmt
 
 void moto_rman_node_writeln(MotoRManNode *self, guint indent_num, const gchar *fmt, ...)
 {
-    if(!out)
+    MotoRManNodePriv* priv = MOTO_RMAN_NODE_GET_PRIVATE(self);
+    if(!priv->out)
         return;
+    FILE* out = priv->out;
 
     GString *indent = g_string_new("");
     guint i;
@@ -149,6 +163,9 @@ static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *re
     if(!mesh)
         return TRUE;
 
+    gboolean subdiv = FALSE;
+    moto_node_get_param_boolean(source_node, "subdiv_render", &subdiv);
+
     moto_rman_node_writeln(render, 0, "# Node '%s' of type '%s'",
         moto_node_get_name(node), moto_node_get_type_name(node));
     moto_rman_node_writeln(render, 0, "AttributeBegin");
@@ -173,66 +190,130 @@ static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *re
     moto_rman_node_writeln(render, 1, "ReadArchive \"%s\"");
     */
 
-    moto_rman_node_write(render, 1, "PointsGeneralPolygons\n    [");
-
-    guint32 i;
-    for(i = 0; i < (mesh->f_num - 1); ++i)
-        moto_rman_node_write(render, 0, "1 ", 1);
-    moto_rman_node_write(render, 0, "1]\n    [");
-
-    guint32 prev_v_offset = 0;
-    for(i = 0; i < (mesh->f_num - 1); ++i)
+    if(subdiv)
     {
-        guint32 v_offset = mesh->f_data16[i].v_offset;
-        moto_rman_node_write(render, 0, "%d ", v_offset - prev_v_offset);
-        prev_v_offset = v_offset;
-    }
-    moto_rman_node_write(render, 0, "%d]\n    [", mesh->f_data16[i].v_offset - prev_v_offset);
+        moto_rman_node_write(render, 1, "SubdivisionMesh \"catmull-clark\"\n    [");
 
-    prev_v_offset = 0;
-    i = 0;
-    for(; i < (mesh->f_num - 1); ++i)
-    {
-        guint32 v_offset = mesh->f_data16[i].v_offset;
-        guint32 v_num = v_offset - prev_v_offset;
-
-        guint32 j;
-        for(j = 0; j < v_num; ++j)
+        guint32 prev_v_offset = 0;
+        guint32 i;
+        for(i = 0; i < (mesh->f_num - 1); ++i)
         {
-            moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            moto_rman_node_write(render, 0, "%d ", v_offset - prev_v_offset);
+            prev_v_offset = v_offset;
         }
-        prev_v_offset = v_offset;
-    }
+        moto_rman_node_write(render, 0, "%d]\n    [", mesh->f_data16[i].v_offset - prev_v_offset);
 
-    {
-        guint32 v_offset = mesh->f_data16[i].v_offset;
-        guint32 v_num = v_offset - prev_v_offset;
-
-        guint32 j;
-        for(j = 0; j < v_num; ++j)
+        prev_v_offset = 0;
+        i = 0;
+        for(; i < (mesh->f_num - 1); ++i)
         {
-            moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
-        }
-        moto_rman_node_write(render, 0, "]\n    \"P\" [");
-    }
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            guint32 v_num = v_offset - prev_v_offset;
 
-    // Points
-    for(i = 0; i < (mesh->v_num - 1); ++i)
-    {
-        moto_rman_node_write(render, 0, "%f %f %f ",
+            guint32 j;
+            for(j = 0; j < v_num; ++j)
+            {
+                moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
+            }
+            prev_v_offset = v_offset;
+        }
+
+        {
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            guint32 v_num = v_offset - prev_v_offset;
+
+            guint32 j;
+            for(j = 0; j < v_num; ++j)
+            {
+                moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
+            }
+            moto_rman_node_write(render, 0, "]\n    [");
+        }
+
+        moto_rman_node_write(render, 0, "\"interpolateboundary\"] [0 0] [] []\n    \"P\" [");
+
+        // Points
+        for(i = 0; i < (mesh->v_num - 1); ++i)
+        {
+            moto_rman_node_write(render, 0, "%f %f %f ",
+                mesh->v_coords[i].x, mesh->v_coords[i].y, mesh->v_coords[i].z);
+        }
+        moto_rman_node_write(render, 0, "%f %f %f ]\n    \"N\" [",
             mesh->v_coords[i].x, mesh->v_coords[i].y, mesh->v_coords[i].z);
-    }
-    moto_rman_node_write(render, 0, "%f %f %f ]\n    \"N\" [",
-        mesh->v_coords[i].x, mesh->v_coords[i].y, mesh->v_coords[i].z);
 
-    // Normals
-    for(i = 0; i < (mesh->v_num - 1); ++i)
-    {
-        moto_rman_node_write(render, 0, "%f %f %f ",
+        // Normals
+        for(i = 0; i < (mesh->v_num - 1); ++i)
+        {
+            moto_rman_node_write(render, 0, "%f %f %f ",
+                mesh->v_normals[i].x, mesh->v_normals[i].y, mesh->v_normals[i].z);
+        }
+        moto_rman_node_write(render, 0, "%f %f %f]\n",
             mesh->v_normals[i].x, mesh->v_normals[i].y, mesh->v_normals[i].z);
     }
-    moto_rman_node_write(render, 0, "%f %f %f]\n",
-        mesh->v_normals[i].x, mesh->v_normals[i].y, mesh->v_normals[i].z);
+    else
+    {
+        moto_rman_node_write(render, 1, "PointsGeneralPolygons\n    [");
+
+        guint32 i;
+        for(i = 0; i < (mesh->f_num - 1); ++i)
+            moto_rman_node_write(render, 0, "1 ", 1);
+        moto_rman_node_write(render, 0, "1]\n    [");
+
+        guint32 prev_v_offset = 0;
+        for(i = 0; i < (mesh->f_num - 1); ++i)
+        {
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            moto_rman_node_write(render, 0, "%d ", v_offset - prev_v_offset);
+            prev_v_offset = v_offset;
+        }
+        moto_rman_node_write(render, 0, "%d]\n    [", mesh->f_data16[i].v_offset - prev_v_offset);
+
+        prev_v_offset = 0;
+        i = 0;
+        for(; i < (mesh->f_num - 1); ++i)
+        {
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            guint32 v_num = v_offset - prev_v_offset;
+
+            guint32 j;
+            for(j = 0; j < v_num; ++j)
+            {
+                moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
+            }
+            prev_v_offset = v_offset;
+        }
+
+        {
+            guint32 v_offset = mesh->f_data16[i].v_offset;
+            guint32 v_num = v_offset - prev_v_offset;
+
+            guint32 j;
+            for(j = 0; j < v_num; ++j)
+            {
+                moto_rman_node_write(render, 0, "%d ", mesh->f_verts16[prev_v_offset + j]);
+            }
+            moto_rman_node_write(render, 0, "]\n    \"P\" [");
+        }
+
+        // Points
+        for(i = 0; i < (mesh->v_num - 1); ++i)
+        {
+            moto_rman_node_write(render, 0, "%f %f %f ",
+                mesh->v_coords[i].x, mesh->v_coords[i].y, mesh->v_coords[i].z);
+        }
+        moto_rman_node_write(render, 0, "%f %f %f ]\n    \"N\" [",
+            mesh->v_coords[i].x, mesh->v_coords[i].y, mesh->v_coords[i].z);
+
+        // Normals
+        for(i = 0; i < (mesh->v_num - 1); ++i)
+        {
+            moto_rman_node_write(render, 0, "%f %f %f ",
+                mesh->v_normals[i].x, mesh->v_normals[i].y, mesh->v_normals[i].z);
+        }
+        moto_rman_node_write(render, 0, "%f %f %f]\n",
+            mesh->v_normals[i].x, mesh->v_normals[i].y, mesh->v_normals[i].z);
+    }
 
     moto_rman_node_writeln(render, 0, "AttributeEnd");
 
@@ -241,27 +322,35 @@ static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *re
 
 static gboolean moto_rman_node_render(MotoRenderNode *self)
 {
-    MotoWorld *world = moto_node_get_world(MOTO_NODE(self));
-    if( ! world)
+    MotoRManNode* rman = (MotoRManNode*)self;
+    MotoRManNodePriv* priv = MOTO_RMAN_NODE_GET_PRIVATE(self);
+    if(priv->out)
+    {
+        fclose(priv->out);
+        priv->out = NULL;
+    }
+
+    MotoWorld *world = moto_node_get_world((MotoNode*)self);
+    if(!world)
         return FALSE;
 
-    out = fopen("last-render.rib", "wb");
+    priv->out = fopen("last-render.rib", "wb");
 
-    moto_rman_node_writeln(self, 0, "# Moto last render");
+    moto_rman_node_writeln(rman, 0, "# Moto last render");
 
-    moto_rman_node_writeln(self, 0, "Display \"last-render.tiff\" \"file\" \"rgb\"");
-    moto_rman_node_writeln(self, 0, "Display \"+last-render\" \"framebuffer\" \"rgb\"");
-    moto_rman_node_writeln(self, 0, "Format 640 480 1");
-    moto_rman_node_writeln(self, 0, "PixelSamples 4 4");
-    moto_rman_node_writeln(self, 0, "PixelFilter \"catmull-rom\" 1 1");
-    moto_rman_node_writeln(self, 0, "Projection \"perspective\" \"fov\" 65");
+    moto_rman_node_writeln(rman, 0, "Display \"last-render.tiff\" \"file\" \"rgb\"");
+    moto_rman_node_writeln(rman, 0, "Display \"+last-render\" \"framebuffer\" \"rgb\"");
+    moto_rman_node_writeln(rman, 0, "Format 640 480 1");
+    moto_rman_node_writeln(rman, 0, "PixelSamples 4 4");
+    moto_rman_node_writeln(rman, 0, "PixelFilter \"catmull-rom\" 1 1");
+    moto_rman_node_writeln(rman, 0, "Projection \"perspective\" \"fov\" 65");
 
-    moto_rman_node_writeln(self, 0, "LightSource \"distantlight\" 3 \"lightcolor\" [1 1 1] \"intensity\" [.8]");
+    moto_rman_node_writeln(rman, 0, "LightSource \"distantlight\" 3 \"lightcolor\" [1 1 1] \"intensity\" [.8]");
 
     MotoObjectNode* camera = moto_world_get_camera(world);
-    moto_rman_node_writeln(self, 0, "# Camera object inverse");
-    moto_rman_node_writeln(self, 0, "Identity");
-    moto_rman_node_writeln(self, 0, "Scale 1 1 -1");
+    moto_rman_node_writeln(rman, 0, "# Camera object inverse");
+    moto_rman_node_writeln(rman, 0, "Identity");
+    moto_rman_node_writeln(rman, 0, "Scale 1 1 -1");
     if(camera)
     {
         const gfloat* mm = moto_object_node_get_matrix(camera, TRUE);
@@ -270,23 +359,23 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
         // matrix44_transpose(m, im);
         matrix44_copy(m, im);
 
-        moto_rman_node_writeln(self, 0,
+        moto_rman_node_writeln(rman, 0,
             "ConcatTransform\n[%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f]",
                 m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7],
                 m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
     }
 
-    moto_rman_node_writeln(self, 0, "FrameBegin 1");
-    moto_rman_node_writeln(self, 0, "WorldBegin");
+    moto_rman_node_writeln(rman, 0, "FrameBegin 1");
+    moto_rman_node_writeln(rman, 0, "WorldBegin");
 
     moto_world_foreach_node(world, MOTO_TYPE_OBJECT_NODE,
-        (MotoWorldForeachNodeFunc)export_object, self);
+        (MotoWorldForeachNodeFunc)export_object, rman);
 
-    moto_rman_node_writeln(self, 0, "WorldEnd");
-    moto_rman_node_writeln(self, 0, "FrameEnd");
+    moto_rman_node_writeln(rman, 0, "WorldEnd");
+    moto_rman_node_writeln(rman, 0, "FrameEnd");
 
-    fclose(out);
-    out = NULL;
+    fclose(priv->out);
+    priv->out = NULL;
 
     // moto_render_node_update_last_render_time(self);
 
