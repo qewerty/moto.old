@@ -184,25 +184,14 @@ static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *re
         moto_node_get_name(node), moto_node_get_type_name(node));
     moto_rman_node_writeln(render, 0, "AttributeBegin");
 
-    const gfloat* mm = moto_object_node_get_matrix((MotoObjectNode*)node, TRUE);
-    gfloat m[16];
-    // matrix44_transpose(m, mm);
-    matrix44_copy(m, mm);
+    const gfloat* m = \
+        moto_object_node_get_matrix((MotoObjectNode*)node, TRUE);
 
     moto_rman_node_writeln(render, 1, "Surface \"plastic\"");
     moto_rman_node_writeln(render, 1,
         "ConcatTransform\n    [%f %f %f %f\n     %f %f %f %f\n     %f %f %f %f\n     %f %f %f %f]",
             m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7],
             m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
-
-    /*
-    moto_rman_node_writeln(render, 1, "Surface \"%s\"");
-    moto_rman_node_writeln(render, 1, "Displacement \"%s\"");
-    moto_rman_node_writeln(render, 1, "Atmosphere \"%s\"");
-    moto_rman_node_writeln(render, 1, "Interior \"%s\"");
-    moto_rman_node_writeln(render, 1, "Exterior \"%s\"");
-    moto_rman_node_writeln(render, 1, "ReadArchive \"%s\"");
-    */
 
     if(subdiv)
     {
@@ -417,12 +406,8 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     moto_rman_node_writeln(rman, 0, "Scale 1 1 -1");
     if(camera)
     {
-        const gfloat* mm = moto_object_node_get_matrix(camera, TRUE);
-        gfloat m[16], im[16], ambuf[16], detbuf;
-        matrix44_inverse(im, mm, ambuf, detbuf);
-        // matrix44_transpose(m, im);
-        matrix44_copy(m, im);
-
+        const gfloat* m = \
+            moto_object_node_get_inverse_matrix(camera, TRUE);
         moto_rman_node_writeln(rman, 0,
             "ConcatTransform\n[%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f]",
                 m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7],
