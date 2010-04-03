@@ -632,11 +632,6 @@ void moto_world_stop_anim(MotoWorld *self)
     g_timer_stop(self->priv->timer);
 }
 
-static gboolean post_update_node(MotoNode *node)
-{
-    MotoWorld *world = moto_node_get_world(node);
-}
-
 static void update_node(MotoNode *node, MotoWorld *world)
 {
     moto_node_update(node);
@@ -733,20 +728,27 @@ void moto_world_button_press(MotoWorld *self,
     tinfo.view[2] = width;
     tinfo.view[3] = height;
 
+    GLdouble ar = width/(GLdouble)height;
+
+    gfloat fov = self->priv->fovy;
+
+    MotoObjectNode* camera = moto_world_get_camera(self);
+
     gfloat point[3];
-    if(moto_world_get_camera(self))
+    if(camera)
     {
-        gfloat *cim = moto_object_node_get_inverse_matrix(moto_world_get_camera(self), TRUE);
+        gfloat *cim = moto_object_node_get_inverse_matrix(camera, TRUE);
         matrix44_copy(tinfo.model, cim);
+
+        moto_node_get_param_float((MotoNode*)camera, "fov", &fov);
+        fov *= RAD_PER_DEG;
     }
     else
     {
         matrix44_identity(tinfo.model);
     }
 
-    GLdouble ar = width/(GLdouble)height;
-    matrix44_perspective(tinfo.proj, self->priv->fovy, ar,
-            self->priv->z_near, self->priv->z_far);
+    matrix44_perspective(tinfo.proj, fov, ar, 0.3, 150);
 
     GLdouble tmp_x, tmp_y, tmp_z;
     if( ! gluUnProject(x, height-y, 0.0, tinfo.model, tinfo.proj, tinfo.view,
