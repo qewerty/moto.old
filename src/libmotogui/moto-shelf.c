@@ -26,14 +26,15 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *root_node = (MotoNode *)moto_world_get_root(w);
 
-    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "CubeObject", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "PlaneObject", NULL);
+
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w,  "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w,  "MotoMeshViewNode", "PlaneView", NULL);
     MotoNode *plane_node = moto_world_create_node_by_name(w, "MotoPlaneNode", "Plane", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w,   "MotoMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w,   "MotoMaterialNode", "PlaneMaterial", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", plane_node, "mesh");
@@ -62,9 +63,9 @@ static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "CubeView", NULL);
     MotoNode *cube_node = moto_world_create_node_by_name(w, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "CubeMaterial", NULL);
 
     moto_node_link(obj_node,  "view", view_node, "view");
     moto_node_link(view_node, "mesh", cube_node, "mesh");
@@ -88,14 +89,14 @@ static void create_mesh_sphere(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *root_node = (MotoNode *)moto_world_get_root(w);
 
-    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "CubeObject", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "SphereObject", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
-    MotoNode *sphere_node = moto_world_create_node_by_name(w, "MotoSphereNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "SphereView", NULL);
+    MotoNode *sphere_node = moto_world_create_node_by_name(w, "MotoSphereNode", "Sphere", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "SphereMaterial", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", sphere_node, "mesh");
@@ -119,14 +120,14 @@ static void create_mesh_cylinder(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *root_node = (MotoNode *)moto_world_get_root(w);
 
-    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "CubeObject", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "CylinderObject", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
-    MotoNode *cylinder_node = moto_world_create_node_by_name(w, "MotoCylinderNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "CylinderView", NULL);
+    MotoNode *cylinder_node = moto_world_create_node_by_name(w, "MotoCylinderNode", "Cylinder", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "CylinderMaterial", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", cylinder_node, "mesh");
@@ -150,48 +151,30 @@ static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
 
     MotoNode *root_node = (MotoNode *)moto_world_get_root(w);
 
-    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "CubeObject", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "MeshFileObject", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_object_current(w, (MotoObjectNode *)obj_node);
 
-    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshView", NULL);
-    MotoNode *mf_node = moto_world_create_node_by_name(w, "MotoMeshFileNode", "Cube", NULL);
-    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "Material1", NULL);
+    MotoNode *view_node = moto_world_create_node_by_name(w, "MotoMeshViewNode", "MeshFileView", NULL);
+    MotoNode *mf_node = moto_world_create_node_by_name(w, "MotoMeshFileNode", "MeshFile", NULL);
+    MotoNode *mat_node = moto_world_create_node_by_name(w, "MotoMaterialNode", "MeshFileMaterial", NULL);
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", mf_node, "mesh");
     moto_node_link(obj_node, "material", mat_node, "material");
 }
 
-static void create_normal_move(MotoShelf *shelf, MotoSystem *system)
-{
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoWorld *w = moto_system_get_current_world(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current world.");
-        return;
-    }
-
-    MotoNode *node = moto_world_create_node_by_name(w, "MotoDisplaceNode", "NormalMove", NULL);
-}
-
 static void perform_geom_op(MotoShelf *shelf, MotoSystem *system, const gchar *op_node_name)
 {
-    if( ! system)
+    if(!system)
     {
         moto_error("MotoShelf has no associated system.");
         return;
     }
 
     MotoWorld *w = moto_system_get_current_world(system);
-    if( ! w)
+    if(!w)
     {
         moto_error("MotoSystem associated with the shelf has no current world.");
         return;
@@ -207,13 +190,13 @@ static void perform_geom_op(MotoShelf *shelf, MotoSystem *system, const gchar *o
     MotoMeshViewNode *view;
     moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
 
-    if( ! view)
+    if(!view)
     {
         moto_error("Current object has no view.");
         return;
     }
 
-    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
+    if(!g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
     {
         moto_error("View of current object is not MotoMeshViewNode.");
         return;
@@ -245,63 +228,6 @@ static void perform_geom_op(MotoShelf *shelf, MotoSystem *system, const gchar *o
 
     MotoParam *out_mesh = moto_node_get_param((MotoNode*)op, "out");
     moto_param_link(param, out_mesh);
-}
-
-static void perform_pc_op(MotoShelf *shelf, MotoSystem *system, const gchar *op_node_name)
-{
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoWorld *w = moto_system_get_current_world(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current world.");
-        return;
-    }
-
-    MotoObjectNode *obj = moto_world_get_current_object(w);
-    if(!obj)
-    {
-        moto_error("No current object to apply extrude.");
-        return;
-    }
-
-    MotoMeshViewNode *view;
-    moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
-
-    if( ! view)
-    {
-        moto_error("Current object has no view.");
-        return;
-    }
-
-    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
-    {
-        moto_error("View of current object is not MotoMeshViewNode.");
-        return;
-    }
-
-    MotoParam *param  = moto_node_get_param((MotoNode*)view, "mesh");
-    MotoParam *source = moto_param_get_source(param);
-    if( ! source)
-    {
-        moto_error("View of current object has not associated geometry.");
-        return;
-    }
-
-    MotoRemoveFacesNode *op = \
-        (MotoRemoveFacesNode*)moto_world_create_node_by_name(w, op_node_name, "Op", NULL);
-    if( ! op)
-        return;
-
-    MotoParam *in = moto_node_get_param((MotoNode*)op, "in_pc");
-    moto_param_link(in, source);
-
-    MotoParam *out = moto_node_get_param((MotoNode*)op, "out_pc");
-    moto_param_link(param, out);
 }
 
 static void perform_extrude(MotoShelf *shelf, MotoSystem *system)

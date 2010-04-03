@@ -324,13 +324,13 @@ moto_test_window_init(MotoTestWindow *self)
 
     param = moto_node_get_param(root_node, "ty");
 
-    MotoNode *obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Object", NULL);
+    MotoNode *obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "GridObject", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     MotoNode *grid_view_node = moto_world_create_node_by_name(self->priv->world, "MotoGridViewNode", "GridView", NULL);
     moto_node_link(obj_node, "view", grid_view_node, "view");
 
-    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Object", NULL);
+    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "AxesObject", NULL);
     moto_node_link(obj_node, "parent", root_node, "transform");
 
     moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
@@ -338,37 +338,7 @@ moto_test_window_init(MotoTestWindow *self)
     MotoNode *axes_view_node = moto_world_create_node_by_name(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
     moto_node_link(obj_node, "view", axes_view_node, "view");
 
-    // cube instance
-    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "CubeObject2", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-    // moto_node_link(obj_node, "view", view_node, "view");
-
-    self->priv->vtest = obj_node;
-    moto_node_save_to_variation(obj_node, self->priv->v1);
-
-    moto_node_set_params(obj_node,
-            "tx", 2.5f,
-            "ty", 3.1f,
-            "tz", -1.5f,
-            "rx", 45.f,
-            "ry", 30.f,
-            "rz", 15.f,
-            NULL);
-
-    moto_node_save_to_variation(obj_node, self->priv->v2);
-
-    moto_node_restore_from_variation(obj_node, self->priv->v1);
-
-    // gfloat tx, ty, tz;
-    // moto_node_get_params(obj_node, "tx", &tx, "ty", &ty, "tz", &tz, NULL);
-    // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
-
-    moto_node_restore_from_variation(obj_node, self->priv->v2);
-
-    // moto_node_get_params(obj_node, "tx", &tx, "ty", &ty, "tz", &tz, NULL);
-    // g_print("tx, ty, tz: %f %f %f\n", tx, ty, tz);
-
-    // camera 
+    // Camera.
     MotoNode *cam_obj = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
     // MotoNode *cam = moto_world_create_node_by_name(self->priv->world, "MotoCameraNode", "CameraObject");
     moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);

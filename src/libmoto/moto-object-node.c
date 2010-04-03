@@ -394,7 +394,7 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
     moto_object_node_update_parent_inverse(self);
 }
 
-static void calc_global_bound(MotoObjectNode *self)
+static void update_global_bound(MotoObjectNode *self)
 {
     MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
     MotoParam *s = moto_param_get_source(p);
@@ -412,16 +412,22 @@ static void calc_global_bound(MotoObjectNode *self)
     self->priv->global_bound_calculated = TRUE;
 }
 
-static void calc_local_bound(MotoObjectNode *self)
+static void update_local_bound(MotoObjectNode *self)
 {
     MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
     MotoParam *s = moto_param_get_source(p);
-    if( ! s)
+    if(!s)
+    {
+        moto_bound_set(self->priv->local_bound, 0, 0, 0, 0, 0, 0);
         return;
+    }
 
     MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
-    if(! g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
+    if(!g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
+    {
+        moto_bound_set(self->priv->local_bound, 0, 0, 0, 0, 0, 0);
         return;
+    }
 
     moto_bound_copy(self->priv->local_bound,
             moto_mesh_view_node_get_bound(MOTO_MESH_VIEW_NODE(gvn)));
@@ -433,13 +439,11 @@ MotoBound *moto_object_node_get_bound(MotoObjectNode *self, gboolean global)
 {
     if(global)
     {
-        if( ! self->priv->global_bound_calculated)
-            calc_global_bound(self);
+        update_global_bound(self);
         return self->priv->global_bound;
     }
 
-    if( ! self->priv->local_bound_calculated)
-        calc_local_bound(self);
+    update_local_bound(self);
     return self->priv->local_bound;
 }
 
@@ -1108,6 +1112,8 @@ static void moto_object_node_update(MotoNode *self)
     obj->priv->scale_calculated        = FALSE;
     obj->priv->transform_calculated    = FALSE;
     obj->priv->inverse_calculated      = FALSE;
+    obj->priv->local_bound_calculated  = FALSE;
+    obj->priv->global_bound_calculated = FALSE;
 }
 
 gboolean moto_object_node_button_press(MotoObjectNode *self,

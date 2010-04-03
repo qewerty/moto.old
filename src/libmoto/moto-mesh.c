@@ -499,7 +499,6 @@ void moto_mesh_tesselate_faces(MotoMesh *self)
         }
 
         guint mem_size = moto_mesh_get_index_size(self) * td.tess_num;
-        g_print("td.tess_num: %d\n", td.tess_num);
         self->f_tess_verts = g_try_malloc(mem_size);
         guint16 *f_tess_verts = self->f_tess_verts16;
 

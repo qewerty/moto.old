@@ -257,6 +257,13 @@ const gchar *moto_world_get_name(MotoWorld *self)
 
 void moto_world_add_node(MotoWorld *self, MotoNode *node)
 {
+    const char* name = moto_node_get_name(node);
+    if(moto_world_get_node(self, name))
+    {
+        moto_error("Can't add node '%s' into the world. Name is busy.\n", name);
+        return;
+    }
+
     moto_node_set_world(node, self);
 
     g_mutex_lock(self->priv->node_list_mutex);
@@ -285,7 +292,17 @@ MotoNode *moto_world_create_node_by_name(MotoWorld *self,
 {
     MotoNode *node = moto_create_node_by_name(type_name, node_name);
     if(node)
+    {
+        int count = 0;
+        GString* new_name = g_string_new(moto_node_get_name(node));
+        while(moto_world_get_node(self, new_name->str))
+        {
+            g_string_printf(new_name, "%s%d", node_name, count++);
+        }
+
+        moto_node_set_name(node, new_name->str);
         moto_world_add_node(self, node);
+    }
 
     return node;
 }

@@ -1483,8 +1483,6 @@ static void update_param(MotoParam *param, gpointer user_data)
 
 void moto_node_update(MotoNode *self)
 {
-    g_print("moto_node_update: %s\n", moto_node_get_name(self));
-
     MotoNodePriv  *priv  = MOTO_NODE_GET_PRIVATE(self);
     MotoNodeClass *klass = MOTO_NODE_GET_CLASS(self);
 
