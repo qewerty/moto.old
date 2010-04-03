@@ -55,10 +55,19 @@ moto_rman_node_init(MotoRManNode *self)
 
     priv->out = NULL;
 
+    gfloat samples[] = {4, 4};
+    gfloat filter_size[] = {1, 1};
+
     /* params */
 
     moto_node_add_params(node,
             "target", "Target", MOTO_TYPE_RMAN_TARGET, MOTO_PARAM_MODE_INOUT, MOTO_RMAN_TARGET_3DELIGHT, NULL, "Arguments",
+            "samples", "Pixel Samples", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, samples, NULL, "Arguments",
+            "filter_size", "Filter Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, filter_size, NULL, "Arguments",
+            "ao", "Ambient Occlusion", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Global Illumination",
+            "gi_intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Global Illumination",
+            "gi_samples", "Samples", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 64.0, NULL, "Global Illumination",
+            "gi_max_dist", "Max Distance", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1e36, NULL, "Global Illumination",
             // "command", "Command", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
             NULL);
 }
@@ -334,6 +343,8 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     if(!world)
         return FALSE;
 
+    MotoObjectNode* camera = moto_world_get_camera(world);
+
     priv->out = fopen("last-render.rib", "wb");
 
     moto_rman_node_writeln(rman, 0, "# Moto last render");
@@ -343,11 +354,42 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     moto_rman_node_writeln(rman, 0, "Format 640 480 1");
     moto_rman_node_writeln(rman, 0, "PixelSamples 4 4");
     moto_rman_node_writeln(rman, 0, "PixelFilter \"catmull-rom\" 1 1");
-    moto_rman_node_writeln(rman, 0, "Projection \"perspective\" \"fov\" 65");
 
-    moto_rman_node_writeln(rman, 0, "LightSource \"distantlight\" 3 \"lightcolor\" [1 1 1] \"intensity\" [.8]");
+    if(camera)
+    {
+        gfloat fov = 60;
+        moto_node_get_param_float((MotoNode*)camera, "fov", &fov);
+        moto_rman_node_writeln(rman, 0, "Projection \"perspective\" \"fov\" [%f]", fov);
+    }
+    else
+    {
+        moto_rman_node_writeln(rman, 0, "Projection \"perspective\" \"fov\" [60]");
+    }
 
-    MotoObjectNode* camera = moto_world_get_camera(world);
+    gboolean ao = FALSE;
+    moto_node_get_param_boolean(self, "ao", &ao);
+
+    if(ao)
+    {
+        gfloat gi_intensity = 1.0;
+        gfloat gi_samples = 64;
+        gfloat gi_max_dist = 1e36;
+
+        moto_node_get_param_float(self, "gi_intensity", &gi_intensity);
+        moto_node_get_param_float(self, "gi_samples", &gi_samples);
+        moto_node_get_param_float(self, "gi_max_dist", &gi_max_dist);
+
+        moto_rman_node_writeln(rman, 0, "Attribute \"visibility\" \"trace\" [1]");
+        moto_rman_node_writeln(rman, 0, "Attribute \"visibility\" \"transmission\" \"opaque\"");
+
+        moto_rman_node_writeln(rman, 0, "LightSource \"occlight\" 0 \"float Kocc\" [%f] \" float samples\" [%f] \"float maxdist\" [%f]",
+            gi_intensity, gi_samples, gi_max_dist);
+    }
+    else
+    {
+        moto_rman_node_writeln(rman, 0, "LightSource \"distantlight\" 3 \"lightcolor\" [1 1 1] \"intensity\" [.8]");
+    }
+
     moto_rman_node_writeln(rman, 0, "# Camera object inverse");
     moto_rman_node_writeln(rman, 0, "Identity");
     moto_rman_node_writeln(rman, 0, "Scale 1 1 -1");
@@ -376,6 +418,8 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
 
     fclose(priv->out);
     priv->out = NULL;
+
+    system("renderdl last-render.rib");
 
     // moto_render_node_update_last_render_time(self);
 

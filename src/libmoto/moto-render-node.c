@@ -41,9 +41,9 @@ moto_render_node_init(MotoRenderNode *self)
     /* params */
 
     moto_node_add_params(node,
-        "size", "Widget/Height", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, size, NULL, "Arguments",
         "variation", "Variation", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Arguments",
-        "skip_untouched",  "Skip Untouched", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
+        "size", "Width/Height", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, size, NULL, "Arguments",
+        // "skip_untouched",  "Skip Untouched", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Optimization",
         NULL);
 }
 
