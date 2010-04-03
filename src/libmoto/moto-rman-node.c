@@ -56,6 +56,7 @@ moto_rman_node_init(MotoRManNode *self)
     priv->out = NULL;
 
     gfloat samples[] = {4, 4};
+    gint bucket_size[] = {12, 12};
     gfloat filter_size[] = {1, 1};
 
     /* params */
@@ -64,6 +65,8 @@ moto_rman_node_init(MotoRManNode *self)
             "target", "Target", MOTO_TYPE_RMAN_TARGET, MOTO_PARAM_MODE_INOUT, MOTO_RMAN_TARGET_3DELIGHT, NULL, "Arguments",
             "samples", "Pixel Samples", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, samples, NULL, "Arguments",
             "filter_size", "Filter Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, filter_size, NULL, "Arguments",
+            "grid_size", "Grid Size", MOTO_TYPE_INT, MOTO_PARAM_MODE_INOUT, 32, NULL, "Limits",
+            "bucket_size", "Bucket Size", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, bucket_size, NULL, "Limits",
             "ao", "Ambient Occlusion", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Global Illumination",
             "gi_intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Global Illumination",
             "gi_samples", "Samples", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 64.0, NULL, "Global Illumination",
@@ -331,6 +334,7 @@ static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *re
 
 static gboolean moto_rman_node_render(MotoRenderNode *self)
 {
+    MotoNode* node = (MotoNode*)self;
     MotoRManNode* rman = (MotoRManNode*)self;
     MotoRManNodePriv* priv = MOTO_RMAN_NODE_GET_PRIVATE(self);
     if(priv->out)
@@ -351,9 +355,25 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
 
     moto_rman_node_writeln(rman, 0, "Display \"last-render.tiff\" \"file\" \"rgb\"");
     moto_rman_node_writeln(rman, 0, "Display \"+last-render\" \"framebuffer\" \"rgb\"");
-    moto_rman_node_writeln(rman, 0, "Format 640 480 1");
-    moto_rman_node_writeln(rman, 0, "PixelSamples 4 4");
-    moto_rman_node_writeln(rman, 0, "PixelFilter \"catmull-rom\" 1 1");
+
+    gint size[2];
+    moto_node_get_param_2iv(node, "size", size);
+    moto_rman_node_writeln(rman, 0, "Format %d %d 1", size[0], size[1]);
+
+    gfloat samples[2] = {4, 4};
+    moto_node_get_param_2fv(node, "samples", samples);
+    moto_rman_node_writeln(rman, 0, "PixelSamples %f %f", samples[0], samples[1]);
+
+    gfloat filter_size[2] = {1, 1};
+    moto_node_get_param_2fv(node, "filter_size", filter_size);
+    moto_rman_node_writeln(rman, 0, "PixelFilter \"catmull-rom\" %f %f", filter_size[0], filter_size[1]);
+
+    gint grid_size = 32;
+    moto_node_get_param_int(node, "grid_size", &grid_size);
+    gint bucket_size[2] = {12, 12};
+    moto_node_get_param_2iv(node, "bucket_size", bucket_size);
+    moto_rman_node_writeln(rman, 0, "Option \"limits\" \"gridsize\" [%d] \"bucketsize\" [%d %d]",
+        grid_size, bucket_size[0], bucket_size[1]);
 
     if(camera)
     {
