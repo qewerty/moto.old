@@ -153,44 +153,11 @@ static void build_tree(GtkTreeStore* store, GtkTreeIter* parent_iter, MotoObject
 
     g_string_free(type_name, TRUE);
 
-    MotoParam* param = moto_node_get_param((MotoNode*)parent, "view");
-    if(param)
-    {
-        MotoParam* source = moto_param_get_source(param);
-        if(source)
-        {
-            MotoNode* view = moto_param_get_node(source);
-            if(view)
-            {
-                GtkTreeIter view_iter;
-
-                GString* type_name = g_string_new(g_type_name(G_TYPE_FROM_INSTANCE(view)));
-
-                g_string_erase(type_name, 0, strlen("Moto"));
-                g_string_erase(type_name, strlen(type_name->str) - 4, 4);
-
-                gtk_tree_store_append(store, &view_iter, &iter);
-                gtk_tree_store_set(store, &view_iter,
-                        0, moto_node_get_name((MotoNode*)view),
-                        1, type_name->str,
-                        2, view, -1);
-
-                g_string_free(type_name, TRUE);
-            }
-        }
-    }
-
-    param = moto_node_get_param((MotoNode*)parent, "transform");
-    if(!param)
-        return;
-
-    const GSList* child = moto_param_get_dests(param);
+    const GList* child = moto_node_get_children((MotoNode*)parent);
 
     for(; child; child = g_slist_next(child))
     {
-        MotoNode* node = moto_param_get_node(MOTO_PARAM(child->data));
-        if(MOTO_IS_OBJECT_NODE(node))
-            build_tree(store, &iter, (MotoObjectNode*)node);
+        build_tree(store, &iter, (MotoObjectNode*)child->data);
     }
 }
 
@@ -203,11 +170,7 @@ void moto_outliner_update(MotoOutliner *self)
     if(!priv->scene_node)
         return;
 
-    MotoObjectNode* root = moto_scene_node_get_root(priv->scene_node);
-    if(!root)
-        return;
-
-    build_tree(priv->ls, NULL, root);
+    build_tree(priv->ls, NULL, priv->scene_node);
 
     gtk_tree_view_expand_all(priv->tv);
 
