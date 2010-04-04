@@ -22,13 +22,7 @@ moto_graph_area_on_expose_event(GtkWidget *widget,
                                 gpointer data);
 
 static void
-moto_graph_area_on_realize(GtkWidget *widget, gpointer data);
-
-static gboolean
-moto_graph_area_on_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer data);
-
-static void
-moto_graph_area_draw(MotoGraphArea *self, gint width, gint height);
+moto_graph_area_draw(MotoGraphArea *self, cairo_t* cairo, gint width, gint height);
 
 /* class MotoGraphAreaNodeView */
 
@@ -105,24 +99,23 @@ GtkWidget *moto_graph_area_node_view_new(MotoNode *node)
 }
 
 static void
-moto_graph_area_node_view_draw(MotoGraphAreaNodeView *self)
+moto_graph_area_node_view_draw(MotoGraphAreaNodeView *self, cairo_t* cairo)
 {
-    glColor3f(0.6, 0.2, 0.1);
-    glBegin(GL_QUADS);
-        glVertex2f(self->x, self->y);
-        glVertex2f(self->x + self->width, self->y);
-        glVertex2f(self->x + self->width, self->y + self->height);
-        glVertex2f(self->x, self->y + self->height);
-    glEnd();
+    cairo_set_antialias(cairo, CAIRO_ANTIALIAS_NONE);
+    cairo_set_line_width(cairo, 1);
 
-    glLineWidth(1);
-    glColor3f(0.8, 0.8, 0.8);
-    glBegin(GL_LINE_LOOP);
-        glVertex2f(self->x, self->y);
-        glVertex2f(self->x + self->width, self->y);
-        glVertex2f(self->x + self->width, self->y + self->height);
-        glVertex2f(self->x, self->y + self->height);
-    glEnd();
+    cairo_rectangle(cairo, self->x, self->y, self->width, self->height);
+    cairo_set_source_rgb(cairo, 0.6, 0.2, 0.1);
+    cairo_fill(cairo);
+
+    cairo_rectangle(cairo, self->x, self->y, self->width, self->height);
+    cairo_set_source_rgb(cairo, 0.2, 0.2, 0.2);
+    cairo_stroke(cairo);
+
+    cairo_save(cairo);
+    cairo_translate(cairo, self->x, self->y - 2);
+    cairo_show_text(cairo, moto_node_get_name(self->node));
+    cairo_restore(cairo);
 }
 
 /* class MotoGraphArea */
@@ -190,10 +183,6 @@ moto_graph_area_init(MotoGraphArea *self)
 
     g_signal_connect(G_OBJECT(self), "expose-event",
         G_CALLBACK(moto_graph_area_on_expose_event), NULL);
-    g_signal_connect(G_OBJECT(self), "realize",
-        G_CALLBACK(moto_graph_area_on_realize), NULL);
-    g_signal_connect(G_OBJECT(self), "configure-event",
-        G_CALLBACK(moto_graph_area_on_configure_event), NULL);
 }
 
 static void
@@ -229,7 +218,7 @@ add_node_view(MotoSceneNode *scene_node, MotoNode *node, MotoGraphArea *area)
 
 GtkWidget *moto_graph_area_new(MotoSystem *system)
 {
-    if( ! system)
+    if(!system)
         return NULL;
 
     MotoSceneNode *scene_node = moto_system_get_current_scene(system);
@@ -239,8 +228,17 @@ GtkWidget *moto_graph_area_new(MotoSystem *system)
     MotoGraphArea *self = (MotoGraphArea *)g_object_new(MOTO_TYPE_GRAPH_AREA, NULL);
     MotoGraphAreaPriv *priv = MOTO_GRAPH_AREA_GET_PRIVATE(self);
 
+    /*
     moto_scene_node_foreach_node(scene_node, MOTO_TYPE_NODE,
         (MotoSceneNodeForeachNodeFunc)add_node_view, self);
+        */
+
+    const GList* child = moto_node_get_children((MotoNode*)scene_node);
+    for(; child; child = g_list_next(child))
+    {
+        MotoNode* node = (MotoNode*)child->data;
+        add_node_view(scene_node, node, self);
+    }
 
     g_object_add_weak_pointer(G_OBJECT(system), (gpointer *)( & priv->system));
 
@@ -290,86 +288,44 @@ moto_graph_area_on_expose_event(GtkWidget *widget,
                                 GdkEventExpose *event,
                                 gpointer data)
 {
-    if( ! GTK_WIDGET_REALIZED(widget))
+    if(!GTK_WIDGET_REALIZED(widget))
         return FALSE;
 
-    GdkGLContext  *gl_context  = gtk_widget_get_gl_context(widget);
-    GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
+    GdkWindow *window = widget->window;
+    GtkStyle *style = gtk_widget_get_style(widget);
 
-    if( ! GDK_IS_GL_DRAWABLE(gl_drawable))
-        return FALSE;
-    if( ! gdk_gl_drawable_gl_begin(gl_drawable, gl_context))
-        return FALSE;
+    gint width, height;
+    gdk_drawable_get_size(window, &width, &height);
 
-    gint width  = widget->allocation.width;
-    gint height = widget->allocation.height;
+    GdkRectangle rect = {0, 0, width, height};
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    gdk_window_begin_paint_rect(window, &rect);
 
-    moto_graph_area_draw(MOTO_GRAPH_AREA(widget), width, height);
+    cairo_t *cairo = gdk_cairo_create(window);
 
-    gdk_gl_drawable_swap_buffers(gl_drawable);
+    // Fill background.
+    cairo_rectangle(cairo, 0, 0, width, height);
+    cairo_set_source_rgb(cairo,
+            style->mid[0].red/255./255.,
+            style->mid[0].green/255./255.,
+            style->mid[0].blue/255./255.);
+    cairo_fill(cairo);
+
+    moto_graph_area_draw((MotoGraphArea*)widget, cairo, width, height);
+
+    gdk_window_end_paint(window);
 
     return TRUE;
 }
 
 static void
-moto_graph_area_on_realize(GtkWidget *widget, gpointer data)
-{
-    GdkGLContext  *gl_context  = gtk_widget_get_gl_context(widget);
-    GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
-
-    if( ! GDK_IS_GL_DRAWABLE(gl_drawable))
-        return;
-    if( ! gdk_gl_drawable_gl_begin(gl_drawable, gl_context))
-        return;
-
-    moto_gl_init();
-
-    glClearColor(0.2, 0.2, 0.2, 1.0);
-
-    gdk_gl_drawable_gl_end(gl_drawable);
-}
-
-static gboolean
-moto_graph_area_on_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer data)
-{
-    GdkGLContext *gl_context   = gtk_widget_get_gl_context(widget);
-    GdkGLDrawable *gl_drawable = gtk_widget_get_gl_drawable(widget);
-
-    if( ! GDK_IS_GL_DRAWABLE(gl_drawable))
-        return FALSE;
-    if( ! gdk_gl_drawable_gl_begin(gl_drawable, gl_context))
-        return FALSE;
-
-    gint width  = widget->allocation.width;
-    gint height = widget->allocation.height;
-
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, width, height, 0);
-
-    glMatrixMode(GL_MODELVIEW);
-    /*
-    glLoadIdentity();
-    glScalef(1, -1, 1);
-    glTranslatef(0, -height, 0);
-    */
-
-    gdk_gl_drawable_gl_end(gl_drawable);
-
-    return FALSE;
-}
-
-static void
-moto_graph_area_draw(MotoGraphArea *self, gint width, gint height)
+moto_graph_area_draw(MotoGraphArea *self, cairo_t* cairo, gint width, gint height)
 {
     MotoGraphAreaPriv *priv = MOTO_GRAPH_AREA_GET_PRIVATE(self);
 
     GList *nv = g_list_last(priv->node_views);
     for(; nv; nv = g_list_previous(nv))
     {
-        moto_graph_area_node_view_draw((MotoGraphAreaNodeView *)nv->data);
+        moto_graph_area_node_view_draw((MotoGraphAreaNodeView *)nv->data, cairo);
     }
 }
