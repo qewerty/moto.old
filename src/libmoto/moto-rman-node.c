@@ -185,37 +185,37 @@ static gboolean export_light(MotoSceneNode *scene_node, MotoNode *node, MotoRMan
             m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7],
             m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
 
-    MotoLightKind kind = MOTO_LIGHT_KIND_POINT;
+    MotoLightModel model = MOTO_LIGHT_MODEL_POINT;
     gfloat intensity = 1.0;
     gfloat color[3] = {1, 1, 1};
     gfloat decay = 2.0;
     gboolean diffspec[2] = {TRUE, TRUE};
 
-    moto_node_get_param_enum(source_node, "kind", &kind);
+    moto_node_get_param_enum(source_node, "model", &model);
     moto_node_get_param_2bv(source_node, "diffspec", diffspec);
     moto_node_get_param_float(source_node, "intensity", &intensity);
     moto_node_get_param_3fv(source_node, "color", color);
     moto_node_get_param_float(source_node, "decay", &decay);
 
-    if(MOTO_LIGHT_KIND_POINT == kind)
+    if(MOTO_LIGHT_MODEL_POINT == model)
     {
         moto_rman_node_writeln(render, 0, "LightSource \"pointlight\" 0 \"float __nondiffuse\" [%d] \"float __nonspecular\" [%d] "
             "\"float intensity\" [%f] \"color lightcolor\" [%f %f %f] \"float decay\" [%f]",
             !diffspec[0], !diffspec[1], intensity, color[0], color[1], color[2], decay);
     }
-    else if(MOTO_LIGHT_KIND_DISTANT == kind)
+    else if(MOTO_LIGHT_MODEL_DISTANT == model)
     {
         moto_rman_node_writeln(render, 0, "LightSource \"distantlight\" 0 \"float __nondiffuse\" [%d] \"float __nonspecular\" [%d] "
             "\"float intensity\" [%f] \"color lightcolor\" [%f %f %f]",
             !diffspec[0], !diffspec[1], intensity, color[0], color[1], color[2]);
     }
-    else if(MOTO_LIGHT_KIND_SPOT == kind)
+    else if(MOTO_LIGHT_MODEL_SPOT == model)
     {
         moto_rman_node_writeln(render, 0, "LightSource \"spotlight\" 0 \"float __nondiffuse\" [%d] \"float __nonspecular\" [%d] "
             "\"float intensity\" [%f] \"color lightcolor\" [%f %f %f] \"float decay\" [%f]",
             !diffspec[0], !diffspec[1], intensity, color[0], color[1], color[2], decay);
     }
-    else if(MOTO_LIGHT_KIND_CUSTOM == kind)
+    else if(MOTO_LIGHT_MODEL_CUSTOM == model)
     {}
 
     moto_rman_node_writeln(render, 0, "TransformEnd");

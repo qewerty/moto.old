@@ -24,18 +24,17 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
         return;
     }
 
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(scene);
+    MotoNode *obj = moto_node_create_child_by_name((MotoNode*)scene, "MotoObjectNode", "plane");
+    moto_node_set_scene_node(obj, scene); // TODO: Remove function 'moto_node_set_scene_node' later.
+    moto_scene_node_set_object_current(scene, (MotoObjectNode*)obj);
 
-    MotoNode *obj_node = moto_node_create_child_by_name((MotoNode*)root_node, "MotoObjectNode", "PlaneNode");
-    moto_scene_node_set_object_current(scene, (MotoObjectNode *)obj_node);
+    MotoNode *view = moto_node_create_child_by_name(obj,  "MotoMeshViewNode", "view");
+    MotoNode *plane = moto_node_create_child_by_name(obj, "MotoPlaneNode", "plane");
+    MotoNode *mat = moto_node_create_child_by_name(obj,  "MotoMaterialNode", "mat");
 
-    MotoNode *view_node = moto_node_create_child_by_name((MotoNode*)obj_node,  "MotoMeshViewNode", "PlaneView");
-    MotoNode *plane_node = moto_node_create_child_by_name((MotoNode*)obj_node, "MotoPlaneNode", "Plane");
-    MotoNode *mat_node = moto_node_create_child_by_name((MotoNode*)obj_node,   "MotoMaterialNode", "PlaneMaterial");
-
-    moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", plane_node, "mesh");
-    moto_node_link(obj_node, "material", mat_node, "material");
+    moto_node_link(obj, "view", view, "view");
+    moto_node_link(view, "mesh", plane, "mesh");
+    moto_node_link(obj, "material", mat, "material");
 }
 
 static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
@@ -254,7 +253,7 @@ static void perform_displace(MotoShelf *shelf, MotoSystem *system)
 
 static void create_light(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
+    if(!system)
     {
         moto_error("MotoShelf has no associated system.");
         return;
@@ -267,11 +266,10 @@ static void create_light(MotoShelf *shelf, MotoSystem *system)
         return;
     }
 
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "LightObject", NULL);
-    MotoNode *light_node = moto_scene_node_create_node_by_name(w, "MotoLightNode", "Light", NULL);
-    moto_node_link(obj_node, "view", light_node, "view");
+    MotoNode *object = moto_node_create_child_by_name((MotoNode*)w, "MotoObjectNode", "light");
+    MotoNode *light_node = moto_node_create_child_by_name(object, "MotoLightNode", "model");
 
-    moto_node_set_param_3f(obj_node, "r", 90, 0, 0);
+    moto_node_set_param_3f(object, "r", 90, 0, 0);
 }
 
 static void create_rman_node(MotoShelf *shelf, MotoSystem *system)

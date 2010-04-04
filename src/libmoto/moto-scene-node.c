@@ -459,9 +459,13 @@ void moto_scene_node_draw(MotoSceneNode *self, gint width, gint height)
 
     glColor4f(1, 1, 1, 1);
 
-    MotoObjectNode* root = moto_scene_node_get_root(self);
-    if(root)
-       moto_object_node_draw(root);
+    const GList* child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
+    {
+        MotoObjectNode* obj = (MotoObjectNode*)child->data;
+        if(MOTO_IS_OBJECT_NODE(obj))
+            moto_object_node_draw(obj);
+    }
 
     if(moto_scene_node_get_axes(self))
     {
