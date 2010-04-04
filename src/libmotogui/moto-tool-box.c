@@ -7,7 +7,7 @@
 #include "moto-tool-box.h"
 
 #include "libmoto/moto-messager.h"
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 #include "libmoto/moto-system.h"
 #include "libmoto/moto-node.h"
 #include "libmoto/moto-object-node.h"

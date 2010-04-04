@@ -1,5 +1,5 @@
 #include "libmoto/moto-messager.h"
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 #include "libmoto/moto-mesh-view-node.h"
 #include "libmoto/moto-extrude-node.h"
 #include "libmoto/moto-remove-faces-node.h"
@@ -11,30 +11,27 @@
 
 static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
+    if(!system)
     {
         moto_error("MotoShelf has no associated system.");
         return;
     }
 
-    MotoSceneNode *w = moto_system_get_current_scene(system);
-    if( ! w)
+    MotoSceneNode *scene = moto_system_get_current_scene(system);
+    if(!scene)
     {
-        moto_error("MotoSystem associated with the shelf has no current scene_node.");
+        moto_error("System associated with the shelf has no current scene_node.");
         return;
     }
 
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(w);
+    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(scene);
 
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "PlaneObject", NULL);
+    MotoNode *obj_node = moto_node_create_child_by_name((MotoNode*)root_node, "MotoObjectNode", "PlaneNode");
+    moto_scene_node_set_object_current(scene, (MotoObjectNode *)obj_node);
 
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_scene_node_set_object_current(w, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = moto_scene_node_create_node_by_name(w,  "MotoMeshViewNode", "PlaneView", NULL);
-    MotoNode *plane_node = moto_scene_node_create_node_by_name(w, "MotoPlaneNode", "Plane", NULL);
-    MotoNode *mat_node = moto_scene_node_create_node_by_name(w,   "MotoMaterialNode", "PlaneMaterial", NULL);
+    MotoNode *view_node = moto_node_create_child_by_name((MotoNode*)obj_node,  "MotoMeshViewNode", "PlaneView");
+    MotoNode *plane_node = moto_node_create_child_by_name((MotoNode*)obj_node, "MotoPlaneNode", "Plane");
+    MotoNode *mat_node = moto_node_create_child_by_name((MotoNode*)obj_node,   "MotoMaterialNode", "PlaneMaterial");
 
     moto_node_link(obj_node, "view", view_node, "view");
     moto_node_link(view_node, "mesh", plane_node, "mesh");

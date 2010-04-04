@@ -1,7 +1,7 @@
 #include <Python.h>
 
 #include "moto-system.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-library.h"
 #include "moto-node.h"
 #include "moto-messager.h"

@@ -237,8 +237,8 @@ void moto_node_update(MotoNode *self);
 void moto_node_undo(MotoNode *self);
 void moto_node_redo(MotoNode *self);
 
-MotoSceneNode *moto_node_get_scene(MotoNode *self);
-void moto_node_set_world(MotoNode *self, MotoSceneNode *scene);
+MotoSceneNode *moto_node_get_scene_node(MotoNode *self);
+void moto_node_set_scene_node(MotoNode *self, MotoSceneNode *scene);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
 

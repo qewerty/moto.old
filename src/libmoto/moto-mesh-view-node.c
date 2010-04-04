@@ -8,7 +8,7 @@
 #include "moto-mesh-view-node.h"
 #include "moto-enums.h"
 #include "moto-mesh.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 
 typedef enum
 {

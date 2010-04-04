@@ -24,7 +24,7 @@
 
 #include "moto-forward.h"
 #include "moto-system.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-node.h"
 #include "moto-object-node.h"
 #include "moto-geom-view-node.h"

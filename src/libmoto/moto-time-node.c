@@ -4,7 +4,7 @@
 #include "libmotoutil/xform.h"
 
 #include "moto-messager.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-types.h"
 #include "moto-time-node.h"
 

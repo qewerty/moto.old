@@ -4,7 +4,7 @@
 #include "GL/glu.h"
 
 #include "moto-types.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-messager.h"
 #include "moto-object-node.h"
 #include "moto-material-node.h"
@@ -1120,8 +1120,17 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
     MotoTransformInfo *tinfo)
 {
-    MotoGeomViewNode *view;
-    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
+    MotoGeomViewNode *view = NULL;
+
+    GList* child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
+    {
+        if(MOTO_IS_GEOM_VIEW_NODE(child->data))
+        {
+            view = (MotoGeomViewNode*)child->data;
+            break;
+        }
+    }
 
     if(view)
     {

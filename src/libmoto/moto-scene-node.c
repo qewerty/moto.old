@@ -7,7 +7,7 @@
 #include "moto-factory.h"
 #include "moto-marshal.h"
 
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-node.h"
 #include "moto-system.h"
 #include "moto-library.h"
@@ -598,7 +598,6 @@ typedef struct _MotoIntersectData
 
 static gboolean intersect_object(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
-
     MotoObjectNode *obj = (MotoObjectNode *)node;
     MotoIntersectData *idata = (MotoIntersectData *)user_data;
     gfloat dist;
@@ -613,16 +612,23 @@ static gboolean intersect_object(MotoSceneNode *scene_node, MotoNode *node, gpoi
     MotoBound bb;
     moto_bound_set_extended(& bb, b, scene_node->priv->select_bound_extent);
 
-    if( !  moto_ray_intersect_bound_dist(& ray, & dist, bb.bound))
+    if(!moto_ray_intersect_bound_dist(& ray, & dist, bb.bound))
         return TRUE;
 
-    if(( ! idata->obj) || dist < idata->dist)
+    if((!idata->obj) || dist < idata->dist)
     {
         if(dist > MICRO)
         {
             idata->obj = obj;
             idata->dist = dist;
         }
+    }
+
+    GList* child = moto_node_get_children(node);
+    for(; child; child = g_list_next(child))
+    {
+        if(intersect_object(scene_node, (MotoNode*)child->data, user_data))
+            return TRUE;
     }
 
     return TRUE;
@@ -660,6 +666,27 @@ void moto_scene_node_prepare_updateable_nodes(MotoSceneNode *self)
     
 }
 
+
+static gboolean __update_node(MotoNode* node)
+{
+    gboolean smth_updated = FALSE;
+
+    if(moto_node_is_ready_to_update(node) && moto_node_needs_update(node))
+    {
+        moto_node_update(node);
+        smth_updated = TRUE;
+    }
+
+    GList* child = moto_node_get_children(node);
+    for(; child; child = g_list_next(child))
+    {
+        if(__update_node((MotoNode*)child->data))
+            smth_updated = TRUE;
+    }
+
+    return smth_updated;
+}
+
 static void scene_node_update(MotoSceneNode *self)
 {
     MotoSceneNodePriv *priv = self->priv;
@@ -669,11 +696,8 @@ static void scene_node_update(MotoSceneNode *self)
     for(; l; l = g_slist_next(l))
     {
         MotoNode *node = (MotoNode*)l->data;
-        if(moto_node_is_ready_to_update(node) && moto_node_needs_update(node))
-        {
-            moto_node_update(node);
+        if(__update_node(node))
             smth_updated = TRUE;
-        }
     }
 
     if(smth_updated)

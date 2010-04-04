@@ -23,7 +23,7 @@
 #define __MOTO_SCENE_VIEW_H__
 
 #include <gtk/gtk.h>
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 
 G_BEGIN_DECLS
 

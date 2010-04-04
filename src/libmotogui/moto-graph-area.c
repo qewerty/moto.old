@@ -3,7 +3,7 @@
 #include <gtk/gtkgl.h>
 
 #include "libmotoutil/moto-gl.h"
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 #include "moto-graph-area.h"
 
 /* Misc */

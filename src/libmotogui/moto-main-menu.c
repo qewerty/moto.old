@@ -10,7 +10,7 @@
 #include "moto-main-menu.h"
 
 #include "libmoto/moto-render-node.h"
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 #include "libmoto/moto-system.h"
 #include "libmoto/moto-node.h"
 #include "libmotoutil/numdef.h"

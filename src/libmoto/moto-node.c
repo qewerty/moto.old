@@ -9,7 +9,7 @@
 #include "moto-filename.h"
 
 #include "moto-node.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-messager.h"
 #include "moto-variation.h"
 
@@ -281,6 +281,8 @@ MotoNode *moto_node_create_child(MotoNode *self, GType type, const gchar *name)
 
     MOTO_NODE_GET_PRIVATE(node)->parent = self;
     priv->children = g_list_append(priv->children, node);
+
+    moto_node_set_scene_node(node, moto_node_get_scene_node(self));
     return node;
 }
 

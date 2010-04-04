@@ -1,6 +1,6 @@
 #include <string.h>
 #include "moto-outliner.h"
-#include "libmoto/moto-world.h"
+#include "libmoto/moto-scene-node.h"
 #include "libmoto/moto-object-node.h"
 
 #include "moto-outliner.h"

@@ -7,7 +7,7 @@
 #include "moto-copyable.h"
 #include "moto-point-cloud.h"
 #include "moto-rman-node.h"
-#include "moto-world.h"
+#include "moto-scene-node.h"
 #include "moto-mesh.h"
 #include "moto-object-node.h"
 #include "moto-light-node.h"
