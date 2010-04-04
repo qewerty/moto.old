@@ -8,21 +8,23 @@
 static void moto_light_node_draw(MotoGeomViewNode *self);
 static void moto_light_node_prepare_for_draw(MotoGeomViewNode *self);
 
-/* MotoLightKind */
+/* MotoLightModel */
 
-GType moto_light_kind_get_type(void)
+GType moto_light_model_get_type(void)
 {
     static GType type = 0;
     if(0 == type)
     {
         static GEnumValue values[] = {
-            {MOTO_LIGHT_KIND_POINT, "LIGHT_KIND_POINT", "Point"},
-            {MOTO_LIGHT_KIND_DISTANT, "LIGHT_KIND_DISTANT", "Distant"},
-            {MOTO_LIGHT_KIND_SPOT, "LIGHT_KIND_SPOT", "Spot"},
-            {MOTO_LIGHT_KIND_CUSTOM, "LIGHT_KIND_CUSTOM", "Custom"},
+            {MOTO_LIGHT_MODEL_POINT, "LIGHT_MODEL_POINT", "Point"},
+            {MOTO_LIGHT_MODEL_DISTANT, "LIGHT_MODEL_DISTANT", "Distant"},
+            {MOTO_LIGHT_MODEL_SPOT, "LIGHT_MODEL_SPOT", "Spot"},
+            {MOTO_LIGHT_MODEL_AMBIENT, "LIGHT_MODEL_AMBIENT", "Ambient"},
+            {MOTO_LIGHT_MODEL_ENVIRONMENT, "LIGHT_MODEL_ENVIRONMENT", "Environment"},
+            {MOTO_LIGHT_MODEL_CUSTOM, "LIGHT_MODEL_CUSTOM", "Custom"},
             {0, NULL, NULL},
         };
-        type = g_enum_register_static("MotoLightKind", values);
+        type = g_enum_register_static("MotoLightModel", values);
     }
     return type;
 }
@@ -73,7 +75,7 @@ moto_light_node_init(MotoLightNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "kind", "Kind", MOTO_TYPE_LIGHT_KIND, MOTO_PARAM_MODE_INOUT, MOTO_LIGHT_KIND_POINT, NULL, "Light",
+            "model", "Model", MOTO_TYPE_LIGHT_MODEL, MOTO_PARAM_MODE_INOUT, MOTO_LIGHT_MODEL_POINT, NULL, "Light",
             "diffspec", "Diffuse/Specular", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, diffspec, NULL, "Light",
             "category", "Category", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Light",
             "intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Light",

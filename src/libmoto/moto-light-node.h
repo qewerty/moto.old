@@ -26,16 +26,18 @@
 
 G_BEGIN_DECLS
 
-typedef enum _MotoLightKind
+typedef enum _MotoLightModel
 {
-    MOTO_LIGHT_KIND_POINT,
-    MOTO_LIGHT_KIND_DISTANT,
-    MOTO_LIGHT_KIND_SPOT,
-    MOTO_LIGHT_KIND_CUSTOM,
-} MotoLightKind;
+    MOTO_LIGHT_MODEL_POINT,
+    MOTO_LIGHT_MODEL_DISTANT,
+    MOTO_LIGHT_MODEL_SPOT,
+    MOTO_LIGHT_MODEL_AMBIENT,
+    MOTO_LIGHT_MODEL_ENVIRONMENT,
+    MOTO_LIGHT_MODEL_CUSTOM,
+} MotoLightModel;
 
-GType moto_light_kind_get_type(void);
-#define MOTO_TYPE_LIGHT_KIND (moto_light_kind_get_type())
+GType moto_light_model_get_type(void);
+#define MOTO_TYPE_LIGHT_MODEL (moto_light_model_get_type())
 
 typedef struct _MotoLightNode MotoLightNode;
 typedef struct _MotoLightNodeClass MotoLightNodeClass;
