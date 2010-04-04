@@ -90,7 +90,7 @@ gboolean on_expose_event(GtkWidget *widget,
     cairo_set_antialias(ctx, CAIRO_ANTIALIAS_NONE);
     cairo_set_line_width(ctx, 1);
 
-    // background
+    // Fill background.
     cairo_rectangle(ctx, 0, 0, width, height);
     cairo_set_source_rgb(ctx,
             style->mid[0].red/255./255.,
@@ -98,7 +98,7 @@ gboolean on_expose_event(GtkWidget *widget,
             style->mid[0].blue/255./255.);
     cairo_fill(ctx);
 
-    // line
+    // Line.
     cairo_move_to(ctx, 0, height/(gfloat)2);
     cairo_line_to(ctx, width, height/(gfloat)2);
     cairo_set_source_rgb(ctx,
