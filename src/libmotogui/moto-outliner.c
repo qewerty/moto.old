@@ -1,3 +1,4 @@
+#include <string.h>
 #include "moto-outliner.h"
 #include "libmoto/moto-world.h"
 
@@ -118,11 +119,18 @@ __append_node(MotoWorld *world, MotoNode *node, MotoOutlinerPriv *priv)
 {
     GtkTreeIter iter;
 
+    GString* name = g_string_new(g_type_name(G_TYPE_FROM_INSTANCE(node)));
+
+    g_string_erase(name, 0, strlen("Moto"));
+    g_string_erase(name, strlen(name->str) - 4, 4);
+
     gtk_list_store_append(priv->ls, & iter);
     gtk_list_store_set(priv->ls, & iter,
             0, moto_node_get_name(node),
-            1, g_type_name(G_TYPE_FROM_INSTANCE(node)),
+            1, name->str,
             2, node, -1);
+
+    g_string_free(name, TRUE);
 
     return TRUE;
 }
