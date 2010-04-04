@@ -1245,7 +1245,7 @@ void moto_value_get_boolean_3(GValue *value, gboolean *v0, gboolean *v1, gboolea
 
 void moto_value_get_boolean_3_v(GValue *value, gboolean *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_3);
     gboolean *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gboolean)*3);
 }
@@ -1262,7 +1262,7 @@ void moto_value_get_boolean_4(GValue *value, gboolean *v0, gboolean *v1, gboolea
 
 void moto_value_get_boolean_4_v(GValue *value, gboolean *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_4);
     gboolean *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gboolean)*4);
 }
@@ -1295,7 +1295,7 @@ void moto_value_get_int_3(GValue *value, gint *v0, gint *v1, gint *v2)
 
 void moto_value_get_int_3_v(GValue *value, gint *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_3);
     gint *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gint)*3);
 }
@@ -1312,7 +1312,7 @@ void moto_value_get_int_4(GValue *value, gint *v0, gint *v1, gint *v2, gint *v3)
 
 void moto_value_get_int_4_v(GValue *value, gint *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_4);
     gint *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gint)*4);
 }
@@ -1345,7 +1345,7 @@ void moto_value_get_float_3(GValue *value, gfloat *v0, gfloat *v1, gfloat *v2)
 
 void moto_value_get_float_3_v(GValue *value, gfloat *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_FLOAT_3);
     gfloat *p = g_value_peek_pointer(value);
     memcpy(v, p, sizeof(gfloat)*3);
 }
@@ -1386,7 +1386,7 @@ void moto_value_set_boolean_2_v(GValue *value, const gboolean *v)
 
 void moto_value_set_boolean_3(GValue *value, gboolean v0, gboolean v1, gboolean v2)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_3);
     gboolean *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1395,14 +1395,14 @@ void moto_value_set_boolean_3(GValue *value, gboolean v0, gboolean v1, gboolean 
 
 void moto_value_set_boolean_3_v(GValue *value, const gboolean *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_3);
     gboolean *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gboolean)*3);
 }
 
 void moto_value_set_boolean_4(GValue *value, gboolean v0, gboolean v1, gboolean v2, gboolean v3)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_4);
     gboolean *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1412,7 +1412,7 @@ void moto_value_set_boolean_4(GValue *value, gboolean v0, gboolean v1, gboolean 
 
 void moto_value_set_boolean_4_v(GValue *value, const gboolean *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_BOOLEAN_4);
     gboolean *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gboolean)*4);
 }
@@ -1436,7 +1436,7 @@ void moto_value_set_int_2_v(GValue *value, const gint *v)
 
 void moto_value_set_int_3(GValue *value, gint v0, gint v1, gint v2)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_3);
     gint *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1445,14 +1445,14 @@ void moto_value_set_int_3(GValue *value, gint v0, gint v1, gint v2)
 
 void moto_value_set_int_3_v(GValue *value, const gint *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_3);
     gint *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gint)*3);
 }
 
 void moto_value_set_int_4(GValue *value, gint v0, gint v1, gint v2, gint v3)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_4);
     gint *p = g_value_peek_pointer(value);
     p[0] = v0;
     p[1] = v1;
@@ -1462,7 +1462,7 @@ void moto_value_set_int_4(GValue *value, gint v0, gint v1, gint v2, gint v3)
 
 void moto_value_set_int_4_v(GValue *value, const gint *v)
 {
-    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_2);
+    g_assert(G_VALUE_TYPE(value) == MOTO_TYPE_INT_4);
     gint *p = g_value_peek_pointer(value);
     memcpy(p, v, sizeof(gint)*4);
 }
