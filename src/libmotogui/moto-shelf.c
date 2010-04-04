@@ -255,6 +255,26 @@ static void perform_displace(MotoShelf *shelf, MotoSystem *system)
     perform_geom_op(shelf, system, "MotoDisplaceNode");
 }
 
+static void create_light(MotoShelf *shelf, MotoSystem *system)
+{
+    if( ! system)
+    {
+        moto_error("MotoShelf has no associated system.");
+        return;
+    }
+
+    MotoWorld *w = moto_system_get_current_world(system);
+    if( ! w)
+    {
+        moto_error("MotoSystem associated with the shelf has no current world.");
+        return;
+    }
+
+    MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "LightObject", NULL);
+    MotoNode *light_node = moto_world_create_node_by_name(w, "MotoLightNode", "Light", NULL);
+    moto_node_link(obj_node, "view", light_node, "view");
+}
+
 static void create_rman_node(MotoShelf *shelf, MotoSystem *system)
 {
     if( ! system)
@@ -368,7 +388,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
 
     moto_shelf_add_tab(self, "Render");
     moto_shelf_add_item(self, "Render", "Camera", NULL);
-    moto_shelf_add_item(self, "Render", "Light", NULL);
+    moto_shelf_add_item(self, "Render", "Light", create_light);
     moto_shelf_add_item(self, "Render", "RenderMan", create_rman_node);
 
     return (GtkWidget *)self;

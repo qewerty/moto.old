@@ -23,6 +23,7 @@
 #include "moto-ray-view-node.h"
 #include "moto-grid-view-node.h"
 #include "moto-axes-view-node.h"
+#include "moto-light-node.h"
 // #include "moto-nurbs-view-node.h"
 #include "moto-plane-node.h"
 #include "moto-cube-node.h"
@@ -162,6 +163,7 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_GRID_VIEW_NODE;
             MOTO_TYPE_AXES_VIEW_NODE;
             MOTO_TYPE_RAY_VIEW_NODE;
+            MOTO_TYPE_LIGHT_NODE;
         MOTO_TYPE_MATERIAL_NODE;
         MOTO_TYPE_DISPLACE_NODE;
         MOTO_TYPE_TWIST_NODE;

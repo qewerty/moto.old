@@ -96,6 +96,20 @@ static void quit(MotoTestWindow *self)
     gtk_main_quit();
 }
 
+static gboolean
+select_more(MotoWorld *world, MotoGeomViewNode *node, gpointer user_data)
+{
+    moto_geom_view_node_grow_selection(node);
+    return TRUE;
+}
+
+static gboolean
+select_less(MotoWorld *world, MotoGeomViewNode *node, gpointer user_data)
+{
+    moto_geom_view_node_select_less(node);
+    return TRUE;
+}
+
 gboolean on_key_press_event(GtkWidget   *widget,
                             GdkEventKey *event,
                             gpointer     user_data)
@@ -106,8 +120,12 @@ gboolean on_key_press_event(GtkWidget   *widget,
        0 == g_utf8_collate(event->string, "="))
     {
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
-        if( ! w)
+        if(!w)
             return FALSE;
+
+        moto_world_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoWorldForeachNodeFunc)select_more, NULL);
+
+        /*
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
@@ -117,6 +135,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
             return FALSE;
 
         moto_geom_view_node_grow_selection(gv);
+        */
+
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "-"))
@@ -124,6 +144,9 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoWorld *w = moto_system_get_current_world(self->priv->system);
         if( ! w)
             return FALSE;
+        moto_world_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoWorldForeachNodeFunc)select_less, NULL);
+
+        /*
         MotoObjectNode *ob = moto_world_get_current_object(w);
         if( ! ob)
             return FALSE;
@@ -132,6 +155,8 @@ gboolean on_key_press_event(GtkWidget   *widget,
         if( ! gv)
             return FALSE;
         moto_geom_view_node_select_less(gv);
+        */
+
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "i"))

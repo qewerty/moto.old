@@ -10,6 +10,7 @@
 #include "moto-world.h"
 #include "moto-mesh.h"
 #include "moto-object-node.h"
+#include "moto-light-node.h"
 #include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
 
@@ -25,10 +26,10 @@ GType moto_rman_target_get_type(void)
     if(0 == type)
     {
         static GEnumValue values[] = {
-            {MOTO_RMAN_TARGET_3DELIGHT, "MOTO_RMAN_TARGET_3DELIGHT", "3Delight"},
-            {MOTO_RMAN_TARGET_AQSIS, "MOTO_RMAN_TARGET_AQSIS", "Aqsis"},
-            {MOTO_RMAN_TARGET_PIXIE, "MOTO_RMAN_TARGET_PIXIE", "Pixie"},
-            {MOTO_RMAN_TARGET_PRMAN, "MOTO_RMAN_TARGET_PRMAN", "PRMan"},
+            {MOTO_RMAN_TARGET_3DELIGHT, "RMAN_TARGET_3DELIGHT", "3Delight"},
+            {MOTO_RMAN_TARGET_AQSIS, "RMAN_TARGET_AQSIS", "Aqsis"},
+            {MOTO_RMAN_TARGET_PIXIE, "RMAN_TARGET_PIXIE", "Pixie"},
+            {MOTO_RMAN_TARGET_PRMAN, "RMAN_TARGET_PRMAN", "PRMan"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoRManTarget", values);
@@ -149,6 +150,54 @@ void moto_rman_node_writeln(MotoRManNode *self, guint indent_num, const gchar *f
     va_end(ap);
 
     g_fprintf(out, "\n");
+}
+
+static gboolean export_light(MotoWorld *world, MotoNode *node, MotoRManNode *render)
+{
+    if(!moto_render_node_check_time((MotoRenderNode*)render,
+                                    moto_node_get_last_modified(node)))
+    {
+        ;//return TRUE;
+    }
+
+    MotoParam* param = moto_node_get_param(node, "view");
+    if(!param)
+        return TRUE;
+
+    MotoParam* source = moto_param_get_source(param);
+    if(!source)
+        return TRUE;
+
+    MotoNode* source_node = moto_param_get_node(source);
+    if(!source_node)
+        return TRUE;
+
+    if(!g_type_is_a(MOTO_TYPE_LIGHT_NODE, G_TYPE_FROM_INSTANCE(source_node)))
+        return TRUE;
+
+    moto_rman_node_writeln(render, 0, "TransformBegin");
+
+    const gfloat* m = \
+        moto_object_node_get_matrix((MotoObjectNode*)node, TRUE);
+
+    moto_rman_node_writeln(render, 1,
+        "ConcatTransform\n    [%f %f %f %f\n     %f %f %f %f\n     %f %f %f %f\n     %f %f %f %f]",
+            m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+
+    gfloat intensity = 1.0;
+    gfloat color[3] = {1, 1, 1};
+    gfloat decay = 2.0;
+
+    moto_node_get_param_float(source_node, "intensity", &intensity);
+    moto_node_get_param_3fv(source_node, "color", color);
+    moto_node_get_param_float(source_node, "decay", &decay);
+
+    moto_rman_node_writeln(render, 0, "LightSource \"pointlight\" 0 \"float intensity\" [%f] \"color lightcolor\" [%f %f %f] \"float decay\" [%f]",
+        intensity, color[0], color[1], color[2], decay);
+    moto_rman_node_writeln(render, 0, "TransformEnd");
+
+    return TRUE;
 }
 
 static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *render)
@@ -416,6 +465,9 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
 
     moto_rman_node_writeln(rman, 0, "FrameBegin 1");
     moto_rman_node_writeln(rman, 0, "WorldBegin");
+
+    moto_world_foreach_node(world, MOTO_TYPE_OBJECT_NODE,
+        (MotoWorldForeachNodeFunc)export_light, rman);
 
     moto_world_foreach_node(world, MOTO_TYPE_OBJECT_NODE,
         (MotoWorldForeachNodeFunc)export_object, rman);
