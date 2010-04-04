@@ -602,6 +602,9 @@ typedef struct _MotoIntersectData
 
 static gboolean intersect_object(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
+    if(!MOTO_IS_OBJECT_NODE(node))
+        return TRUE;
+
     MotoObjectNode *obj = (MotoObjectNode *)node;
     MotoIntersectData *idata = (MotoIntersectData *)user_data;
     gfloat dist;
@@ -696,10 +699,11 @@ static void scene_node_update(MotoSceneNode *self)
     MotoSceneNodePriv *priv = self->priv;
 
     gboolean smth_updated = FALSE;
-    GSList *l = priv->nodes;
-    for(; l; l = g_slist_next(l))
+
+    const GList* child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
     {
-        MotoNode *node = (MotoNode*)l->data;
+        MotoNode *node = (MotoNode*)child->data;
         if(__update_node(node))
             smth_updated = TRUE;
     }
@@ -812,8 +816,13 @@ void moto_scene_node_button_press(MotoSceneNode *self,
     vector3_dif(idata.ray.dir, point, idata.ray.pos);
     moto_ray_normalize(& idata.ray);
 
-    moto_scene_node_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
-            intersect_object, & idata);
+    const GList* child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
+    {
+        MotoNode* node = (MotoNode*)child->data;
+        if(MOTO_IS_OBJECT_NODE(node))
+            intersect_object(self, node, &idata);
+    }
 
     if(idata.obj)
     {

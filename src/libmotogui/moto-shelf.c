@@ -9,7 +9,9 @@
 
 /* Some items */
 
-static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
+static void 
+create_geometry(MotoShelf* shelf, MotoSystem* system,
+                const char* type_name, const char* name)
 {
     if(!system)
     {
@@ -24,12 +26,12 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
         return;
     }
 
-    MotoNode *obj = moto_node_create_child_by_name((MotoNode*)scene, "MotoObjectNode", "plane");
+    MotoNode *obj = moto_node_create_child_by_name((MotoNode*)scene, "MotoObjectNode", name);
     moto_node_set_scene_node(obj, scene); // TODO: Remove function 'moto_node_set_scene_node' later.
     moto_scene_node_set_object_current(scene, (MotoObjectNode*)obj);
 
     MotoNode *view = moto_node_create_child_by_name(obj,  "MotoMeshViewNode", "view");
-    MotoNode *plane = moto_node_create_child_by_name(obj, "MotoPlaneNode", "plane");
+    MotoNode *plane = moto_node_create_child_by_name(obj, type_name, name);
     MotoNode *mat = moto_node_create_child_by_name(obj,  "MotoMaterialNode", "mat");
 
     moto_node_link(obj, "view", view, "view");
@@ -37,128 +39,29 @@ static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
     moto_node_link(obj, "material", mat, "material");
 }
 
+static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
+{
+    create_geometry(shelf, system, "MotoPlaneNode", "plane");
+}
+
 static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoSceneNode *w = moto_system_get_current_scene(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current scene_node.");
-        return;
-    }
-
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(w);
-
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "CubeObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_scene_node_set_object_current(w, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = moto_scene_node_create_node_by_name(w, "MotoMeshViewNode", "CubeView", NULL);
-    MotoNode *cube_node = moto_scene_node_create_node_by_name(w, "MotoCubeNode", "Cube", NULL);
-    MotoNode *mat_node = moto_scene_node_create_node_by_name(w, "MotoMaterialNode", "CubeMaterial", NULL);
-
-    moto_node_link(obj_node,  "view", view_node, "view");
-    moto_node_link(view_node, "mesh", cube_node, "mesh");
-    moto_node_link(obj_node,  "material", mat_node, "material");
+    create_geometry(shelf, system, "MotoCubeNode", "cube");
 }
 
 static void create_mesh_sphere(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoSceneNode *w = moto_system_get_current_scene(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current scene_node.");
-        return;
-    }
-
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(w);
-
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "SphereObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_scene_node_set_object_current(w, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = moto_scene_node_create_node_by_name(w, "MotoMeshViewNode", "SphereView", NULL);
-    MotoNode *sphere_node = moto_scene_node_create_node_by_name(w, "MotoSphereNode", "Sphere", NULL);
-    MotoNode *mat_node = moto_scene_node_create_node_by_name(w, "MotoMaterialNode", "SphereMaterial", NULL);
-
-    moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", sphere_node, "mesh");
-    moto_node_link(obj_node, "material", mat_node, "material");
+    create_geometry(shelf, system, "MotoSphereNode", "sphere");
 }
 
 static void create_mesh_cylinder(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoSceneNode *w = moto_system_get_current_scene(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current scene_node.");
-        return;
-    }
-
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(w);
-
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "CylinderObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_scene_node_set_object_current(w, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = moto_scene_node_create_node_by_name(w, "MotoMeshViewNode", "CylinderView", NULL);
-    MotoNode *cylinder_node = moto_scene_node_create_node_by_name(w, "MotoCylinderNode", "Cylinder", NULL);
-    MotoNode *mat_node = moto_scene_node_create_node_by_name(w, "MotoMaterialNode", "CylinderMaterial", NULL);
-
-    moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", cylinder_node, "mesh");
-    moto_node_link(obj_node, "material", mat_node, "material");
+    create_geometry(shelf, system, "MotoCylinderNode", "cylinder");
 }
 
 static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
-    {
-        moto_error("MotoShelf has no associated system.");
-        return;
-    }
-
-    MotoSceneNode *w = moto_system_get_current_scene(system);
-    if( ! w)
-    {
-        moto_error("MotoSystem associated with the shelf has no current scene_node.");
-        return;
-    }
-
-    MotoNode *root_node = (MotoNode *)moto_scene_node_get_root(w);
-
-    MotoNode *obj_node = moto_scene_node_create_node_by_name(w, "MotoObjectNode", "MeshFileObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_scene_node_set_object_current(w, (MotoObjectNode *)obj_node);
-
-    MotoNode *view_node = moto_scene_node_create_node_by_name(w, "MotoMeshViewNode", "MeshFileView", NULL);
-    MotoNode *mf_node = moto_scene_node_create_node_by_name(w, "MotoMeshFileNode", "MeshFile", NULL);
-    MotoNode *mat_node = moto_scene_node_create_node_by_name(w, "MotoMaterialNode", "MeshFileMaterial", NULL);
-
-    moto_node_link(obj_node, "view", view_node, "view");
-    moto_node_link(view_node, "mesh", mf_node, "mesh");
-    moto_node_link(obj_node, "material", mat_node, "material");
+    create_geometry(shelf, system, "MotoMeshFileNode", "mesh_file");
 }
 
 static void perform_geom_op(MotoShelf *shelf, MotoSystem *system, const gchar *op_node_name)
@@ -267,14 +170,14 @@ static void create_light(MotoShelf *shelf, MotoSystem *system)
     }
 
     MotoNode *object = moto_node_create_child_by_name((MotoNode*)w, "MotoObjectNode", "light");
-    MotoNode *light_node = moto_node_create_child_by_name(object, "MotoLightNode", "model");
+    MotoNode *light = moto_node_create_child_by_name(object, "MotoLightNode", "model");
 
     moto_node_set_param_3f(object, "r", 90, 0, 0);
 }
 
 static void create_rman_node(MotoShelf *shelf, MotoSystem *system)
 {
-    if( ! system)
+    if(!system)
     {
         moto_error("MotoShelf has no associated system.");
         return;
@@ -287,7 +190,7 @@ static void create_rman_node(MotoShelf *shelf, MotoSystem *system)
         return;
     }
 
-    MotoNode *node = moto_scene_node_create_node_by_name(w, "MotoRManNode", "RenderMan", NULL);
+    moto_node_create_child_by_name((MotoNode*)w, "MotoRManNode", "rman");
 }
 
 /* class MotoShelf */
