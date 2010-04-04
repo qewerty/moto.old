@@ -273,6 +273,8 @@ static void create_light(MotoShelf *shelf, MotoSystem *system)
     MotoNode *obj_node = moto_world_create_node_by_name(w, "MotoObjectNode", "LightObject", NULL);
     MotoNode *light_node = moto_world_create_node_by_name(w, "MotoLightNode", "Light", NULL);
     moto_node_link(obj_node, "view", light_node, "view");
+
+    moto_node_set_param_3f(obj_node, "r", 90, 0, 0);
 }
 
 static void create_rman_node(MotoShelf *shelf, MotoSystem *system)
