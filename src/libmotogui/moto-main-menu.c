@@ -65,7 +65,7 @@ static void create_render_node(GtkMenuItem* item, MotoCreateRenderNodeData* data
         return;
     }
 
-    MotoWorld* w = moto_system_get_current_world(data->system);
+    MotoSceneNode* w = moto_system_get_current_scene(data->system);
     if(!w)
     {
         // TODO: Error.
@@ -73,7 +73,7 @@ static void create_render_node(GtkMenuItem* item, MotoCreateRenderNodeData* data
     }
 
     MotoNode* node = \
-        moto_world_create_node_by_name(w, g_type_name(data->type), "RenderMan", NULL);
+        moto_scene_node_create_node_by_name(w, g_type_name(data->type), "RenderMan", NULL);
 }
 
 static void free_MotoCreateRenderNodeData(gpointer data, GClosure *closure)
@@ -108,7 +108,7 @@ static void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data
     gtk_widget_show_all((GtkWidget*)menu);
 }
 
-static gboolean render(MotoWorld *world, MotoRenderNode *node, gpointer user_data)
+static gboolean render(MotoSceneNode *scene_node, MotoRenderNode *node, gpointer user_data)
 {
     g_print("render: %s\n", moto_node_get_name((MotoNode*)node));
     moto_render_node_render(node);
@@ -120,14 +120,14 @@ static void on_start_render_activate(GtkMenuItem *item, gpointer user_data)
 {
     MotoSystem* system = *((MotoSystem**)user_data);
 
-    MotoWorld* w = moto_system_get_current_world(system);
+    MotoSceneNode* w = moto_system_get_current_scene(system);
     if(!w)
         return;
 
     g_print("w: %p\n", w);
 
-    moto_world_foreach_node(w, MOTO_TYPE_RENDER_NODE,
-        (MotoWorldForeachNodeFunc)render, NULL);
+    moto_scene_node_foreach_node(w, MOTO_TYPE_RENDER_NODE,
+        (MotoSceneNodeForeachNodeFunc)render, NULL);
     g_print("---\n");
 }
 
@@ -176,14 +176,14 @@ moto_main_menu_init(MotoMainMenu *self)
     /* Root menu items. */
     GtkWidget *file = gtk_menu_item_new_with_label("File");
     GtkWidget *project = gtk_menu_item_new_with_label("Project");
-    GtkWidget *world = gtk_menu_item_new_with_label("World");
+    GtkWidget *scene = gtk_menu_item_new_with_label("Scene");
     GtkWidget *node = gtk_menu_item_new_with_label("Node");
     GtkWidget *render = gtk_menu_item_new_with_label("Render");
     GtkWidget *window = gtk_menu_item_new_with_label("Window");
     GtkWidget *help = gtk_menu_item_new_with_label("Help");
     gtk_menu_shell_append(menu_bar, file);
     gtk_menu_shell_append(menu_bar, project);
-    gtk_menu_shell_append(menu_bar, world);
+    gtk_menu_shell_append(menu_bar, scene);
     gtk_menu_shell_append(menu_bar, node);
     gtk_menu_shell_append(menu_bar, render);
     gtk_menu_shell_append(menu_bar, window);

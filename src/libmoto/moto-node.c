@@ -102,7 +102,7 @@ struct _MotoNodePriv
     guint id;
 
     GString *name;
-    MotoWorld *world;
+    MotoSceneNode *scene_node;
 
     MotoMappedList params;
     MotoMappedList pgroups;
@@ -195,7 +195,7 @@ moto_node_init(MotoNode *self)
     static guint id = 0;
 
     priv->name = g_string_new("");
-    priv->world = NULL;
+    priv->scene_node = NULL;
 
     moto_mapped_list_init(& priv->params);
     moto_mapped_list_init(& priv->pgroups);
@@ -317,6 +317,11 @@ guint moto_node_get_n_children(MotoNode *self)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
     return g_list_length(priv->children);
+}
+
+GList* moto_node_get_children(MotoNode *self)
+{
+    return MOTO_NODE_GET_PRIVATE(self)->children;
 }
 
 void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data)
@@ -1549,24 +1554,24 @@ gboolean moto_node_has_tag(MotoNode *self, const gchar *tag)
     return FALSE;
 }
 
-MotoWorld *moto_node_get_world(MotoNode *self)
+MotoSceneNode *moto_node_get_scene_node(MotoNode *self)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    return priv->world;
+    return priv->scene_node;
 }
 
-void moto_node_set_world(MotoNode *self, MotoWorld *world)
+void moto_node_set_scene_node(MotoNode *self, MotoSceneNode *scene_node)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
-    priv->world = world;
+    priv->scene_node = scene_node;
 }
 
 MotoLibrary *moto_node_get_library(MotoNode *self)
 {
-    MotoWorld *w = moto_node_get_world(self);
+    MotoSceneNode *w = moto_node_get_scene_node(self);
     if( ! w)
         return NULL;
-    return moto_world_get_library(w);
+    return moto_scene_node_get_library(w);
 }
 
 gboolean moto_node_depends_on(MotoNode *self, MotoNode *other)
@@ -2282,6 +2287,12 @@ void moto_param_unlink(MotoParam *self)
 {
     moto_param_unlink_source(self);
     moto_param_unlink_dests(self);
+}
+
+const GSList* moto_param_get_dests(MotoParam *self)
+{
+    MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
+    return priv->dests;
 }
 
 gboolean moto_param_has_dests(MotoParam *self)

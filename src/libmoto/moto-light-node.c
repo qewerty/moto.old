@@ -75,6 +75,7 @@ moto_light_node_init(MotoLightNode *self)
     moto_node_add_params(node,
             "kind", "Kind", MOTO_TYPE_LIGHT_KIND, MOTO_PARAM_MODE_INOUT, MOTO_LIGHT_KIND_POINT, NULL, "Light",
             "diffspec", "Diffuse/Specular", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, diffspec, NULL, "Light",
+            "category", "Category", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Light",
             "intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Light",
             "color", "Color", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, color, NULL, "Light",
             "decay", "Decay", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0, NULL, "Light",

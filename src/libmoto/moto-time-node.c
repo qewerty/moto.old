@@ -87,16 +87,16 @@ MotoTimeNode *moto_time_node_new(const gchar *name)
 
 static void _moto_time_node_update(MotoNode *self)
 {
-    MotoWorld *world = moto_node_get_world(self);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_node_get_scene_node(self);
+    if( ! scene_node)
     {
         /* TODO: Print smth? =) */
         return;
     }
 
     /*
-    self->priv->time = moto_world_get_current_time(world);
-    self->priv->frame = 1.0f + (gfloat)(moto_world_get_current_time(world) / moto_world_get_fps(world));
+    self->priv->time = moto_scene_node_get_current_time(scene_node);
+    self->priv->frame = 1.0f + (gfloat)(moto_scene_node_get_current_time(scene_node) / moto_scene_node_get_fps(scene_node));
     */
 
     /* Chain up updates to all nodes which depend on this. */

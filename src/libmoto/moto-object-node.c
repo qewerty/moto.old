@@ -165,8 +165,6 @@ moto_object_node_init(MotoObjectNode *self)
             "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec, "Transform/Misc",
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec, "Transform/Misc",
             "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
-            "parent", "Parent",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_IN, NULL, pspec, "Transform",
-            "transform", "Transform",  MOTO_TYPE_OBJECT_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Transform",
             "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
             "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
             "material", "Material", MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading/Material",
@@ -646,12 +644,11 @@ static void apply_global_transform(MotoObjectNode *self)
     glMultMatrixf(moto_object_node_get_matrix(self, TRUE));
 }
 
-void moto_object_node_draw_full(MotoObjectNode *self,
-        gboolean recursive, gboolean use_global)
+void moto_object_node_draw(MotoObjectNode *self)
 {
     gboolean visible;
     moto_node_get_param_boolean((MotoNode *)self, "visible", &visible);
-    if( ! visible)
+    if(!visible)
         return;
 
     MotoMaterialNode *mat;
@@ -659,12 +656,10 @@ void moto_object_node_draw_full(MotoObjectNode *self,
     MotoGeomViewNode *view;
     moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
-    if(use_global)
-        apply_global_transform(self);
-    else
-        apply_transform(self);
+    apply_global_transform(self);
 
     if(mat)
         moto_material_node_use(mat);
@@ -672,16 +667,21 @@ void moto_object_node_draw_full(MotoObjectNode *self,
     if(view)
         moto_geom_view_node_draw(view);
 
-    if(recursive)
+    GList* child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
     {
-        GSList *child = self->priv->children;
-        for(; child; child = g_slist_next(child))
-        {
-            moto_object_node_draw((MotoObjectNode *)child->data);
-        }
+        if(MOTO_IS_GEOM_VIEW_NODE(child->data))
+            moto_geom_view_node_draw((MotoGeomViewNode*)child->data);
     }
 
     glPopMatrix();
+
+    child = moto_node_get_children((MotoNode*)self);
+    for(; child; child = g_list_next(child))
+    {
+        if(MOTO_IS_OBJECT_NODE(child->data))
+            moto_object_node_draw((MotoObjectNode *)child->data);
+    }
 }
 
 void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3])

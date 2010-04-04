@@ -1788,7 +1788,7 @@ static void add_param_to_menu(MotoNode *node, MotoParam *param, MotoMakeNodeMenu
     }
 }
 
-static gboolean make_submenu_for_node(MotoWorld *world, MotoNode *node, MotoMakeNodeMenuData *data)
+static gboolean make_submenu_for_node(MotoSceneNode *scene_node, MotoNode *node, MotoMakeNodeMenuData *data)
 {
     if(node == data->node)
         return TRUE;
@@ -1820,16 +1820,16 @@ static void on_connect_button_clicked(GtkButton *button, MotoParam *param)
     MotoNode *node = moto_param_get_node(param);
     if( ! node)
         return;
-    MotoWorld *world = moto_node_get_world(node);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_node_get_scene_node(node);
+    if( ! scene_node)
         return;
 
     GtkMenu *menu = gtk_menu_new();
     g_object_weak_ref(G_OBJECT(menu), (GWeakNotify)on_menu_destroy, NULL);
 
     MotoMakeNodeMenuData data = {menu, moto_param_get_value_type(param), node};
-    moto_world_foreach_node(world, MOTO_TYPE_NODE,
-        (MotoWorldForeachNodeFunc)make_submenu_for_node, & data);
+    moto_scene_node_foreach_node(scene_node, MOTO_TYPE_NODE,
+        (MotoSceneNodeForeachNodeFunc)make_submenu_for_node, & data);
 
     gtk_widget_show_all((GtkWidget*)menu);
     gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 2, 0);

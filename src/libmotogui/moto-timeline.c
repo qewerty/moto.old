@@ -14,7 +14,7 @@ struct _MotoTimelinePriv
 {
     gboolean disposed;
 
-    MotoWorld *world;
+    MotoSceneNode *scene_node;
 };
 
 static void
@@ -47,7 +47,7 @@ moto_timeline_init(MotoTimeline *self)
     g_signal_connect(G_OBJECT(self), "expose-event",
                 G_CALLBACK(on_expose_event), NULL);
 
-    self->priv->world = NULL;
+    self->priv->scene_node = NULL;
 }
 
 static void
@@ -63,11 +63,11 @@ moto_timeline_class_init(MotoTimelineClass *klass)
 
 G_DEFINE_TYPE(MotoTimeline, moto_timeline, GTK_TYPE_DRAWING_AREA);
 
-GtkWidget *moto_timeline_new(MotoWorld *world)
+GtkWidget *moto_timeline_new(MotoSceneNode *scene_node)
 {
     MotoTimeline *self = (MotoTimeline *)g_object_new(MOTO_TYPE_TIMELINE, NULL);
 
-    self->priv->world = world;
+    self->priv->scene_node = scene_node;
 
     return (GtkWidget *)self;
 }

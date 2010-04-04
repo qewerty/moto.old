@@ -152,7 +152,7 @@ void moto_rman_node_writeln(MotoRManNode *self, guint indent_num, const gchar *f
     g_fprintf(out, "\n");
 }
 
-static gboolean export_light(MotoWorld *world, MotoNode *node, MotoRManNode *render)
+static gboolean export_light(MotoSceneNode *scene_node, MotoNode *node, MotoRManNode *render)
 {
     if(!moto_render_node_check_time((MotoRenderNode*)render,
                                     moto_node_get_last_modified(node)))
@@ -223,7 +223,7 @@ static gboolean export_light(MotoWorld *world, MotoNode *node, MotoRManNode *ren
     return TRUE;
 }
 
-static gboolean export_object(MotoWorld *world, MotoNode *node, MotoRManNode *render)
+static gboolean export_object(MotoSceneNode *scene_node, MotoNode *node, MotoRManNode *render)
 {
     if(!moto_render_node_check_time((MotoRenderNode*)render,
                                     moto_node_get_last_modified(node)))
@@ -406,11 +406,11 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
         priv->out = NULL;
     }
 
-    MotoWorld *world = moto_node_get_world((MotoNode*)self);
-    if(!world)
+    MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode*)self);
+    if(!scene_node)
         return FALSE;
 
-    MotoObjectNode* camera = moto_world_get_camera(world);
+    MotoObjectNode* camera = moto_scene_node_get_camera(scene_node);
 
     priv->out = fopen("last-render.rib", "wb");
 
@@ -487,15 +487,15 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     }
 
     moto_rman_node_writeln(rman, 0, "FrameBegin 1");
-    moto_rman_node_writeln(rman, 0, "WorldBegin");
+    moto_rman_node_writeln(rman, 0, "SceneNodeBegin");
 
-    moto_world_foreach_node(world, MOTO_TYPE_OBJECT_NODE,
-        (MotoWorldForeachNodeFunc)export_light, rman);
+    moto_scene_node_foreach_node(scene_node, MOTO_TYPE_OBJECT_NODE,
+        (MotoSceneNodeForeachNodeFunc)export_light, rman);
 
-    moto_world_foreach_node(world, MOTO_TYPE_OBJECT_NODE,
-        (MotoWorldForeachNodeFunc)export_object, rman);
+    moto_scene_node_foreach_node(scene_node, MOTO_TYPE_OBJECT_NODE,
+        (MotoSceneNodeForeachNodeFunc)export_object, rman);
 
-    moto_rman_node_writeln(rman, 0, "WorldEnd");
+    moto_rman_node_writeln(rman, 0, "SceneNodeEnd");
     moto_rman_node_writeln(rman, 0, "FrameEnd");
 
     fclose(priv->out);

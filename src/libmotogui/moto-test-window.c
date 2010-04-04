@@ -52,7 +52,7 @@ static GObjectClass *test_window_parent_class = NULL;
 struct _MotoTestWindowPriv
 {
     MotoSystem *system;
-    MotoWorld *world;
+    MotoSceneNode *scene_node;
 
     MotoGeomViewNode *gv;
 
@@ -97,14 +97,14 @@ static void quit(MotoTestWindow *self)
 }
 
 static gboolean
-select_more(MotoWorld *world, MotoGeomViewNode *node, gpointer user_data)
+select_more(MotoSceneNode *scene_node, MotoGeomViewNode *node, gpointer user_data)
 {
     moto_geom_view_node_grow_selection(node);
     return TRUE;
 }
 
 static gboolean
-select_less(MotoWorld *world, MotoGeomViewNode *node, gpointer user_data)
+select_less(MotoSceneNode *scene_node, MotoGeomViewNode *node, gpointer user_data)
 {
     moto_geom_view_node_select_less(node);
     return TRUE;
@@ -119,14 +119,14 @@ gboolean on_key_press_event(GtkWidget   *widget,
     if(0 == g_utf8_collate(event->string, "+") || \
        0 == g_utf8_collate(event->string, "="))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if(!w)
             return FALSE;
 
-        moto_world_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoWorldForeachNodeFunc)select_more, NULL);
+        moto_scene_node_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_more, NULL);
 
         /*
-        MotoObjectNode *ob = moto_world_get_current_object(w);
+        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
         MotoGeomViewNode *gv;
@@ -141,13 +141,13 @@ gboolean on_key_press_event(GtkWidget   *widget,
     }
     else if(0 == g_utf8_collate(event->string, "-"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
-        moto_world_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoWorldForeachNodeFunc)select_less, NULL);
+        moto_scene_node_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_less, NULL);
 
         /*
-        MotoObjectNode *ob = moto_world_get_current_object(w);
+        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
         MotoGeomViewNode *gv;
@@ -161,10 +161,10 @@ gboolean on_key_press_event(GtkWidget   *widget,
     }
     else if(0 == g_utf8_collate(event->string, "i"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
-        MotoObjectNode *ob = moto_world_get_current_object(w);
+        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
         MotoGeomViewNode *gv;
@@ -177,10 +177,10 @@ gboolean on_key_press_event(GtkWidget   *widget,
     else if(0 == g_utf8_collate(event->string, "z"))
     {
         // FIXME: TEMP
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
-        MotoObjectNode *ob = moto_world_get_current_object(w);
+        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
         MotoGeomViewNode *gv;
@@ -206,74 +206,74 @@ gboolean on_key_press_event(GtkWidget   *widget,
     }
     else if(0 == g_utf8_collate(event->string, "b"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
 
-        moto_world_set_use_vbo(w, ! moto_world_get_use_vbo(w));
+        moto_scene_node_set_use_vbo(w, ! moto_scene_node_get_use_vbo(w));
 
-        if(moto_world_get_use_vbo(w))
+        if(moto_scene_node_get_use_vbo(w))
             moto_info("VBO enabled");
         else
             moto_info("VBO disabled");
 
-        moto_world_reset(w);
+        moto_scene_node_reset(w);
         moto_test_window_redraw_3dview(self);
     }
     else if(0 == g_utf8_collate(event->string, "a"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
 
-        moto_world_set_use_arrays(w, ! moto_world_get_use_arrays(w));
+        moto_scene_node_set_use_arrays(w, ! moto_scene_node_get_use_arrays(w));
 
-        if(moto_world_get_use_arrays(w))
+        if(moto_scene_node_get_use_arrays(w))
             moto_info("Arrays enabled");
         else
             moto_info("Arrays disabled");
 
-        moto_world_reset(w);
+        moto_scene_node_reset(w);
         moto_test_window_redraw_3dview(self);
     }
     else if(0 == g_utf8_collate(event->string, "n"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
 
-        moto_world_set_show_normals(w, ! moto_world_get_show_normals(w));
+        moto_scene_node_set_show_normals(w, ! moto_scene_node_get_show_normals(w));
 
-        if(moto_world_get_show_normals(w))
+        if(moto_scene_node_get_show_normals(w))
             moto_info("Normals enabled");
         else
             moto_info("Normals disabled");
 
-        moto_world_reset(w);
+        moto_scene_node_reset(w);
         moto_test_window_redraw_3dview(self);
     }
     else if(0 == g_utf8_collate(event->string, "c"))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
 
-        moto_world_set_cull_faces(w, ! moto_world_get_cull_faces(w));
+        moto_scene_node_set_cull_faces(w, ! moto_scene_node_get_cull_faces(w));
 
-        if(moto_world_get_cull_faces(w))
+        if(moto_scene_node_get_cull_faces(w))
             moto_info("Cull enabled");
         else
             moto_info("Cull disabled");
 
-        moto_world_reset(w);
+        moto_scene_node_reset(w);
         moto_test_window_redraw_3dview(self);
     }
     else if(65289 == event->keyval && (GDK_CONTROL_MASK & event->state))
     {
-        MotoWorld *w = moto_system_get_current_world(self->priv->system);
+        MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
-        MotoObjectNode *ob = moto_world_get_current_object(w);
+        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
         MotoGeomViewNode *gv;
@@ -287,7 +287,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
     return FALSE;
 }
 
-gboolean redraw_world_idle(gpointer data)
+gboolean redraw_scene_node_idle(gpointer data)
 {
     MotoTestWindow *tw = (MotoTestWindow *)data;
     MotoSystem *system = tw->priv->system;
@@ -295,11 +295,11 @@ gboolean redraw_world_idle(gpointer data)
     if( ! system)
         return FALSE;
 
-    MotoWorld *world = moto_system_get_current_world(system);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_system_get_current_scene(system);
+    if( ! scene_node)
         return FALSE;
 
-    MotoNode *node = (MotoNode *)moto_world_get_current_object(world);
+    MotoNode *node = (MotoNode *)moto_scene_node_get_current_object(scene_node);
     if( ! node)
         return FALSE;
 
@@ -315,7 +315,7 @@ gboolean redraw_world_idle(gpointer data)
     return FALSE;
 }
 
-static void on_world_changed(MotoWorld* world, MotoTestWindow* window)
+static void on_scene_node_changed(MotoSceneNode* scene_node, MotoTestWindow* window)
 {
     moto_test_window_redraw_3dview(window);
     moto_test_window_update_param_editor(window);
@@ -336,37 +336,27 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->v2 = moto_variation_new("v2");
     moto_variation_set_parent(self->priv->v2, self->priv->v1);
 
-    MotoParam *param;
-
     self->priv->system = moto_system_new();
     moto_system_get_library(self->priv->system);
-    self->priv->world = moto_world_new("My Test World", moto_system_get_library(self->priv->system));
-    g_signal_connect(G_OBJECT(self->priv->world), "changed", G_CALLBACK(on_world_changed), self);
-    moto_system_add_world(self->priv->system, self->priv->world, TRUE);
+    self->priv->scene_node = moto_scene_node_new("MyTestSceneNode", moto_system_get_library(self->priv->system));
+    g_signal_connect(G_OBJECT(self->priv->scene_node), "changed", G_CALLBACK(on_scene_node_changed), self);
+    moto_system_add_scene(self->priv->system, self->priv->scene_node, TRUE);
 
-    MotoNode *root_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "Root", NULL);
-    moto_world_set_root(self->priv->world, (MotoObjectNode *)root_node);
+    MotoNode *root_node = moto_scene_node_create_node_by_name(self->priv->scene_node, "MotoObjectNode", "Root", NULL);
+    moto_scene_node_set_root(self->priv->scene_node, (MotoObjectNode *)root_node);
 
-    param = moto_node_get_param(root_node, "ty");
+    MotoNode *obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "GridObject");
+    MotoNode *grid_view_node = moto_node_create_child_by_name(obj_node, "MotoGridViewNode", "GridView");
 
-    MotoNode *obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "GridObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
+    obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "AxesObject");
+    MotoNode *axes_view_node = moto_node_create_child_by_name(obj_node, "MotoAxesViewNode", "AxesView");
 
-    MotoNode *grid_view_node = moto_world_create_node_by_name(self->priv->world, "MotoGridViewNode", "GridView", NULL);
-    moto_node_link(obj_node, "view", grid_view_node, "view");
-
-    obj_node = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "AxesObject", NULL);
-    moto_node_link(obj_node, "parent", root_node, "transform");
-
-    moto_world_set_axes(self->priv->world, (MotoObjectNode *)obj_node);
-
-    MotoNode *axes_view_node = moto_world_create_node_by_name(self->priv->world, "MotoAxesViewNode", "AxesView", NULL);
-    moto_node_link(obj_node, "view", axes_view_node, "view");
+    moto_scene_node_set_axes(self->priv->scene_node, (MotoObjectNode *)obj_node);
 
     // Camera.
-    MotoNode *cam_obj = moto_world_create_node_by_name(self->priv->world, "MotoObjectNode", "CameraObject", NULL);
-    // MotoNode *cam = moto_world_create_node_by_name(self->priv->world, "MotoCameraNode", "CameraObject");
-    moto_world_set_camera(self->priv->world, (MotoObjectNode *)cam_obj);
+    MotoNode *cam_obj = moto_scene_node_create_node_by_name(self->priv->scene_node, "MotoObjectNode", "CameraObject", NULL);
+    // MotoNode *cam = moto_scene_node_create_node_by_name(self->priv->scene_node, "MotoCameraNode", "CameraObject");
+    moto_scene_node_set_camera(self->priv->scene_node, (MotoObjectNode *)cam_obj);
 
     // Window
     self->priv->area = (GtkDrawingArea *)gtk_drawing_area_new();
@@ -388,7 +378,7 @@ moto_test_window_init(MotoTestWindow *self)
             GDK_BUTTON_PRESS_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_RELEASE_MASK |
             GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
 
-    moto_world_update(self->priv->world);
+    moto_scene_node_update(self->priv->scene_node);
 
     GtkBox *hbox = (GtkBox *)gtk_hbox_new(FALSE, 1);
 
@@ -412,7 +402,7 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->graph_area);
     gtk_notebook_append_page(notebook, sw0, gtk_label_new("Graph"));
 
-    self->priv->outliner = (MotoOutliner *)moto_outliner_new(self, self->priv->world);
+    self->priv->outliner = (MotoOutliner *)moto_outliner_new(self, self->priv->scene_node);
     sw0 = (GtkScrolledWindow *)gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(sw0, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_add_with_viewport(sw0, (GtkWidget *)self->priv->outliner);
@@ -427,7 +417,7 @@ moto_test_window_init(MotoTestWindow *self)
     gtk_box_pack_start(vbox, moto_main_menu_new(self->priv->system), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, moto_shelf_new(self->priv->system, (GtkWindow *)self), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, (GtkWidget *)hbox, TRUE, TRUE, 0);
-    gtk_box_pack_start(vbox, moto_timeline_new(self->priv->world), FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, moto_timeline_new(self->priv->scene_node), FALSE, FALSE, 0);
     gtk_box_pack_start(vbox, moto_message_bar_new(moto_messager_singleton()), FALSE, FALSE, 0);
 
     gtk_container_add(GTK_CONTAINER(self), (GtkWidget *)vbox);
@@ -483,7 +473,7 @@ GtkWindow *moto_test_window_new()
     GtkWindow *self = (GtkWindow *)g_object_new(MOTO_TYPE_TEST_WINDOW, NULL);
     // MotoTestWindow *twin = (MotoTestWindow *)self;
 
-    // MotoWorld *w = twin->priv->world;
+    // MotoSceneNode *w = twin->priv->scene_node;
     //
 
     twin = (MotoTestWindow *)self;
@@ -506,7 +496,7 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
     if(!self->priv->param_editor)
         return;
 
-    MotoNode *obj = (MotoNode *)moto_world_get_current_object(self->priv->world);
+    MotoNode *obj = (MotoNode *)moto_scene_node_get_current_object(self->priv->scene_node);
     if( ! obj)
         return;
 
@@ -568,7 +558,7 @@ draw(GtkWidget *widget,
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    moto_world_draw(twin->priv->world, width, height);
+    moto_scene_node_draw(twin->priv->scene_node, width, height);
 
     gdk_gl_drawable_swap_buffers(gl_drawable);
 
@@ -601,8 +591,8 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
     if( ! GTK_WIDGET_REALIZED(widget))
         return FALSE;
 
-    MotoWorld *world = twin->priv->world;
-    // MotoObjectNode *cam = moto_world_get_camera(world);
+    MotoSceneNode *scene_node = twin->priv->scene_node;
+    // MotoObjectNode *cam = moto_scene_node_get_camera(scene_node);
 
     gint width = widget->allocation.width;
     gint height = widget->allocation.height;
@@ -621,7 +611,7 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
             }
             else if( ! (event->state & GDK_SHIFT_MASK))
             {
-                moto_world_button_press(world, event->x, event->y, width, height);
+                moto_scene_node_button_press(scene_node, event->x, event->y, width, height);
             }
         break;
         case 2:
@@ -686,8 +676,8 @@ mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 
     if (!gdk_gl_drawable_gl_begin(gl_drawable, gl_context)) return FALSE;
 
-    MotoWorld *world = twin->priv->world;
-    MotoObjectNode *cam = moto_world_get_camera(world);
+    MotoSceneNode *scene_node = twin->priv->scene_node;
+    MotoObjectNode *cam = moto_scene_node_get_camera(scene_node);
 
     if(cam && move)
     {

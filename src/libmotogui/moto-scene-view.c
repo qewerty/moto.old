@@ -10,7 +10,7 @@ static GObjectClass *scene_view_parent_class = NULL;
 
 typedef struct
 {
-    MotoWorld* world;
+    MotoSceneNode* scene_node;
 } MotoSceneViewPriv;
 
 static void
@@ -31,7 +31,7 @@ moto_scene_view_init(MotoSceneView* self)
     GtkWidget* widget = (GtkWidget*)self;
     MotoSceneViewPriv* priv = MOTO_SCENE_VIEW_GET_PRIVATE(self);
 
-    priv->world = NULL;
+    priv->scene_node = NULL;
 
     GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS);
     gtk_widget_add_events(widget, GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
@@ -59,20 +59,20 @@ moto_scene_view_class_init(MotoSceneViewClass* klass)
 
 G_DEFINE_TYPE(MotoSceneView, moto_scene_view, GTK_TYPE_DRAWING_AREA);
 
-void on_world_destroyed(MotoSceneView* sv, MotoWorld* where_the_world_was)
+void on_scene_node_destroyed(MotoSceneView* sv, MotoSceneNode* where_the_scene_node_was)
 {
     MotoSceneViewPriv* priv = MOTO_SCENE_VIEW_GET_PRIVATE(sv);
-    priv->world = NULL;
+    priv->scene_node = NULL;
 }
 
-GtkWidget *moto_scene_view_new(MotoWorld* world)
+GtkWidget *moto_scene_view_new(MotoSceneNode* scene_node)
 {
     MotoSceneView *self = (MotoSceneView*)g_object_new(MOTO_TYPE_SCENE_VIEW, NULL);
     MotoSceneViewPriv* priv = MOTO_SCENE_VIEW_GET_PRIVATE(self);
 
-    priv->world = world;
-    if(world)
-        g_object_weak_ref(world, (GWeakNotify)on_world_destroyed, self);
+    priv->scene_node = scene_node;
+    if(scene_node)
+        g_object_weak_ref(scene_node, (GWeakNotify)on_scene_node_destroyed, self);
 
     return (GtkWidget*)self;
 }

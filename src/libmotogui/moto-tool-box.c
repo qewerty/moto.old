@@ -173,7 +173,7 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
 static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 {
-    moto_world_set_draw_mode(MOTO_WORLD(user_data),
+    moto_scene_node_set_draw_mode(MOTO_SCENE_NODE(user_data),
             *((MotoDrawMode*)g_object_get_data(G_OBJECT(item), "moto-draw-mode-enum-value")));
 }
 
@@ -196,10 +196,10 @@ void show_draw_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_system_get_current_scene(tb->priv->system);
+    if( ! scene_node)
     {
-        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+        moto_error("MotoSystem instance associated ToolBox has no current scene_node. I can do nothing.");
 
         return;
     }
@@ -215,7 +215,7 @@ void show_draw_mode_menu(GtkButton *button, gpointer user_data)
     {
         item = gtk_menu_item_new_with_label(ec->values[i].value_nick);
         g_object_set_data((GObject *)item, "moto-draw-mode-enum-value", & ec->values[i].value);
-        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_draw_mode), world);
+        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_draw_mode), scene_node);
 
         gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     }
@@ -236,18 +236,18 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_system_get_current_scene(tb->priv->system);
+    if( ! scene_node)
     {
-        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+        moto_error("MotoSystem instance associated ToolBox has no current scene_node. I can do nothing.");
 
         return;
     }
 
-    MotoObjectNode *object = moto_world_get_current_object(world);
+    MotoObjectNode *object = moto_scene_node_get_current_object(scene_node);
     if( ! object)
     {
-        moto_warning("MotoWorld instance associated ToolBox has no current object. I can do nothing.");
+        moto_warning("MotoSceneNode instance associated ToolBox has no current object. I can do nothing.");
 
         return;
     }
@@ -301,13 +301,13 @@ void do_fps_test(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoWorld *world = moto_system_get_current_world(tb->priv->system);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_system_get_current_scene(tb->priv->system);
+    if( ! scene_node)
     {
-        moto_error("MotoSystem instance associated ToolBox has no current world. I can do nothing.");
+        moto_error("MotoSystem instance associated ToolBox has no current scene_node. I can do nothing.");
 
         return;
     }
 
-    moto_world_draw_fps_test(world);
+    moto_scene_node_draw_fps_test(scene_node);
 }

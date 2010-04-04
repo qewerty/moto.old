@@ -55,12 +55,12 @@ GType moto_system_get_type(void);
 
 MotoSystem *moto_system_new();
 
-MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name);
-MotoWorld *moto_system_get_current_world(MotoSystem *self);
-void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current);
-void moto_system_delete_world(MotoSystem *self, MotoWorld *world);
-void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name);
-void moto_system_set_world_current(MotoSystem *self, MotoWorld *world);
+MotoSceneNode *moto_system_get_scene(MotoSystem *self, const gchar *name);
+MotoSceneNode *moto_system_get_current_scene(MotoSystem *self);
+void moto_system_add_scene(MotoSystem *self, MotoSceneNode *scene, gboolean set_current);
+void moto_system_delete_scene(MotoSystem *self, MotoSceneNode *scene);
+void moto_system_delete_scene_by_name(MotoSystem *self, const gchar *scene_name);
+void moto_system_set_scene_current(MotoSystem *self, MotoSceneNode *scene);
 
 MotoNode *moto_system_create_node(MotoSystem *self,
         const gchar *type_name, const gchar *node_path);

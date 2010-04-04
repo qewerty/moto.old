@@ -30,9 +30,9 @@ typedef struct _MotoSystem MotoSystem;
 typedef struct _MotoSystemClass MotoSystemClass;
 typedef struct _MotoSystemPriv MotoSystemPriv;
 
-typedef struct _MotoWorld MotoWorld;
-typedef struct _MotoWorldClass MotoWorldClass;
-typedef struct _MotoWorldPriv MotoWorldPriv;
+typedef struct _MotoSceneNode MotoSceneNode;
+typedef struct _MotoSceneNodeClass MotoSceneNodeClass;
+typedef struct _MotoSceneNodePriv MotoSceneNodePriv;
 
 typedef struct _MotoObjectNode MotoObjectNode;
 typedef struct _MotoObjectNodeClass MotoObjectNodeClass;

@@ -73,12 +73,8 @@ struct _MotoSystemPriv
 {
     MotoLibrary *library;
 
-    GSList *worlds;
-    MotoWorld *current_world;
-
-    GMutex *world_list_mutex;
-    GMutex *current_world_mutex;
-    GMutex *library_mutex;
+    GSList *scenes;
+    MotoSceneNode *current_scene;
 };
 
 static void
@@ -86,9 +82,9 @@ moto_system_dispose(GObject *obj)
 {
     MotoSystem *self = (MotoSystem *)obj;
 
-    // FIXME: Not thread-safe access to self->priv->worlds!!!
-    g_slist_foreach(self->priv->worlds, unref_gobject, NULL);
-    g_slist_free(self->priv->worlds);
+    // FIXME: Not thread-safe access to self->priv->scenes!!!
+    g_slist_foreach(self->priv->scenes, unref_gobject, NULL);
+    g_slist_free(self->priv->scenes);
     g_object_unref(self->priv->library);
     g_slice_free(MotoSystemPriv, self->priv);
 
@@ -118,10 +114,6 @@ moto_system_init(MotoSystem *self)
     moto_library_new_entry(self->priv->library, "mesh-loader",
             g_type_name(MOTO_TYPE_WOBJ_MESH_LOADER), moto_wobj_mesh_loader_new());
 #endif
-
-    self->priv->world_list_mutex    = g_mutex_new();
-    self->priv->current_world_mutex = g_mutex_new();
-    self->priv->library_mutex       = g_mutex_new();
 }
 
 static void
@@ -178,109 +170,91 @@ MotoSystem *moto_system_new()
 {
     MotoSystem *self = (MotoSystem *)g_object_new(MOTO_TYPE_SYSTEM, NULL);
 
-    g_mutex_lock(self->priv->library_mutex);
     // MotoLibrary *lib = self->priv->library;
-    g_mutex_unlock(self->priv->library_mutex);
 
     return self;
 }
 
-MotoWorld *moto_system_get_world(MotoSystem *self, const gchar *name)
+MotoSceneNode *moto_system_get_scene_node(MotoSystem *self, const gchar *name)
 {
-    g_mutex_lock(self->priv->world_list_mutex);
-    MotoWorld *world = NULL;
-    GSList *w = self->priv->worlds;
+    MotoSceneNode *scene_node = NULL;
+    GSList *w = self->priv->scenes;
     for(; w; w = g_slist_next(w))
     {
-        if(g_utf8_collate(moto_world_get_name((MotoWorld *)w->data), name) == 0)
+        if(g_utf8_collate(moto_scene_node_get_name((MotoSceneNode *)w->data), name) == 0)
         {
-            world = (MotoWorld *)w->data;
+            scene_node = (MotoSceneNode *)w->data;
             break;
         }
     }
-    g_mutex_unlock(self->priv->world_list_mutex);
-    return world;
+    return scene_node;
 }
 
-MotoWorld *moto_system_get_current_world(MotoSystem *self)
+MotoSceneNode *moto_system_get_current_scene(MotoSystem *self)
 {
-    g_mutex_lock(self->priv->current_world_mutex);
-    MotoWorld *world = self->priv->current_world;
-    g_mutex_unlock(self->priv->current_world_mutex);
-    return world;
+    MotoSceneNode *scene_node = self->priv->current_scene;
+    return scene_node;
 }
 
-void moto_system_add_world(MotoSystem *self, MotoWorld *world, gboolean set_current)
+void moto_system_add_scene(MotoSystem *self, MotoSceneNode *scene_node, gboolean set_current)
 {
-    if(moto_system_get_world(self, moto_world_get_name(world)))
+    if(moto_system_get_scene_node(self, moto_scene_node_get_name(scene_node)))
     {
-        moto_warning("World \"%s\" is already in the system. I won't add it again.", moto_world_get_name(world));
+        moto_warning("SceneNode \"%s\" is already in the system. I won't add it again.", moto_scene_node_get_name(scene_node));
 
-        /* If set_current is TRUE, world will be set as current in any case. */
+        /* If set_current is TRUE, scene_node will be set as current in any case. */
         if(set_current)
-            moto_system_set_world_current(self, world);
+            moto_system_set_scene_current(self, scene_node);
 
         return;
     }
 
-    g_mutex_lock(self->priv->world_list_mutex);
-    g_object_ref(G_OBJECT(world));
-    self->priv->worlds = g_slist_append(self->priv->worlds, world);
-    g_mutex_unlock(self->priv->world_list_mutex);
+    g_object_ref(G_OBJECT(scene_node));
+    self->priv->scenes = g_slist_append(self->priv->scenes, scene_node);
 
     if(set_current)
-        moto_system_set_world_current(self, world);
+        moto_system_set_scene_current(self, scene_node);
 }
 
-void moto_system_delete_world(MotoSystem *self, MotoWorld *world)
+void moto_system_delete_scene_node(MotoSystem *self, MotoSceneNode *scene_node)
 {
-    g_mutex_lock(self->priv->world_list_mutex);
-    if( ! g_slist_find(self->priv->worlds, world))
+    if( ! g_slist_find(self->priv->scenes, scene_node))
     {
-        moto_warning("World \"%s\" is not in the system. Nothing to delete.", moto_world_get_name(world));
+        moto_warning("SceneNode \"%s\" is not in the system. Nothing to delete.", moto_scene_node_get_name(scene_node));
 
-        g_mutex_unlock(self->priv->world_list_mutex);
         return;
     }
-    self->priv->worlds = g_slist_remove(self->priv->worlds, world);
-    g_mutex_unlock(self->priv->world_list_mutex);
+    self->priv->scenes = g_slist_remove(self->priv->scenes, scene_node);
 
-    g_object_unref(G_OBJECT(world));
+    g_object_unref(G_OBJECT(scene_node));
 }
 
-void moto_system_delete_world_by_name(MotoSystem *self, const gchar *world_name)
+void moto_system_delete_scene_node_by_name(MotoSystem *self, const gchar *scene_node_name)
 {
-    MotoWorld *world = moto_system_get_world(self, world_name);
+    MotoSceneNode *scene_node = moto_system_get_scene_node(self, scene_node_name);
 
-    if( ! world)
+    if( ! scene_node)
     {
-        moto_error("System has no world with name \"%s\". Nothing to delete.", world_name);
+        moto_error("System has no scene_node with name \"%s\". Nothing to delete.", scene_node_name);
         return;
     }
 
-    moto_system_delete_world(self, world);
+    moto_system_delete_scene_node(self, scene_node);
 }
 
-void moto_system_set_world_current(MotoSystem *self, MotoWorld *world)
+void moto_system_set_scene_current(MotoSystem *self, MotoSceneNode *scene_node)
 {
-    g_mutex_lock(self->priv->world_list_mutex);
-    if( ! g_slist_find(self->priv->worlds, world))
+    if( ! g_slist_find(self->priv->scenes, scene_node))
     {
-        g_mutex_unlock(self->priv->world_list_mutex);
-        moto_warning("World \"%s\" is not in the system. I won't set it current.", moto_world_get_name(world));
+        moto_warning("SceneNode \"%s\" is not in the system. I won't set it current.", moto_scene_node_get_name(scene_node));
         return;
     }
-    g_mutex_unlock(self->priv->world_list_mutex);
 
-    g_mutex_lock(self->priv->current_world_mutex);
-    self->priv->current_world = world;
-    g_mutex_unlock(self->priv->current_world_mutex);
+    self->priv->current_scene = scene_node;
 }
 
 MotoLibrary *moto_system_get_library(MotoSystem *self)
 {
-    g_mutex_lock(self->priv->library_mutex);
     MotoLibrary *lib = self->priv->library;
-    g_mutex_unlock(self->priv->library_mutex);
     return lib;
 }

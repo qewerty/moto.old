@@ -210,7 +210,7 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
 {
     MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
 
-    MotoWorld* world = moto_node_get_world((MotoNode*)mv);
+    MotoSceneNode* scene_node = moto_node_get_scene_node((MotoNode*)mv);
 
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glPushAttrib(GL_ENABLE_BIT);
@@ -221,11 +221,11 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    if(moto_world_get_cull_faces(world))
+    if(moto_scene_node_get_cull_faces(scene_node))
         glEnable(GL_CULL_FACE);
 
     gboolean force_arrays = FALSE;
-    force_arrays = ! moto_world_get_use_vbo(world);
+    force_arrays = ! moto_scene_node_get_use_vbo(scene_node);
     if(moto_gl_is_vbo_supported() && ! force_arrays) // VBO used if supported
     {
         if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
@@ -263,7 +263,7 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
     }
     else // Vertex arrays
     {
-        MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+        MotoDrawMode draw_mode = moto_scene_node_get_draw_mode(scene_node);
         if(MOTO_DRAW_MODE_SOLID == draw_mode)
         {
             MotoMeshFace16 *f_data = mesh->f_data16;
@@ -287,7 +287,7 @@ inline static void draw_mesh_as_object(MotoMeshViewNode *mv, MotoMesh *mesh)
         }
         else
         {
-            if(!moto_world_get_use_arrays(world))
+            if(!moto_scene_node_get_use_arrays(scene_node))
             {
                 moto_info("Using simple face cycles");
                 MotoMeshFace16 *f_data = mesh->f_data16;
@@ -337,9 +337,9 @@ inline static void draw_mesh_as_verts(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glDepthFunc(GL_LEQUAL);
 
     gboolean force_arrays = FALSE;
-    MotoWorld *world = moto_node_get_world((MotoNode *)mv);
-    if(world)
-        force_arrays = ! moto_world_get_use_vbo(world);
+    MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode *)mv);
+    if(scene_node)
+        force_arrays = ! moto_scene_node_get_use_vbo(scene_node);
 
     gboolean using_vbo = TRUE;
     if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
@@ -466,9 +466,9 @@ inline static void draw_mesh_as_edges(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glEnableClientState(GL_VERTEX_ARRAY);
 
     gboolean force_arrays = FALSE;
-    MotoWorld *world = moto_node_get_world((MotoNode *)mv);
-    if(world)
-        force_arrays = ! moto_world_get_use_vbo(world);
+    MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode *)mv);
+    if(scene_node)
+        force_arrays = ! moto_scene_node_get_use_vbo(scene_node);
     if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
     {
         g_print("Initializng VBO for 'edge' drawing mode ... ");
@@ -585,7 +585,7 @@ static unsigned long stipple_mask[] = {
 inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, MotoMeshSelection *selection)
 {
     MotoMeshViewNodePriv *priv = MOTO_MESH_VIEW_NODE_GET_PRIVATE(mv);
-    MotoWorld *world = moto_node_get_world((MotoNode *)mv);
+    MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode *)mv);
 
     glPushAttrib(GL_ENABLE_BIT);
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
@@ -599,7 +599,7 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
 
     glDisable(GL_CULL_FACE);
-    if(moto_world_get_cull_faces(world))
+    if(moto_scene_node_get_cull_faces(scene_node))
         glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -619,8 +619,8 @@ inline static void draw_mesh_as_faces(MotoMeshViewNode *mv, MotoMesh *mesh, Moto
     gluTessCallback(tess, GLU_TESS_ERROR, tessCallbackError);
     // gluTessCallback(tess, GLU_TESS_COMBINE, tessCallbackCombine);
 
-    gboolean show_normals = moto_world_get_show_normals(world);
-    MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+    gboolean show_normals = moto_scene_node_get_show_normals(scene_node);
+    MotoDrawMode draw_mode = moto_scene_node_get_draw_mode(scene_node);
 
     glEnable(GL_LIGHTING);
 
@@ -773,8 +773,8 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self)
 
     glShadeModel(GL_SMOOTH);
 
-    MotoWorld* world = moto_node_get_world(MOTO_NODE(self));
-    MotoDrawMode draw_mode = moto_world_get_draw_mode(world);
+    MotoSceneNode* scene_node = moto_node_get_scene_node(MOTO_NODE(self));
+    MotoDrawMode draw_mode = moto_scene_node_get_draw_mode(scene_node);
     switch(draw_mode)
     {
         case MOTO_DRAW_MODE_BBOX_WIREFRAME:

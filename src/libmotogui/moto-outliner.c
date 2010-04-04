@@ -1,6 +1,7 @@
 #include <string.h>
 #include "moto-outliner.h"
 #include "libmoto/moto-world.h"
+#include "libmoto/moto-object-node.h"
 
 #include "moto-outliner.h"
 #include "moto-test-window.h"
@@ -21,7 +22,7 @@ static GObjectClass *outliner_parent_class = NULL;
 
 struct _MotoOutlinerPriv
 {
-    MotoWorld *world;
+    MotoSceneNode *scene_node;
     MotoTestWindow *window;
 
     GtkListStore *ls;
@@ -41,7 +42,7 @@ moto_outliner_finalize(GObject *obj)
 {
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(obj);
 
-    g_object_remove_weak_pointer(G_OBJECT(priv->world), (gpointer *) & priv->world);
+    g_object_remove_weak_pointer(G_OBJECT(priv->scene_node), (gpointer *) & priv->scene_node);
     g_object_unref(priv->tv);
     g_object_unref(priv->ls);
 
@@ -53,10 +54,10 @@ moto_outliner_init(MotoOutliner *self)
 {
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
-    priv->world = NULL;
+    priv->scene_node = NULL;
     priv->window = NULL;
 
-    priv->ls = (GtkListStore *)gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, MOTO_TYPE_NODE);
+    priv->ls = (GtkListStore *)gtk_tree_store_new(3, G_TYPE_STRING, G_TYPE_STRING, MOTO_TYPE_NODE);
 
     priv->tv = (GtkTreeView *)gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->ls));
     gtk_tree_view_set_rules_hint(priv->tv, TRUE);
@@ -96,16 +97,16 @@ moto_outliner_class_init(MotoOutlinerClass *klass)
 
 G_DEFINE_TYPE(MotoOutliner, moto_outliner, GTK_TYPE_VBOX);
 
-GtkWidget *moto_outliner_new(MotoTestWindow *window, MotoWorld *world)
+GtkWidget *moto_outliner_new(MotoTestWindow *window, MotoSceneNode *scene_node)
 {
-    g_return_val_if_fail(world, NULL);
+    g_return_val_if_fail(scene_node, NULL);
 
 
     MotoOutliner *self = (MotoOutliner *)g_object_new(MOTO_TYPE_OUTLINER, NULL);
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
-    priv->world = world;
-    g_object_add_weak_pointer(G_OBJECT(world), (gpointer *) & priv->world);
+    priv->scene_node = scene_node;
+    g_object_add_weak_pointer(G_OBJECT(scene_node), (gpointer *) & priv->scene_node);
 
     priv->window = window;
 
@@ -115,7 +116,7 @@ GtkWidget *moto_outliner_new(MotoTestWindow *window, MotoWorld *world)
 }
 
 static gboolean
-__append_node(MotoWorld *world, MotoNode *node, MotoOutlinerPriv *priv)
+__append_node(MotoSceneNode *scene_node, MotoNode *node, MotoOutlinerPriv *priv)
 {
     GtkTreeIter iter;
 
@@ -135,17 +136,85 @@ __append_node(MotoWorld *world, MotoNode *node, MotoOutlinerPriv *priv)
     return TRUE;
 }
 
+static void build_tree(GtkTreeStore* store, GtkTreeIter* parent_iter, MotoObjectNode* parent)
+{
+    GtkTreeIter iter;
+
+    GString* type_name = g_string_new(g_type_name(G_TYPE_FROM_INSTANCE(parent)));
+
+    g_string_erase(type_name, 0, strlen("Moto"));
+    g_string_erase(type_name, strlen(type_name->str) - 4, 4);
+
+    gtk_tree_store_append(store, &iter, parent_iter);
+    gtk_tree_store_set(store, &iter,
+            0, moto_node_get_name((MotoNode*)parent),
+            1, type_name->str,
+            2, parent, -1);
+
+    g_string_free(type_name, TRUE);
+
+    MotoParam* param = moto_node_get_param((MotoNode*)parent, "view");
+    if(param)
+    {
+        MotoParam* source = moto_param_get_source(param);
+        if(source)
+        {
+            MotoNode* view = moto_param_get_node(source);
+            if(view)
+            {
+                GtkTreeIter view_iter;
+
+                GString* type_name = g_string_new(g_type_name(G_TYPE_FROM_INSTANCE(view)));
+
+                g_string_erase(type_name, 0, strlen("Moto"));
+                g_string_erase(type_name, strlen(type_name->str) - 4, 4);
+
+                gtk_tree_store_append(store, &view_iter, &iter);
+                gtk_tree_store_set(store, &view_iter,
+                        0, moto_node_get_name((MotoNode*)view),
+                        1, type_name->str,
+                        2, view, -1);
+
+                g_string_free(type_name, TRUE);
+            }
+        }
+    }
+
+    param = moto_node_get_param((MotoNode*)parent, "transform");
+    if(!param)
+        return;
+
+    const GSList* child = moto_param_get_dests(param);
+
+    for(; child; child = g_slist_next(child))
+    {
+        MotoNode* node = moto_param_get_node(MOTO_PARAM(child->data));
+        if(MOTO_IS_OBJECT_NODE(node))
+            build_tree(store, &iter, (MotoObjectNode*)node);
+    }
+}
+
 void moto_outliner_update(MotoOutliner *self)
 {
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(self);
 
-    gtk_list_store_clear(priv->ls);
+    gtk_tree_store_clear(priv->ls);
 
-    if( ! priv->world)
+    if(!priv->scene_node)
         return;
 
-    moto_world_foreach_node(priv->world, MOTO_TYPE_NODE,
-            (MotoWorldForeachNodeFunc)__append_node, priv);
+    MotoObjectNode* root = moto_scene_node_get_root(priv->scene_node);
+    if(!root)
+        return;
+
+    build_tree(priv->ls, NULL, root);
+
+    gtk_tree_view_expand_all(priv->tv);
+
+    /*
+    moto_scene_node_foreach_node(priv->scene_node, MOTO_TYPE_OBJECT_NODE,
+            (MotoSceneNodeForeachNodeFunc)__append_node, priv);
+            */
 }
 
 static  void 

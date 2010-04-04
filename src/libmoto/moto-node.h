@@ -81,6 +81,7 @@ MotoNode *moto_node_create_child_by_name(MotoNode *self,
     const gchar *type_name, const gchar *name);
 MotoNode *moto_node_get_child(MotoNode *self, const gchar *name);
 guint moto_node_get_n_children(MotoNode *self);
+GList* moto_node_get_children(MotoNode *self);
 void moto_node_foreach_children(MotoNode *self, GFunc func, gpointer user_data);
 
 MotoNode *moto_node_get_parent(MotoNode *self);
@@ -236,8 +237,8 @@ void moto_node_update(MotoNode *self);
 void moto_node_undo(MotoNode *self);
 void moto_node_redo(MotoNode *self);
 
-MotoWorld *moto_node_get_world(MotoNode *self);
-void moto_node_set_world(MotoNode *self, MotoWorld *world);
+MotoSceneNode *moto_node_get_scene(MotoNode *self);
+void moto_node_set_world(MotoNode *self, MotoSceneNode *scene);
 
 MotoLibrary *moto_node_get_library(MotoNode *self);
 
@@ -395,6 +396,7 @@ void moto_param_unlink_dests(MotoParam *self);
 /* Just calls moto_param_unlink_source and moto_param_unlink_dests. */
 void moto_param_unlink(MotoParam *self);
 
+const GSList* moto_param_get_dests(MotoParam *self);
 gboolean moto_param_has_dests(MotoParam *self);
 
 /* May be FALSE if source is invalid or when limits are exceeded.  */

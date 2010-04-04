@@ -57,7 +57,7 @@ GType moto_timeline_get_type(void);
 #define MOTO_IS_TIMELINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_TIMELINE))
 #define MOTO_TIMELINE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_TIMELINE, MotoTimelineClass))
 
-GtkWidget *moto_timeline_new(MotoWorld *world);
+GtkWidget *moto_timeline_new(MotoSceneNode *scene_node);
 
 G_END_DECLS
 

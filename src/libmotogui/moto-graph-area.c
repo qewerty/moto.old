@@ -212,7 +212,7 @@ moto_graph_area_class_init(MotoGraphAreaClass *klass)
 G_DEFINE_TYPE(MotoGraphArea, moto_graph_area, GTK_TYPE_DRAWING_AREA);
 
 static gboolean
-add_node_view(MotoWorld *world, MotoNode *node, MotoGraphArea *area)
+add_node_view(MotoSceneNode *scene_node, MotoNode *node, MotoGraphArea *area)
 {
     MotoGraphAreaPriv *priv = MOTO_GRAPH_AREA_GET_PRIVATE(area);
 
@@ -232,15 +232,15 @@ GtkWidget *moto_graph_area_new(MotoSystem *system)
     if( ! system)
         return NULL;
 
-    MotoWorld *world = moto_system_get_current_world(system);
-    if( ! world)
+    MotoSceneNode *scene_node = moto_system_get_current_scene(system);
+    if( ! scene_node)
         return NULL;
 
     MotoGraphArea *self = (MotoGraphArea *)g_object_new(MOTO_TYPE_GRAPH_AREA, NULL);
     MotoGraphAreaPriv *priv = MOTO_GRAPH_AREA_GET_PRIVATE(self);
 
-    moto_world_foreach_node(world, MOTO_TYPE_NODE,
-        (MotoWorldForeachNodeFunc)add_node_view, self);
+    moto_scene_node_foreach_node(scene_node, MOTO_TYPE_NODE,
+        (MotoSceneNodeForeachNodeFunc)add_node_view, self);
 
     g_object_add_weak_pointer(G_OBJECT(system), (gpointer *)( & priv->system));
 

@@ -27,7 +27,7 @@ static void unref_gobject(gpointer data, gpointer user_data)
 }
 
 
-/* class World */
+/* class SceneNode */
 
 /* for mutex factory */
 static gpointer create_mutex(gpointer user_data)
@@ -41,9 +41,9 @@ static void free_mutex(GQuark key_id, gpointer data, gpointer user_data)
 
 #define get_mutex(factory, name) ((GMutex *)moto_factory_get(factory, name))
 
-static GObjectClass *world_parent_class = NULL;
+static GObjectClass *scene_node_parent_class = NULL;
 
-struct _MotoWorldPriv
+struct _MotoSceneNodePriv
 {
     GString *name;
     GString *filename;
@@ -81,7 +81,7 @@ struct _MotoWorldPriv
     GMutex *camera_object_mutex;
     GMutex *axes_object_mutex;
 
-    MotoWorldManipulator *manipulator;
+    MotoSceneNodeManipulator *manipulator;
 
     MotoDrawMode draw_mode;
 
@@ -101,10 +101,10 @@ struct _MotoWorldPriv
 };
 
 static void
-moto_world_dispose(GObject *obj)
+moto_scene_node_dispose(GObject *obj)
 {
-    MotoWorld *self = (MotoWorld *)obj;
-    MotoWorldPriv *priv = self->priv;
+    MotoSceneNode *self = (MotoSceneNode *)obj;
+    MotoSceneNodePriv *priv = self->priv;
 
     g_timer_destroy(priv->timer);
 
@@ -115,35 +115,35 @@ moto_world_dispose(GObject *obj)
     g_slist_free(priv->selected_nodes);
 
     g_string_free(priv->filename, TRUE);
-    g_slice_free(MotoWorldPriv, priv);
+    g_slice_free(MotoSceneNodePriv, priv);
 
     if(priv->thread_pool)
         g_thread_pool_free(priv->thread_pool, TRUE, FALSE);
     g_list_free(priv->updateable_nodes);
 
-    G_OBJECT_CLASS(world_parent_class)->dispose(obj);
+    G_OBJECT_CLASS(scene_node_parent_class)->dispose(obj);
 }
 
 static void
-moto_world_finalize(GObject *obj)
+moto_scene_node_finalize(GObject *obj)
 {
-    world_parent_class->finalize(obj);
+    scene_node_parent_class->finalize(obj);
 }
 
 static gboolean
-test_manip_button_press(MotoWorldManipulator *manip, MotoWorld *world,
+test_manip_button_press(MotoSceneNodeManipulator *manip, MotoSceneNode *scene_node,
         gint x, gint y, gint width, gint height, gpointer user_data)
 {
     return FALSE;
 }
 
 static void
-moto_world_init(MotoWorld *self)
+moto_scene_node_init(MotoSceneNode *self)
 {
-    MotoWorldPriv *priv = self->priv = g_slice_new(MotoWorldPriv);
+    MotoSceneNodePriv *priv = self->priv = g_slice_new(MotoSceneNodePriv);
 
     priv->library = NULL;
-    priv->manipulator = moto_world_manipulator_new();
+    priv->manipulator = moto_scene_node_manipulator_new();
 
     g_signal_connect(self->priv->manipulator, "button-press", G_CALLBACK(test_manip_button_press), NULL);
 
@@ -194,14 +194,14 @@ moto_world_init(MotoWorld *self)
 }
 
 static void
-moto_world_class_init(MotoWorldClass *klass)
+moto_scene_node_class_init(MotoSceneNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass*)klass;
 
-    world_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    scene_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose  = moto_world_dispose;
-    goclass->finalize = moto_world_finalize;
+    goclass->dispose  = moto_scene_node_dispose;
+    goclass->finalize = moto_scene_node_finalize;
 
     klass->updated_signal_id = g_signal_newv ("updated",
                  G_TYPE_FROM_CLASS (klass),
@@ -226,13 +226,13 @@ moto_world_class_init(MotoWorldClass *klass)
                  NULL  /* param_types */);
 }
 
-G_DEFINE_TYPE(MotoWorld, moto_world, G_TYPE_OBJECT);
+G_DEFINE_TYPE(MotoSceneNode, moto_scene_node, MOTO_TYPE_NODE);
 
-/* Methods of class World */
+/* Methods of class SceneNode */
 
-MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
+MotoSceneNode *moto_scene_node_new(const gchar *name, MotoLibrary *lib)
 {
-    MotoWorld *self = (MotoWorld *)g_object_new(MOTO_TYPE_WORLD, NULL);
+    MotoSceneNode *self = (MotoSceneNode *)g_object_new(MOTO_TYPE_SCENE_NODE, NULL);
 
     g_string_assign(self->priv->name, name);
     self->priv->library = lib;
@@ -240,31 +240,31 @@ MotoWorld *moto_world_new(const gchar *name, MotoLibrary *lib)
     return self;
 }
 
-MotoWorld *moto_world_new_from_dump(const gchar *filename, MotoLibrary *lib)
+MotoSceneNode *moto_scene_node_new_from_dump(const gchar *filename, MotoLibrary *lib)
 {
-    MotoWorld *self = moto_world_new("", lib);
+    MotoSceneNode *self = moto_scene_node_new("", lib);
 
-    /* load world from dump */
+    /* load scene_node from dump */
         /* Loading ... */
 
     return self;
 }
 
-const gchar *moto_world_get_name(MotoWorld *self)
+const gchar *moto_scene_node_get_name(MotoSceneNode *self)
 {
     return self->priv->name->str;
 }
 
-void moto_world_add_node(MotoWorld *self, MotoNode *node)
+void moto_scene_node_add_node(MotoSceneNode *self, MotoNode *node)
 {
     const char* name = moto_node_get_name(node);
-    if(moto_world_get_node(self, name))
+    if(moto_scene_node_get_node(self, name))
     {
-        moto_error("Can't add node '%s' into the world. Name is busy.\n", name);
+        moto_error("Can't add node '%s' into the scene_node. Name is busy.\n", name);
         return;
     }
 
-    moto_node_set_world(node, self);
+    moto_node_set_scene_node(node, self);
 
     g_mutex_lock(self->priv->node_list_mutex);
     self->priv->nodes = g_slist_append(self->priv->nodes, node);
@@ -273,19 +273,19 @@ void moto_world_add_node(MotoWorld *self, MotoNode *node)
     g_signal_emit_by_name(self, "changed");
 }
 
-MotoNode *moto_world_create_node(MotoWorld *self,
+MotoNode *moto_scene_node_create_node(MotoSceneNode *self,
         GType type,
         const gchar *node_name,
         const gchar *path)
 {
     MotoNode *node = moto_create_node(type, node_name);
     if(node)
-        moto_world_add_node(self, node);
+        moto_scene_node_add_node(self, node);
 
     return node;
 }
 
-MotoNode *moto_world_create_node_by_name(MotoWorld *self,
+MotoNode *moto_scene_node_create_node_by_name(MotoSceneNode *self,
         const gchar *type_name,
         const gchar *node_name,
         const gchar *path)
@@ -295,48 +295,48 @@ MotoNode *moto_world_create_node_by_name(MotoWorld *self,
     {
         int count = 0;
         GString* new_name = g_string_new(moto_node_get_name(node));
-        while(moto_world_get_node(self, new_name->str))
+        while(moto_scene_node_get_node(self, new_name->str))
         {
             g_string_printf(new_name, "%s%d", node_name, count++);
         }
 
         moto_node_set_name(node, new_name->str);
-        moto_world_add_node(self, node);
+        moto_scene_node_add_node(self, node);
     }
 
     return node;
 }
 
-void moto_world_binary_dump(MotoWorld *self,
+void moto_scene_node_binary_dump(MotoSceneNode *self,
         const gchar *filename, gboolean change_filename)
 {
 
 }
 
-void moto_world_xml_dump(MotoWorld *self,
+void moto_scene_node_xml_dump(MotoSceneNode *self,
         const gchar *filename, gboolean change_filename)
 {
 
 }
 
-void moto_world_binary_dump_selected(MotoWorld *self,
+void moto_scene_node_binary_dump_selected(MotoSceneNode *self,
         const gchar *filename, gboolean change_filename)
 {
 
 }
 
-void moto_world_xml_dump_selected(MotoWorld *self,
+void moto_scene_node_xml_dump_selected(MotoSceneNode *self,
         const gchar *filename, gboolean change_filename)
 {
 
 }
 
-void moto_world_merge(MotoWorld *self, MotoWorld *other)
+void moto_scene_node_merge(MotoSceneNode *self, MotoSceneNode *other)
 {
 
 }
 
-MotoObjectNode *moto_world_get_current_object(MotoWorld *self)
+MotoObjectNode *moto_scene_node_get_current_object(MotoSceneNode *self)
 {
     g_mutex_lock(self->priv->current_object_mutex);
     MotoObjectNode *co = self->priv->current_object;
@@ -344,14 +344,14 @@ MotoObjectNode *moto_world_get_current_object(MotoWorld *self)
     return co;
 }
 
-void moto_world_set_object_current(MotoWorld *self, MotoObjectNode *obj)
+void moto_scene_node_set_object_current(MotoSceneNode *self, MotoObjectNode *obj)
 {
     g_mutex_lock(self->priv->current_object_mutex);
     self->priv->current_object = obj;
     g_mutex_unlock(self->priv->current_object_mutex);
 }
 
-MotoObjectNode *moto_world_get_root(MotoWorld *self)
+MotoObjectNode *moto_scene_node_get_root(MotoSceneNode *self)
 {
     g_mutex_lock(self->priv->root_object_mutex);
     MotoObjectNode *root = self->priv->root;
@@ -359,15 +359,15 @@ MotoObjectNode *moto_world_get_root(MotoWorld *self)
     return root;
 }
 
-void moto_world_set_root(MotoWorld *self, MotoObjectNode *root)
+void moto_scene_node_set_root(MotoSceneNode *self, MotoObjectNode *root)
 {
-    /* TODO: Check that new root is a node in this world! */
+    /* TODO: Check that new root is a node in this scene_node! */
     g_mutex_lock(self->priv->root_object_mutex);
     self->priv->root = root;
     g_mutex_unlock(self->priv->root_object_mutex);
 }
 
-MotoObjectNode * moto_world_get_camera(MotoWorld *self)
+MotoObjectNode * moto_scene_node_get_camera(MotoSceneNode *self)
 {
     g_mutex_lock(self->priv->camera_object_mutex);
     MotoObjectNode *cam = self->priv->camera;
@@ -375,14 +375,14 @@ MotoObjectNode * moto_world_get_camera(MotoWorld *self)
     return cam;
 }
 
-void moto_world_set_camera(MotoWorld *self, MotoObjectNode *camera)
+void moto_scene_node_set_camera(MotoSceneNode *self, MotoObjectNode *camera)
 {
     g_mutex_lock(self->priv->camera_object_mutex);
     self->priv->camera = camera;
     g_mutex_unlock(self->priv->camera_object_mutex);
 }
 
-MotoObjectNode * moto_world_get_axes(MotoWorld *self)
+MotoObjectNode * moto_scene_node_get_axes(MotoSceneNode *self)
 {
     g_mutex_lock(self->priv->axes_object_mutex);
     MotoObjectNode *axes = self->priv->global_axes;
@@ -390,28 +390,21 @@ MotoObjectNode * moto_world_get_axes(MotoWorld *self)
     return axes;
 }
 
-void moto_world_set_axes(MotoWorld *self, MotoObjectNode *axes)
+void moto_scene_node_set_axes(MotoSceneNode *self, MotoObjectNode *axes)
 {
     g_mutex_lock(self->priv->axes_object_mutex);
     self->priv->global_axes = axes;
     g_mutex_unlock(self->priv->axes_object_mutex);
 }
 
-static gboolean __draw_object(MotoWorld *world, MotoNode *node, gpointer user_data)
+void moto_scene_node_redraw(MotoSceneNode *self)
 {
-    moto_object_node_draw_full((MotoObjectNode *)node, FALSE, TRUE);
-
-    return TRUE;
+    moto_scene_node_draw(self, self->priv->prev_width, self->priv->prev_height);
 }
 
-void moto_world_redraw(MotoWorld *self)
+void moto_scene_node_draw(MotoSceneNode *self, gint width, gint height)
 {
-    moto_world_draw(self, self->priv->prev_width, self->priv->prev_height);
-}
-
-void moto_world_draw(MotoWorld *self, gint width, gint height)
-{
-    moto_world_update(self);
+    moto_scene_node_update(self);
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
@@ -421,7 +414,7 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     glEnable(GL_LIGHT0);
     glDisable(GL_COLOR_MATERIAL);
 
-    MotoObjectNode* cam = moto_world_get_camera(self);
+    MotoObjectNode* cam = moto_scene_node_get_camera(self);
 
     if(cam)
     {
@@ -431,7 +424,7 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
     {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        moto_world_apply_default_camera(self, width, height);
+        moto_scene_node_apply_default_camera(self, width, height);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glViewport(0, 0, width, height);
@@ -466,23 +459,21 @@ void moto_world_draw(MotoWorld *self, gint width, gint height)
 
     glColor4f(1, 1, 1, 1);
 
-    // if(moto_world_get_root(self))
-    //    moto_object_node_draw_full(moto_world_get_root(self), FALSE, TRUE);
+    MotoObjectNode* root = moto_scene_node_get_root(self);
+    if(root)
+       moto_object_node_draw(root);
 
-    moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
-            __draw_object, NULL);
-
-    if(moto_world_get_axes(self))
+    if(moto_scene_node_get_axes(self))
     {
         glClear(GL_DEPTH_BUFFER_BIT);
-        moto_object_node_draw(moto_world_get_axes(self));
+        moto_object_node_draw(moto_scene_node_get_axes(self));
     }
 
     if(self->priv->manipulator)
-        moto_world_manipulator_draw(self->priv->manipulator, self);
+        moto_scene_node_manipulator_draw(self->priv->manipulator, self);
 }
 
-void moto_world_draw_fps_test(MotoWorld *self)
+void moto_scene_node_draw_fps_test(MotoSceneNode *self)
 {
     int iters = 1000;
 
@@ -491,7 +482,7 @@ void moto_world_draw_fps_test(MotoWorld *self)
     int i;
     for(i = 0; i < iters; i++)
     {
-        moto_world_redraw(self);
+        moto_scene_node_redraw(self);
     }
     double time = g_timer_elapsed(timer, NULL);
     moto_info("iters: %d, time: %f, fps: %.2f", iters, time, iters / time);
@@ -499,18 +490,18 @@ void moto_world_draw_fps_test(MotoWorld *self)
     g_timer_destroy(timer);
 }
 
-void moto_world_apply_default_camera(MotoWorld *self, gint width, gint height)
+void moto_scene_node_apply_default_camera(MotoSceneNode *self, gint width, gint height)
 {
     gluPerspective(self->priv->fovy*DEG_PER_RAD, width/(GLdouble)height,
             self->priv->z_near, self->priv->z_far);
 }
 
-MotoLibrary *moto_world_get_library(MotoWorld *self)
+MotoLibrary *moto_scene_node_get_library(MotoSceneNode *self)
 {
     return self->priv->library;
 }
 
-MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name)
+MotoNode *moto_scene_node_get_node(MotoSceneNode *self, const gchar *name)
 {
     g_mutex_lock(self->priv->node_list_mutex);
 
@@ -529,8 +520,8 @@ MotoNode *moto_world_get_node(MotoWorld *self, const gchar *name)
     return node;
 }
 
-void moto_world_foreach_node(MotoWorld *self, GType type,
-        MotoWorldForeachNodeFunc func, gpointer user_data)
+void moto_scene_node_foreach_node(MotoSceneNode *self, GType type,
+        MotoSceneNodeForeachNodeFunc func, gpointer user_data)
 {
     GSList *l = self->priv->nodes;
     for(; l; l=g_slist_next(l))
@@ -545,57 +536,57 @@ void moto_world_foreach_node(MotoWorld *self, GType type,
     }
 }
 
-void moto_world_set_use_vbo(MotoWorld *self, gboolean use)
+void moto_scene_node_set_use_vbo(MotoSceneNode *self, gboolean use)
 {
     self->priv->use_vbo = use;
 }
 
-gboolean moto_world_get_use_vbo(MotoWorld *self)
+gboolean moto_scene_node_get_use_vbo(MotoSceneNode *self)
 {
     return self->priv->use_vbo;
 }
 
-void moto_world_set_use_arrays(MotoWorld *self, gboolean use)
+void moto_scene_node_set_use_arrays(MotoSceneNode *self, gboolean use)
 {
     self->priv->use_arrays = use;
 }
 
-gboolean moto_world_get_use_arrays(MotoWorld *self)
+gboolean moto_scene_node_get_use_arrays(MotoSceneNode *self)
 {
     return self->priv->use_arrays;
 }
 
-void moto_world_set_show_normals(MotoWorld *self, gboolean show)
+void moto_scene_node_set_show_normals(MotoSceneNode *self, gboolean show)
 {
     self->priv->show_normals = show;
 }
 
-gboolean moto_world_get_show_normals(MotoWorld *self)
+gboolean moto_scene_node_get_show_normals(MotoSceneNode *self)
 {
     return self->priv->show_normals;
 }
 
-void moto_world_set_cull_faces(MotoWorld *self, gboolean cull)
+void moto_scene_node_set_cull_faces(MotoSceneNode *self, gboolean cull)
 {
     self->priv->cull_faces = cull;
 }
 
-gboolean moto_world_get_cull_faces(MotoWorld *self)
+gboolean moto_scene_node_get_cull_faces(MotoSceneNode *self)
 {
     return self->priv->cull_faces;
 }
 
 static gboolean
-__reset_geometry_view(MotoWorld *world, MotoNode *node, gpointer user_data)
+__reset_geometry_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
     moto_geom_view_node_set_prepared((MotoGeomViewNode *)node, FALSE);
 
     return TRUE;
 }
 
-void moto_world_reset(MotoWorld *self)
+void moto_scene_node_reset(MotoSceneNode *self)
 {
-    moto_world_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_geometry_view, NULL);
+    moto_scene_node_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_geometry_view, NULL);
 }
 
 typedef struct _MotoIntersectData
@@ -605,7 +596,7 @@ typedef struct _MotoIntersectData
     gfloat dist;
 } MotoIntersectData;
 
-static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user_data)
+static gboolean intersect_object(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
 
     MotoObjectNode *obj = (MotoObjectNode *)node;
@@ -620,7 +611,7 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
 
     MotoBound *b = moto_object_node_get_bound(obj, FALSE);
     MotoBound bb;
-    moto_bound_set_extended(& bb, b, world->priv->select_bound_extent);
+    moto_bound_set_extended(& bb, b, scene_node->priv->select_bound_extent);
 
     if( !  moto_ray_intersect_bound_dist(& ray, & dist, bb.bound))
         return TRUE;
@@ -639,17 +630,17 @@ static gboolean intersect_object(MotoWorld *world, MotoNode *node, gpointer user
 
 /* Animation */
 
-void moto_world_start_anim(MotoWorld *self)
+void moto_scene_node_start_anim(MotoSceneNode *self)
 {
     g_timer_start(self->priv->timer);
 }
 
-void moto_world_stop_anim(MotoWorld *self)
+void moto_scene_node_stop_anim(MotoSceneNode *self)
 {
     g_timer_stop(self->priv->timer);
 }
 
-static void update_node(MotoNode *node, MotoWorld *world)
+static void update_node(MotoNode *node, MotoSceneNode *scene_node)
 {
     moto_node_update(node);
 }
@@ -659,19 +650,19 @@ void push_node(MotoNode *node, GThreadPool *tp)
     g_thread_pool_push(tp, node, NULL);
 }
 
-guint moto_world_get_update_complexity(MotoWorld *self)
+guint moto_scene_node_get_update_complexity(MotoSceneNode *self)
 {
     return 0; // TODO: Implement
 }
 
-void moto_world_prepare_updateable_nodes(MotoWorld *self)
+void moto_scene_node_prepare_updateable_nodes(MotoSceneNode *self)
 {
     
 }
 
-static void world_update(MotoWorld *self)
+static void scene_node_update(MotoSceneNode *self)
 {
-    MotoWorldPriv *priv = self->priv;
+    MotoSceneNodePriv *priv = self->priv;
 
     gboolean smth_updated = FALSE;
     GSList *l = priv->nodes;
@@ -686,16 +677,16 @@ static void world_update(MotoWorld *self)
     }
 
     if(smth_updated)
-        world_update(self);
+        scene_node_update(self);
 }
 
-void moto_world_update(MotoWorld *self)
+void moto_scene_node_update(MotoSceneNode *self)
 {
-    MotoWorldPriv *priv = self->priv;
+    MotoSceneNodePriv *priv = self->priv;
 
-    if(moto_world_get_update_complexity(self) < 1000)
+    if(moto_scene_node_get_update_complexity(self) < 1000)
     {
-        world_update(self);
+        scene_node_update(self);
     }
     else
     {
@@ -704,7 +695,7 @@ void moto_world_update(MotoWorld *self)
                               priv->max_thread_for_update,
                               TRUE, NULL);
 
-        moto_world_prepare_updateable_nodes(self);
+        moto_scene_node_prepare_updateable_nodes(self);
         priv->updating_done = FALSE;
         while(1)
         {
@@ -723,12 +714,12 @@ void moto_world_update(MotoWorld *self)
 
 /*  */
 
-void moto_world_button_press(MotoWorld *self,
+void moto_scene_node_button_press(MotoSceneNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(self->priv->manipulator)
     {
-        if(moto_world_manipulator_button_press(self->priv->manipulator, self,
+        if(moto_scene_node_manipulator_button_press(self->priv->manipulator, self,
                 x, y, width, height))
             return;
     }
@@ -749,7 +740,7 @@ void moto_world_button_press(MotoWorld *self,
 
     gfloat fov = self->priv->fovy;
 
-    MotoObjectNode* camera = moto_world_get_camera(self);
+    MotoObjectNode* camera = moto_scene_node_get_camera(self);
 
     gfloat point[3];
     if(camera)
@@ -793,7 +784,7 @@ void moto_world_button_press(MotoWorld *self,
     vector3_dif(idata.ray.dir, point, idata.ray.pos);
     moto_ray_normalize(& idata.ray);
 
-    moto_world_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
+    moto_scene_node_foreach_node(self, MOTO_TYPE_OBJECT_NODE,
             intersect_object, & idata);
 
     if(idata.obj)
@@ -812,84 +803,84 @@ void moto_world_button_press(MotoWorld *self,
     }
 }
 
-void moto_world_process_button_release(MotoWorld *self,
+void moto_scene_node_process_button_release(MotoSceneNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(self->priv->manipulator)
     {
-        moto_world_manipulator_button_release(self->priv->manipulator, self,
+        moto_scene_node_manipulator_button_release(self->priv->manipulator, self,
                 x, y, width, height);
 
         return;
     }
 
-    if(moto_world_get_root(self))
-        moto_object_node_button_release(moto_world_get_root(self), x, y, width, height);
+    if(moto_scene_node_get_root(self))
+        moto_object_node_button_release(moto_scene_node_get_root(self), x, y, width, height);
 }
 
-void moto_world_process_motion(MotoWorld *self,
+void moto_scene_node_process_motion(MotoSceneNode *self,
     gint x, gint y, gint width, gint height)
 {
     if(self->priv->manipulator)
     {
-        moto_world_manipulator_motion_notify(self->priv->manipulator, self,
+        moto_scene_node_manipulator_motion_notify(self->priv->manipulator, self,
                 x, y, width, height);
 
         return;
     }
 
-    if(moto_world_get_root(self))
-        moto_object_node_motion(moto_world_get_root(self), x, y, width, height);
+    if(moto_scene_node_get_root(self))
+        moto_object_node_motion(moto_scene_node_get_root(self), x, y, width, height);
 }
 
-/* MotoWorldManipulator */
+/* MotoSceneNodeManipulator */
 
-static GObjectClass *world_manipulator_parent_class = NULL;
+static GObjectClass *scene_node_manipulator_parent_class = NULL;
 
-struct _MotoWorldManipulatorPriv
+struct _MotoSceneNodeManipulatorPriv
 {
     gboolean disposed;
 };
 
 static void
-moto_world_manipulator_dispose(GObject *obj)
+moto_scene_node_manipulator_dispose(GObject *obj)
 {
-    MotoWorldManipulator *self = (MotoWorldManipulator *)obj;
+    MotoSceneNodeManipulator *self = (MotoSceneNodeManipulator *)obj;
 
     if(self->priv->disposed)
         return;
     self->priv->disposed = TRUE;
 
-    world_manipulator_parent_class->dispose(obj);
+    scene_node_manipulator_parent_class->dispose(obj);
 }
 
 static void
-moto_world_manipulator_finalize(GObject *obj)
+moto_scene_node_manipulator_finalize(GObject *obj)
 {
-    MotoWorldManipulator *self = (MotoWorldManipulator *)obj;
-    g_slice_free(MotoWorldManipulatorPriv, self->priv);
+    MotoSceneNodeManipulator *self = (MotoSceneNodeManipulator *)obj;
+    g_slice_free(MotoSceneNodeManipulatorPriv, self->priv);
 
-    world_manipulator_parent_class->finalize(obj);
+    scene_node_manipulator_parent_class->finalize(obj);
 }
 
 static void
-moto_world_manipulator_init(MotoWorldManipulator *self)
+moto_scene_node_manipulator_init(MotoSceneNodeManipulator *self)
 {
-    self->priv = g_slice_new(MotoWorldManipulatorPriv);
+    self->priv = g_slice_new(MotoSceneNodeManipulatorPriv);
     self->priv->disposed = FALSE;
 }
 
 static void
-moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
+moto_scene_node_manipulator_class_init(MotoSceneNodeManipulatorClass *klass)
 {
     GObjectClass *goclass = (GObjectClass*)klass;
 
-    world_manipulator_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    scene_node_manipulator_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_world_manipulator_dispose;
-    goclass->finalize   = moto_world_manipulator_finalize;
+    goclass->dispose    = moto_scene_node_manipulator_dispose;
+    goclass->finalize   = moto_scene_node_manipulator_finalize;
 
-    GType draw_signal_types[] = {MOTO_TYPE_WORLD};
+    GType draw_signal_types[] = {MOTO_TYPE_SCENE_NODE};
     klass->draw_signal_id = g_signal_newv ("draw",
                  G_TYPE_FROM_CLASS (klass),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
@@ -901,7 +892,7 @@ moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
                  1     /* n_params */,
                  draw_signal_types  /* param_types */);
 
-    GType button_press_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    GType button_press_signal_types[] = {MOTO_TYPE_SCENE_NODE, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
     klass->button_press_signal_id = g_signal_newv ("button-press",
                  G_TYPE_FROM_CLASS (klass),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE,
@@ -913,7 +904,7 @@ moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
                  5     /* n_params */,
                  button_press_signal_types  /* param_types */);
 
-    GType button_release_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    GType button_release_signal_types[] = {MOTO_TYPE_SCENE_NODE, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
     klass->button_release_signal_id = g_signal_newv ("button-release",
                  G_TYPE_FROM_CLASS (klass),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
@@ -925,7 +916,7 @@ moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
                  5     /* n_params */,
                  button_release_signal_types /* param_types */);
 
-    GType motion_notify_signal_types[] = {MOTO_TYPE_WORLD, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
+    GType motion_notify_signal_types[] = {MOTO_TYPE_SCENE_NODE, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT};
     klass->motion_notify_signal_id = g_signal_newv ("motion-notify",
                  G_TYPE_FROM_CLASS (klass),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
@@ -938,52 +929,52 @@ moto_world_manipulator_class_init(MotoWorldManipulatorClass *klass)
                  motion_notify_signal_types  /* param_types */);
 }
 
-G_DEFINE_TYPE(MotoWorldManipulator, moto_world_manipulator, G_TYPE_OBJECT);
+G_DEFINE_TYPE(MotoSceneNodeManipulator, moto_scene_node_manipulator, G_TYPE_OBJECT);
 
-MotoWorldManipulator *moto_world_manipulator_new()
+MotoSceneNodeManipulator *moto_scene_node_manipulator_new()
 {
-    MotoWorldManipulator *self = \
-        (MotoWorldManipulator *)g_object_new(MOTO_TYPE_WORLD_MANIPULATOR, NULL);
+    MotoSceneNodeManipulator *self = \
+        (MotoSceneNodeManipulator *)g_object_new(MOTO_TYPE_SCENE_NODE_MANIPULATOR, NULL);
 
     return self;
 }
 
-void moto_world_manipulator_draw(MotoWorldManipulator *self, MotoWorld *world)
+void moto_scene_node_manipulator_draw(MotoSceneNodeManipulator *self, MotoSceneNode *scene_node)
 {
-    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->draw_signal_id, 0, world);
+    g_signal_emit(self, MOTO_SCENE_NODE_MANIPULATOR_GET_CLASS(self)->draw_signal_id, 0, scene_node);
 }
 
-gboolean moto_world_manipulator_button_press(MotoWorldManipulator *self, MotoWorld *world,
+gboolean moto_scene_node_manipulator_button_press(MotoSceneNodeManipulator *self, MotoSceneNode *scene_node,
         gint x, gint y, gint width, gint height)
 {
     gboolean return_value = FALSE;
-    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->button_press_signal_id, 0,
-            world, x, y, width, height, & return_value);
+    g_signal_emit(self, MOTO_SCENE_NODE_MANIPULATOR_GET_CLASS(self)->button_press_signal_id, 0,
+            scene_node, x, y, width, height, & return_value);
     return return_value;
 }
 
-void moto_world_manipulator_button_release(MotoWorldManipulator *self, MotoWorld *world,
+void moto_scene_node_manipulator_button_release(MotoSceneNodeManipulator *self, MotoSceneNode *scene_node,
         gint x, gint y, gint width, gint height)
 {
-    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->button_release_signal_id, 0,
-            world, x, y, width, height);
+    g_signal_emit(self, MOTO_SCENE_NODE_MANIPULATOR_GET_CLASS(self)->button_release_signal_id, 0,
+            scene_node, x, y, width, height);
 }
 
-void moto_world_manipulator_motion_notify(MotoWorldManipulator *self, MotoWorld *world,
+void moto_scene_node_manipulator_motion_notify(MotoSceneNodeManipulator *self, MotoSceneNode *scene_node,
         gint x, gint y, gint width, gint height)
 {
-    g_signal_emit(self, MOTO_WORLD_MANIPULATOR_GET_CLASS(self)->motion_notify_signal_id, 0,
-            world, x, y, width, height);
+    g_signal_emit(self, MOTO_SCENE_NODE_MANIPULATOR_GET_CLASS(self)->motion_notify_signal_id, 0,
+            scene_node, x, y, width, height);
 }
 
-void moto_world_set_draw_mode(MotoWorld *self, MotoDrawMode draw_mode)
+void moto_scene_node_set_draw_mode(MotoSceneNode *self, MotoDrawMode draw_mode)
 {
     self->priv->draw_mode = draw_mode;
-    moto_world_reset(self);
-    moto_world_redraw(self);
+    moto_scene_node_reset(self);
+    moto_scene_node_redraw(self);
 }
 
-MotoDrawMode moto_world_get_draw_mode(MotoWorld *self)
+MotoDrawMode moto_scene_node_get_draw_mode(MotoSceneNode *self)
 {
     return self->priv->draw_mode;
 }

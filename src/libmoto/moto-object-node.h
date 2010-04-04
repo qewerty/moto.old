@@ -96,7 +96,7 @@ MotoObjectNode *moto_object_node_new(const gchar *name);
 MotoBound *moto_object_node_get_bound(MotoObjectNode *self, gboolean global);
 void moto_object_node_draw_full(MotoObjectNode *self,
         gboolean recursive, gboolean use_global);
-#define moto_object_node_draw(self) moto_object_node_draw_full(self, TRUE, FALSE)
+void moto_object_node_draw(MotoObjectNode* self);
 
 void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3]);
 void moto_object_node_slide(MotoObjectNode *self,
