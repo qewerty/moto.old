@@ -2,6 +2,7 @@
 #include "math.h"
 
 #include <gtk/gtkgl.h>
+#include <gdk/gdkkeysyms.h>
 #include "libmotoutil/moto-gl.h"
 
 #include "moto-test-window.h"
@@ -115,6 +116,17 @@ gboolean on_key_press_event(GtkWidget   *widget,
                             gpointer     user_data)
 {
     MotoTestWindow *self = (MotoTestWindow *)widget;
+
+    if(GDK_F11 == event->keyval)
+    {
+        static fullscreen = FALSE;
+        if(fullscreen)
+            gtk_window_unfullscreen(GTK_WINDOW(widget));
+        else
+            gtk_window_fullscreen(GTK_WINDOW(widget));
+        fullscreen = !fullscreen;
+        return TRUE;
+    }
 
     if(0 == g_utf8_collate(event->string, "+") || \
        0 == g_utf8_collate(event->string, "="))
