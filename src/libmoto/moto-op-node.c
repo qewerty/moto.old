@@ -49,9 +49,7 @@ moto_op_node_init(MotoOpNode *self)
     priv->selection = NULL;
 
     moto_node_add_params(node,
-            "active", "Active",          MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
-            "in",     "Input Shape",  MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_IN,    NULL, NULL, "Shape",
-            "out",    "Output Shape", MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
+            "in", "Input Shape", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, NULL, "Shape",
             NULL);
 }
 
@@ -75,7 +73,7 @@ moto_op_node_class_init(MotoOpNodeClass *klass)
     // TODO: moto_node_class_add_action(moto_node_action_new("reselect", "Reselect"));
 }
 
-G_DEFINE_ABSTRACT_TYPE(MotoOpNode, moto_op_node, MOTO_TYPE_NODE);
+G_DEFINE_ABSTRACT_TYPE(MotoOpNode, moto_op_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class MotoOpNode */
 

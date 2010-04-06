@@ -1,6 +1,7 @@
 #include <GL/gl.h>
 
 #include "moto-shape-node.h"
+#include "moto-geom.h"
 
 /* class ShapeNode */
 
@@ -26,7 +27,14 @@ moto_shape_node_finalize(GObject *obj)
 static void
 moto_shape_node_init(MotoShapeNode *self)
 {
+    MotoNode *node = (MotoNode *)self;
     MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+
+    moto_node_add_params(node,
+            "active", "Active", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
+            "blocked", "Blocked", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
+            "out", "Output Shape", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
+            NULL);
 
     priv->prepared = FALSE;
 }

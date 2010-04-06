@@ -22,7 +22,7 @@
 #ifndef __MOTO_OP_NODE_H__
 #define __MOTO_OP_NODE_H__
 
-#include "moto-node.h"
+#include "moto-shape-node.h"
 #include "moto-geom.h"
 #include "moto-mesh.h"
 
@@ -37,12 +37,12 @@ typedef MotoGeom* (*MotoOpPerformMethod)(MotoOpNode *self, MotoGeom *in, gboolea
 
 struct _MotoOpNode
 {
-    MotoNode parent;
+    MotoShapeNode parent;
 };
 
 struct _MotoOpNodeClass
 {
-    MotoNodeClass parent;
+    MotoShapeNodeClass parent;
 
     MotoOpPerformMethod perform;
 };
