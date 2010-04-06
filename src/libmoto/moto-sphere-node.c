@@ -72,7 +72,6 @@ moto_sphere_node_init(MotoSphereNode *self)
             "radius", "Radius",   MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, radius, pspec, "Form",
             "rc", "Rows/Columns", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Form",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Y, pspec, "Orientation",
-            "mesh",   "Polygonal Mesh",    MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -297,7 +296,7 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
 
     priv->bound_calculated = FALSE;
     moto_geom_prepare((MotoGeom*)mesh);
-    moto_node_set_param_object((MotoNode*)self, "mesh", (GObject*)mesh);
+    moto_node_set_param_object((MotoNode*)self, "out", (GObject*)mesh);
 }
 #undef get_v
 
@@ -307,16 +306,9 @@ static void moto_sphere_node_update(MotoNode *self)
 
     MotoParam *param;
 
-    param = moto_node_get_param(self, "mesh");
-    if(param && 1)//moto_param_has_dests(param))
+    param = moto_node_get_param(self, "out");
+    if(param)
         moto_sphere_node_update_mesh(sphere);
-
-    /* TODO: Implement NURBS objects =) */
-    /*
-    param = moto_node_get_param(self, "main", "nurbs");
-    if(param && moto_param_has_dests(param))
-        moto_sphere_update_nurbs(sphere);
-    */
 }
 
 static void calc_bound(MotoSphereNode *self)

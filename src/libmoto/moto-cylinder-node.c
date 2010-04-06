@@ -76,7 +76,6 @@ moto_cylinder_node_init(MotoCylinderNode *self)
             "screw", "Screw", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Screw",
             "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
             "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Shape",
             NULL);
 
     self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -484,7 +483,7 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     {
         g_print("Error while preparing mesh of MotoCylinderNode\n");
     }
-    moto_node_set_param_object(node, "mesh", (GObject*)mesh);
+    moto_node_set_param_object(node, "out", (GObject*)mesh);
 }
 #undef get_v
 
@@ -494,16 +493,9 @@ static void moto_cylinder_node_update(MotoNode *self)
 
     MotoParam *param;
 
-    param = moto_node_get_param(self, "mesh");
-    if(param && 1)//moto_param_has_dests(param))
+    param = moto_node_get_param(self, "out");
+    if(param)
         moto_cylinder_node_update_mesh(cylinder);
-
-    /* TODO: Implement NURBS objects =) */
-    /*
-    param = moto_node_get_param(self, "main", "nurbs");
-    if(param && moto_param_has_dests(param))
-        moto_cylinder_update_nurbs(cylinder);
-    */
 }
 
 static void calc_bound(MotoCylinderNode *self)

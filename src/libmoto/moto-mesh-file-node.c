@@ -69,7 +69,6 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General",
             "lock",     "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
             "watch",    "Watch", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
-            "mesh",     "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -176,7 +175,7 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
     }
 
     priv->bound_calculated = FALSE;
-    moto_node_set_param_object(node, "mesh", (GObject*)priv->mesh);
+    moto_node_set_param_object(node, "out", (GObject*)priv->mesh);
 }
 
 static void moto_mesh_file_node_update(MotoNode *self)
@@ -185,8 +184,8 @@ static void moto_mesh_file_node_update(MotoNode *self)
 
     MotoParam *param;
 
-    param = moto_node_get_param(self, "mesh");
-    if(param && 1)//moto_param_has_dests(param)) /* FIXME */
+    param = moto_node_get_param(self, "out");
+    if(param)
         moto_mesh_file_node_update_mesh(mesh_file);
 }
 

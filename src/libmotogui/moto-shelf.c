@@ -35,7 +35,7 @@ create_shape(MotoShelf* shelf, MotoSystem* system,
     MotoNode *mat = moto_node_create_child_by_name(obj,  "MotoMaterialNode", "mat");
 
     moto_node_link(obj, "view", view, "view");
-    moto_node_link(view, "mesh", plane, "mesh");
+    moto_node_link(view, "mesh", plane, "out");
     moto_node_link(obj, "material", mat, "material");
 }
 

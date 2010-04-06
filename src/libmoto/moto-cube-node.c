@@ -78,7 +78,6 @@ moto_cube_node_init(MotoCubeNode *self)
           // "bevel",    "Bevel",          G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Bevel",
           // "bev_abs",  "Absolute Bevel", G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Bevel",
           // "bev_size", "Bevel Size",     G_TYPE_FLOAT,      MOTO_PARAM_MODE_INOUT, 0.1f,       NULL,      "Bevel",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,    MOTO_PARAM_MODE_OUT,   priv->mesh, NULL,      "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -383,7 +382,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
     priv->bound_calculated = FALSE;
     moto_geom_prepare((MotoGeom*)mesh);
-    moto_node_set_param_object(node, "mesh", (GObject*)mesh);
+    moto_node_set_param_object(node, "out", (GObject*)mesh);
 }
 #undef get_v
 
@@ -393,8 +392,8 @@ static void moto_cube_node_update(MotoNode *self)
 
     MotoParam *param;
 
-    param = moto_node_get_param(self, "mesh");
-    if(param && 1)//moto_param_has_dests(param))
+    param = moto_node_get_param(self, "out");
+    if(param)
         moto_cube_node_update_mesh(cube);
 }
 

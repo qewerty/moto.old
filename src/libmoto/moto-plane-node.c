@@ -85,7 +85,6 @@ moto_plane_node_init(MotoPlaneNode *self)
             "size", "Size",               MOTO_TYPE_FLOAT_2,     MOTO_PARAM_MODE_INOUT, size,                NULL,      "Form",
             "divs", "Divisions",          MOTO_TYPE_INT_2,       MOTO_PARAM_MODE_INOUT, divs,                divs_spec, "Form",
             "orientation", "Orientation", MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, NULL,      "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,        MOTO_PARAM_MODE_OUT,   priv->mesh,          NULL,      "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -312,7 +311,7 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
     priv->bound_calculated = FALSE;
     moto_geom_prepare((MotoGeom*)mesh);
-    moto_node_set_param_object(node, "mesh", (GObject*)mesh);
+    moto_node_set_param_object(node, "out", (GObject*)mesh);
 }
 #undef e_x_num
 #undef e_y_num
@@ -324,16 +323,9 @@ static void moto_plane_node_update(MotoNode *self)
 {
     MotoParam *param;
 
-    param = moto_node_get_param(self, "mesh");
-    if(param && 1)//moto_param_has_dests(param))
+    param = moto_node_get_param(self, "out");
+    if(param)
         moto_plane_node_update_mesh((MotoPlaneNode *)self);
-
-    /* TODO: Implement NURBS objects =) */
-    /*
-    param = moto_node_get_param(self, "main", "nurbs");
-    if(param && moto_param_has_dests(param))
-        moto_plane_update_nurbs(plane);
-    */
 }
 
 static void calc_bound(MotoPlaneNode *self)
