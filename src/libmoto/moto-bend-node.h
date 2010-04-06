@@ -22,7 +22,7 @@
 #ifndef __MOTO_BEND_NODE_H__
 #define __MOTO_BEND_NODE_H__
 
-#include "moto-geom-op-node.h"
+#include "moto-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -33,12 +33,12 @@ typedef struct _MotoBendNodeClass MotoBendNodeClass;
 
 struct _MotoBendNode
 {
-    MotoGeomOpNode parent;
+    MotoOpNode parent;
 };
 
 struct _MotoBendNodeClass
 {
-    MotoGeomOpNodeClass parent;
+    MotoOpNodeClass parent;
 };
 
 GType moto_bend_node_get_type(void);

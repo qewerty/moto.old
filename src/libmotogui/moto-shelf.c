@@ -65,7 +65,7 @@ static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
 }
 
 static void
-perform_geom_op(MotoShelf *shelf, MotoSystem *system,
+perform_op(MotoShelf *shelf, MotoSystem *system,
                 const gchar *op_node_name, const char* name)
 {
     if(!system)
@@ -113,7 +113,7 @@ perform_geom_op(MotoShelf *shelf, MotoSystem *system,
 
     MotoNode *op = \
         moto_node_create_child_by_name(obj, op_node_name, name);
-    if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_GEOM_OP_NODE))
+    if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_OP_NODE))
         return;
 
     MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode*)view);
@@ -121,7 +121,7 @@ perform_geom_op(MotoShelf *shelf, MotoSystem *system,
         moto_geom_view_state_leave(state, (MotoGeomViewNode*)view);
 
     MotoMeshSelection *selection = moto_mesh_view_node_get_selection(view);
-    moto_geom_op_node_set_selection((MotoGeomOpNode*)op, selection);
+    moto_op_node_set_selection((MotoOpNode*)op, selection);
     moto_mesh_selection_deselect_all(selection);
 
     MotoParam *in_mesh = moto_node_get_param(op, "in");
@@ -133,27 +133,27 @@ perform_geom_op(MotoShelf *shelf, MotoSystem *system,
 
 static void perform_extrude(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_geom_op(shelf, system, "MotoExtrudeNode", "extrude");
+    perform_op(shelf, system, "MotoExtrudeNode", "extrude");
 }
 
 static void perform_remove_faces(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_geom_op(shelf, system, "MotoRemoveFacesNode", "remove");
+    perform_op(shelf, system, "MotoRemoveFacesNode", "remove");
 }
 
 static void perform_twist(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_geom_op(shelf, system, "MotoTwistNode", "twist");
+    perform_op(shelf, system, "MotoTwistNode", "twist");
 }
 
 static void perform_bend(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_geom_op(shelf, system, "MotoBendNode", "bend");
+    perform_op(shelf, system, "MotoBendNode", "bend");
 }
 
 static void perform_displace(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_geom_op(shelf, system, "MotoDisplaceNode", "displace");
+    perform_op(shelf, system, "MotoDisplaceNode", "displace");
 }
 
 static void create_light(MotoShelf *shelf, MotoSystem *system)

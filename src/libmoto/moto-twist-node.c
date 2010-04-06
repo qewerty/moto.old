@@ -21,7 +21,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoTwistNode */
 
@@ -64,11 +64,11 @@ moto_twist_node_class_init(MotoTwistNodeClass *klass)
 
     twist_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoGeomOpNodeClass *gopclass = (MotoGeomOpNodeClass *)klass;
+    MotoOpNodeClass *gopclass = (MotoOpNodeClass *)klass;
     gopclass->perform   = moto_twist_node_perform;
 }
 
-G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_GEOM_OP_NODE);
+G_DEFINE_TYPE(MotoTwistNode, moto_twist_node, MOTO_TYPE_OP_NODE);
 
 /* Methods of class MotoTwistNode */
 
@@ -82,7 +82,7 @@ MotoTwistNode *moto_twist_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_twist_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
 {
     *the_same = TRUE;
 

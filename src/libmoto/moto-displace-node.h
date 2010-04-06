@@ -22,7 +22,7 @@
 #ifndef __MOTO_DISPLACE_NODE_H__
 #define __MOTO_DISPLACE_NODE_H__
 
-#include "moto-geom-op-node.h"
+#include "moto-op-node.h"
 
 G_BEGIN_DECLS
 
@@ -33,12 +33,12 @@ typedef struct _MotoDisplaceNodeClass MotoDisplaceNodeClass;
 
 struct _MotoDisplaceNode
 {
-    MotoGeomOpNode parent;
+    MotoOpNode parent;
 };
 
 struct _MotoDisplaceNodeClass
 {
-    MotoGeomOpNodeClass parent;
+    MotoOpNodeClass parent;
 };
 
 GType moto_displace_node_get_type(void);

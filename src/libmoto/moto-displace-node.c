@@ -41,11 +41,11 @@ moto_displace_node_class_init(MotoDisplaceNodeClass *klass)
 {
     bend_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoGeomOpNodeClass *gopclass = (MotoGeomOpNodeClass *)klass;
+    MotoOpNodeClass *gopclass = (MotoOpNodeClass *)klass;
     gopclass->perform = moto_displace_node_perform;
 }
 
-G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_GEOM_OP_NODE);
+G_DEFINE_TYPE(MotoDisplaceNode, moto_displace_node, MOTO_TYPE_OP_NODE);
 
 /* Methods of class MotoDisplaceNode */
 

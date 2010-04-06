@@ -9,7 +9,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
 
 /* class MotoBendNode */
 
@@ -38,11 +38,11 @@ moto_bend_node_class_init(MotoBendNodeClass *klass)
 {
     bend_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoGeomOpNodeClass *gopclass = (MotoGeomOpNodeClass *)klass;
+    MotoOpNodeClass *gopclass = (MotoOpNodeClass *)klass;
     gopclass->perform = moto_bend_node_perform;
 }
 
-G_DEFINE_TYPE(MotoBendNode, moto_bend_node, MOTO_TYPE_GEOM_OP_NODE);
+G_DEFINE_TYPE(MotoBendNode, moto_bend_node, MOTO_TYPE_OP_NODE);
 
 /* methods of class MotoBendNode */
 
@@ -56,7 +56,7 @@ MotoBendNode *moto_bend_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_bend_node_perform(MotoGeomOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
 {
     *the_same = TRUE;
 

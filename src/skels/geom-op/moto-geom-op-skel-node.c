@@ -6,14 +6,14 @@
 
 /* forwards */
 
-static MotoMesh *moto_geom_op_skel_node_perform(MotoGeomOpNode *self, MotoGeom *in);
+static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoGeom *in);
 
-/* class MotoGeomOpSkelNode */
+/* class MotoOpSkelNode */
 
-static GObjectClass *geom_op_skel_node_parent_class = NULL;
+static GObjectClass *op_skel_node_parent_class = NULL;
 
 static void
-moto_geom_op_skel_node_init(MotoGeomOpSkelNode *self)
+moto_op_skel_node_init(MotoOpSkelNode *self)
 {
     MotoNode *node = (MotoNode*)self;
 
@@ -22,21 +22,21 @@ moto_geom_op_skel_node_init(MotoGeomOpSkelNode *self)
 }
 
 static void
-moto_geom_op_skel_node_class_init(MotoGeomOpSkelNodeClass *klass)
+moto_op_skel_node_class_init(MotoOpSkelNodeClass *klass)
 {
-    geom_op_skel_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    op_skel_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    MotoGeomOpNodeClass *geom_op_class = (MotoGeomOpNodeClass *)klass;
-    geom_op_class->perform = moto_geom_op_skel_node_perform;
+    MotoOpNodeClass *op_class = (MotoOpNodeClass *)klass;
+    op_class->perform = moto_op_skel_node_perform;
 }
 
-G_DEFINE_TYPE(MotoGeomOpSkelNode, moto_geom_op_skel_node, MOTO_TYPE_GEOM_OP_NODE);
+G_DEFINE_TYPE(MotoOpSkelNode, moto_op_skel_node, MOTO_TYPE_OP_NODE);
 
-/* Methods of class MotoGeomOpSkelNode */
+/* Methods of class MotoOpSkelNode */
 
-MotoGeomOpSkelNode *moto_geom_op_skel_node_new(const gchar *name)
+MotoOpSkelNode *moto_op_skel_node_new(const gchar *name)
 {
-    MotoGeomOpSkelNode *self = (MotoGeomOpSkelNode *)g_object_new(MOTO_TYPE_GEOM_OP_SKEL_NODE, NULL);
+    MotoOpSkelNode *self = (MotoOpSkelNode *)g_object_new(MOTO_TYPE_OP_SKEL_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -44,7 +44,7 @@ MotoGeomOpSkelNode *moto_geom_op_skel_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_geom_op_skel_node_perform(MotoGeomOpNode *self, MotoGeom *in)
+static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoGeom *in)
 {
     // Implement your operator here.
 

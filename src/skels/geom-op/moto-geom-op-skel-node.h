@@ -19,41 +19,41 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_GEOM_OP_SKEL_NODE_H__
-#define __MOTO_GEOM_OP_SKEL_NODE_H__
+#ifndef __MOTO_OP_SKEL_NODE_H__
+#define __MOTO_OP_SKEL_NODE_H__
 
-#include "moto-geom-op-node.h"
+#include "moto-op-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoGeomOpSkelNode MotoGeomOpSkelNode;
-typedef struct _MotoGeomOpSkelNodeClass MotoGeomOpSkelNodeClass;
+typedef struct _MotoOpSkelNode MotoOpSkelNode;
+typedef struct _MotoOpSkelNodeClass MotoOpSkelNodeClass;
 
-/* class MotoGeomOpSkelNode */
+/* class MotoOpSkelNode */
 
-struct _MotoGeomOpSkelNode
+struct _MotoOpSkelNode
 {
-    MotoGeomOpNode parent;
+    MotoOpNode parent;
 };
 
-struct _MotoGeomOpSkelNodeClass
+struct _MotoOpSkelNodeClass
 {
-    MotoGeomOpNodeClass parent;
+    MotoOpNodeClass parent;
 };
 
-GType moto_geom_op_skel_node_get_type(void);
+GType moto_op_skel_node_get_type(void);
 
-#define MOTO_TYPE_GEOM_OP_SKEL_NODE (moto_geom_op_skel_node_get_type())
-#define MOTO_GEOM_OP_SKEL_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_OP_SKEL_NODE, MotoGeomOpSkelNode))
-#define MOTO_GEOM_OP_SKEL_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_OP_SKEL_NODE, MotoGeomOpSkelNodeClass))
-#define MOTO_IS_GEOM_OP_SKEL_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM_OP_SKEL_NODE))
-#define MOTO_IS_GEOM_OP_SKEL_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM_OP_SKEL_NODE))
-#define MOTO_GEOM_OP_SKEL_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_OP_SKEL_NODE, MotoGeomOpSkelNodeClass))
+#define MOTO_TYPE_OP_SKEL_NODE (moto_op_skel_node_get_type())
+#define MOTO_OP_SKEL_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_OP_SKEL_NODE, MotoOpSkelNode))
+#define MOTO_OP_SKEL_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_OP_SKEL_NODE, MotoOpSkelNodeClass))
+#define MOTO_IS_OP_SKEL_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_OP_SKEL_NODE))
+#define MOTO_IS_OP_SKEL_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_OP_SKEL_NODE))
+#define MOTO_OP_SKEL_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OP_SKEL_NODE, MotoOpSkelNodeClass))
 
-MotoGeomOpSkelNode *moto_geom_op_skel_node_new(const gchar *name);
+MotoOpSkelNode *moto_op_skel_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_GEOM_OP_SKEL_NODE_H__ */
+#endif /* __MOTO_OP_SKEL_NODE_H__ */
 
 
