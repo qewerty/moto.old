@@ -372,7 +372,7 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
     MotoMeshSelection *selection, guint sections,
     gfloat length);
 
-MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
+MotoMesh* moto_mesh_remove(MotoMesh *self,
     MotoMeshSelection *selection);
 
 G_END_DECLS

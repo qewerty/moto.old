@@ -3092,7 +3092,7 @@ MotoMesh* moto_mesh_bevel_faces(MotoMesh *self, MotoMeshSelection *selection)
 
 }
 
-MotoMesh* moto_mesh_remove_faces(MotoMesh *self,
+MotoMesh* moto_mesh_remove(MotoMesh *self,
     MotoMeshSelection *selection)
 {
     guint selected_f_num = 0;

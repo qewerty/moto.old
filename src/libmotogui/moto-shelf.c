@@ -2,7 +2,7 @@
 #include "libmoto/moto-scene-node.h"
 #include "libmoto/moto-mesh-view-node.h"
 #include "libmoto/moto-extrude-node.h"
-#include "libmoto/moto-remove-faces-node.h"
+#include "libmoto/moto-remove-node.h"
 
 #include "moto-shelf.h"
 #include "moto-test-window.h"
@@ -136,9 +136,9 @@ static void perform_extrude(MotoShelf *shelf, MotoSystem *system)
     perform_op(shelf, system, "MotoExtrudeNode", "extrude");
 }
 
-static void perform_remove_faces(MotoShelf *shelf, MotoSystem *system)
+static void perform_remove(MotoShelf *shelf, MotoSystem *system)
 {
-    perform_op(shelf, system, "MotoRemoveFacesNode", "remove");
+    perform_op(shelf, system, "MotoRemoveNode", "remove");
 }
 
 static void perform_twist(MotoShelf *shelf, MotoSystem *system)
@@ -271,7 +271,7 @@ GtkWidget *moto_shelf_new(MotoSystem *system, GtkWindow *window)
     moto_shelf_add_item(self, "Geom", "File",     create_mesh_file);
 
     moto_shelf_add_tab(self,  "Model");
-    moto_shelf_add_item(self, "Model", "Remove",  perform_remove_faces);
+    moto_shelf_add_item(self, "Model", "Remove",  perform_remove);
     moto_shelf_add_item(self, "Model", "Extrude",  perform_extrude);
     moto_shelf_add_item(self, "Model", "Bevel",    NULL);
     moto_shelf_add_item(self, "Model", "Collapse", NULL);

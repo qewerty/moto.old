@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_REMOVE_FACES_NODE_H__
-#define __MOTO_REMOVE_FACES_NODE_H__
+#ifndef __MOTO_REMOVE_NODE_H__
+#define __MOTO_REMOVE_NODE_H__
 
 #include "moto-node.h"
 #include "moto-mesh.h"
@@ -28,34 +28,34 @@
 
 G_BEGIN_DECLS
 
-typedef struct _MotoRemoveFacesNode MotoRemoveFacesNode;
-typedef struct _MotoRemoveFacesNodeClass MotoRemoveFacesNodeClass;
+typedef struct _MotoRemoveNode MotoRemoveNode;
+typedef struct _MotoRemoveNodeClass MotoRemoveNodeClass;
 
-/* class MotoRemoveFacesNode */
+/* class MotoRemoveNode */
 
-struct _MotoRemoveFacesNode
+struct _MotoRemoveNode
 {
     MotoOpNode parent;
 };
 
-struct _MotoRemoveFacesNodeClass
+struct _MotoRemoveNodeClass
 {
     MotoOpNodeClass parent;
 };
 
-GType moto_remove_faces_node_get_type(void);
+GType moto_remove_node_get_type(void);
 
-#define MOTO_TYPE_REMOVE_FACES_NODE (moto_remove_faces_node_get_type())
-#define MOTO_REMOVE_FACES_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_REMOVE_FACES_NODE, MotoRemoveFacesNode))
-#define MOTO_REMOVE_FACES_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_REMOVE_FACES_NODE, MotoRemoveFacesNodeClass))
-#define MOTO_IS_REMOVE_FACES_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_REMOVE_FACES_NODE))
-#define MOTO_IS_REMOVE_FACES_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_REMOVE_FACES_NODE))
-#define MOTO_REMOVE_FACES_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_REMOVE_FACES_NODE, MotoRemoveFacesNodeClass))
+#define MOTO_TYPE_REMOVE_NODE (moto_remove_node_get_type())
+#define MOTO_REMOVE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_REMOVE_NODE, MotoRemoveNode))
+#define MOTO_REMOVE_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_REMOVE_NODE, MotoRemoveNodeClass))
+#define MOTO_IS_REMOVE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_REMOVE_NODE))
+#define MOTO_IS_REMOVE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_REMOVE_NODE))
+#define MOTO_REMOVE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_REMOVE_NODE, MotoRemoveNodeClass))
 
-MotoRemoveFacesNode *moto_remove_faces_node_new(const gchar *name);
+MotoRemoveNode *moto_remove_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_REMOVE_FACES_NODE_H__ */
+#endif /* __MOTO_REMOVE_NODE_H__ */
 
 
