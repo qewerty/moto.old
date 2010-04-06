@@ -19,44 +19,44 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_GEOMETRY_NODE_H__
-#define __MOTO_GEOMETRY_NODE_H__
+#ifndef __MOTO_SHAPE_NODE_H__
+#define __MOTO_SHAPE_NODE_H__
 
 #include "moto-node.h"
 #include "moto-bound.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoGeometryNode MotoGeometryNode;
-typedef struct _MotoGeometryNodeClass MotoGeometryNodeClass;
+typedef struct _MotoShapeNode MotoShapeNode;
+typedef struct _MotoShapeNodeClass MotoShapeNodeClass;
 
-typedef MotoBound *(*MotoGeometryNodeGetBoundMethod)(MotoGeometryNode *self);
+typedef MotoBound *(*MotoShapeNodeGetBoundMethod)(MotoShapeNode *self);
 
-/* class MotoGeometryNode */
+/* class MotoShapeNode */
 
-struct _MotoGeometryNode
+struct _MotoShapeNode
 {
     MotoNode parent;
 };
 
-struct _MotoGeometryNodeClass
+struct _MotoShapeNodeClass
 {
     MotoNodeClass parent;
 
-    MotoGeometryNodeGetBoundMethod get_bound;
+    MotoShapeNodeGetBoundMethod get_bound;
 };
 
-GType moto_geometry_node_get_type(void);
+GType moto_shape_node_get_type(void);
 
-#define MOTO_TYPE_GEOMETRY_NODE (moto_geometry_node_get_type())
-#define MOTO_GEOMETRY_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOMETRY_NODE, MotoGeometryNode))
-#define MOTO_GEOMETRY_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOMETRY_NODE, MotoGeometryNodeClass))
-#define MOTO_IS_GEOMETRY_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOMETRY_NODE))
-#define MOTO_IS_GEOMETRY_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOMETRY_NODE))
-#define MOTO_GEOMETRY_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOMETRY_NODE, MotoGeometryNodeClass))
+#define MOTO_TYPE_SHAPE_NODE (moto_shape_node_get_type())
+#define MOTO_SHAPE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_SHAPE_NODE, MotoShapeNode))
+#define MOTO_SHAPE_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_SHAPE_NODE, MotoShapeNodeClass))
+#define MOTO_IS_SHAPE_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_SHAPE_NODE))
+#define MOTO_IS_SHAPE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SHAPE_NODE))
+#define MOTO_SHAPE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE_NODE, MotoShapeNodeClass))
 
-MotoBound *moto_geometry_node_get_bound(MotoGeometryNode *self);
+MotoBound *moto_shape_node_get_bound(MotoShapeNode *self);
 
 G_END_DECLS
 
-#endif /* __MOTO_GEOMETRY_NODE_H__ */
+#endif /* __MOTO_SHAPE_NODE_H__ */

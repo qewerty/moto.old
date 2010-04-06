@@ -144,7 +144,7 @@ moto_system_class_init(MotoSystemClass *klass)
         MOTO_TYPE_RENDER_NODE;
             MOTO_TYPE_RMAN_NODE;
         MOTO_TYPE_OBJECT_NODE;
-        MOTO_TYPE_GEOMETRY_NODE;
+        MOTO_TYPE_SHAPE_NODE;
             MOTO_TYPE_PLANE_NODE;
             MOTO_TYPE_CUBE_NODE;
             MOTO_TYPE_SPHERE_NODE;

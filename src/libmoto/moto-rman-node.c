@@ -87,7 +87,7 @@ moto_rman_node_class_init(MotoRManNodeClass *klass)
     MotoRenderNodeClass *rclass = (MotoRenderNodeClass*)klass;
     rclass->render = moto_rman_node_render;
 
-    /* Initializing functions for exporting geometry  */
+    /* Initializing functions for exporting shape  */
     // moto_register_geom_processor(MOTO_TYPE_MESH,  moto_rman_export_mesh);
     // moto_register_geom_processor(MOTO_TYPE_CURVE, moto_rman_export_curve);
     // moto_register_geom_processor(MOTO_TYPE_NURBS, moto_rman_export_nurbs);

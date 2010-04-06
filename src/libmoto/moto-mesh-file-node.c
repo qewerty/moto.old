@@ -13,7 +13,7 @@
 
 /* forwards */
 
-static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self);
+static MotoBound *moto_mesh_file_node_get_bound(MotoShapeNode *self);
 
 /*
 static MotoMesh *moto_mesh_file_node_get_mesh(MotoMeshFileNode *self);
@@ -69,7 +69,7 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General",
             "lock",     "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
             "watch",    "Watch", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
-            "mesh",     "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
+            "mesh",     "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -83,7 +83,7 @@ moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
 
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
-    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
+    MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     mesh_file_node_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
 
@@ -95,7 +95,7 @@ moto_mesh_file_node_class_init(MotoMeshFileNodeClass *klass)
     nclass->update = moto_mesh_file_node_update;
 }
 
-G_DEFINE_TYPE(MotoMeshFileNode, moto_mesh_file_node, MOTO_TYPE_GEOMETRY_NODE);
+G_DEFINE_TYPE(MotoMeshFileNode, moto_mesh_file_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class MeshFileNode */
 
@@ -190,7 +190,7 @@ static void moto_mesh_file_node_update(MotoNode *self)
         moto_mesh_file_node_update_mesh(mesh_file);
 }
 
-static MotoBound *moto_mesh_file_node_get_bound(MotoGeometryNode *self)
+static MotoBound *moto_mesh_file_node_get_bound(MotoShapeNode *self)
 {
     MotoMeshFileNodePriv *priv = MOTO_MESH_FILE_NODE_GET_PRIVATE(self);
 

@@ -31,7 +31,7 @@ moto_displace_node_init(MotoDisplaceNode *self)
     /* params */
     MotoParamSpec *scale_spec = moto_param_spec_float_new(0.1, -1000000, 1000000, 0.01, 0.1);
     moto_node_add_params(node,
-            "scale",  "Scaling Value", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, scale_spec, "Geometry",
+            "scale",  "Scaling Value", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, scale_spec, "Shape",
             NULL);
     g_object_unref(scale_spec);
 }

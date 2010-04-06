@@ -9,7 +9,7 @@
 
 static void moto_ray_view_node_draw(MotoGeomViewNode *self);
 static void moto_ray_view_node_prepare_for_draw(MotoGeomViewNode *self);
-static MotoGeometryNode *moto_ray_view_node_get_geometry(MotoGeomViewNode *self);
+static MotoShapeNode *moto_ray_view_node_get_shape(MotoGeomViewNode *self);
 
 /* class RayViewNode */
 
@@ -58,7 +58,7 @@ moto_ray_view_node_init(MotoRayViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "view", "View", MOTO_TYPE_RAY_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
+            "view", "View", MOTO_TYPE_RAY_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     self->priv->ray.pos[0] = 0;
@@ -85,7 +85,7 @@ moto_ray_view_node_class_init(MotoRayViewNodeClass *klass)
 
     gvclass->draw               = moto_ray_view_node_draw;
     gvclass->prepare_for_draw   = moto_ray_view_node_prepare_for_draw;
-    gvclass->get_geometry       = moto_ray_view_node_get_geometry;
+    gvclass->get_shape       = moto_ray_view_node_get_shape;
 
     /*
     gvclass->states = g_slist_append(gvclass->states,
@@ -153,7 +153,7 @@ static void moto_ray_view_node_prepare_for_draw(MotoGeomViewNode *self)
     moto_geom_view_node_set_prepared(self, TRUE);
 }
 
-static MotoGeometryNode *moto_ray_view_node_get_geometry(MotoGeomViewNode *self)
+static MotoShapeNode *moto_ray_view_node_get_shape(MotoGeomViewNode *self)
 {
     return NULL;
 }

@@ -46,8 +46,8 @@
 #include "moto-copyable.h"
 #include "moto-displace-node.h"
 #include "moto-messager.h"
-// #include "moto-geometry.h"
-#include "moto-geom-node.h"
+// #include "moto-shape.h"
+#include "moto-shape-node.h"
 #include "moto-ipo-segment.h"
 #include "moto-library.h"
 

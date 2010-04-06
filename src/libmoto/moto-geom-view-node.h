@@ -27,7 +27,7 @@
 
 #include "moto-ray.h"
 #include "moto-transform-info.h"
-#include "moto-geom-node.h"
+#include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
@@ -39,7 +39,7 @@ typedef void (*MotoGeomViewNodeDrawMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodePrepareForDrawMethod)(MotoGeomViewNode *self);
 typedef gboolean (*MotoGeomViewNodeSelectMethod)(MotoGeomViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-typedef MotoGeometryNode *(*MotoGeomViewNodeGetGeometryMethod)(MotoGeomViewNode *self);
+typedef MotoShapeNode *(*MotoGeomViewNodeGetShapeMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodeGrowSelectionMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodeSelectLessMethod)(MotoGeomViewNode *self);
 typedef void (*MotoGeomViewNodeInvertSelectionMethod)(MotoGeomViewNode *self);
@@ -80,7 +80,7 @@ struct _MotoGeomViewNodeClass
     MotoGeomViewNodeDrawMethod draw;
     MotoGeomViewNodePrepareForDrawMethod prepare_for_draw;
     MotoGeomViewNodeSelectMethod select;
-    MotoGeomViewNodeGetGeometryMethod get_geometry;
+    MotoGeomViewNodeGetShapeMethod get_shape;
     MotoGeomViewNodeGrowSelectionMethod grow_selection;
     MotoGeomViewNodeSelectLessMethod select_less;
     MotoGeomViewNodeInvertSelectionMethod invert_selection;
@@ -120,7 +120,7 @@ void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_na
 GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self);
 void moto_geom_view_node_goto_next_state(MotoGeomViewNode *self);
 
-MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self);
+MotoShapeNode *moto_geom_view_node_get_shape(MotoGeomViewNode *self);
 
 void moto_geom_view_node_grow_selection(MotoGeomViewNode *self);
 void moto_geom_view_node_select_less(MotoGeomViewNode *self);

@@ -12,9 +12,9 @@ static void moto_geom_view_node_grow_selection_virtual(MotoGeomViewNode *self);
 static void moto_geom_view_node_select_less_virtual(MotoGeomViewNode *self);
 static void moto_geom_view_node_invert_selection_virtual(MotoGeomViewNode *self);
 
-/* class GeometryViewNode */
+/* class ShapeViewNode */
 
-static GObjectClass *geometry_view_node_parent_class = NULL;
+static GObjectClass *shape_view_node_parent_class = NULL;
 
 struct _MotoGeomViewNodePriv
 {
@@ -33,7 +33,7 @@ moto_geom_view_node_dispose(GObject *obj)
         return;
     self->priv->disposed = TRUE;
 
-    geometry_view_node_parent_class->dispose(obj);
+    shape_view_node_parent_class->dispose(obj);
 }
 
 static void
@@ -43,7 +43,7 @@ moto_geom_view_node_finalize(GObject *obj)
 
     g_slice_free(MotoGeomViewNodePriv, self->priv);
 
-    geometry_view_node_parent_class->finalize(obj);
+    shape_view_node_parent_class->finalize(obj);
 }
 
 static void
@@ -61,7 +61,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
-    geometry_view_node_parent_class = g_type_class_peek_parent(klass);
+    shape_view_node_parent_class = g_type_class_peek_parent(klass);
 
     goclass->dispose    = moto_geom_view_node_dispose;
     goclass->finalize   = moto_geom_view_node_finalize;
@@ -69,7 +69,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
     klass->draw = NULL;
     klass->select = NULL;
     klass->prepare_for_draw = NULL;
-    klass->get_geometry = NULL;
+    klass->get_shape = NULL;
     klass->grow_selection = moto_geom_view_node_grow_selection_virtual;
     klass->select_less    = moto_geom_view_node_select_less_virtual;
     klass->invert_selection = moto_geom_view_node_invert_selection_virtual;
@@ -123,7 +123,7 @@ moto_geom_view_node_class_init(MotoGeomViewNodeClass *klass)
 
 G_DEFINE_ABSTRACT_TYPE(MotoGeomViewNode, moto_geom_view_node, MOTO_TYPE_NODE);
 
-/* Methods of class GeometryViewNode */
+/* Methods of class ShapeViewNode */
 
 void moto_geom_view_node_draw(MotoGeomViewNode *self)
 {
@@ -193,7 +193,7 @@ void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_na
         }
     }
 
-    moto_warning("Instance \"%s\" of GeometryViewNode has no state with name \"%s\"",
+    moto_warning("Instance \"%s\" of ShapeViewNode has no state with name \"%s\"",
         moto_node_get_name((MotoNode *)self), state_name);
 }
 
@@ -217,12 +217,12 @@ void moto_geom_view_node_goto_next_state(MotoGeomViewNode *self)
     }
 }
 
-MotoGeometryNode *moto_geom_view_node_get_geometry(MotoGeomViewNode *self)
+MotoShapeNode *moto_geom_view_node_get_shape(MotoGeomViewNode *self)
 {
     MotoGeomViewNodeClass *klass = MOTO_GEOM_VIEW_NODE_GET_CLASS(self);
 
-    if(klass->get_geometry)
-        return klass->get_geometry(self);
+    if(klass->get_shape)
+        return klass->get_shape(self);
     return NULL;
 }
 
@@ -298,9 +298,9 @@ gboolean moto_geom_view_node_process_motion(MotoGeomViewNode *self,
     return TRUE;
 }
 
-/* class GeometryViewState */
+/* class ShapeViewState */
 
-static GObjectClass *geometry_view_state_parent_class = NULL;
+static GObjectClass *shape_view_state_parent_class = NULL;
 
 struct _MotoGeomViewStatePriv
 {
@@ -323,7 +323,7 @@ moto_geom_view_state_dispose(GObject *obj)
     g_string_free(self->priv->name, TRUE);
     g_string_free(self->priv->title, TRUE);
 
-    geometry_view_state_parent_class->dispose(obj);
+    shape_view_state_parent_class->dispose(obj);
 }
 
 static void
@@ -333,7 +333,7 @@ moto_geom_view_state_finalize(GObject *obj)
 
     g_slice_free(MotoGeomViewStatePriv, self->priv);
 
-    geometry_view_state_parent_class->finalize(obj);
+    shape_view_state_parent_class->finalize(obj);
 }
 
 static void
@@ -352,7 +352,7 @@ moto_geom_view_state_class_init(MotoGeomViewStateClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
-    geometry_view_state_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
+    shape_view_state_parent_class = G_OBJECT_CLASS(g_type_class_peek_parent(klass));
 
     goclass->dispose    = moto_geom_view_state_dispose;
     goclass->finalize   = moto_geom_view_state_finalize;
@@ -360,7 +360,7 @@ moto_geom_view_state_class_init(MotoGeomViewStateClass *klass)
 
 G_DEFINE_TYPE(MotoGeomViewState, moto_geom_view_state, G_TYPE_OBJECT);
 
-/* Methods of class GeometryViewState */
+/* Methods of class ShapeViewState */
 
 MotoGeomViewState *
 moto_geom_view_state_new(const gchar *name, const gchar *title,

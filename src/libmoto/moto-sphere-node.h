@@ -22,7 +22,7 @@
 #ifndef __MOTO_SPHERE_NODE_H__
 #define __MOTO_SPHERE_NODE_H__
 
-#include "moto-geom-node.h"
+#include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
@@ -33,12 +33,12 @@ typedef struct _MotoSphereNodeClass MotoSphereNodeClass;
 
 struct _MotoSphereNode
 {
-    MotoGeometryNode parent;
+    MotoShapeNode parent;
 };
 
 struct _MotoSphereNodeClass
 {
-    MotoGeometryNodeClass parent;
+    MotoShapeNodeClass parent;
 };
 
 GType moto_sphere_node_get_type(void);

@@ -10,7 +10,7 @@
 /* forwards */
 
 static void moto_cylinder_node_update(MotoNode *self);
-static MotoBound *moto_cylinder_node_get_bound(MotoGeometryNode *self);
+static MotoBound *moto_cylinder_node_get_bound(MotoShapeNode *self);
 
 /* class CylinderNode */
 
@@ -76,7 +76,7 @@ moto_cylinder_node_init(MotoCylinderNode *self)
             "screw", "Screw", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Screw",
             "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
             "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, self->priv->mesh, pspec, "Shape",
             NULL);
 
     self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -88,7 +88,7 @@ moto_cylinder_node_class_init(MotoCylinderNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
-    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
+    MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     cylinder_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -100,7 +100,7 @@ moto_cylinder_node_class_init(MotoCylinderNodeClass *klass)
     nclass->update = moto_cylinder_node_update;
 }
 
-G_DEFINE_TYPE(MotoCylinderNode, moto_cylinder_node, MOTO_TYPE_GEOMETRY_NODE);
+G_DEFINE_TYPE(MotoCylinderNode, moto_cylinder_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class CylinderNode */
 
@@ -547,7 +547,7 @@ static void calc_bound(MotoCylinderNode *self)
     self->priv->bound->bound[5] =  rsz;
 }
 
-static MotoBound *moto_cylinder_node_get_bound(MotoGeometryNode *self)
+static MotoBound *moto_cylinder_node_get_bound(MotoShapeNode *self)
 {
     MotoCylinderNode *cylinder = (MotoCylinderNode *)self;
 

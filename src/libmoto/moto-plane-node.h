@@ -22,7 +22,7 @@
 #ifndef __MOTO_PLANE_NODE_H__
 #define __MOTO_PLANE_NODE_H__
 
-#include "moto-geom-node.h"
+#include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
@@ -43,12 +43,12 @@ GType moto_orientation_get_type(void);
 
 struct _MotoPlaneNode
 {
-    MotoGeometryNode parent;
+    MotoShapeNode parent;
 };
 
 struct _MotoPlaneNodeClass
 {
-    MotoGeometryNodeClass parent;
+    MotoShapeNodeClass parent;
 };
 
 GType moto_plane_node_get_type(void);

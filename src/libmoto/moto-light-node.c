@@ -84,7 +84,7 @@ moto_light_node_init(MotoLightNode *self)
             "spot_blur", "Spot Blur", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0, NULL, "Spot",
             "cone_angle", "Cone Angle", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 30.0, NULL, "Spot",
             "cone_angle_delta", "Cone Angle Delta", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 5.0, NULL, "Spot",
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
+            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     priv->prepared = FALSE;

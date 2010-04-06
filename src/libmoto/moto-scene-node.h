@@ -247,7 +247,7 @@ void moto_scene_node_set_axes(MotoSceneNode *self, MotoObjectNode *axes);
  * @width: width of viewport.
  * @height: height of viewport.
  *
- * Draws the scene_node geometry.
+ * Draws the scene_node shape.
  */
 void moto_scene_node_redraw(MotoSceneNode *self);
 

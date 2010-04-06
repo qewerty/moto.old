@@ -7,7 +7,7 @@
 /* forwards */
 
 static void moto_cube_node_update(MotoNode *self);
-static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self);
+static MotoBound *moto_cube_node_get_bound(MotoShapeNode *self);
 
 /* class CubeNode */
 
@@ -78,7 +78,7 @@ moto_cube_node_init(MotoCubeNode *self)
           // "bevel",    "Bevel",          G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Bevel",
           // "bev_abs",  "Absolute Bevel", G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Bevel",
           // "bev_size", "Bevel Size",     G_TYPE_FLOAT,      MOTO_PARAM_MODE_INOUT, 0.1f,       NULL,      "Bevel",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,    MOTO_PARAM_MODE_OUT,   priv->mesh, NULL,      "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,    MOTO_PARAM_MODE_OUT,   priv->mesh, NULL,      "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -92,7 +92,7 @@ moto_cube_node_class_init(MotoCubeNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
-    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
+    MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     cube_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -106,7 +106,7 @@ moto_cube_node_class_init(MotoCubeNodeClass *klass)
     g_type_class_add_private(klass, sizeof(MotoCubeNodePriv));
 }
 
-G_DEFINE_TYPE(MotoCubeNode, moto_cube_node, MOTO_TYPE_GEOMETRY_NODE);
+G_DEFINE_TYPE(MotoCubeNode, moto_cube_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class CubeNode */
 
@@ -418,7 +418,7 @@ static void calc_bound(MotoCubeNode *self)
     priv->bound->bound[5] =  hsz;
 }
 
-static MotoBound *moto_cube_node_get_bound(MotoGeometryNode *self)
+static MotoBound *moto_cube_node_get_bound(MotoShapeNode *self)
 {
     MotoCubeNodePriv *priv = MOTO_CUBE_NODE_GET_PRIVATE(self);
 

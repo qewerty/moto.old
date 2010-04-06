@@ -10,7 +10,7 @@
 /* Some items */
 
 static void 
-create_geometry(MotoShelf* shelf, MotoSystem* system,
+create_shape(MotoShelf* shelf, MotoSystem* system,
                 const char* type_name, const char* name)
 {
     if(!system)
@@ -41,27 +41,27 @@ create_geometry(MotoShelf* shelf, MotoSystem* system,
 
 static void create_mesh_plane(MotoShelf *shelf, MotoSystem *system)
 {
-    create_geometry(shelf, system, "MotoPlaneNode", "plane");
+    create_shape(shelf, system, "MotoPlaneNode", "plane");
 }
 
 static void create_mesh_cube(MotoShelf *shelf, MotoSystem *system)
 {
-    create_geometry(shelf, system, "MotoCubeNode", "cube");
+    create_shape(shelf, system, "MotoCubeNode", "cube");
 }
 
 static void create_mesh_sphere(MotoShelf *shelf, MotoSystem *system)
 {
-    create_geometry(shelf, system, "MotoSphereNode", "sphere");
+    create_shape(shelf, system, "MotoSphereNode", "sphere");
 }
 
 static void create_mesh_cylinder(MotoShelf *shelf, MotoSystem *system)
 {
-    create_geometry(shelf, system, "MotoCylinderNode", "cylinder");
+    create_shape(shelf, system, "MotoCylinderNode", "cylinder");
 }
 
 static void create_mesh_file(MotoShelf *shelf, MotoSystem *system)
 {
-    create_geometry(shelf, system, "MotoMeshFileNode", "mesh_file");
+    create_shape(shelf, system, "MotoMeshFileNode", "mesh_file");
 }
 
 static void
@@ -107,7 +107,7 @@ perform_geom_op(MotoShelf *shelf, MotoSystem *system,
     MotoParam *source = moto_param_get_source(param);
     if( ! source)
     {
-        moto_error("View of current object has not associated geometry.");
+        moto_error("View of current object has not associated shape.");
         return;
     }
 

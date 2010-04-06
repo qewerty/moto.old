@@ -603,7 +603,7 @@ gboolean moto_scene_node_get_cull_faces(MotoSceneNode *self)
 }
 
 static gboolean
-__reset_geometry_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
+__reset_shape_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
     moto_geom_view_node_set_prepared((MotoGeomViewNode *)node, FALSE);
 
@@ -612,7 +612,7 @@ __reset_geometry_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_d
 
 void moto_scene_node_reset(MotoSceneNode *self)
 {
-    moto_scene_node_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_geometry_view, NULL);
+    moto_scene_node_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_shape_view, NULL);
 }
 
 typedef struct _MotoIntersectData

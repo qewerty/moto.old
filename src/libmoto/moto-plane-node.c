@@ -25,7 +25,7 @@ GType moto_orientation_get_type(void)
 /* forwards */
 
 static void moto_plane_node_update(MotoNode *self);
-static MotoBound *moto_plane_node_get_bound(MotoGeometryNode *self);
+static MotoBound *moto_plane_node_get_bound(MotoShapeNode *self);
 
 /* class PlaneNode */
 
@@ -85,7 +85,7 @@ moto_plane_node_init(MotoPlaneNode *self)
             "size", "Size",               MOTO_TYPE_FLOAT_2,     MOTO_PARAM_MODE_INOUT, size,                NULL,      "Form",
             "divs", "Divisions",          MOTO_TYPE_INT_2,       MOTO_PARAM_MODE_INOUT, divs,                divs_spec, "Form",
             "orientation", "Orientation", MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, NULL,      "Orientation",
-            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,        MOTO_PARAM_MODE_OUT,   priv->mesh,          NULL,      "Geometry",
+            "mesh",   "Polygonal Mesh",   MOTO_TYPE_MESH,        MOTO_PARAM_MODE_OUT,   priv->mesh,          NULL,      "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -99,7 +99,7 @@ moto_plane_node_class_init(MotoPlaneNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
-    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
+    MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     plane_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -113,7 +113,7 @@ moto_plane_node_class_init(MotoPlaneNodeClass *klass)
     g_type_class_add_private(klass, sizeof(MotoPlaneNodePriv));
 }
 
-G_DEFINE_TYPE(MotoPlaneNode, moto_plane_node, MOTO_TYPE_GEOMETRY_NODE);
+G_DEFINE_TYPE(MotoPlaneNode, moto_plane_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class PlaneNode */
 
@@ -375,7 +375,7 @@ static void calc_bound(MotoPlaneNode *self)
     priv->bound->bound[5] =  hsz;
 }
 
-static MotoBound *moto_plane_node_get_bound(MotoGeometryNode *self)
+static MotoBound *moto_plane_node_get_bound(MotoShapeNode *self)
 {
     MotoPlaneNodePriv *priv = MOTO_PLANE_NODE_GET_PRIVATE(self);
 

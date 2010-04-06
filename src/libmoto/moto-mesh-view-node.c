@@ -25,7 +25,7 @@ static void moto_mesh_view_node_draw(MotoGeomViewNode *self);
 static void moto_mesh_view_node_prepare_for_draw(MotoGeomViewNode *self);
 static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self, gint x, gint y,
         gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeomViewNode *self);
+static MotoShapeNode *moto_mesh_view_node_get_shape(MotoGeomViewNode *self);
 
 static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wireframe);
 
@@ -124,10 +124,10 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "subdiv", "Subdiv", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Geometry",
-            "subdiv_render", "Subdiv Render", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Geometry",
-            "mesh", "Mesh", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, pspec, "Geometry",
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Geometry",
+            "subdiv", "Subdiv", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Shape",
+            "subdiv_render", "Subdiv Render", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Shape",
+            "mesh", "Mesh", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, pspec, "Shape",
+            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     moto_geom_view_node_set_state((MotoGeomViewNode *)self, "verts");
@@ -153,7 +153,7 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
     gvclass->draw               = moto_mesh_view_node_draw;
     gvclass->prepare_for_draw   = moto_mesh_view_node_prepare_for_draw;
     gvclass->select             = moto_mesh_view_node_select;
-    gvclass->get_geometry       = moto_mesh_view_node_get_geometry;
+    gvclass->get_shape       = moto_mesh_view_node_get_shape;
 
     gvclass->states = g_slist_append(gvclass->states,
             moto_geom_view_state_new("object", "Object",
@@ -834,13 +834,13 @@ static gboolean moto_mesh_view_node_select(MotoGeomViewNode *self,
     return FALSE;
 }
 
-static MotoGeometryNode *moto_mesh_view_node_get_geometry(MotoGeomViewNode *self)
+static MotoShapeNode *moto_mesh_view_node_get_shape(MotoGeomViewNode *self)
 {
     MotoParam *p = moto_node_get_param((MotoNode *)self, "mesh");
     MotoParam *s = moto_param_get_source(p);
     if( ! s)
         return NULL;
-    return (MotoGeometryNode *)moto_param_get_node(s);
+    return (MotoShapeNode *)moto_param_get_node(s);
 }
 
 static void moto_mesh_view_node_draw_bound(MotoMeshViewNode *self, gboolean wireframe)

@@ -50,8 +50,8 @@ moto_geom_op_node_init(MotoGeomOpNode *self)
 
     moto_node_add_params(node,
             "active", "Active",          MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
-            "in",     "Input Geometry",  MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_IN,    NULL, NULL, "Geometry",
-            "out",    "Output Geometry", MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_OUT,   NULL, NULL, "Geometry",
+            "in",     "Input Shape",  MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_IN,    NULL, NULL, "Shape",
+            "out",    "Output Shape", MOTO_TYPE_GEOM,    MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
             NULL);
 }
 

@@ -181,7 +181,7 @@ static void set_state(GtkMenuItem *item, gpointer user_data)
 {
     MotoGeomViewNode *geom = (MotoGeomViewNode *)user_data;
     MotoGeomViewState *state = \
-        (MotoGeomViewState *)g_object_get_data(G_OBJECT(item), "moto-geometry-view-state");
+        (MotoGeomViewState *)g_object_get_data(G_OBJECT(item), "moto-shape-view-state");
 
     moto_geom_view_node_set_state(geom, moto_geom_view_state_get_name(state));
 }
@@ -280,7 +280,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         item = \
             gtk_menu_item_new_with_label(moto_geom_view_state_get_title((MotoGeomViewState *)state->data));
 
-        g_object_set_data((GObject *)item, "moto-geometry-view-state", state->data);
+        g_object_set_data((GObject *)item, "moto-shape-view-state", state->data);
         g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_state), geom);
 
         gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);

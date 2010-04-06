@@ -10,7 +10,7 @@
 /* forwards */
 
 static void moto_sphere_node_update(MotoNode *self);
-static MotoBound *moto_sphere_node_get_bound(MotoGeometryNode *self);
+static MotoBound *moto_sphere_node_get_bound(MotoShapeNode *self);
 
 /* class SphereNode */
 
@@ -72,7 +72,7 @@ moto_sphere_node_init(MotoSphereNode *self)
             "radius", "Radius",   MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, radius, pspec, "Form",
             "rc", "Rows/Columns", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Form",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Y, pspec, "Orientation",
-            "mesh",   "Polygonal Mesh",    MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Geometry",
+            "mesh",   "Polygonal Mesh",    MOTO_TYPE_MESH, MOTO_PARAM_MODE_OUT, priv->mesh, pspec, "Shape",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
@@ -86,7 +86,7 @@ moto_sphere_node_class_init(MotoSphereNodeClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
     MotoNodeClass *nclass = (MotoNodeClass *)klass;
-    MotoGeometryNodeClass *gnclass = (MotoGeometryNodeClass *)klass;
+    MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     sphere_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -100,7 +100,7 @@ moto_sphere_node_class_init(MotoSphereNodeClass *klass)
     g_type_class_add_private(klass, sizeof(MotoSphereNodePriv));
 }
 
-G_DEFINE_TYPE(MotoSphereNode, moto_sphere_node, MOTO_TYPE_GEOMETRY_NODE);
+G_DEFINE_TYPE(MotoSphereNode, moto_sphere_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class SphereNode */
 
@@ -358,7 +358,7 @@ static void calc_bound(MotoSphereNode *self)
     priv->bound->bound[5] =  rsz;
 }
 
-static MotoBound *moto_sphere_node_get_bound(MotoGeometryNode *self)
+static MotoBound *moto_sphere_node_get_bound(MotoShapeNode *self)
 {
     MotoSphereNodePriv *priv = MOTO_SPHERE_NODE_GET_PRIVATE(self);
 
