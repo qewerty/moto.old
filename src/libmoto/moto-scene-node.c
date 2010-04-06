@@ -524,19 +524,41 @@ MotoNode *moto_scene_node_get_node(MotoSceneNode *self, const gchar *name)
     return node;
 }
 
-void moto_scene_node_foreach_node(MotoSceneNode *self, GType type,
-        MotoSceneNodeForeachNodeFunc func, gpointer user_data)
+gboolean moto_node_foreach_child(MotoNode *self, GType type,
+    MotoSceneNodeForeachNodeFunc func, gpointer user_data)
 {
-    GSList *l = self->priv->nodes;
-    for(; l; l=g_slist_next(l))
+    GList *l = moto_node_get_children(self);
+    for(; l; l = g_list_next(l))
     {
         if(g_type_is_a(G_TYPE_FROM_INSTANCE(l->data), type))
         {
-            if( ! func(self, (MotoNode *)l->data, user_data))
+            if(!func(self, (MotoNode *)l->data, user_data))
+            {
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
+
+void moto_scene_node_foreach_node(MotoSceneNode *self, GType type,
+    MotoSceneNodeForeachNodeFunc func, gpointer user_data)
+{
+    GList *l = moto_node_get_children((MotoNode*)self);
+    for(; l; l = g_list_next(l))
+    {
+        MotoNode* node = (MotoNode *)l->data;
+
+        if(g_type_is_a(G_TYPE_FROM_INSTANCE(l->data), type))
+        {
+            if(!func(self, node, user_data))
             {
                 break;
             }
         }
+
+        if(!moto_node_foreach_child(node, type, func, user_data))
+            break;
     }
 }
 
