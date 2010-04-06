@@ -73,7 +73,7 @@ static void create_render_node(GtkMenuItem* item, MotoCreateRenderNodeData* data
     }
 
     MotoNode* node = \
-        moto_scene_node_create_node_by_name(w, g_type_name(data->type), "RenderMan", NULL);
+        moto_node_create_child_by_name((MotoNode*)w, g_type_name(data->type), "RenderMan");
 }
 
 static void free_MotoCreateRenderNodeData(gpointer data, GClosure *closure)
@@ -110,7 +110,6 @@ static void on_create_render_node_activate(GtkMenuItem *item, gpointer user_data
 
 static gboolean render(MotoSceneNode *scene_node, MotoRenderNode *node, gpointer user_data)
 {
-    g_print("render: %s\n", moto_node_get_name((MotoNode*)node));
     moto_render_node_render(node);
 
     return TRUE;
@@ -124,11 +123,8 @@ static void on_start_render_activate(GtkMenuItem *item, gpointer user_data)
     if(!w)
         return;
 
-    g_print("w: %p\n", w);
-
     moto_scene_node_foreach_node(w, MOTO_TYPE_RENDER_NODE,
         (MotoSceneNodeForeachNodeFunc)render, NULL);
-    g_print("---\n");
 }
 
 /* class MainMenu */

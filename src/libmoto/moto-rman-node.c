@@ -406,8 +406,13 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
         priv->out = NULL;
     }
 
-    MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode*)self);
-    if(!scene_node)
+    MotoSceneNode *scene_node = (MotoSceneNode*)moto_node_get_parent(node);
+    while(scene_node && !MOTO_IS_SCENE_NODE(scene_node))
+    {
+        scene_node = (MotoSceneNode*)moto_node_get_parent((MotoNode*)scene_node);
+    }
+
+    if(!scene_node || !MOTO_IS_SCENE_NODE(scene_node))
         return FALSE;
 
     MotoObjectNode* camera = moto_scene_node_get_camera(scene_node);
@@ -487,7 +492,7 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     }
 
     moto_rman_node_writeln(rman, 0, "FrameBegin 1");
-    moto_rman_node_writeln(rman, 0, "SceneNodeBegin");
+    moto_rman_node_writeln(rman, 0, "WorldBegin");
 
     moto_scene_node_foreach_node(scene_node, MOTO_TYPE_OBJECT_NODE,
         (MotoSceneNodeForeachNodeFunc)export_light, rman);
@@ -495,7 +500,7 @@ static gboolean moto_rman_node_render(MotoRenderNode *self)
     moto_scene_node_foreach_node(scene_node, MOTO_TYPE_OBJECT_NODE,
         (MotoSceneNodeForeachNodeFunc)export_object, rman);
 
-    moto_rman_node_writeln(rman, 0, "SceneNodeEnd");
+    moto_rman_node_writeln(rman, 0, "WorldEnd");
     moto_rman_node_writeln(rman, 0, "FrameEnd");
 
     fclose(priv->out);
