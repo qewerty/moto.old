@@ -6,11 +6,9 @@
 #include "moto-outliner.h"
 #include "moto-test-window.h"
 
-static  void 
-__on_row_activated(GtkTreeView       *tree_view,
-                   GtkTreePath       *path,
-                   GtkTreeViewColumn *column,
-                   MotoOutliner      *outliner);
+static void
+on_cursor_changed(GtkTreeView *tree_view,
+                  MotoOutliner *outliner);
 
 /* class MotoOutliner */
 
@@ -63,7 +61,7 @@ moto_outliner_init(MotoOutliner *self)
     gtk_tree_view_set_rules_hint(priv->tv, TRUE);
     g_object_ref_sink(priv->tv);
 
-    g_signal_connect(G_OBJECT(priv->tv), "row-activated", G_CALLBACK(__on_row_activated), self);
+    g_signal_connect(G_OBJECT(priv->tv), "cursor-changed", G_CALLBACK(on_cursor_changed), self);
 
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(priv->tv, -1,
@@ -180,19 +178,22 @@ void moto_outliner_update(MotoOutliner *self)
             */
 }
 
-static  void 
-__on_row_activated(GtkTreeView       *tree_view,
-                   GtkTreePath       *path,
-                   GtkTreeViewColumn *column,
-                   MotoOutliner      *outliner)
+static void
+on_cursor_changed(GtkTreeView *tree_view,
+                  MotoOutliner *outliner)
 {
     MotoOutlinerPriv *priv = MOTO_OUTLINER_GET_PRIVATE(outliner);
+
+    GtkTreePath* path = NULL;
+    gtk_tree_view_get_cursor(tree_view, &path, NULL);
 
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeIter iter;
     gtk_tree_model_get_iter(model, & iter, path);
 
     MotoNode *node = NULL;
-    gtk_tree_model_get(model, & iter, 2, & node, -1);
+    gtk_tree_model_get(model, &iter, 2, & node, -1);
     moto_test_window_update_param_editor_full(priv->window, node);
+
+    gtk_tree_path_free(path);
 }
