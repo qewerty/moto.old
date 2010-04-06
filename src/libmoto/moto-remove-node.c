@@ -11,7 +11,7 @@
 
 /* forwards */
 
-static MotoMesh *moto_remove_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoMesh *moto_remove_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoRemoveNode */
 
@@ -45,7 +45,7 @@ MotoRemoveNode *moto_remove_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_remove_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoMesh *moto_remove_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
 {
     *the_same = FALSE;
 

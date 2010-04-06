@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_GEOM_VIEW_NODE_H__
-#define __MOTO_GEOM_VIEW_NODE_H__
+#ifndef __MOTO_SHAPE_VIEW_NODE_H__
+#define __MOTO_SHAPE_VIEW_NODE_H__
 
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -31,30 +31,30 @@
 
 G_BEGIN_DECLS
 
-typedef struct _MotoGeomViewNode MotoGeomViewNode;
-typedef struct _MotoGeomViewNodeClass MotoGeomViewNodeClass;
-typedef struct _MotoGeomViewNodePriv MotoGeomViewNodePriv;
+typedef struct _MotoShapeViewNode MotoShapeViewNode;
+typedef struct _MotoShapeViewNodeClass MotoShapeViewNodeClass;
+typedef struct _MotoShapeViewNodePriv MotoShapeViewNodePriv;
 
-typedef void (*MotoGeomViewNodeDrawMethod)(MotoGeomViewNode *self);
-typedef void (*MotoGeomViewNodePrepareForDrawMethod)(MotoGeomViewNode *self);
-typedef gboolean (*MotoGeomViewNodeSelectMethod)(MotoGeomViewNode *self,
+typedef void (*MotoShapeViewNodeDrawMethod)(MotoShapeViewNode *self);
+typedef void (*MotoShapeViewNodePrepareForDrawMethod)(MotoShapeViewNode *self);
+typedef gboolean (*MotoShapeViewNodeSelectMethod)(MotoShapeViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-typedef MotoShapeNode *(*MotoGeomViewNodeGetShapeMethod)(MotoGeomViewNode *self);
-typedef void (*MotoGeomViewNodeGrowSelectionMethod)(MotoGeomViewNode *self);
-typedef void (*MotoGeomViewNodeSelectLessMethod)(MotoGeomViewNode *self);
-typedef void (*MotoGeomViewNodeInvertSelectionMethod)(MotoGeomViewNode *self);
+typedef MotoShapeNode *(*MotoShapeViewNodeGetShapeMethod)(MotoShapeViewNode *self);
+typedef void (*MotoShapeViewNodeGrowSelectionMethod)(MotoShapeViewNode *self);
+typedef void (*MotoShapeViewNodeSelectLessMethod)(MotoShapeViewNode *self);
+typedef void (*MotoShapeViewNodeInvertSelectionMethod)(MotoShapeViewNode *self);
 
-typedef struct _MotoGeomViewState MotoGeomViewState;
-typedef struct _MotoGeomViewStateClass MotoGeomViewStateClass;
-typedef struct _MotoGeomViewStatePriv MotoGeomViewStatePriv;
+typedef struct _MotoShapeViewState MotoShapeViewState;
+typedef struct _MotoShapeViewStateClass MotoShapeViewStateClass;
+typedef struct _MotoShapeViewStatePriv MotoShapeViewStatePriv;
 
-typedef void (*MotoGeomViewStateDrawFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
-typedef gboolean (*MotoGeomViewStateSelectFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom,
+typedef void (*MotoShapeViewStateDrawFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom);
+typedef gboolean (*MotoShapeViewStateSelectFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-typedef void (*MotoGeomViewStateGrowSelectionFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
-typedef void (*MotoGeomViewStateSelectLessFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
-typedef void (*MotoGeomViewStateInvertSelectionFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
-typedef void (*MotoGeomViewStateLeaveFunc)(MotoGeomViewState *self, MotoGeomViewNode *geom);
+typedef void (*MotoShapeViewStateGrowSelectionFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom);
+typedef void (*MotoShapeViewStateSelectLessFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom);
+typedef void (*MotoShapeViewStateInvertSelectionFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom);
+typedef void (*MotoShapeViewStateLeaveFunc)(MotoShapeViewState *self, MotoShapeViewNode *geom);
 
 
 /* Drawing modes.
@@ -64,26 +64,26 @@ typedef void (*MotoGeomViewStateLeaveFunc)(MotoGeomViewState *self, MotoGeomView
  *
  * */
 
-/* MotoGeomViewNode */
+/* MotoShapeViewNode */
 
-struct _MotoGeomViewNode
+struct _MotoShapeViewNode
 {
     MotoNode parent;
 
-    MotoGeomViewNodePriv *priv;
+    MotoShapeViewNodePriv *priv;
 };
 
-struct _MotoGeomViewNodeClass
+struct _MotoShapeViewNodeClass
 {
     MotoNodeClass parent;
 
-    MotoGeomViewNodeDrawMethod draw;
-    MotoGeomViewNodePrepareForDrawMethod prepare_for_draw;
-    MotoGeomViewNodeSelectMethod select;
-    MotoGeomViewNodeGetShapeMethod get_shape;
-    MotoGeomViewNodeGrowSelectionMethod grow_selection;
-    MotoGeomViewNodeSelectLessMethod select_less;
-    MotoGeomViewNodeInvertSelectionMethod invert_selection;
+    MotoShapeViewNodeDrawMethod draw;
+    MotoShapeViewNodePrepareForDrawMethod prepare_for_draw;
+    MotoShapeViewNodeSelectMethod select;
+    MotoShapeViewNodeGetShapeMethod get_shape;
+    MotoShapeViewNodeGrowSelectionMethod grow_selection;
+    MotoShapeViewNodeSelectLessMethod select_less;
+    MotoShapeViewNodeInvertSelectionMethod invert_selection;
 
     GSList *states;
 
@@ -98,84 +98,84 @@ struct _MotoGeomViewNodeClass
     guint motion_notify_signal_id;
 };
 
-GType moto_geom_view_node_get_type(void);
+GType moto_shape_view_node_get_type(void);
 
-#define MOTO_TYPE_GEOM_VIEW_NODE (moto_geom_view_node_get_type())
-#define MOTO_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNode))
-#define MOTO_GEOM_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNodeClass))
+#define MOTO_TYPE_GEOM_VIEW_NODE (moto_shape_view_node_get_type())
+#define MOTO_SHAPE_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_NODE, MotoShapeViewNode))
+#define MOTO_SHAPE_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_NODE, MotoShapeViewNodeClass))
 #define MOTO_IS_GEOM_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM_VIEW_NODE))
 #define MOTO_IS_GEOM_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM_VIEW_NODE))
-#define MOTO_GEOM_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_NODE, MotoGeomViewNodeClass))
+#define MOTO_SHAPE_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_NODE, MotoShapeViewNodeClass))
 
-void moto_geom_view_node_draw(MotoGeomViewNode *self);
-void moto_geom_view_node_prepare_for_draw(MotoGeomViewNode *self);
-gboolean moto_geom_view_node_select(MotoGeomViewNode *self,
+void moto_shape_view_node_draw(MotoShapeViewNode *self);
+void moto_shape_view_node_prepare_for_draw(MotoShapeViewNode *self);
+gboolean moto_shape_view_node_select(MotoShapeViewNode *self,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
-gboolean moto_geom_view_node_get_prepared(MotoGeomViewNode *self);
-void moto_geom_view_node_set_prepared(MotoGeomViewNode *self, gboolean status);
+gboolean moto_shape_view_node_get_prepared(MotoShapeViewNode *self);
+void moto_shape_view_node_set_prepared(MotoShapeViewNode *self, gboolean status);
 
-MotoGeomViewState *moto_geom_view_node_get_state(MotoGeomViewNode *self);
-void moto_geom_view_node_set_state(MotoGeomViewNode *self, const gchar *state_name);
-GSList *moto_geom_view_node_get_state_list(MotoGeomViewNode *self);
-void moto_geom_view_node_goto_next_state(MotoGeomViewNode *self);
+MotoShapeViewState *moto_shape_view_node_get_state(MotoShapeViewNode *self);
+void moto_shape_view_node_set_state(MotoShapeViewNode *self, const gchar *state_name);
+GSList *moto_shape_view_node_get_state_list(MotoShapeViewNode *self);
+void moto_shape_view_node_goto_next_state(MotoShapeViewNode *self);
 
-MotoShapeNode *moto_geom_view_node_get_shape(MotoGeomViewNode *self);
+MotoShapeNode *moto_shape_view_node_get_shape(MotoShapeViewNode *self);
 
-void moto_geom_view_node_grow_selection(MotoGeomViewNode *self);
-void moto_geom_view_node_select_less(MotoGeomViewNode *self);
-void moto_geom_view_node_invert_selection(MotoGeomViewNode *self);
+void moto_shape_view_node_grow_selection(MotoShapeViewNode *self);
+void moto_shape_view_node_select_less(MotoShapeViewNode *self);
+void moto_shape_view_node_invert_selection(MotoShapeViewNode *self);
 
-gboolean moto_geom_view_node_process_button_press(MotoGeomViewNode *self,
+gboolean moto_shape_view_node_process_button_press(MotoShapeViewNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
-gboolean moto_geom_view_node_process_button_release(MotoGeomViewNode *self,
+gboolean moto_shape_view_node_process_button_release(MotoShapeViewNode *self,
     gint x, gint y, gint width, gint height);
-gboolean moto_geom_view_node_process_motion(MotoGeomViewNode *self,
+gboolean moto_shape_view_node_process_motion(MotoShapeViewNode *self,
     gint x, gint y, gint width, gint height);
 
-/* class MotoGeomViewState */
+/* class MotoShapeViewState */
 
-struct _MotoGeomViewState
+struct _MotoShapeViewState
 {
     GObject parent;
 
-    MotoGeomViewStatePriv *priv;
+    MotoShapeViewStatePriv *priv;
 };
 
-struct _MotoGeomViewStateClass
+struct _MotoShapeViewStateClass
 {
     GObjectClass parent;
 };
 
-GType moto_geom_view_state_get_type(void);
+GType moto_shape_view_state_get_type(void);
 
-#define MOTO_TYPE_GEOM_VIEW_STATE (moto_geom_view_state_get_type())
-#define MOTO_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewState))
-#define MOTO_GEOM_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewStateClass))
+#define MOTO_TYPE_GEOM_VIEW_STATE (moto_shape_view_state_get_type())
+#define MOTO_SHAPE_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM_VIEW_STATE, MotoShapeViewState))
+#define MOTO_SHAPE_VIEW_STATE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_VIEW_STATE, MotoShapeViewStateClass))
 #define MOTO_IS_GEOM_VIEW_STATE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM_VIEW_STATE))
 #define MOTO_IS_GEOM_VIEW_STATE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM_VIEW_STATE))
-#define MOTO_GEOM_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_STATE, MotoGeomViewStateClass))
+#define MOTO_SHAPE_VIEW_STATE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM_VIEW_STATE, MotoShapeViewStateClass))
 
-MotoGeomViewState *
-moto_geom_view_state_new(const gchar *name, const gchar *title,
-        MotoGeomViewStateDrawFunc draw, MotoGeomViewStateSelectFunc select,
-        MotoGeomViewStateGrowSelectionFunc grow_selection,
-        MotoGeomViewStateSelectLessFunc select_less,
-        MotoGeomViewStateInvertSelectionFunc invert_selection,
-        MotoGeomViewStateLeaveFunc leave);
+MotoShapeViewState *
+moto_shape_view_state_new(const gchar *name, const gchar *title,
+        MotoShapeViewStateDrawFunc draw, MotoShapeViewStateSelectFunc select,
+        MotoShapeViewStateGrowSelectionFunc grow_selection,
+        MotoShapeViewStateSelectLessFunc select_less,
+        MotoShapeViewStateInvertSelectionFunc invert_selection,
+        MotoShapeViewStateLeaveFunc leave);
 
-const gchar *moto_geom_view_state_get_name(MotoGeomViewState *self);
-const gchar *moto_geom_view_state_get_title(MotoGeomViewState *self);
+const gchar *moto_shape_view_state_get_name(MotoShapeViewState *self);
+const gchar *moto_shape_view_state_get_title(MotoShapeViewState *self);
 
-void moto_geom_view_state_draw(MotoGeomViewState *self, MotoGeomViewNode *geom);
-gboolean moto_geom_view_state_select(MotoGeomViewState *self, MotoGeomViewNode *geom,
+void moto_shape_view_state_draw(MotoShapeViewState *self, MotoShapeViewNode *geom);
+gboolean moto_shape_view_state_select(MotoShapeViewState *self, MotoShapeViewNode *geom,
         gint x, gint y, gint width, gint height, MotoRay *ray, MotoTransformInfo *tinfo);
 
-void moto_geom_view_state_grow_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
-void moto_geom_view_state_select_less(MotoGeomViewState *self, MotoGeomViewNode *geom);
-void moto_geom_view_state_invert_selection(MotoGeomViewState *self, MotoGeomViewNode *geom);
-void moto_geom_view_state_leave(MotoGeomViewState *self, MotoGeomViewNode *geom);
+void moto_shape_view_state_grow_selection(MotoShapeViewState *self, MotoShapeViewNode *geom);
+void moto_shape_view_state_select_less(MotoShapeViewState *self, MotoShapeViewNode *geom);
+void moto_shape_view_state_invert_selection(MotoShapeViewState *self, MotoShapeViewNode *geom);
+void moto_shape_view_state_leave(MotoShapeViewState *self, MotoShapeViewNode *geom);
 
 G_END_DECLS
 
-#endif /* __MOTO_GEOM_VIEW_NODE_H__ */
+#endif /* __MOTO_SHAPE_VIEW_NODE_H__ */

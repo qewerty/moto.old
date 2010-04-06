@@ -9,6 +9,7 @@
 #include "moto-object-node.h"
 #include "moto-material-node.h"
 #include "moto-mesh-view-node.h"
+#include "moto-shape-node.h"
 
 #include "libmotoutil/xform.h"
 #include "libmotoutil/numdef.h"
@@ -54,12 +55,12 @@ GType moto_rotate_order_get_type(void)
     if(0 == type)
     {
         static GEnumValue values[] = {
-            {MOTO_ROTATE_ORDER_XYZ, "MOTO_ROTATE_ORDER_XYZ", "XYZ"},
-            {MOTO_ROTATE_ORDER_XZY, "MOTO_ROTATE_ORDER_XZY", "XZY"},
-            {MOTO_ROTATE_ORDER_YXZ, "MOTO_ROTATE_ORDER_YXZ", "YXZ"},
-            {MOTO_ROTATE_ORDER_YZX, "MOTO_ROTATE_ORDER_YZX", "YZX"},
-            {MOTO_ROTATE_ORDER_ZXY, "MOTO_ROTATE_ORDER_ZXY", "ZXY"},
-            {MOTO_ROTATE_ORDER_ZYX, "MOTO_ROTATE_ORDER_ZYX", "ZYX"},
+            {MOTO_ROTATE_ORDER_XYZ, "ROTATE_ORDER_XYZ", "XYZ"},
+            {MOTO_ROTATE_ORDER_XZY, "ROTATE_ORDER_XZY", "XZY"},
+            {MOTO_ROTATE_ORDER_YXZ, "ROTATE_ORDER_YXZ", "YXZ"},
+            {MOTO_ROTATE_ORDER_YZX, "ROTATE_ORDER_YZX", "YZX"},
+            {MOTO_ROTATE_ORDER_ZXY, "ROTATE_ORDER_ZXY", "ZXY"},
+            {MOTO_ROTATE_ORDER_ZYX, "ROTATE_ORDER_ZYX", "ZYX"},
             {0, NULL, NULL},
         };
         type = g_enum_register_static("MotoRotateOrder", values);
@@ -164,9 +165,11 @@ moto_object_node_init(MotoObjectNode *self)
             "far", "Far Plane", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 150.0, NULL, "Projection",
             "to", "Transform Order", MOTO_TYPE_TRANSFORM_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_TRANSFORM_ORDER_SRT, pspec, "Transform/Misc",
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec, "Transform/Misc",
-            "kt", "Keep Transform", G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
-            "visible", "Visible",   G_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
+            "kt", "Keep Transform", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
+            "visible", "Visible",   MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
             "view", "View",   MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
+            "mode", "Selection Mode",   MOTO_TYPE_SELECTION_MODE, MOTO_PARAM_MODE_INOUT, MOTO_SELECTION_MODE_OBJECT, pspec, "View",
+            "shape", "Shape",   MOTO_TYPE_SHAPE_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
             "material", "Material", MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Shading/Material",
             NULL);
 
@@ -399,7 +402,7 @@ static void update_global_bound(MotoObjectNode *self)
     if( ! s)
         return;
 
-    MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
+    MotoShapeViewNode *gvn = (MotoShapeViewNode *)moto_param_get_node(s);
     if(! g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
         return;
 
@@ -420,7 +423,7 @@ static void update_local_bound(MotoObjectNode *self)
         return;
     }
 
-    MotoGeomViewNode *gvn = (MotoGeomViewNode *)moto_param_get_node(s);
+    MotoShapeViewNode *gvn = (MotoShapeViewNode *)moto_param_get_node(s);
     if(!g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
     {
         moto_bound_set(self->priv->local_bound, 0, 0, 0, 0, 0, 0);
@@ -653,7 +656,7 @@ void moto_object_node_draw(MotoObjectNode *self)
 
     MotoMaterialNode *mat;
     moto_node_get_param_object((MotoNode *)self, "material", (GObject **)&mat);
-    MotoGeomViewNode *view;
+    MotoShapeViewNode *view;
     moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     glMatrixMode(GL_MODELVIEW);
@@ -665,13 +668,13 @@ void moto_object_node_draw(MotoObjectNode *self)
         moto_material_node_use(mat);
 
     if(view)
-        moto_geom_view_node_draw(view);
+        moto_shape_view_node_draw(view);
 
     GList* child = moto_node_get_children((MotoNode*)self);
     for(; child; child = g_list_next(child))
     {
         if(MOTO_IS_GEOM_VIEW_NODE(child->data))
-            moto_geom_view_node_draw((MotoGeomViewNode*)child->data);
+            moto_shape_view_node_draw((MotoShapeViewNode*)child->data);
     }
 
     glPopMatrix();
@@ -682,6 +685,18 @@ void moto_object_node_draw(MotoObjectNode *self)
         if(MOTO_IS_OBJECT_NODE(child->data))
             moto_object_node_draw((MotoObjectNode *)child->data);
     }
+}
+
+MotoSelectionMode moto_object_node_get_selection_mode(MotoObjectNode* self)
+{
+    MotoSelectionMode sm = MOTO_SELECTION_MODE_OBJECT;
+    moto_node_get_param_enum((MotoNode*)self, "mode", (gint*)&sm);
+    return sm;
+}
+
+void moto_object_node_set_selection_mode(MotoObjectNode* self, MotoSelectionMode mode)
+{
+    moto_node_set_param_enum((MotoNode*)self, "mode", (gint)mode);
 }
 
 void moto_object_node_look_at(MotoObjectNode *self, gfloat eye[3], gfloat look[3], gfloat up[3])
@@ -1120,21 +1135,21 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
     MotoTransformInfo *tinfo)
 {
-    MotoGeomViewNode *view = NULL;
+    MotoShapeViewNode *view = NULL;
 
     GList* child = moto_node_get_children((MotoNode*)self);
     for(; child; child = g_list_next(child))
     {
         if(MOTO_IS_GEOM_VIEW_NODE(child->data))
         {
-            view = (MotoGeomViewNode*)child->data;
+            view = (MotoShapeViewNode*)child->data;
             break;
         }
     }
 
     if(view)
     {
-        if(moto_geom_view_node_process_button_press(view, x, y, width, height, ray, tinfo))
+        if(moto_shape_view_node_process_button_press(view, x, y, width, height, ray, tinfo))
         {
             return TRUE;
         }
@@ -1146,11 +1161,11 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoGeomViewNode *view;
+    MotoShapeViewNode *view;
     moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     if(view)
-        if(moto_geom_view_node_process_button_release(view, x, y, width, height))
+        if(moto_shape_view_node_process_button_release(view, x, y, width, height))
             return TRUE;
 
     GSList *child = self->priv->children;
@@ -1167,11 +1182,11 @@ gboolean moto_object_node_button_release(MotoObjectNode *self,
 gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoGeomViewNode *view;
+    MotoShapeViewNode *view;
     moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
 
     if(view)
-        if(moto_geom_view_node_process_motion(view, x, y, width, height))
+        if(moto_shape_view_node_process_motion(view, x, y, width, height))
             return TRUE;
 
     GSList *child = self->priv->children;

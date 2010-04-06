@@ -605,7 +605,7 @@ gboolean moto_scene_node_get_cull_faces(MotoSceneNode *self)
 static gboolean
 __reset_shape_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
-    moto_geom_view_node_set_prepared((MotoGeomViewNode *)node, FALSE);
+    moto_shape_view_node_set_prepared((MotoShapeViewNode *)node, FALSE);
 
     return TRUE;
 }

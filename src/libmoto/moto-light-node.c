@@ -5,8 +5,8 @@
 
 /* forwards */
 
-static void moto_light_node_draw(MotoGeomViewNode *self);
-static void moto_light_node_prepare_for_draw(MotoGeomViewNode *self);
+static void moto_light_node_draw(MotoShapeViewNode *self);
+static void moto_light_node_prepare_for_draw(MotoShapeViewNode *self);
 
 /* MotoLightModel */
 
@@ -98,8 +98,8 @@ moto_light_node_class_init(MotoLightNodeClass *klass)
 {
     g_type_class_add_private(klass, sizeof(MotoLightNodePriv));
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
-    MotoGeomViewNodeClass *gvnclass = \
-        MOTO_GEOM_VIEW_NODE_CLASS(klass);
+    MotoShapeViewNodeClass *gvnclass = \
+        MOTO_SHAPE_VIEW_NODE_CLASS(klass);
 
     light_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -137,7 +137,7 @@ static void draw_light(MotoLightNode *self)
     glEnd();
 }
 
-static void moto_light_node_draw(MotoGeomViewNode *self)
+static void moto_light_node_draw(MotoShapeViewNode *self)
 {
     MotoLightNode *view = (MotoLightNode *)self;
     MotoLightNodePriv* priv = MOTO_LIGHT_NODE_GET_PRIVATE(self);
@@ -159,7 +159,7 @@ static void moto_light_node_draw(MotoGeomViewNode *self)
     glPopAttrib();
 }
 
-static void moto_light_node_prepare_for_draw(MotoGeomViewNode *self)
+static void moto_light_node_prepare_for_draw(MotoShapeViewNode *self)
 {
     MotoLightNodePriv* priv = MOTO_LIGHT_NODE_GET_PRIVATE(self);
     MotoLightNode *view = (MotoLightNode *)self;

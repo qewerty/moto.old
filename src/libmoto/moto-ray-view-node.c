@@ -7,9 +7,9 @@
 
 /* forwards */
 
-static void moto_ray_view_node_draw(MotoGeomViewNode *self);
-static void moto_ray_view_node_prepare_for_draw(MotoGeomViewNode *self);
-static MotoShapeNode *moto_ray_view_node_get_shape(MotoGeomViewNode *self);
+static void moto_ray_view_node_draw(MotoShapeViewNode *self);
+static void moto_ray_view_node_prepare_for_draw(MotoShapeViewNode *self);
+static MotoShapeNode *moto_ray_view_node_get_shape(MotoShapeViewNode *self);
 
 /* class RayViewNode */
 
@@ -75,8 +75,8 @@ static void
 moto_ray_view_node_class_init(MotoRayViewNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
-    MotoGeomViewNodeClass *gvclass = \
-        MOTO_GEOM_VIEW_NODE_CLASS(klass);
+    MotoShapeViewNodeClass *gvclass = \
+        MOTO_SHAPE_VIEW_NODE_CLASS(klass);
 
     ray_view_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -89,7 +89,7 @@ moto_ray_view_node_class_init(MotoRayViewNodeClass *klass)
 
     /*
     gvclass->states = g_slist_append(gvclass->states,
-            moto_geom_view_state_new("object", "Object",
+            moto_shape_view_state_new("object", "Object",
                 moto_ray_view_node_draw_as_object));
     */
 }
@@ -107,18 +107,18 @@ MotoRayViewNode *moto_ray_view_node_new(const gchar *name)
 {
     MotoRayViewNode *self = (MotoRayViewNode *)g_object_new(MOTO_TYPE_RAY_VIEW_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
-    MotoGeomViewNode *gv = (MotoGeomViewNode *)self;
+    MotoShapeViewNode *gv = (MotoShapeViewNode *)self;
 
     moto_node_set_name(node, name);
 
     return self;
 }
 
-static void moto_ray_view_node_draw(MotoGeomViewNode *self)
+static void moto_ray_view_node_draw(MotoShapeViewNode *self)
 {
     MotoRayViewNode *view = (MotoRayViewNode *)self;
 
-    if( ! moto_geom_view_node_get_prepared(self))
+    if( ! moto_shape_view_node_get_prepared(self))
         moto_ray_view_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
@@ -126,7 +126,7 @@ static void moto_ray_view_node_draw(MotoGeomViewNode *self)
     /* draw */
 }
 
-static void moto_ray_view_node_prepare_for_draw(MotoGeomViewNode *self)
+static void moto_ray_view_node_prepare_for_draw(MotoShapeViewNode *self)
 {
     MotoRayViewNode *rv = (MotoRayViewNode *)self;
 
@@ -150,10 +150,10 @@ static void moto_ray_view_node_prepare_for_draw(MotoGeomViewNode *self)
 
     glEndList();
 
-    moto_geom_view_node_set_prepared(self, TRUE);
+    moto_shape_view_node_set_prepared(self, TRUE);
 }
 
-static MotoShapeNode *moto_ray_view_node_get_shape(MotoGeomViewNode *self)
+static MotoShapeNode *moto_ray_view_node_get_shape(MotoShapeViewNode *self)
 {
     return NULL;
 }
@@ -166,6 +166,6 @@ MotoRay *moto_ray_view_node_get_ray(MotoRayViewNode *self)
 void moto_ray_view_node_set_ray(MotoRayViewNode *self, MotoRay *ray)
 {
     moto_ray_copy(& self->priv->ray, ray);
-    moto_geom_view_node_set_prepared((MotoGeomViewNode *)self, FALSE);
+    moto_shape_view_node_set_prepared((MotoShapeViewNode *)self, FALSE);
 }
 

@@ -34,14 +34,14 @@ typedef struct _MotoGridViewNodePriv MotoGridViewNodePriv;
 
 struct _MotoGridViewNode
 {
-    MotoGeomViewNode parent;
+    MotoShapeViewNode parent;
 
     MotoGridViewNodePriv *priv;
 };
 
 struct _MotoGridViewNodeClass
 {
-    MotoGeomViewNodeClass parent;
+    MotoShapeViewNodeClass parent;
 };
 
 GType moto_grid_view_node_get_type(void);

@@ -24,6 +24,8 @@
 
 #include "moto-node.h"
 #include "moto-bound.h"
+#include "moto-shape.h"
+#include "moto-enums.h"
 
 G_BEGIN_DECLS
 
@@ -31,6 +33,8 @@ typedef struct _MotoShapeNode MotoShapeNode;
 typedef struct _MotoShapeNodeClass MotoShapeNodeClass;
 
 typedef MotoBound *(*MotoShapeNodeGetBoundMethod)(MotoShapeNode *self);
+typedef void *(*MotoShapeDrawMethod)(MotoShapeNode *self, MotoShapeSelection* selection,
+    MotoDrawMode draw_mode, MotoSelectionMode selection_mode);
 
 /* class MotoShapeNode */
 
@@ -44,6 +48,7 @@ struct _MotoShapeNodeClass
     MotoNodeClass parent;
 
     MotoShapeNodeGetBoundMethod get_bound;
+    MotoShapeDrawMethod draw;
 };
 
 GType moto_shape_node_get_type(void);
@@ -56,6 +61,9 @@ GType moto_shape_node_get_type(void);
 #define MOTO_SHAPE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE_NODE, MotoShapeNodeClass))
 
 MotoBound *moto_shape_node_get_bound(MotoShapeNode *self);
+
+void moto_shape_node_draw(MotoShapeNode* self, MotoShapeSelection* selection,
+    MotoDrawMode draw_mode, MotoSelectionMode selection_mode);
 
 G_END_DECLS
 

@@ -381,7 +381,7 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
     }
 
     priv->bound_calculated = FALSE;
-    moto_geom_prepare((MotoGeom*)mesh);
+    moto_shape_prepare((MotoShape*)mesh);
     moto_node_set_param_object(node, "out", (GObject*)mesh);
 }
 #undef get_v

@@ -8,8 +8,8 @@
 
 /* forwards */
 
-static void moto_grid_view_node_draw(MotoGeomViewNode *self);
-static void moto_grid_view_node_prepare_for_draw(MotoGeomViewNode *self);
+static void moto_grid_view_node_draw(MotoShapeViewNode *self);
+static void moto_grid_view_node_prepare_for_draw(MotoShapeViewNode *self);
 
 /* class GridViewNode */
 
@@ -68,8 +68,8 @@ static void
 moto_grid_view_node_class_init(MotoGridViewNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
-    MotoGeomViewNodeClass *gvnclass = \
-        MOTO_GEOM_VIEW_NODE_CLASS(klass);
+    MotoShapeViewNodeClass *gvnclass = \
+        MOTO_SHAPE_VIEW_NODE_CLASS(klass);
 
     grid_view_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -139,7 +139,7 @@ static void draw_grid()
     glEnd();
 }
 
-static void moto_grid_view_node_draw(MotoGeomViewNode *self)
+static void moto_grid_view_node_draw(MotoShapeViewNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 
@@ -158,7 +158,7 @@ static void moto_grid_view_node_draw(MotoGeomViewNode *self)
     glPopAttrib();
 }
 
-static void moto_grid_view_node_prepare_for_draw(MotoGeomViewNode *self)
+static void moto_grid_view_node_prepare_for_draw(MotoShapeViewNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 

@@ -55,7 +55,7 @@ struct _MotoTestWindowPriv
     MotoSystem *system;
     MotoSceneNode *scene_node;
 
-    MotoGeomViewNode *gv;
+    MotoShapeViewNode *gv;
 
     MotoParamEditor *param_editor;
     MotoOutliner *outliner;
@@ -98,16 +98,16 @@ static void quit(MotoTestWindow *self)
 }
 
 static gboolean
-select_more(MotoSceneNode *scene_node, MotoGeomViewNode *node, gpointer user_data)
+select_more(MotoSceneNode *scene_node, MotoShapeViewNode *node, gpointer user_data)
 {
-    moto_geom_view_node_grow_selection(node);
+    moto_shape_view_node_grow_selection(node);
     return TRUE;
 }
 
 static gboolean
-select_less(MotoSceneNode *scene_node, MotoGeomViewNode *node, gpointer user_data)
+select_less(MotoSceneNode *scene_node, MotoShapeViewNode *node, gpointer user_data)
 {
-    moto_geom_view_node_select_less(node);
+    moto_shape_view_node_select_less(node);
     return TRUE;
 }
 
@@ -141,12 +141,12 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv;
+        MotoShapeViewNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
 
-        moto_geom_view_node_grow_selection(gv);
+        moto_shape_view_node_grow_selection(gv);
         */
 
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
@@ -162,11 +162,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv;
+        MotoShapeViewNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
-        moto_geom_view_node_select_less(gv);
+        moto_shape_view_node_select_less(gv);
         */
 
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
@@ -179,11 +179,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv;
+        MotoShapeViewNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
-        moto_geom_view_node_invert_selection(gv);
+        moto_shape_view_node_invert_selection(gv);
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "z"))
@@ -195,7 +195,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv;
+        MotoShapeViewNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
@@ -288,11 +288,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoGeomViewNode *gv;
+        MotoShapeViewNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
-        moto_geom_view_node_goto_next_state(gv);
+        moto_shape_view_node_goto_next_state(gv);
         moto_test_window_redraw_3dview(self);
     }
 

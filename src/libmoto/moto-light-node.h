@@ -46,12 +46,12 @@ typedef struct _MotoLightNodeClass MotoLightNodeClass;
 
 struct _MotoLightNode
 {
-    MotoGeomViewNode parent;
+    MotoShapeViewNode parent;
 };
 
 struct _MotoLightNodeClass
 {
-    MotoGeomViewNodeClass parent;
+    MotoShapeViewNodeClass parent;
 };
 
 GType moto_light_node_get_type(void);

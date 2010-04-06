@@ -9,7 +9,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoBendNode */
 
@@ -56,7 +56,7 @@ MotoBendNode *moto_bend_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
 {
     *the_same = TRUE;
 
@@ -67,13 +67,13 @@ static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
-    if(!geom || !moto_geom_is_struct_the_same(geom, in))
+    if(!geom || !moto_shape_is_struct_the_same(geom, in))
     {
         *the_same = FALSE;
         geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
-    MotoGeom *out = (MotoGeom*)geom;
+    MotoShape *out = (MotoShape*)geom;
 
     // FIXME
     GValue *vorig = moto_node_get_param_value(node, "orig");
@@ -169,6 +169,6 @@ static MotoGeom *moto_bend_node_perform(MotoOpNode *self, MotoGeom *in, gboolean
         }
     }
 
-    moto_geom_prepare(out);
+    moto_shape_prepare(out);
     return out;
 }

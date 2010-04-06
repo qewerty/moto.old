@@ -116,13 +116,13 @@ perform_op(MotoShelf *shelf, MotoSystem *system,
     if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_OP_NODE))
         return;
 
-    MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode*)view);
+    MotoShapeViewState *state = moto_shape_view_node_get_state((MotoShapeViewNode*)view);
     if(state)
-        moto_geom_view_state_leave(state, (MotoGeomViewNode*)view);
+        moto_shape_view_state_leave(state, (MotoShapeViewNode*)view);
 
-    MotoMeshSelection *selection = moto_mesh_view_node_get_selection(view);
+    MotoShapeSelection *selection = moto_mesh_view_node_get_selection(view);
     moto_op_node_set_selection((MotoOpNode*)op, selection);
-    moto_mesh_selection_deselect_all(selection);
+    moto_shape_selection_deselect_all(selection);
 
     MotoParam *in_mesh = moto_node_get_param(op, "in");
     moto_param_link(in_mesh, source);
@@ -343,3 +343,4 @@ void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *na
 
     gtk_widget_show_all((GtkWidget *)tab);
 }
+

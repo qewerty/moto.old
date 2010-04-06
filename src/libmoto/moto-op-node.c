@@ -2,7 +2,7 @@
 #include "moto-types.h"
 #include "moto-enums.h"
 #include "moto-param-spec.h"
-#include "moto-geom.h"
+#include "moto-shape.h"
 #include "moto-op-node.h"
 
 /* forwards */
@@ -20,7 +20,7 @@ static GObjectClass *op_node_parent_class = NULL;
 
 struct _MotoOpNodePriv
 {
-    MotoMeshSelection *selection;
+    MotoShapeSelection *selection;
 };
 
 static void
@@ -29,7 +29,7 @@ moto_op_node_dispose(GObject *obj)
     MotoOpNodePriv *priv = MOTO_OP_NODE_GET_PRIVATE(obj);
 
     if(priv->selection)
-        moto_mesh_selection_free(priv->selection);
+        moto_shape_selection_free(priv->selection);
 
     op_node_parent_class->dispose(obj);
 }
@@ -88,17 +88,17 @@ MotoOpNode *moto_op_node_new(const gchar *name)
 }
 
 void moto_op_node_set_selection(MotoOpNode *self,
-    MotoMeshSelection *selection)
+    MotoShapeSelection *selection)
 {
     MotoOpNodePriv *priv = MOTO_OP_NODE_GET_PRIVATE(self);
 
     if(priv->selection)
-        moto_mesh_selection_free(priv->selection);
+        moto_shape_selection_free(priv->selection);
 
-    priv->selection = moto_mesh_selection_copy(selection);
+    priv->selection = moto_shape_selection_copy(selection);
 }
 
-MotoMeshSelection *moto_op_node_get_selection(MotoOpNode *self)
+MotoShapeSelection *moto_op_node_get_selection(MotoOpNode *self)
 {
     return MOTO_OP_NODE_GET_PRIVATE(self)->selection;
 }
@@ -107,8 +107,8 @@ static void moto_op_node_update(MotoNode *self)
 {
     MotoOpNodePriv *priv = MOTO_OP_NODE_GET_PRIVATE(self);
 
-    MotoGeom *in;
-    MotoGeom *old_geom;
+    MotoShape *in;
+    MotoShape *old_geom;
     moto_node_get_param_object(self, "in", (GObject**)&in);
     moto_node_get_param_object((MotoNode *)self, "out", (GObject**)&old_geom);
     if( ! in)
@@ -128,7 +128,7 @@ static void moto_op_node_update(MotoNode *self)
         return;
     }
 
-    MotoGeom *geom = in;
+    MotoShape *geom = in;
 
     gboolean the_same = FALSE;
     gboolean active;
@@ -143,7 +143,7 @@ static void moto_op_node_update(MotoNode *self)
     moto_node_set_param_object(self, "out", (GObject *)geom);
 }
 
-MotoGeom *moto_op_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
+MotoShape *moto_op_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
 {
     MotoOpNodeClass *klass = MOTO_OP_NODE_GET_CLASS(self);
 

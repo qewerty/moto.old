@@ -179,11 +179,11 @@ static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 
 static void set_state(GtkMenuItem *item, gpointer user_data)
 {
-    MotoGeomViewNode *geom = (MotoGeomViewNode *)user_data;
-    MotoGeomViewState *state = \
-        (MotoGeomViewState *)g_object_get_data(G_OBJECT(item), "moto-shape-view-state");
+    MotoShapeViewNode *geom = (MotoShapeViewNode *)user_data;
+    MotoShapeViewState *state = \
+        (MotoShapeViewState *)g_object_get_data(G_OBJECT(item), "moto-geom-view-state");
 
-    moto_geom_view_node_set_state(geom, moto_geom_view_state_get_name(state));
+    moto_shape_view_node_set_state(geom, moto_shape_view_state_get_name(state));
 }
 
 void show_draw_mode_menu(GtkButton *button, gpointer user_data)
@@ -268,19 +268,19 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoGeomViewNode *geom = (MotoGeomViewNode *)moto_param_get_node(out_view);
+    MotoShapeViewNode *geom = (MotoShapeViewNode *)moto_param_get_node(out_view);
 
     /* menu */
     GtkMenu *menu = (GtkMenu *)gtk_menu_new();
     GtkWidget *item;
 
-    GSList *state = moto_geom_view_node_get_state_list(geom);
+    GSList *state = moto_shape_view_node_get_state_list(geom);
     for(; state; state = g_slist_next(state))
     {
         item = \
-            gtk_menu_item_new_with_label(moto_geom_view_state_get_title((MotoGeomViewState *)state->data));
+            gtk_menu_item_new_with_label(moto_shape_view_state_get_title((MotoShapeViewState *)state->data));
 
-        g_object_set_data((GObject *)item, "moto-shape-view-state", state->data);
+        g_object_set_data((GObject *)item, "moto-geom-view-state", state->data);
         g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_state), geom);
 
         gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);

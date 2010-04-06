@@ -171,7 +171,7 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
     if(priv->mesh)
     {
         moto_info("Mesh '%s' loaded successfully", filename);
-        moto_geom_prepare((MotoGeom*)priv->mesh);
+        moto_shape_prepare((MotoShape*)priv->mesh);
     }
 
     priv->bound_calculated = FALSE;

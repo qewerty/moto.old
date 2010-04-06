@@ -34,12 +34,12 @@ typedef struct _MotoMeshViewNodeClass MotoMeshViewNodeClass;
 
 struct _MotoMeshViewNode
 {
-    MotoGeomViewNode parent;
+    MotoShapeViewNode parent;
 };
 
 struct _MotoMeshViewNodeClass
 {
-    MotoGeomViewNodeClass parent;
+    MotoShapeViewNodeClass parent;
 };
 
 GType moto_mesh_view_node_get_type(void);
@@ -54,7 +54,7 @@ GType moto_mesh_view_node_get_type(void);
 MotoMeshViewNode *moto_mesh_view_node_new(const gchar *name);
 
 MotoMesh *moto_mesh_view_node_get_mesh(MotoMeshViewNode *self);
-MotoMeshSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self);
+MotoShapeSelection *moto_mesh_view_node_get_selection(MotoMeshViewNode *self);
 
 const MotoBound *moto_mesh_view_node_get_bound(MotoMeshViewNode *self);
 

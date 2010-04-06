@@ -19,51 +19,96 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_GEOM_H__
-#define __MOTO_GEOM_H__
+#ifndef __MOTO_SHAPE_H__
+#define __MOTO_SHAPE_H__
 
 #include <glib-object.h>
+#include "moto-bitmask.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoGeom MotoGeom;
-typedef struct _MotoGeomClass MotoGeomClass;
+typedef struct _MotoShape MotoShape;
+typedef struct _MotoShapeClass MotoShapeClass;
 
-typedef struct _MotoGeomCreator MotoGeomCreator;
-typedef struct _MotoGeomCreatorClass MotoGeomCreatorClass;
+typedef struct _MotoShapeSelection MotoShapeSelection;
 
-typedef gboolean (*MotoGeomPrepareMethod)(MotoGeom *self);
-typedef gboolean (*MotoGeomIsStructTheSameMethod)(MotoGeom *self, MotoGeom *other);
+typedef gboolean (*MotoShapePrepareMethod)(MotoShape *self);
+typedef gboolean (*MotoShapeIsStructTheSameMethod)(MotoShape *self, MotoShape *other);
 
-/* class MotoGeom */
+/* class MotoShape */
 
-struct _MotoGeom
+struct _MotoShape
 {
     GInitiallyUnowned parent;
 };
 
-struct _MotoGeomClass
+struct _MotoShapeClass
 {
     GInitiallyUnownedClass parent;
 
-    MotoGeomPrepareMethod prepare;
-    MotoGeomIsStructTheSameMethod is_struct_the_same;
+    MotoShapePrepareMethod prepare;
+    MotoShapeIsStructTheSameMethod is_struct_the_same;
 };
 
-GType moto_geom_get_type(void);
+GType moto_shape_get_type(void);
 
-#define MOTO_TYPE_GEOM (moto_geom_get_type())
-#define MOTO_GEOM(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM, MotoGeom))
-#define MOTO_GEOM_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_, MotoGeomClass))
+#define MOTO_TYPE_GEOM (moto_shape_get_type())
+#define MOTO_SHAPE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM, MotoShape))
+#define MOTO_SHAPE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_, MotoShapeClass))
 #define MOTO_IS_GEOM_(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM))
 #define MOTO_IS_GEOM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM))
-#define MOTO_GEOM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM, MotoGeomClass))
+#define MOTO_SHAPE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM, MotoShapeClass))
 
-void moto_geom_update(MotoGeom *self);
+void moto_shape_update(MotoShape *self);
 
-gboolean moto_geom_prepare(MotoGeom *self);
-gboolean moto_geom_is_struct_the_same(MotoGeom *self, MotoGeom *other);
+gboolean moto_shape_prepare(MotoShape *self);
+gboolean moto_shape_is_struct_the_same(MotoShape *self, MotoShape *other);
+
+struct _MotoShapeSelection
+{
+    MotoBitmask *verts;
+    MotoBitmask *edges;
+    MotoBitmask *faces;
+};
+
+MotoShapeSelection *moto_shape_selection_new(guint v_num, guint e_num, guint f_num);
+MotoShapeSelection *moto_shape_selection_copy(MotoShapeSelection *other);
+void moto_shape_selection_copy_smth(MotoShapeSelection *self, MotoShapeSelection *other);
+void moto_shape_selection_free(MotoShapeSelection *self);
+
+guint32 moto_shape_selection_get_v_num(MotoShapeSelection *self);
+guint32 moto_shape_selection_get_e_num(MotoShapeSelection *self);
+guint32 moto_shape_selection_get_f_num(MotoShapeSelection *self);
+
+guint32 moto_shape_selection_get_selected_v_num(MotoShapeSelection *self);
+guint32 moto_shape_selection_get_selected_e_num(MotoShapeSelection *self);
+guint32 moto_shape_selection_get_selected_f_num(MotoShapeSelection *self);
+
+void moto_shape_selection_select_vertex(MotoShapeSelection *self, guint index);
+void moto_shape_selection_select_verts(MotoShapeSelection *self, ...);
+void moto_shape_selection_deselect_vertex(MotoShapeSelection *self, guint index);
+void moto_shape_selection_deselect_verts(MotoShapeSelection *self, ...);
+void moto_shape_selection_deselect_all_verts(MotoShapeSelection *self);
+void moto_shape_selection_toggle_vertex_selection(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_is_vertex_selected(MotoShapeSelection *self, guint index);
+
+void moto_shape_selection_select_edge(MotoShapeSelection *self, guint index);
+void moto_shape_selection_select_edges(MotoShapeSelection *self, ...);
+void moto_shape_selection_deselect_edge(MotoShapeSelection *self, guint index);
+void moto_shape_selection_deselect_edges(MotoShapeSelection *self, ...);
+void moto_shape_selection_deselect_all_edges(MotoShapeSelection *self);
+void moto_shape_selection_toggle_edge_selection(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_is_edge_selected(MotoShapeSelection *self, guint index);
+
+void moto_shape_selection_select_face(MotoShapeSelection *self, guint index);
+void moto_shape_selection_select_faces(MotoShapeSelection *self, ...);
+void moto_shape_selection_deselect_face(MotoShapeSelection *self, guint index);
+void moto_shape_selection_deselect_all_faces(MotoShapeSelection *self);
+void moto_shape_selection_toggle_face_selection(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_is_face_selected(MotoShapeSelection *self, guint index);
+
+void moto_shape_selection_deselect_all(MotoShapeSelection *self);
 
 G_END_DECLS
 
-#endif /* __MOTO_GEOM_H__ */
+#endif /* __MOTO_SHAPE_H__ */
