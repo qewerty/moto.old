@@ -14,13 +14,13 @@ Requrements
 Build
 -----
 
-To build run SCons:
+To build Moto run command:
 
-    $ scons
+    $ ./build.py
 
 Or for debug version:
 
-    $ scons config=config/debug.py
+    $ ./build.py config=config/debug.py
     $ export LD_LIBRARY_PATH=./build/linux2[-dbg]/lib
 
 And run with:
