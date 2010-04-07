@@ -150,7 +150,7 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_SPHERE_NODE;
             MOTO_TYPE_CYLINDER_NODE;
             MOTO_TYPE_MESH_FILE_NODE;
-        MOTO_TYPE_GEOM_VIEW_NODE;
+        MOTO_TYPE_SHAPE_VIEW_NODE;
             MOTO_TYPE_MESH_VIEW_NODE;
             MOTO_TYPE_GRID_VIEW_NODE;
             MOTO_TYPE_AXES_VIEW_NODE;

@@ -49,7 +49,7 @@ moto_op_node_init(MotoOpNode *self)
     priv->selection = NULL;
 
     moto_node_add_params(node,
-            "in", "Input Shape", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, NULL, "Shape",
+            "in", "Input Shape", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_IN, NULL, NULL, "Shape",
             NULL);
 }
 

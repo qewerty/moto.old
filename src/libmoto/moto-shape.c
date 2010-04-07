@@ -16,6 +16,9 @@ moto_shape_class_init(MotoShapeClass *klass)
 
     klass->prepare = NULL;
     klass->is_struct_the_same = NULL;
+    klass->select_more = NULL;
+    klass->select_less = NULL;
+    klass->select_inverse = NULL;
 }
 
 G_DEFINE_ABSTRACT_TYPE(MotoShape, moto_shape, G_TYPE_INITIALLY_UNOWNED);
@@ -40,6 +43,30 @@ gboolean moto_shape_is_struct_the_same(MotoShape *self, MotoShape *other)
         return klass->is_struct_the_same(self, other);
 
     return FALSE;
+}
+
+void moto_shape_select_more(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShapeClass* klass = MOTO_SHAPE_GET_CLASS(self);
+    if(klass->select_more)
+        klass->select_more(self, selection, mode);
+}
+
+void moto_shape_select_less(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShapeClass* klass = MOTO_SHAPE_GET_CLASS(self);
+    if(klass->select_less)
+        klass->select_less(self, selection, mode);
+}
+
+void moto_shape_select_inverse(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShapeClass* klass = MOTO_SHAPE_GET_CLASS(self);
+    if(klass->select_inverse)
+        klass->select_inverse(self, selection, mode);
 }
 
 /* MeshSelection */

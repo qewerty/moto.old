@@ -1,12 +1,33 @@
-#include <GL/gl.h>
+#include "libmotoutil/moto-gl.h"
+#include "libmotoutil/numdef.h"
+#include "libmotoutil/xform.h"
 
 #include "moto-shape-node.h"
 #include "moto-shape.h"
+#include "moto-mesh.h"
 
-void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoShapeSelection* selection,
-    MotoDrawMode draw_mode, MotoSelectionMode selection_mode);
+void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoDrawMode draw_mode,
+    MotoShapeSelection* selection, MotoSelectionMode selection_mode);
+static void
+moto_shape_node_select_more_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+static void
+moto_shape_node_select_less_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+static void
+moto_shape_node_select_inverse_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
 
 /* class ShapeNode */
+
+typedef enum
+{
+    VBUF_VERTEX,
+    VBUF_NORMAL,
+    VBUF_ELEMENT,
+    VBUF_LINE_ELEMENT,
+    VBUF_NUMBER
+} MotoVBufs;
 
 typedef struct _MotoShapeNodePriv MotoShapeNodePriv;
 
@@ -17,6 +38,9 @@ static GObjectClass *shape_node_parent_class = NULL;
 struct _MotoShapeNodePriv
 {
     gboolean prepared;
+
+    GLuint dlist;
+    GLuint vbufs[VBUF_NUMBER];
 };
 
 /*
@@ -37,7 +61,7 @@ moto_shape_node_init(MotoShapeNode *self)
             "active", "Active", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
             "visible", "Visible",   MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
             "lock", "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
-            "out", "Output Shape", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
+            "out", "Output Shape", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
             NULL);
 
     priv->prepared = FALSE;
@@ -54,6 +78,9 @@ moto_shape_node_class_init(MotoShapeNodeClass *klass)
 
     klass->get_bound = NULL;
     klass->draw = moto_shape_node_draw_DEFUALT;
+    klass->select_more = moto_shape_node_select_more_DEFAULT;
+    klass->select_less = moto_shape_node_select_less_DEFAULT;
+    klass->select_inverse = moto_shape_node_select_inverse_DEFAULT;
 
     g_type_class_add_private(klass, sizeof(MotoShapeNodePriv));
 }
@@ -72,10 +99,28 @@ MotoBound *moto_shape_node_get_bound(MotoShapeNode *self)
     return NULL;
 }
 
-void moto_shape_node_draw(MotoShapeNode* self, MotoShapeSelection* selection,
-    MotoDrawMode draw_mode, MotoSelectionMode selection_mode)
+MotoShape* moto_shape_node_get_shape(MotoShapeNode* self)
 {
-    MOTO_SHAPE_NODE_GET_CLASS(self)->draw(self, selection, draw_mode, selection_mode);
+    GObject* obj = NULL;
+    moto_node_get_param_object((MotoNode*)self, "out", &obj);
+    return (MotoShape*)obj;
+}
+
+void moto_shape_node_draw(MotoShapeNode* self, MotoDrawMode draw_mode,
+    MotoShapeSelection* selection, MotoSelectionMode selection_mode)
+{
+    MOTO_SHAPE_NODE_GET_CLASS(self)->draw(self, draw_mode, selection, selection_mode);
+}
+
+static void moto_shape_node_delete_buffers(MotoShapeNode *self)
+{
+    MotoShapeNodePriv* priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+
+    if(moto_gl_is_vbo_supported())
+    {
+        glDeleteBuffersARB(VBUF_NUMBER, priv->vbufs);
+        memset(priv->vbufs, 0, VBUF_NUMBER);
+    }
 }
 
 static void moto_shape_node_draw_BBOX_WIREFRAME_OBJECT(MotoShapeNode* self, MotoShapeSelection* selection)
@@ -106,7 +151,138 @@ static void moto_shape_node_draw_WIREFRAME_OBJECT(MotoShapeNode* self, MotoShape
 {}
 
 static void moto_shape_node_draw_WIREFRAME_VERTEX(MotoShapeNode* self, MotoShapeSelection* selection)
-{}
+{
+    g_print("moto_shape_node_draw_WIREFRAME_VERTEX\n");
+    MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(MOTO_IS_MESH(shape))
+    {
+        MotoMesh* mesh = (MotoMesh*)shape;
+
+        glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+        glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if(moto_gl_is_glsl_supported())
+            glUseProgramObjectARB(0);
+        glDisable(GL_LIGHTING);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glDepthFunc(GL_LEQUAL);
+
+        gboolean force_arrays = FALSE;
+        MotoSceneNode *scene_node = moto_node_get_scene_node((MotoNode *)self);
+        if(scene_node)
+            force_arrays = ! moto_scene_node_get_use_vbo(scene_node);
+
+        gboolean using_vbo = TRUE;
+        if(moto_gl_is_vbo_supported() && ! force_arrays) // vbo
+        {
+            g_print("Initializng VBO for 'vertex' drawing mode ... ");
+            if( ! glIsBufferARB(priv->vbufs[VBUF_VERTEX]))
+            {
+                GLenum error;
+
+                glGenBuffersARB(VBUF_NUMBER, priv->vbufs);
+
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh->v_num * sizeof(MotoVector), mesh->v_coords,  GL_STATIC_DRAW_ARB);
+
+                error = glGetError();
+                switch(error)
+                {
+                    case GL_NO_ERROR:
+                        // Ok
+                    break;
+                    case GL_OUT_OF_MEMORY:
+                    // break;
+                    default:
+                        // Unknown Error
+                        moto_shape_node_delete_buffers(self);
+                        using_vbo = FALSE;
+                    break;
+                }
+
+                glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+                glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                        moto_mesh_get_index_size(mesh) * mesh->e_num * 2,
+                        mesh->e_verts, GL_STATIC_DRAW_ARB);
+
+                error = glGetError();
+                switch(error)
+                {
+                    case GL_NO_ERROR:
+                        // Ok
+                    break;
+                    case GL_OUT_OF_MEMORY:
+                    // break;
+                    default:
+                        // Unknown Error
+                        moto_shape_node_delete_buffers(self);
+                        using_vbo = FALSE;
+                    break;
+                }
+
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+                glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+            }
+
+            if(using_vbo)
+            {
+                g_print("OK\n");
+
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_VERTEX]);
+                glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), 0);
+
+                glColor4f(0.6, 0.6, 0.6, 1.0);
+                glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, priv->vbufs[VBUF_ELEMENT]);
+                glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, 0);
+
+                glColor4f(1, 0.1, 0.1, 1);
+                glPointSize(3);
+                glDrawArrays(GL_POINTS, 0, mesh->v_num);
+
+                glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+                glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+            }
+            else
+            {
+                g_print("Failed\n");
+            }
+        }
+        else // vertex arrays
+        {
+            using_vbo = FALSE;
+        }
+
+        if( ! using_vbo)
+        {
+            glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
+
+            glColor4f(0.6, 0.6, 0.6, 1.0);
+            glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
+
+            glColor4f(1, 0.1, 0.1, 1);
+            glPointSize(3);
+            glDrawArrays(GL_POINTS, 0, mesh->v_num);
+        }
+
+        glColor3f(0, 1, 0);
+        glPointSize(4);
+
+        glBegin(GL_POINTS);
+        guint i;
+        for(i = 0; i < mesh->v_num; i++)
+        {
+            if(moto_shape_selection_is_vertex_selected(selection, i))
+            {
+                glVertex3fv((GLfloat *)(& mesh->v_coords[i]));
+            }
+        }
+        glEnd();
+
+        glPopAttrib();
+        glPopClientAttrib();
+    }
+}
 
 static void moto_shape_node_draw_WIREFRAME_EDGE(MotoShapeNode* self, MotoShapeSelection* selection)
 {}
@@ -186,8 +362,8 @@ static void moto_shape_node_draw_SHADED_EDGE(MotoShapeNode* self, MotoShapeSelec
 static void moto_shape_node_draw_SHADED_FACE(MotoShapeNode* self, MotoShapeSelection* selection)
 {}
 
-void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoShapeSelection* selection,
-    MotoDrawMode draw_mode, MotoSelectionMode selection_mode)
+void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoDrawMode draw_mode,
+    MotoShapeSelection* selection, MotoSelectionMode selection_mode)
 {
     switch(draw_mode)
     {
@@ -365,4 +541,49 @@ void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoShapeSelection* selec
         default:
         break;
     }
+}
+
+void moto_shape_node_select_more(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MOTO_SHAPE_NODE_GET_CLASS(self)->select_more(self, selection, mode);
+}
+
+static void
+moto_shape_node_select_more_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape)
+        moto_shape_select_more(shape, selection, mode);
+}
+
+void moto_shape_node_select_less(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MOTO_SHAPE_NODE_GET_CLASS(self)->select_less(self, selection, mode);
+}
+
+static void
+moto_shape_node_select_less_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape)
+        moto_shape_select_less(shape, selection, mode);
+}
+
+void moto_shape_node_select_inverse(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MOTO_SHAPE_NODE_GET_CLASS(self)->select_inverse(self, selection, mode);
+}
+
+static void
+moto_shape_node_select_inverse_DEFAULT(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape)
+        moto_shape_select_inverse(shape, selection, mode);
 }

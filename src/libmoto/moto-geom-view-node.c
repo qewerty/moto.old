@@ -370,7 +370,7 @@ moto_shape_view_state_new(const gchar *name, const gchar *title,
         MotoShapeViewStateInvertSelectionFunc invert_selection,
         MotoShapeViewStateLeaveFunc leave)
 {
-    MotoShapeViewState *self = (MotoShapeViewState *)g_object_new(MOTO_TYPE_GEOM_VIEW_STATE, NULL);
+    MotoShapeViewState *self = (MotoShapeViewState *)g_object_new(MOTO_TYPE_SHAPE_VIEW_STATE, NULL);
 
     g_string_assign(self->priv->name, name);
     g_string_assign(self->priv->title, title);

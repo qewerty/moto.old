@@ -135,7 +135,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         if(!w)
             return FALSE;
 
-        moto_scene_node_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_more, NULL);
+        moto_scene_node_foreach_node(w, MOTO_TYPE_SHAPE_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_more, NULL);
 
         /*
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
@@ -156,7 +156,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if( ! w)
             return FALSE;
-        moto_scene_node_foreach_node(w, MOTO_TYPE_GEOM_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_less, NULL);
+        moto_scene_node_foreach_node(w, MOTO_TYPE_SHAPE_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_less, NULL);
 
         /*
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);

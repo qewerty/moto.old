@@ -23,6 +23,7 @@
 #define __MOTO_SHAPE_H__
 
 #include <glib-object.h>
+#include "moto-enums.h"
 #include "moto-bitmask.h"
 
 G_BEGIN_DECLS
@@ -34,6 +35,13 @@ typedef struct _MotoShapeSelection MotoShapeSelection;
 
 typedef gboolean (*MotoShapePrepareMethod)(MotoShape *self);
 typedef gboolean (*MotoShapeIsStructTheSameMethod)(MotoShape *self, MotoShape *other);
+
+typedef void (*MotoShapeSelectMoreMethod)(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+typedef void (*MotoShapeSelectLessMethod)(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+typedef void (*MotoShapeSelectInverseMethod)(MotoShape* self,
+        MotoShapeSelection* selection, MotoSelectionMode mode);
 
 /* class MotoShape */
 
@@ -48,21 +56,31 @@ struct _MotoShapeClass
 
     MotoShapePrepareMethod prepare;
     MotoShapeIsStructTheSameMethod is_struct_the_same;
+    MotoShapeSelectMoreMethod select_more;
+    MotoShapeSelectLessMethod select_less;
+    MotoShapeSelectInverseMethod select_inverse;
 };
 
 GType moto_shape_get_type(void);
 
-#define MOTO_TYPE_GEOM (moto_shape_get_type())
-#define MOTO_SHAPE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GEOM, MotoShape))
-#define MOTO_SHAPE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GEOM_, MotoShapeClass))
-#define MOTO_IS_GEOM_(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GEOM))
-#define MOTO_IS_GEOM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GEOM))
-#define MOTO_SHAPE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GEOM, MotoShapeClass))
+#define MOTO_TYPE_SHAPE (moto_shape_get_type())
+#define MOTO_SHAPE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_SHAPE, MotoShape))
+#define MOTO_SHAPE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_SHAPE_, MotoShapeClass))
+#define MOTO_IS_SHAPE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_SHAPE))
+#define MOTO_IS_SHAPE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SHAPE))
+#define MOTO_SHAPE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE, MotoShapeClass))
 
 void moto_shape_update(MotoShape *self);
 
 gboolean moto_shape_prepare(MotoShape *self);
 gboolean moto_shape_is_struct_the_same(MotoShape *self, MotoShape *other);
+
+void moto_shape_select_more(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+void moto_shape_select_less(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+void moto_shape_select_inverse(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
 
 struct _MotoShapeSelection
 {

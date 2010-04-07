@@ -612,7 +612,7 @@ __reset_shape_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data
 
 void moto_scene_node_reset(MotoSceneNode *self)
 {
-    moto_scene_node_foreach_node(self, MOTO_TYPE_GEOM_VIEW_NODE, __reset_shape_view, NULL);
+    moto_scene_node_foreach_node(self, MOTO_TYPE_SHAPE_VIEW_NODE, __reset_shape_view, NULL);
 }
 
 typedef struct _MotoIntersectData

@@ -23,6 +23,13 @@ static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
 gboolean moto_mesh_prepare(MotoMesh *self);
 gboolean moto_mesh_is_struct_the_same(MotoMesh *self, MotoMesh *other);
 
+static void moto_mesh_select_more(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+static void moto_mesh_select_less(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+static void moto_mesh_select_inverse(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+
 /* MotoMesh */
 
 static GObjectClass *mesh_parent_class = NULL;
@@ -119,9 +126,12 @@ moto_mesh_class_init(MotoMeshClass *klass)
     MotoShapeClass *geomclass = (MotoShapeClass*)klass;
     geomclass->prepare = (MotoShapePrepareMethod)moto_mesh_prepare;
     geomclass->is_struct_the_same = (MotoShapeIsStructTheSameMethod)moto_mesh_is_struct_the_same;
+    geomclass->select_more = moto_mesh_select_more;
+    geomclass->select_less = moto_mesh_select_less;
+    geomclass->select_inverse = moto_mesh_select_inverse;
 }
 
-G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_GEOM,
+G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_SHAPE,
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_COPYABLE,
                                               moto_mesh_copyable_init);
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINT_CLOUD,
@@ -1309,6 +1319,66 @@ MotoShapeSelection *moto_mesh_adapt_selection(MotoMesh *self, MotoShapeSelection
     MotoShapeSelection *new_selection = moto_mesh_create_selection(self);
     moto_shape_selection_copy_smth(new_selection, selection);
     return new_selection;
+}
+
+static void moto_mesh_select_more(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoMesh* mesh = MOTO_MESH(self);
+    switch(mode)
+    {
+        case MOTO_SELECTION_MODE_VERTEX:
+            moto_mesh_select_more_verts(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_EDGE:
+            moto_mesh_select_more_edges(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_FACE:
+            moto_mesh_select_more_faces(mesh, selection);
+        break;
+        default:
+            return;
+    }
+}
+
+static void moto_mesh_select_less(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoMesh* mesh = MOTO_MESH(self);
+    switch(mode)
+    {
+        case MOTO_SELECTION_MODE_VERTEX:
+            moto_mesh_select_less_verts(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_EDGE:
+            moto_mesh_select_less_edges(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_FACE:
+            moto_mesh_select_less_faces(mesh, selection);
+        break;
+        default:
+            return;
+    }
+}
+
+static void moto_mesh_select_inverse(MotoShape* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode)
+{
+    MotoMesh* mesh = MOTO_MESH(self);
+    switch(mode)
+    {
+        case MOTO_SELECTION_MODE_VERTEX:
+            moto_mesh_select_inverse_verts(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_EDGE:
+            moto_mesh_select_inverse_edges(mesh, selection);
+        break;
+        case MOTO_SELECTION_MODE_FACE:
+            moto_mesh_select_inverse_faces(mesh, selection);
+        break;
+        default:
+            return;
+    }
 }
 
 void moto_mesh_select_more_verts(MotoMesh *self, MotoShapeSelection *selection)

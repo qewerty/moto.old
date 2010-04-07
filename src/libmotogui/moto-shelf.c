@@ -30,12 +30,10 @@ create_shape(MotoShelf* shelf, MotoSystem* system,
     moto_node_set_scene_node(obj, scene); // TODO: Remove function 'moto_node_set_scene_node' later.
     moto_scene_node_set_object_current(scene, (MotoObjectNode*)obj);
 
-    MotoNode *view = moto_node_create_child_by_name(obj,  "MotoMeshViewNode", "view");
     MotoNode *plane = moto_node_create_child_by_name(obj, type_name, name);
     MotoNode *mat = moto_node_create_child_by_name(obj,  "MotoMaterialNode", "mat");
 
-    moto_node_link(obj, "view", view, "view");
-    moto_node_link(view, "mesh", plane, "out");
+    moto_node_link(obj, "shape", plane, "self");
     moto_node_link(obj, "material", mat, "material");
 }
 

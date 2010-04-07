@@ -126,8 +126,8 @@ moto_mesh_view_node_init(MotoMeshViewNode *self)
     moto_node_add_params(node,
             "subdiv", "Subdiv", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Shape",
             "subdiv_render", "Subdiv Render", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Shape",
-            "mesh", "Mesh", MOTO_TYPE_GEOM, MOTO_PARAM_MODE_IN, NULL, pspec, "Shape",
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
+            "mesh", "Mesh", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_IN, NULL, pspec, "Shape",
+            "view", "View", MOTO_TYPE_SHAPE_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     moto_shape_view_node_set_state((MotoShapeViewNode *)self, "verts");
@@ -181,7 +181,7 @@ moto_mesh_view_node_class_init(MotoMeshViewNodeClass *klass)
                 moto_mesh_view_node_leave_from_faces));
 }
 
-G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
+G_DEFINE_TYPE(MotoMeshViewNode, moto_mesh_view_node, MOTO_TYPE_SHAPE_VIEW_NODE);
 
 /* Methods of class MeshViewNode */
 

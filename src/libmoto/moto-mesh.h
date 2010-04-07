@@ -312,7 +312,7 @@ MotoShapeSelection *moto_mesh_create_selection(MotoMesh *self);
 gboolean moto_mesh_is_selection_valid(MotoMesh *self, MotoShapeSelection *selection);
 MotoShapeSelection *moto_mesh_adapt_selection(MotoMesh *self, MotoShapeSelection *selection);
 
-void moto_mesh_select_more(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_more_verts(MotoMesh *self, MotoShapeSelection *selection);
 void moto_mesh_select_less_verts(MotoMesh *self, MotoShapeSelection *selection);
 void moto_mesh_select_inverse_verts(MotoMesh *self, MotoShapeSelection *selection);
 

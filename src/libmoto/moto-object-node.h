@@ -98,6 +98,11 @@ void moto_object_node_draw_full(MotoObjectNode *self,
         gboolean recursive, gboolean use_global);
 void moto_object_node_draw(MotoObjectNode* self);
 
+MotoDrawMode moto_object_node_get_draw_mode(MotoObjectNode* self);
+
+MotoShapeNode* moto_object_node_get_shape(MotoObjectNode* self);
+
+MotoShapeSelection* moto_object_node_get_selection(MotoObjectNode* self);
 MotoSelectionMode moto_object_node_get_selection_mode(MotoObjectNode* self);
 void moto_object_node_set_selection_mode(MotoObjectNode* self, MotoSelectionMode mode);
 

@@ -84,7 +84,7 @@ moto_light_node_init(MotoLightNode *self)
             "spot_blur", "Spot Blur", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0, NULL, "Spot",
             "cone_angle", "Cone Angle", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 30.0, NULL, "Spot",
             "cone_angle_delta", "Cone Angle Delta", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 5.0, NULL, "Spot",
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
+            "view", "View", MOTO_TYPE_SHAPE_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     priv->prepared = FALSE;
@@ -110,7 +110,7 @@ moto_light_node_class_init(MotoLightNodeClass *klass)
     gvnclass->prepare_for_draw  = moto_light_node_prepare_for_draw;
 }
 
-G_DEFINE_TYPE(MotoLightNode, moto_light_node, MOTO_TYPE_GEOM_VIEW_NODE);
+G_DEFINE_TYPE(MotoLightNode, moto_light_node, MOTO_TYPE_SHAPE_VIEW_NODE);
 
 /* Methods of class LightNode */
 
