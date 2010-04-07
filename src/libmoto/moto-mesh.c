@@ -2547,7 +2547,7 @@ MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
         return moto_mesh_new_copy(self);
     }
 
-    selection = moto_mesh_adapt_selection(selection, self);
+    selection = moto_mesh_adapt_selection(self, selection);
     selected_f_num = moto_shape_selection_get_selected_f_num(selection);
     if(selected_f_num < 1)
     {
@@ -2742,7 +2742,7 @@ MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
         return moto_mesh_new_copy(self);
     }
 
-    selection = moto_mesh_adapt_selection(selection, self);
+    selection = moto_mesh_adapt_selection(self, selection);
 
     guint v_num   = self->v_num;
     guint e_num   = self->e_num;
@@ -2817,7 +2817,7 @@ MotoMesh* moto_mesh_bevel_faces(MotoMesh *self, MotoShapeSelection *selection)
         return moto_mesh_new_copy(self);
     }
 
-    selection = moto_mesh_adapt_selection(selection, self);
+    selection = moto_mesh_adapt_selection(self, selection);
 
     guint v_num   = self->v_num;
     guint e_num   = self->e_num;
@@ -2840,7 +2840,7 @@ MotoMesh* moto_mesh_remove(MotoMesh *self,
         {
             return moto_mesh_new_copy(self);
         }
-        selection = moto_mesh_adapt_selection(selection, self);
+        selection = moto_mesh_adapt_selection(self, selection);
         selected_f_num = moto_shape_selection_get_selected_f_num(selection);
         if(selected_f_num  < 1)
         {
