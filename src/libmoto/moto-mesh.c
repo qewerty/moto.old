@@ -17,6 +17,8 @@
 
 /* forwards */
 
+static MotoBound* moto_mesh_update_bound(MotoShape* self);
+
 static void moto_mesh_copyable_init(MotoCopyableIface *iface);
 static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
 
@@ -123,14 +125,17 @@ moto_mesh_class_init(MotoMeshClass *klass)
     goclass->dispose    = moto_mesh_dispose;
     goclass->finalize   = moto_mesh_finalize;
 
-    MotoShapeClass *geomclass = (MotoShapeClass*)klass;
-    geomclass->prepare = (MotoShapePrepareMethod)moto_mesh_prepare;
-    geomclass->is_struct_the_same = (MotoShapeIsStructTheSameMethod)moto_mesh_is_struct_the_same;
-    geomclass->select_more = moto_mesh_select_more;
-    geomclass->select_less = moto_mesh_select_less;
-    geomclass->select_inverse = moto_mesh_select_inverse;
+    MotoShapeClass *shape_class = (MotoShapeClass*)klass;
+
+    shape_class->update_bound = moto_mesh_update_bound;
+    shape_class->prepare = (MotoShapePrepareMethod)moto_mesh_prepare;
+    shape_class->is_struct_the_same = (MotoShapeIsStructTheSameMethod)moto_mesh_is_struct_the_same;
+    shape_class->select_more = moto_mesh_select_more;
+    shape_class->select_less = moto_mesh_select_less;
+    shape_class->select_inverse = moto_mesh_select_inverse;
 }
 
+// TODO: Remove interfaces.
 G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_SHAPE,
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_COPYABLE,
                                               moto_mesh_copyable_init);
@@ -1290,10 +1295,17 @@ void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound)
     moto_bound_set(bound, min_x, max_x, min_y, max_y, min_z, max_z);
 }
 
-MotoBound* moto_mesh_create_bound(MotoMesh* self)
+MotoBound* moto_mesh_create_bound(MotoMesh* self) // TODO: Remove.
 {
     MotoBound* bound = moto_bound_new(0, 0, 0, 0, 0, 0);
     moto_mesh_calc_bound(self, bound);
+    return bound;
+}
+
+static MotoBound* moto_mesh_update_bound(MotoShape* self)
+{
+    MotoBound* bound = moto_shape_get_bound(self);
+    moto_mesh_calc_bound((MotoMesh*)self, bound);
     return bound;
 }
 

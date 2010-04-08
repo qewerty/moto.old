@@ -3,17 +3,42 @@
 
 /* class MotoShape */
 
-static GObjectClass *geom_parent_class = NULL;
+static GObjectClass *shape_parent_class = NULL;
+
+#define MOTO_SHAPE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_SHAPE, MotoShapePriv)
+
+typedef struct _MotoShapePriv
+{
+    MotoBound* bound;
+} MotoShapePriv;
+
+static void
+moto_shape_dispose(GObject *obj)
+{
+    MotoShapePriv* priv = MOTO_SHAPE_GET_PRIVATE(obj);
+    g_object_unref(priv->bound);
+    shape_parent_class->dispose(obj);
+}
 
 static void
 moto_shape_init(MotoShape *self)
-{}
+{
+    MotoShapePriv* priv = MOTO_SHAPE_GET_PRIVATE(self);
+
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
+}
 
 static void
 moto_shape_class_init(MotoShapeClass *klass)
 {
-    geom_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(MotoShapePriv));
 
+    shape_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+
+    ((GObjectClass*)klass)->dispose = moto_shape_dispose;
+
+    klass->update_bound = NULL;
     klass->prepare = NULL;
     klass->is_struct_the_same = NULL;
     klass->select_more = NULL;
@@ -24,6 +49,22 @@ moto_shape_class_init(MotoShapeClass *klass)
 G_DEFINE_ABSTRACT_TYPE(MotoShape, moto_shape, G_TYPE_INITIALLY_UNOWNED);
 
 /* Methods of class MotoShape */
+
+MotoBound* moto_shape_update_bound(MotoShape *self)
+{
+    MotoShapeClass* klass = MOTO_SHAPE_GET_CLASS(self);
+    MotoShapePriv* priv = MOTO_SHAPE_GET_PRIVATE(self);
+
+    if(klass->update_bound)
+        return klass->update_bound(self);
+
+    return priv->bound;
+}
+
+MotoBound* moto_shape_get_bound(MotoShape *self)
+{
+    return MOTO_SHAPE_GET_PRIVATE(self)->bound;
+}
 
 gboolean moto_shape_prepare(MotoShape *self)
 {

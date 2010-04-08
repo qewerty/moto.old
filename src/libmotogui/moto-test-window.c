@@ -98,16 +98,23 @@ static void quit(MotoTestWindow *self)
 }
 
 static gboolean
-select_more(MotoSceneNode *scene_node, MotoShapeViewNode *node, gpointer user_data)
+select_more(MotoSceneNode *scene_node, MotoObjectNode *node, gpointer user_data)
 {
-    moto_shape_view_node_grow_selection(node);
+    moto_object_node_select_more(node);
     return TRUE;
 }
 
 static gboolean
-select_less(MotoSceneNode *scene_node, MotoShapeViewNode *node, gpointer user_data)
+select_less(MotoSceneNode *scene_node, MotoObjectNode *node, gpointer user_data)
 {
-    moto_shape_view_node_select_less(node);
+    moto_object_node_select_less(node);
+    return TRUE;
+}
+
+static gboolean
+select_inverse(MotoSceneNode *scene_node, MotoObjectNode *node, gpointer user_data)
+{
+    moto_object_node_select_inverse(node);
     return TRUE;
 }
 
@@ -134,56 +141,23 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
         if(!w)
             return FALSE;
-
-        moto_scene_node_foreach_node(w, MOTO_TYPE_SHAPE_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_more, NULL);
-
-        /*
-        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
-        if( ! ob)
-            return FALSE;
-        MotoShapeViewNode *gv;
-        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
-        if( ! gv)
-            return FALSE;
-
-        moto_shape_view_node_grow_selection(gv);
-        */
-
+        moto_scene_node_foreach_node(w, MOTO_TYPE_OBJECT_NODE, (MotoSceneNodeForeachNodeFunc)select_more, NULL);
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "-"))
     {
         MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
-        if( ! w)
+        if(!w)
             return FALSE;
-        moto_scene_node_foreach_node(w, MOTO_TYPE_SHAPE_VIEW_NODE, (MotoSceneNodeForeachNodeFunc)select_less, NULL);
-
-        /*
-        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
-        if( ! ob)
-            return FALSE;
-        MotoShapeViewNode *gv;
-        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
-        if( ! gv)
-            return FALSE;
-        moto_shape_view_node_select_less(gv);
-        */
-
+        moto_scene_node_foreach_node(w, MOTO_TYPE_OBJECT_NODE, (MotoSceneNodeForeachNodeFunc)select_less, NULL);
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "i"))
     {
         MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
-        if( ! w)
+        if(!w)
             return FALSE;
-        MotoObjectNode *ob = moto_scene_node_get_current_object(w);
-        if( ! ob)
-            return FALSE;
-        MotoShapeViewNode *gv;
-        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
-        if( ! gv)
-            return FALSE;
-        moto_shape_view_node_invert_selection(gv);
+        moto_scene_node_foreach_node(w, MOTO_TYPE_OBJECT_NODE, (MotoSceneNodeForeachNodeFunc)select_inverse, NULL);
         draw((GtkWidget*)self->priv->area, (GdkEventExpose *)event, user_data);
     }
     else if(0 == g_utf8_collate(event->string, "z"))
@@ -360,6 +334,7 @@ moto_test_window_init(MotoTestWindow *self)
 
     MotoNode *obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "GridObject");
     MotoNode *grid_view_node = moto_node_create_child_by_name(obj_node, "MotoGridViewNode", "GridView");
+    moto_node_link(obj_node, "shape", grid_view_node, "self");
 
     obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "AxesObject");
     MotoNode *axes_view_node = moto_node_create_child_by_name(obj_node, "MotoAxesViewNode", "AxesView");
@@ -617,6 +592,7 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
     switch(event->button)
     {
         case 1:
+        {
             if(event->state & GDK_MOD1_MASK)
             {
                 roll = TRUE;
@@ -625,6 +601,7 @@ press_mouse_button(GtkWidget *widget, GdkEventButton *event, gpointer data)
             {
                 moto_scene_node_button_press(scene_node, event->x, event->y, width, height);
             }
+        }
         break;
         case 2:
             if(event->state & GDK_MOD1_MASK)

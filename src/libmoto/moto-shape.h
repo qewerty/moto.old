@@ -22,7 +22,7 @@
 #ifndef __MOTO_SHAPE_H__
 #define __MOTO_SHAPE_H__
 
-#include <glib-object.h>
+#include "moto-bound.h"
 #include "moto-enums.h"
 #include "moto-bitmask.h"
 
@@ -32,6 +32,8 @@ typedef struct _MotoShape MotoShape;
 typedef struct _MotoShapeClass MotoShapeClass;
 
 typedef struct _MotoShapeSelection MotoShapeSelection;
+
+typedef const MotoBound* (*MotoShapeUpdateBoundMethod)(MotoShape* self);
 
 typedef gboolean (*MotoShapePrepareMethod)(MotoShape *self);
 typedef gboolean (*MotoShapeIsStructTheSameMethod)(MotoShape *self, MotoShape *other);
@@ -54,6 +56,7 @@ struct _MotoShapeClass
 {
     GInitiallyUnownedClass parent;
 
+    MotoShapeUpdateBoundMethod update_bound;
     MotoShapePrepareMethod prepare;
     MotoShapeIsStructTheSameMethod is_struct_the_same;
     MotoShapeSelectMoreMethod select_more;
@@ -70,7 +73,8 @@ GType moto_shape_get_type(void);
 #define MOTO_IS_SHAPE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SHAPE))
 #define MOTO_SHAPE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE, MotoShapeClass))
 
-void moto_shape_update(MotoShape *self);
+MotoBound* moto_shape_update_bound(MotoShape *self);
+MotoBound* moto_shape_get_bound(MotoShape *self);
 
 gboolean moto_shape_prepare(MotoShape *self);
 gboolean moto_shape_is_struct_the_same(MotoShape *self, MotoShape *other);

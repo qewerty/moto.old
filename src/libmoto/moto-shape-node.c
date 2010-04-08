@@ -1,10 +1,15 @@
+#include <string.h>
 #include "libmotoutil/moto-gl.h"
 #include "libmotoutil/numdef.h"
 #include "libmotoutil/xform.h"
 
+#include "moto-scene-node.h"
 #include "moto-shape-node.h"
 #include "moto-shape.h"
 #include "moto-mesh.h"
+
+static MotoBound*
+moto_shape_node_get_bound_DEFAULT(MotoShapeNode* self);
 
 void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoDrawMode draw_mode,
     MotoShapeSelection* selection, MotoSelectionMode selection_mode);
@@ -39,23 +44,35 @@ struct _MotoShapeNodePriv
 {
     gboolean prepared;
 
+    MotoBound* bound;
+
     GLuint dlist;
     GLuint vbufs[VBUF_NUMBER];
 };
 
-/*
+static void
+moto_shape_node_dispose(GObject *obj)
+{
+    MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(obj);
+
+    g_object_unref(priv->bound);
+
+    shape_node_parent_class->dispose(obj);
+}
+
 static void
 moto_shape_node_finalize(GObject *obj)
 {
     shape_node_parent_class->finalize(obj);
 }
-*/
 
 static void
 moto_shape_node_init(MotoShapeNode *self)
 {
     MotoNode *node = (MotoNode *)self;
     MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+
+    priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
 
     moto_node_add_params(node,
             "active", "Active", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
@@ -74,9 +91,10 @@ moto_shape_node_class_init(MotoShapeNodeClass *klass)
 
     shape_node_parent_class = (GObjectClass *)(g_type_class_peek_parent(klass));
 
-    // goclass->finalize = moto_shape_node_finalize;
+    goclass->dispose = moto_shape_node_dispose;
+    goclass->finalize = moto_shape_node_finalize;
 
-    klass->get_bound = NULL;
+    klass->get_bound = moto_shape_node_get_bound_DEFAULT;
     klass->draw = moto_shape_node_draw_DEFUALT;
     klass->select_more = moto_shape_node_select_more_DEFAULT;
     klass->select_less = moto_shape_node_select_less_DEFAULT;
@@ -152,7 +170,6 @@ static void moto_shape_node_draw_WIREFRAME_OBJECT(MotoShapeNode* self, MotoShape
 
 static void moto_shape_node_draw_WIREFRAME_VERTEX(MotoShapeNode* self, MotoShapeSelection* selection)
 {
-    g_print("moto_shape_node_draw_WIREFRAME_VERTEX\n");
     MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(MOTO_IS_MESH(shape))
@@ -586,4 +603,134 @@ moto_shape_node_select_inverse_DEFAULT(MotoShapeNode* self,
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(shape)
         moto_shape_select_inverse(shape, selection, mode);
+}
+
+static gboolean
+moto_shape_node_select_VERTEX(MotoShapeNode *self,
+        MotoShapeSelection* selection,
+        gint x, gint y, gint width, gint height,
+        MotoRay *ray, MotoTransformInfo *tinfo)
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+
+    if(!MOTO_IS_MESH(shape))
+        return FALSE;
+
+    MotoMesh* mesh = (MotoMesh*)shape;
+
+    /* Array of intersected verts. */
+    GArray *hits = \
+        g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
+
+    guint index = 0;
+    gfloat dist, dist_tmp;
+    dist = MACRO;
+    gfloat square_radius = 0.25*0.25;
+    gfloat fovy = atan((1/tinfo->proj[5]))*2;
+
+    guint i;
+    for(i = 0; i < mesh->v_num; i++)
+    {
+        gfloat *xyz = (gfloat *)(mesh->v_coords + i);
+
+        /* perspective compensatioin for sphere radius */
+        gfloat p2v[3]; /* Vector from ray origin to vertex. */
+        vector3_dif(p2v, xyz, ray->pos);
+        gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
+
+        if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
+            continue;
+
+        g_array_append_val(hits, i);
+
+        if(dist_tmp < dist)
+        {
+            dist = dist_tmp;
+            index = i;
+        }
+    }
+
+    if(hits->len > 0)
+    {
+        /* Detecting which of intersected verts is nearest to cursor. */
+        GLdouble win_dist,
+                 min_win_dist = MACRO;
+        GLdouble win_x, win_y, win_z, xx, yy;
+        guint i, ii;
+        for(i = 0; i < hits->len; i++)
+        {
+            ii = g_array_index(hits, gint, i);
+            gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
+                    tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
+
+            xx = (x - win_x);
+            yy = (height - y - win_y);
+            win_dist = sqrt(xx*xx + yy*yy);
+            if(win_dist < min_win_dist)
+            {
+                min_win_dist = win_dist;
+                index = ii;
+            }
+        }
+
+        moto_shape_selection_toggle_vertex_selection(selection, index);
+        // moto_shape_node_set_prepared((MotoShapeViewNode *)shape_node, FALSE);
+        // moto_shape_node_draw(shape_node);
+    }
+
+    g_array_free(hits, TRUE);
+    return TRUE;
+}
+
+static gboolean
+moto_shape_node_select_EDGE(MotoShapeNode *self,
+        MotoShapeSelection* selection,
+        gint x, gint y, gint width, gint height,
+        MotoRay *ray, MotoTransformInfo *tinfo)
+{
+}
+
+static gboolean
+moto_shape_node_select_FACE(MotoShapeNode *self,
+        MotoShapeSelection* selection,
+        gint x, gint y, gint width, gint height,
+        MotoRay *ray, MotoTransformInfo *tinfo)
+{}
+
+gboolean
+moto_shape_node_select(MotoShapeNode *self,
+        MotoShapeSelection* selection, MotoSelectionMode mode,
+        gint x, gint y, gint width, gint height,
+        MotoRay *ray, MotoTransformInfo *tinfo)
+{
+    switch(mode)
+    {
+        case MOTO_SELECTION_MODE_OBJECT:
+        break;
+        case MOTO_SELECTION_MODE_VERTEX:
+            return moto_shape_node_select_VERTEX(self, selection,
+                x, y, width, height, ray, tinfo);
+        break;
+        case MOTO_SELECTION_MODE_EDGE:
+            return moto_shape_node_select_EDGE(self, selection,
+                x, y, width, height, ray, tinfo);
+        break;
+        case MOTO_SELECTION_MODE_FACE:
+            return moto_shape_node_select_FACE(self, selection,
+                x, y, width, height, ray, tinfo);
+        break;
+        default:
+        break;
+    }
+
+    return FALSE;
+}
+
+static MotoBound*
+moto_shape_node_get_bound_DEFAULT(MotoShapeNode* self)
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape)
+        return moto_shape_get_bound(shape);
+    return MOTO_SHAPE_NODE_GET_PRIVATE(self)->bound;
 }

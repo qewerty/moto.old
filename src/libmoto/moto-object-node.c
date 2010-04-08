@@ -424,23 +424,23 @@ static void update_global_bound(MotoObjectNode *self)
 
 static void update_local_bound(MotoObjectNode *self)
 {
-    MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
-    MotoParam *s = moto_param_get_source(p);
-    if(!s)
+    MotoShapeNode* shape_node = \
+        moto_object_node_get_shape(self);
+    if(!shape_node)
     {
         moto_bound_set(self->priv->local_bound, 0, 0, 0, 0, 0, 0);
         return;
     }
 
-    MotoShapeViewNode *gvn = (MotoShapeViewNode *)moto_param_get_node(s);
-    if(!g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
+    MotoShape* shape = moto_shape_node_get_shape(shape_node);
+    if(!shape || !MOTO_IS_MESH(shape))
     {
         moto_bound_set(self->priv->local_bound, 0, 0, 0, 0, 0, 0);
         return;
     }
 
-    moto_bound_copy(self->priv->local_bound,
-            moto_mesh_view_node_get_bound(MOTO_MESH_VIEW_NODE(gvn)));
+    MotoMesh* mesh = (MotoMesh*)shape;
+    moto_mesh_calc_bound(mesh, self->priv->local_bound);
 
     self->priv->local_bound_calculated = TRUE;
 }
@@ -1231,24 +1231,15 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
     gint x, gint y, gint width, gint height, MotoRay *ray,
     MotoTransformInfo *tinfo)
 {
-    MotoShapeViewNode *view = NULL;
+    MotoShapeNode* shape_node = \
+        moto_object_node_get_shape(self);
 
-    GList* child = moto_node_get_children((MotoNode*)self);
-    for(; child; child = g_list_next(child))
+    if(shape_node)
     {
-        if(MOTO_IS_SHAPE_VIEW_NODE(child->data))
-        {
-            view = (MotoShapeViewNode*)child->data;
-            break;
-        }
-    }
-
-    if(view)
-    {
-        if(moto_shape_view_node_process_button_press(view, x, y, width, height, ray, tinfo))
-        {
-            return TRUE;
-        }
+        return moto_shape_node_select(shape_node,
+            moto_object_node_get_selection(self),
+            moto_object_node_get_selection_mode(self),
+            x, y, width, height, ray, tinfo);
     }
 
     return FALSE;
