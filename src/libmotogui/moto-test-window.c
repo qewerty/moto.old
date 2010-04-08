@@ -325,19 +325,20 @@ moto_test_window_init(MotoTestWindow *self)
     self->priv->system = moto_system_new();
     moto_system_get_library(self->priv->system);
     self->priv->scene_node = moto_scene_node_new("MyTestSceneNode", moto_system_get_library(self->priv->system));
-    moto_node_set_name(self->priv->scene_node, "Scene");
+    moto_node_set_name(self->priv->scene_node, "scene");
     g_signal_connect(G_OBJECT(self->priv->scene_node), "changed", G_CALLBACK(on_scene_node_changed), self);
     moto_system_add_scene(self->priv->system, self->priv->scene_node, TRUE);
 
     MotoNode *root_node = moto_node_create_child_by_name(self->priv->scene_node, "MotoObjectNode", "root");
     moto_scene_node_set_root(self->priv->scene_node, (MotoObjectNode *)root_node);
 
-    MotoNode *obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "GridObject");
-    MotoNode *grid_view_node = moto_node_create_child_by_name(obj_node, "MotoGridViewNode", "GridView");
-    moto_node_link(obj_node, "shape", grid_view_node, "self");
+    MotoNode *obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "grid");
+    MotoNode *grid_node = moto_node_create_child_by_name(obj_node, "MotoGridViewNode", "grid");
+    moto_node_link(obj_node, "shape", grid_node, "self");
 
-    obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "AxesObject");
-    MotoNode *axes_view_node = moto_node_create_child_by_name(obj_node, "MotoAxesViewNode", "AxesView");
+    obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "axes");
+    MotoNode *axes_node = moto_node_create_child_by_name(obj_node, "MotoAxesViewNode", "axes");
+    moto_node_link(obj_node, "shape", axes_node, "self");
 
     moto_scene_node_set_axes(self->priv->scene_node, (MotoObjectNode *)obj_node);
 
