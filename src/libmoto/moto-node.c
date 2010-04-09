@@ -205,6 +205,8 @@ moto_node_init(MotoNode *self)
 
     priv->tags = NULL;
 
+    moto_node_define_param_group(self, "Status");
+
     moto_node_add_params(self,
             "self", "Self", MOTO_TYPE_NODE, MOTO_PARAM_MODE_OUT, self, NULL, "Node",
             NULL);
@@ -469,12 +471,24 @@ guint moto_node_get_id(MotoNode *self)
     return priv->id;
 }
 
+void moto_node_define_param_group(MotoNode* self, const char* name)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    Group *g = (Group *)moto_mapped_list_get(& priv->pgroups, name);
+    if(!g)
+    {
+        g = group_new(name);
+        moto_mapped_list_set(& priv->pgroups, name, g);
+    }
+}
+
 void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *group)
 {
     MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
 
     Group *g = (Group *)moto_mapped_list_get(& priv->pgroups, group);
-    if( ! g)
+    if(!g)
     {
         g = group_new(group);
         moto_mapped_list_set(& priv->pgroups, group, g);

@@ -1208,6 +1208,8 @@ static void moto_object_node_update(MotoNode *self)
                 moto_shape_selection_free(priv->selection);
             priv->selection = NULL;
         }
+
+        moto_shape_node_reset(shape_node);
     }
     else
     {

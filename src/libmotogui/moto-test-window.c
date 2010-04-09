@@ -271,34 +271,6 @@ gboolean on_key_press_event(GtkWidget   *widget,
     return FALSE;
 }
 
-gboolean redraw_scene_node_idle(gpointer data)
-{
-    MotoTestWindow *tw = (MotoTestWindow *)data;
-    MotoSystem *system = tw->priv->system;
-
-    if( ! system)
-        return FALSE;
-
-    MotoSceneNode *scene_node = moto_system_get_current_scene(system);
-    if( ! scene_node)
-        return FALSE;
-
-    MotoNode *node = (MotoNode *)moto_scene_node_get_current_object(scene_node);
-    if( ! node)
-        return FALSE;
-
-    /*
-    moto_object_node_set_translate((MotoObjectNode *)node,
-            moto_node_get_param_float(node, "tx"),
-            moto_node_get_param_float(node, "ty") + 0.02,
-            moto_node_get_param_float(node, "tz"));
-            */
-
-    moto_test_window_redraw_3dview(tw);
-
-    return FALSE;
-}
-
 static void on_scene_node_changed(MotoSceneNode* scene_node, MotoTestWindow* window)
 {
     moto_test_window_redraw_3dview(window);
@@ -483,22 +455,14 @@ void moto_test_window_update_param_editor(MotoTestWindow *self)
         return;
 
     MotoNode *obj = (MotoNode *)moto_scene_node_get_current_object(self->priv->scene_node);
-    if( ! obj)
+    if(!obj)
         return;
 
-    MotoNode *view;
-    moto_node_get_param_object(obj, "view", (GObject**)&view);
-    if( ! view)
+    MotoShapeNode* shape = moto_object_node_get_shape((MotoObjectNode*)obj);
+    if(!shape)
         return;
 
-    MotoParam *p = moto_node_get_param(view, "mesh");
-    if( ! p)
-        return;
-    MotoParam *s = moto_param_get_source(p);
-    if( ! s)
-        return;
-    moto_param_editor_set_node(self->priv->param_editor, moto_param_get_node(s));
-    // moto_param_editor_set_node(self->priv->param_editor, obj);
+    moto_param_editor_set_node(self->priv->param_editor, shape);
 }
 
 void moto_test_window_update_param_editor_full(MotoTestWindow *self, MotoNode *node)

@@ -71,6 +71,8 @@ GType moto_shape_node_get_type(void);
 #define MOTO_IS_SHAPE_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_SHAPE_NODE))
 #define MOTO_SHAPE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE_NODE, MotoShapeNodeClass))
 
+MotoBound *moto_shape_node_reset(MotoShapeNode *self);
+
 MotoBound *moto_shape_node_get_bound(MotoShapeNode *self);
 
 MotoShape* moto_shape_node_get_shape(MotoShapeNode* self);

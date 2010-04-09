@@ -602,16 +602,15 @@ gboolean moto_scene_node_get_cull_faces(MotoSceneNode *self)
 }
 
 static gboolean
-__reset_shape_view(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
+reset_shape(MotoSceneNode *scene_node, MotoNode *node, gpointer user_data)
 {
-    // moto_shape_node_reset(MotoShapeNode *)node);
-
+    moto_shape_node_reset((MotoShapeNode *)node);
     return TRUE;
 }
 
 void moto_scene_node_reset(MotoSceneNode *self)
 {
-    // moto_scene_node_foreach_node(self, MOTO_TYPE_SHAPE_NODE, __reset_shape_view, NULL);
+    moto_scene_node_foreach_node(self, MOTO_TYPE_SHAPE_NODE, reset_shape, NULL);
 }
 
 typedef struct _MotoIntersectData

@@ -106,6 +106,8 @@ gboolean moto_node_is_independent(MotoNode *self);
 gboolean moto_node_is_ready_to_update(MotoNode *self);
 gboolean moto_node_needs_update(MotoNode *self);
 
+void moto_node_define_param_group(MotoNode* self, const char* name);
+
 void moto_node_add_dynamic_param(MotoNode *self, MotoParam *param, const gchar *group);
 #define moto_node_add_param(self, param, group) \
     moto_node_add_dynamic_param(self, param, group)

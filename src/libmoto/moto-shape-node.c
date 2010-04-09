@@ -3,6 +3,7 @@
 #include "libmotoutil/numdef.h"
 #include "libmotoutil/xform.h"
 
+#include "moto-messager.h"
 #include "moto-scene-node.h"
 #include "moto-shape-node.h"
 #include "moto-shape.h"
@@ -42,7 +43,7 @@ static GObjectClass *shape_node_parent_class = NULL;
 
 struct _MotoShapeNodePriv
 {
-    gboolean prepared;
+    gboolean ready;
 
     MotoBound* bound;
 
@@ -81,7 +82,7 @@ moto_shape_node_init(MotoShapeNode *self)
             "out", "Output Shape", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
             NULL);
 
-    priv->prepared = FALSE;
+    priv->ready = FALSE;
 }
 
 static void
@@ -106,6 +107,12 @@ moto_shape_node_class_init(MotoShapeNodeClass *klass)
 G_DEFINE_ABSTRACT_TYPE(MotoShapeNode, moto_shape_node, MOTO_TYPE_NODE);
 
 /* Methods of class ShapeNode */
+
+MotoBound *moto_shape_node_reset(MotoShapeNode *self)
+{
+    MotoShapeNodePriv* priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+    priv->ready = FALSE;
+}
 
 MotoBound *moto_shape_node_get_bound(MotoShapeNode *self)
 {
@@ -645,35 +652,6 @@ static void moto_shape_node_draw_WIREFRAME_FACE(MotoShapeNode* self, MotoShapeSe
                     gluTessEndContour(tess);
                     gluTessEndPolygon(tess);
                 }
-
-                /*
-                if(show_normals)
-                {
-                    gfloat ox = 0;
-                    gfloat oy = 0;
-                    gfloat oz = 0;
-
-                    for(j = 0; j < v_num; ++j)
-                    {
-                        ox += mesh->v_coords[f_verts[start + j]].x;
-                        oy += mesh->v_coords[f_verts[start + j]].y;
-                        oz += mesh->v_coords[f_verts[start + j]].z;
-                    }
-                    ox /= v_num;
-                    oy /= v_num;
-                    oz /= v_num;
-
-                    gfloat nx = ox + mesh->f_normals[i].x;
-                    gfloat ny = oy + mesh->f_normals[i].y;
-                    gfloat nz = oz + mesh->f_normals[i].z;
-
-                    glColor3f(1, 1, 0);
-                    glBegin(GL_LINES);
-                    glVertex3f(ox, oy, oz);
-                    glVertex3f(nx, ny, nz);
-                    glEnd();
-                }
-                */
             }
         }
         else if(MOTO_DRAW_MODE_WIREFRAME == draw_mode)
@@ -765,7 +743,69 @@ static void moto_shape_node_draw_WIREFRAME_TEX_FACE(MotoShapeNode* self, MotoSha
 {}
 
 static void moto_shape_node_draw_SOLID_OBJECT(MotoShapeNode* self, MotoShapeSelection* selection)
-{}
+{
+    MotoShapeNodePriv *priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+
+    MotoSceneNode* scene_node = \
+        moto_node_get_scene_node((MotoNode*)self);
+
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(MOTO_IS_MESH(shape))
+    {
+        MotoMesh* mesh = (MotoMesh*)shape;
+
+        glPushAttrib(GL_ENABLE_BIT);
+
+        glColor4f(1, 1, 1, 1);
+
+        glEnable(GL_LIGHTING);
+
+        if(moto_scene_node_get_cull_faces(scene_node))
+            glEnable(GL_CULL_FACE);
+        else
+            glDisable(GL_CULL_FACE);
+
+        MotoMeshFace16 *f_data = mesh->f_data16;
+        guint16 *f_verts = (guint16 *)mesh->f_verts;
+
+        GLUtesselator* tess = gluNewTess();
+
+        gluTessCallback(tess, GLU_TESS_VERTEX, tessCallbackVertex);
+        gluTessCallback(tess, GLU_TESS_BEGIN, tessCallbackBegin);
+        gluTessCallback(tess, GLU_TESS_END, tessCallbackEnd);
+        gluTessCallback(tess, GLU_TESS_ERROR, tessCallbackError);
+
+        guint i;
+        for(i = 0; i < mesh->f_num; ++i)
+        {
+            guint start = (0 == i) ? 0: f_data[i-1].v_offset;
+            guint v_num = f_data[i].v_offset - start;
+
+            glColor4f(1, 1, 1, 1);
+
+            GLdouble verts[v_num*3];
+
+            glNormal3fv((GLfloat*)( & mesh->f_normals[i]));
+            gluTessBeginPolygon(tess, NULL);
+            gluTessBeginContour(tess);
+            guint j;
+            for(j = 0; j < v_num; ++j)
+            {
+                float* v0 = (float*) & mesh->v_coords[f_verts[start + j]];
+                float* n0 = (float*) & mesh->f_normals[i];
+                GLdouble* v = verts + j*3;
+                v[0] = v0[0];
+                v[1] = v0[1];
+                v[2] = v0[2];
+                gluTessVertex(tess, v, v);
+            }
+            gluTessEndContour(tess);
+            gluTessEndPolygon(tess);
+        }
+
+        glPopAttrib();
+    }
+}
 
 static void moto_shape_node_draw_SOLID_VERTEX(MotoShapeNode* self, MotoShapeSelection* selection)
 {}
@@ -827,6 +867,23 @@ static void moto_shape_node_draw_SHADED_FACE(MotoShapeNode* self, MotoShapeSelec
 void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoDrawMode draw_mode,
     MotoShapeSelection* selection, MotoSelectionMode selection_mode)
 {
+    MotoShapeNodePriv* priv = MOTO_SHAPE_NODE_GET_PRIVATE(self);
+
+    if(priv->ready)
+    {
+        glCallList(priv->dlist);
+        return;
+    }
+
+    if(!glIsList(priv->dlist))
+    {
+        priv->dlist = glGenLists(1);
+        if(0 == priv->dlist)
+            return;
+    }
+
+    glNewList(priv->dlist, GL_COMPILE_AND_EXECUTE);
+
     switch(draw_mode)
     {
         case MOTO_DRAW_MODE_BBOX_WIREFRAME:
@@ -1003,6 +1060,10 @@ void moto_shape_node_draw_DEFUALT(MotoShapeNode* self, MotoDrawMode draw_mode,
         default:
         break;
     }
+
+    glEndList();
+
+    priv->ready = TRUE;
 }
 
 void moto_shape_node_select_more(MotoShapeNode* self,
@@ -1018,6 +1079,7 @@ moto_shape_node_select_more_DEFAULT(MotoShapeNode* self,
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(shape)
         moto_shape_select_more(shape, selection, mode);
+    moto_shape_node_reset(self);
 }
 
 void moto_shape_node_select_less(MotoShapeNode* self,
@@ -1033,6 +1095,7 @@ moto_shape_node_select_less_DEFAULT(MotoShapeNode* self,
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(shape)
         moto_shape_select_less(shape, selection, mode);
+    moto_shape_node_reset(self);
 }
 
 void moto_shape_node_select_inverse(MotoShapeNode* self,
@@ -1048,6 +1111,7 @@ moto_shape_node_select_inverse_DEFAULT(MotoShapeNode* self,
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(shape)
         moto_shape_select_inverse(shape, selection, mode);
+    moto_shape_node_reset(self);
 }
 
 static gboolean
@@ -1119,8 +1183,7 @@ moto_shape_node_select_VERTEX(MotoShapeNode *self,
         }
 
         moto_shape_selection_toggle_vertex_selection(selection, index);
-        // moto_shape_node_set_prepared((MotoShapeViewNode *)shape_node, FALSE);
-        // moto_shape_node_draw(shape_node);
+        moto_shape_node_reset(self);
     }
 
     g_array_free(hits, TRUE);
@@ -1253,27 +1316,41 @@ moto_shape_node_select(MotoShapeNode *self,
         gint x, gint y, gint width, gint height,
         MotoRay *ray, MotoTransformInfo *tinfo)
 {
+    gboolean result = FALSE;
+
     switch(mode)
     {
         case MOTO_SELECTION_MODE_OBJECT:
         break;
         case MOTO_SELECTION_MODE_VERTEX:
-            return moto_shape_node_select_VERTEX(self, selection,
+        {
+            result = moto_shape_node_select_VERTEX(self, selection,
                 x, y, width, height, ray, tinfo);
+            if(result)
+                moto_shape_node_reset(self);
+        }
         break;
         case MOTO_SELECTION_MODE_EDGE:
-            return moto_shape_node_select_EDGE(self, selection,
+        {
+            result = moto_shape_node_select_EDGE(self, selection,
                 x, y, width, height, ray, tinfo);
+            if(result)
+                moto_shape_node_reset(self);
+        }
         break;
         case MOTO_SELECTION_MODE_FACE:
-            return moto_shape_node_select_FACE(self, selection,
+        {
+            result = moto_shape_node_select_FACE(self, selection,
                 x, y, width, height, ray, tinfo);
+            if(result)
+                moto_shape_node_reset(self);
+        }
         break;
         default:
         break;
     }
 
-    return FALSE;
+    return result;
 }
 
 static MotoBound*

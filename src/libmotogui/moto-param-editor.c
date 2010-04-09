@@ -1838,7 +1838,10 @@ static void on_connect_button_clicked(GtkButton *button, MotoParam *param)
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
     MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(data->pe);
-    if(moto_param_get_mode(param) != pe_priv->param_mode && ! pe_priv->show_all)
+
+    MotoParamMode mode = moto_param_get_mode(param);
+
+    if(!(mode & MOTO_PARAM_MODE_IN) || !(mode && MOTO_PARAM_MODE_INOUT))
         return;
 
     const gchar *title = moto_param_get_title(param);
@@ -1894,8 +1897,7 @@ static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
 {
     MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
     GtkExpander *exp = (GtkExpander *)gtk_expander_new(group);
-    if(pe_priv->gnum < 4)
-        gtk_expander_set_expanded(exp, TRUE);
+    gtk_expander_set_expanded(exp, TRUE);
 
     GtkTable *table = (GtkTable *)gtk_table_new(5, 3, FALSE);
     gtk_container_add((GtkContainer *)exp, (GtkWidget *)table);
