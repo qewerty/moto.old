@@ -8,7 +8,6 @@
 #include "moto-messager.h"
 #include "moto-object-node.h"
 #include "moto-material-node.h"
-#include "moto-mesh-view-node.h"
 #include "moto-shape-node.h"
 #include "moto-mesh.h"
 
@@ -172,7 +171,6 @@ moto_object_node_init(MotoObjectNode *self)
             "ro", "Rotate Order", MOTO_TYPE_ROTATE_ORDER, MOTO_PARAM_MODE_INOUT, MOTO_ROTATE_ORDER_XYZ, pspec, "Transform/Misc",
             "kt", "Keep Transform", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Transform/Misc",
             "visible", "Visible",   MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "View",
-            "view", "View",   MOTO_TYPE_SHAPE_VIEW_NODE, MOTO_PARAM_MODE_INOUT, NULL, pspec, "View",
             "use_local_mode", "Use Local Mode",   MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "View",
             "mode", "Selection Mode",   MOTO_TYPE_SELECTION_MODE, MOTO_PARAM_MODE_INOUT, MOTO_SELECTION_MODE_OBJECT, pspec, "View",
             "shape", "Shape",   MOTO_TYPE_SHAPE_NODE, MOTO_PARAM_MODE_INOUT, NULL, NULL, "View",
@@ -404,22 +402,14 @@ void moto_object_node_set_parent(MotoObjectNode *self, MotoObjectNode *parent)
     moto_object_node_update_parent_inverse(self);
 }
 
+static void update_local_bound(MotoObjectNode *self);
+
 static void update_global_bound(MotoObjectNode *self)
 {
-    MotoParam *p = moto_node_get_param((MotoNode *)self, "view");
-    MotoParam *s = moto_param_get_source(p);
-    if( ! s)
-        return;
-
-    MotoShapeViewNode *gvn = (MotoShapeViewNode *)moto_param_get_node(s);
-    if(! g_type_is_a(MOTO_TYPE_MESH_VIEW_NODE, G_TYPE_FROM_INSTANCE(gvn)))
-        return;
-
-    // MotoBound *b = moto_mesh_view_node_get_bound(MOTO_MESH_VIEW_NODE(gvn));
-
-    /* TODO */
-
-    self->priv->global_bound_calculated = TRUE;
+    update_local_bound(self);
+    // TODO:
+    moto_bound_copy(self->priv->global_bound, self->priv->local_bound);
+    // self->priv->global_bound_calculated = TRUE;
 }
 
 static void update_local_bound(MotoObjectNode *self)
@@ -658,7 +648,7 @@ static void apply_global_transform(MotoObjectNode *self)
 
 MotoDrawMode moto_object_node_get_draw_mode(MotoObjectNode* self)
 {
-    MotoSceneNode* scene = moto_node_get_scene_node(self);
+    MotoSceneNode* scene = moto_node_get_scene_node((MotoNode*)self);
     if(!scene)
         return MOTO_DRAW_MODE_SMOOTH;
 
@@ -1248,42 +1238,12 @@ gboolean moto_object_node_button_press(MotoObjectNode *self,
 gboolean moto_object_node_button_release(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoShapeViewNode *view;
-    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
-
-    if(view)
-        if(moto_shape_view_node_process_button_release(view, x, y, width, height))
-            return TRUE;
-
-    GSList *child = self->priv->children;
-    for(; child; child = g_slist_next(child))
-    {
-        if(moto_object_node_button_release((MotoObjectNode *)child->data,
-                x, y, width, height))
-            return TRUE;
-    }
-
     return FALSE;
 }
 
 gboolean moto_object_node_motion(MotoObjectNode *self,
     gint x, gint y, gint width, gint height)
 {
-    MotoShapeViewNode *view;
-    moto_node_get_param_object((MotoNode *)self, "view", (GObject**)&view);
-
-    if(view)
-        if(moto_shape_view_node_process_motion(view, x, y, width, height))
-            return TRUE;
-
-    GSList *child = self->priv->children;
-    for(; child; child = g_slist_next(child))
-    {
-        if(moto_object_node_motion((MotoObjectNode *)child->data,
-                x, y, width, height))
-            return TRUE;
-    }
-
     return FALSE;
 }
 

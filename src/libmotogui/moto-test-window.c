@@ -21,8 +21,6 @@
 #include "libmoto/moto-object-node.h"
 #include "libmotoutil/numdef.h"
 
-#include "libmoto/moto-geom-view-node.h"
-
 #include "moto-shelf.h"
 
 static MotoTestWindow *twin = NULL;
@@ -55,7 +53,7 @@ struct _MotoTestWindowPriv
     MotoSystem *system;
     MotoSceneNode *scene_node;
 
-    MotoShapeViewNode *gv;
+    MotoShapeNode *gv;
 
     MotoParamEditor *param_editor;
     MotoOutliner *outliner;
@@ -169,7 +167,7 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoShapeViewNode *gv;
+        MotoShapeNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
@@ -262,11 +260,11 @@ gboolean on_key_press_event(GtkWidget   *widget,
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
         if( ! ob)
             return FALSE;
-        MotoShapeViewNode *gv;
+        MotoShapeNode *gv;
         moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
         if( ! gv)
             return FALSE;
-        moto_shape_view_node_goto_next_state(gv);
+        // moto_shape_view_node_goto_next_state(gv);
         moto_test_window_redraw_3dview(self);
     }
 

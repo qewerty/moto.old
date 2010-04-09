@@ -179,11 +179,6 @@ static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 
 static void set_state(GtkMenuItem *item, gpointer user_data)
 {
-    MotoShapeViewNode *geom = (MotoShapeViewNode *)user_data;
-    MotoShapeViewState *state = \
-        (MotoShapeViewState *)g_object_get_data(G_OBJECT(item), "moto-geom-view-state");
-
-    moto_shape_view_node_set_state(geom, moto_shape_view_state_get_name(state));
 }
 
 void show_draw_mode_menu(GtkButton *button, gpointer user_data)
@@ -268,12 +263,11 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoShapeViewNode *geom = (MotoShapeViewNode *)moto_param_get_node(out_view);
-
     /* menu */
     GtkMenu *menu = (GtkMenu *)gtk_menu_new();
     GtkWidget *item;
 
+    /*
     GSList *state = moto_shape_view_node_get_state_list(geom);
     for(; state; state = g_slist_next(state))
     {
@@ -285,6 +279,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
 
         gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
     }
+    */
 
     gtk_widget_show_all((GtkWidget *)menu);
     gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, 0);

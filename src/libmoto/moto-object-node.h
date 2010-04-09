@@ -29,7 +29,7 @@
 #include "moto-transform-info.h"
 #include "moto-node.h"
 #include "moto-bound.h"
-#include "moto-geom-view-node.h"
+#include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 

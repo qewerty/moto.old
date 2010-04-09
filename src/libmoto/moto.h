@@ -27,8 +27,6 @@
 #include "moto-scene-node.h"
 #include "moto-node.h"
 #include "moto-object-node.h"
-#include "moto-geom-view-node.h"
-#include "moto-mesh-view-node.h"
 #include "moto-wobj-mesh-loader.h"
 #include "moto-variation.h"
 #include "moto-time-node.h"
@@ -38,7 +36,6 @@
 #include "moto-cylinder-node.h"
 #include "moto-mesh-file-node.h"
 #include "moto-material-node.h"
-#include "moto-ray-view-node.h"
 #include "moto-grid-view-node.h"
 #include "moto-axes-view-node.h"
 #include "moto-mesh.h"
@@ -46,11 +43,9 @@
 #include "moto-copyable.h"
 #include "moto-displace-node.h"
 #include "moto-messager.h"
-// #include "moto-shape.h"
+#include "moto-shape.h"
 #include "moto-shape-node.h"
 #include "moto-ipo-segment.h"
 #include "moto-library.h"
-
-#include "moto-geom-view-node.h"
 
 #endif /* __MOTO_H__ */

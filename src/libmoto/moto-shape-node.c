@@ -1133,6 +1133,76 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
         gint x, gint y, gint width, gint height,
         MotoRay *ray, MotoTransformInfo *tinfo)
 {
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape && MOTO_IS_MESH(shape))
+    {
+        MotoMesh *mesh = (MotoMesh*)shape;
+
+        /* Array of intersected verts. */
+        GArray *hits = \
+            g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
+
+        guint index = 0;
+        gfloat dist, dist_tmp;
+        dist = MACRO;
+        gfloat square_radius = 0.25*0.25;
+        gfloat fovy = atan((1/tinfo->proj[5]))*2;
+
+        guint i;
+        for(i = 0; i < mesh->v_num; i++)
+        {
+            gfloat *xyz = (gfloat *)(mesh->v_coords + i);
+
+            /* perspective compensatioin for sphere radius */
+            gfloat p2v[3]; /* Vector from ray origin to vertex. */
+            vector3_dif(p2v, xyz, ray->pos);
+            gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
+
+            if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
+                continue;
+
+            g_array_append_val(hits, i);
+
+            if(dist_tmp < dist)
+            {
+                dist = dist_tmp;
+                index = i;
+            }
+        }
+
+        if(hits->len > 0)
+        {
+            /* Detecting which of intersected verts is nearest to cursor. */
+            GLdouble win_dist,
+                     min_win_dist = MACRO;
+            GLdouble win_x, win_y, win_z, xx, yy;
+            guint i, ii;
+            for(i = 0; i < hits->len; i++)
+            {
+                ii = g_array_index(hits, gint, i);
+                gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
+                        tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
+
+                xx = (x - win_x);
+                yy = (height - y - win_y);
+                win_dist = sqrt(xx*xx + yy*yy);
+                if(win_dist < min_win_dist)
+                {
+                    min_win_dist = win_dist;
+                    index = ii;
+                }
+            }
+
+            moto_shape_selection_toggle_vertex_selection(selection, index);
+        }
+
+        moto_mesh_update_selection_from_verts(mesh, selection);
+
+        g_array_free(hits, TRUE);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 static gboolean
@@ -1140,7 +1210,42 @@ moto_shape_node_select_FACE(MotoShapeNode *self,
         MotoShapeSelection* selection,
         gint x, gint y, gint width, gint height,
         MotoRay *ray, MotoTransformInfo *tinfo)
-{}
+{
+    MotoShape* shape = moto_shape_node_get_shape(self);
+    if(shape && MOTO_IS_MESH(shape))
+    {
+
+        MotoMesh *mesh = (MotoMesh*)shape;
+
+        guint index = moto_mesh_invalid_index(mesh);
+        guint num = 0;
+        gfloat dist = MACRO;
+        gfloat dist_tmp;
+
+        guint i;
+        for(i = 0; i < mesh->f_num; i++)
+        {
+            if( ! moto_mesh_intersect_face(mesh, i, ray, & dist_tmp))
+                continue;
+            num++;
+
+            if(dist_tmp < dist)
+            {
+                dist = dist_tmp;
+                index = i;
+            }
+        }
+
+        if(num > 0)
+        {
+            moto_shape_selection_toggle_face_selection(selection, index);
+        }
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
 
 gboolean
 moto_shape_node_select(MotoShapeNode *self,
