@@ -25,7 +25,7 @@
 #include <glib-object.h>
 
 #include "moto-forward.h"
-#include "moto-axes-view-node.h"
+#include "moto-axes-node.h"
 
 #include "moto-enums.h"
 

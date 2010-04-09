@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "moto-axes-view-node.h"
+#include "moto-axes-node.h"
 #include "libmotoutil/moto-gl.h"
 
 /* forwards */

@@ -4,7 +4,7 @@
 #include "GL/glu.h"
 
 #include "libmotoutil/numdef.h"
-#include "moto-grid-view-node.h"
+#include "moto-grid-node.h"
 
 /* forwards */
 
