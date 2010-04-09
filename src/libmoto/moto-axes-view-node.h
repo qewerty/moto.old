@@ -22,7 +22,7 @@
 #ifndef __MOTO_AXES_VIEW_NODE_H__
 #define __MOTO_AXES_VIEW_NODE_H__
 
-#include "moto-geom-view-node.h"
+#include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
@@ -34,14 +34,14 @@ typedef struct _MotoAxesViewNodePriv MotoAxesViewNodePriv;
 
 struct _MotoAxesViewNode
 {
-    MotoGeomViewNode parent;
+    MotoShapeNode parent;
 
     MotoAxesViewNodePriv *priv;
 };
 
 struct _MotoAxesViewNodeClass
 {
-    MotoGeomViewNodeClass parent;
+    MotoShapeNodeClass parent;
 };
 
 GType moto_axes_view_node_get_type(void);

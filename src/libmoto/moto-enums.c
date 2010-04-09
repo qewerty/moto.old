@@ -53,6 +53,25 @@ GType moto_draw_mode_get_type(void)
     return type;
 }
 
+/* MotoSelectionMode */
+
+GType moto_selection_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_SELECTION_MODE_OBJECT, "SELECTION_MODE_OBJECT", "Object"},
+            {MOTO_SELECTION_MODE_VERTEX, "SELECTION_MODE_VERTEX", "Vertex"},
+            {MOTO_SELECTION_MODE_EDGE, "SELECTION_MODE_EDGE", "Edge"},
+            {MOTO_SELECTION_MODE_FACE, "SELECTION_MODE_FACE", "Face"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoSelectionMode", values);
+    }
+    return type;
+}
+
 /* MotoExtrudeMode */
 
 GType moto_extrude_mode_get_type(void)

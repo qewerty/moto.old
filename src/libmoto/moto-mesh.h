@@ -28,7 +28,7 @@
 #include "moto-ray.h"
 #include "moto-bitmask.h"
 #include "moto-bound.h"
-#include "moto-geom.h"
+#include "moto-shape.h"
 
 G_BEGIN_DECLS
 
@@ -46,8 +46,6 @@ typedef struct _MotoHalfEdge16 MotoHalfEdge16;
 typedef struct _MotoHalfEdge32 MotoHalfEdge32;
 
 typedef struct _MotoMeshVertAttr MotoMeshVertAttr;
-
-typedef struct _MotoMeshSelection MotoMeshSelection;
 
 typedef void (*MotoMeshForeachVertexFunc)(MotoMesh *mesh,
         gpointer vert, gpointer user_data);
@@ -94,72 +92,6 @@ struct _MotoMeshVertAttr
     gfloat *data;
 };
 
-struct _MotoMeshSelection
-{
-    MotoBitmask *verts;
-    MotoBitmask *edges;
-    MotoBitmask *faces;
-};
-
-MotoMeshSelection *moto_mesh_selection_new(guint v_num, guint e_num, guint f_num);
-MotoMeshSelection *moto_mesh_selection_copy(MotoMeshSelection *other);
-void moto_mesh_selection_copy_smth(MotoMeshSelection *self, MotoMeshSelection *other);
-MotoMeshSelection *moto_mesh_selection_new_for_mesh(MotoMesh *mesh);
-void moto_mesh_selection_free(MotoMeshSelection *self);
-
-guint32 moto_mesh_selection_get_v_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_e_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_f_num(MotoMeshSelection *self);
-
-guint32 moto_mesh_selection_get_selected_v_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_selected_e_num(MotoMeshSelection *self);
-guint32 moto_mesh_selection_get_selected_f_num(MotoMeshSelection *self);
-
-void moto_mesh_selection_select_vertex(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_select_verts(MotoMeshSelection *self, ...);
-void moto_mesh_selection_deselect_vertex(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_deselect_verts(MotoMeshSelection *self, ...);
-void moto_mesh_selection_deselect_all_verts(MotoMeshSelection *self);
-void moto_mesh_selection_toggle_vertex_selection(MotoMeshSelection *self, guint index);
-gboolean moto_mesh_selection_is_vertex_selected(MotoMeshSelection *self, guint index);
-
-void moto_mesh_selection_select_edge(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_select_edges(MotoMeshSelection *self, ...);
-void moto_mesh_selection_deselect_edge(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_deselect_edges(MotoMeshSelection *self, ...);
-void moto_mesh_selection_deselect_all_edges(MotoMeshSelection *self);
-void moto_mesh_selection_toggle_edge_selection(MotoMeshSelection *self, guint index);
-gboolean moto_mesh_selection_is_edge_selected(MotoMeshSelection *self, guint index);
-
-void moto_mesh_selection_select_face(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_select_faces(MotoMeshSelection *self, ...);
-void moto_mesh_selection_deselect_face(MotoMeshSelection *self, guint index);
-void moto_mesh_selection_deselect_all_faces(MotoMeshSelection *self);
-void moto_mesh_selection_toggle_face_selection(MotoMeshSelection *self, guint index);
-gboolean moto_mesh_selection_is_face_selected(MotoMeshSelection *self, guint index);
-
-void moto_mesh_selection_deselect_all(MotoMeshSelection *self);
-
-gboolean moto_mesh_selection_is_valid(MotoMeshSelection *self, MotoMesh *mesh);
-
-MotoMeshSelection *moto_mesh_selection_adapt(MotoMeshSelection *self, MotoMesh *mesh);
-
-void moto_mesh_selection_select_more_verts(MotoMeshSelection *self, MotoMesh *mesh);
-void moto_mesh_selection_select_less_verts(MotoMeshSelection *self, MotoMesh*mesh);
-void moto_mesh_selection_select_inverse_verts(MotoMeshSelection *self, MotoMesh*mesh);
-
-void moto_mesh_selection_select_more_edges(MotoMeshSelection *self, MotoMesh*mesh);
-void moto_mesh_selection_select_less_edges(MotoMeshSelection *self, MotoMesh*mesh);
-void moto_mesh_selection_select_inverse_edges(MotoMeshSelection *self, MotoMesh*mesh);
-
-void moto_mesh_selection_select_more_faces(MotoMeshSelection *self, MotoMesh *mesh);
-void moto_mesh_selection_select_less_faces(MotoMeshSelection *self, MotoMesh *mesh);
-void moto_mesh_selection_select_inverse_faces(MotoMeshSelection *self, MotoMesh *mesh);
-
-void moto_mesh_selection_update_from_verts(MotoMeshSelection *self, MotoMesh *mesh);
-void moto_mesh_selection_update_from_edges(MotoMeshSelection *self, MotoMesh *mesh);
-void moto_mesh_selection_update_from_faces(MotoMeshSelection *self, MotoMesh *mesh);
-
 struct _MotoHalfEdge16
 {
     guint16 next;
@@ -190,7 +122,7 @@ struct _MotoMesh
     /* WARNING! All members are private but opened for performance reasons.
      *          Don't use them directly! */
 
-    MotoGeom parent;
+    MotoShape parent;
 
     gboolean b32; // 16bit or 32bit are used for indecies
     GLenum index_gl_type;
@@ -265,7 +197,7 @@ struct _MotoMesh
 
 struct _MotoMeshClass
 {
-    MotoGeomClass parent;
+    MotoShapeClass parent;
 };
 
 GType moto_mesh_get_type(void);
@@ -332,11 +264,11 @@ void moto_mesh_foreach_face(MotoMesh *self,
         MotoMeshForeachFaceFunc func, gpointer user_data);
 
 void moto_mesh_foreach_selected_vertex(MotoMesh *self,
-        MotoMeshSelection *selection, MotoMeshForeachVertexFunc func, gpointer user_data);
+        MotoShapeSelection *selection, MotoMeshForeachVertexFunc func, gpointer user_data);
 void moto_mesh_foreach_selected_edge(MotoMesh *self,
-        MotoMeshSelection *selection, MotoMeshForeachEdgeFunc func, gpointer user_data);
+        MotoShapeSelection *selection, MotoMeshForeachEdgeFunc func, gpointer user_data);
 void moto_mesh_foreach_selected_face(MotoMesh *self,
-        MotoMeshSelection *selection, MotoMeshForeachFaceFunc func, gpointer user_data);
+        MotoShapeSelection *selection, MotoMeshForeachFaceFunc func, gpointer user_data);
 
 void moto_mesh_tesselate_faces(MotoMesh *self);
 
@@ -359,21 +291,42 @@ void moto_mesh_calc_bound(MotoMesh* self, MotoBound* bound);
 MotoBound* moto_mesh_create_bound(MotoMesh* self);
 
 MotoMesh* moto_mesh_extrude_faces(MotoMesh *self,
-    MotoMeshSelection *selection, guint sections,
+    MotoShapeSelection *selection, guint sections,
     gfloat ltx, gfloat lty, gfloat ltz,
     gfloat lrx, gfloat lry, gfloat lrz,
     gfloat lsx, gfloat lsy, gfloat lsz);
 
 MotoMesh* moto_mesh_extrude_region(MotoMesh *self,
-    MotoMeshSelection *selection, guint sections,
+    MotoShapeSelection *selection, guint sections,
     gfloat length);
 
 MotoMesh* moto_mesh_extrude_verts(MotoMesh *self,
-    MotoMeshSelection *selection, guint sections,
+    MotoShapeSelection *selection, guint sections,
     gfloat length);
 
 MotoMesh* moto_mesh_remove(MotoMesh *self,
-    MotoMeshSelection *selection);
+    MotoShapeSelection *selection);
+
+MotoShapeSelection *moto_mesh_create_selection(MotoMesh *self);
+
+gboolean moto_mesh_is_selection_valid(MotoMesh *self, MotoShapeSelection *selection);
+MotoShapeSelection *moto_mesh_adapt_selection(MotoMesh *self, MotoShapeSelection *selection);
+
+void moto_mesh_select_more_verts(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_less_verts(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_inverse_verts(MotoMesh *self, MotoShapeSelection *selection);
+
+void moto_mesh_select_more_edges(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_less_edges(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_inverse_edges(MotoMesh *self, MotoShapeSelection *selection);
+
+void moto_mesh_select_more_faces(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_less_faces(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_select_inverse_faces(MotoMesh *self, MotoShapeSelection *selection);
+
+void moto_mesh_update_selection_from_verts(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_update_selection_from_edges(MotoMesh *self, MotoShapeSelection *selection);
+void moto_mesh_update_selection_from_faces(MotoMesh *self, MotoShapeSelection *selection);
 
 G_END_DECLS
 

@@ -295,7 +295,7 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
     }
 
     priv->bound_calculated = FALSE;
-    moto_geom_prepare((MotoGeom*)mesh);
+    moto_shape_prepare((MotoShape*)mesh);
     moto_node_set_param_object((MotoNode*)self, "out", (GObject*)mesh);
 }
 #undef get_v

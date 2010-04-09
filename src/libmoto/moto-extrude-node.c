@@ -12,7 +12,7 @@
 
 /* forwards */
 
-static MotoMesh *moto_extrude_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoMesh *moto_extrude_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoExtrudeNode */
 
@@ -64,7 +64,7 @@ MotoExtrudeNode *moto_extrude_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_extrude_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoMesh *moto_extrude_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
 {
     *the_same = FALSE;
 
@@ -94,7 +94,7 @@ static MotoMesh *moto_extrude_node_perform(MotoOpNode *self, MotoGeom *in, gbool
     MotoExtrudeMode mode;
     moto_node_get_param_enum(node, "mode", (gint*)&mode);
 
-    MotoMeshSelection *selection = moto_op_node_get_selection(self);
+    MotoShapeSelection *selection = moto_op_node_get_selection(self);
 
     MotoMesh *mesh = NULL;
     switch(mode)

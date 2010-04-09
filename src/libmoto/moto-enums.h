@@ -54,6 +54,17 @@ typedef enum
 GType moto_draw_mode_get_type(void);
 #define MOTO_TYPE_DRAW_MODE (moto_draw_mode_get_type())
 
+typedef enum
+{
+    MOTO_SELECTION_MODE_OBJECT,
+    MOTO_SELECTION_MODE_VERTEX,
+    MOTO_SELECTION_MODE_EDGE,
+    MOTO_SELECTION_MODE_FACE,
+} MotoSelectionMode;
+
+GType moto_selection_mode_get_type(void);
+#define MOTO_TYPE_SELECTION_MODE (moto_selection_mode_get_type())
+
 typedef enum _MotoExtrudeMode
 {
     MOTO_EXTRUDE_MODE_VERTS,

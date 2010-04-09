@@ -21,7 +21,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+static MotoShape *moto_twist_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoTwistNode */
 
@@ -32,7 +32,7 @@ static GObjectClass *twist_node_parent_class = NULL;
 
 typedef struct _MotoTwistNodePriv
 {
-    MotoGeom *in;
+    MotoShape *in;
 } MotoTwistNodePriv;
 
 static void
@@ -82,7 +82,7 @@ MotoTwistNode *moto_twist_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same)
+static MotoShape *moto_twist_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
 {
     *the_same = TRUE;
 
@@ -94,13 +94,13 @@ static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolea
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
-    if(!geom || !moto_geom_is_struct_the_same(geom, in))
+    if(!geom || !moto_shape_is_struct_the_same(geom, in))
     {
         *the_same = FALSE;
         geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
-    MotoGeom *out = (MotoGeom*)geom;
+    MotoShape *out = (MotoShape*)geom;
 
     float tmp;
 
@@ -291,6 +291,6 @@ static MotoGeom *moto_twist_node_perform(MotoOpNode *self, MotoGeom *in, gboolea
         }
     }
 
-    moto_geom_prepare(out);
+    moto_shape_prepare(out);
     return out;
 }

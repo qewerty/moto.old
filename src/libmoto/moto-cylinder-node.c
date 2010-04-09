@@ -479,7 +479,7 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     }
 
     self->priv->bound_calculated = FALSE;
-    if(!moto_geom_prepare((MotoGeom*)mesh))
+    if(!moto_shape_prepare((MotoShape*)mesh))
     {
         g_print("Error while preparing mesh of MotoCylinderNode\n");
     }

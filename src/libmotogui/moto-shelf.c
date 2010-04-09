@@ -1,11 +1,11 @@
 #include "libmoto/moto-messager.h"
 #include "libmoto/moto-scene-node.h"
-#include "libmoto/moto-mesh-view-node.h"
+#include "libmoto/moto-object-node.h"
+#include "libmoto/moto-shape-node.h"
 #include "libmoto/moto-extrude-node.h"
 #include "libmoto/moto-remove-node.h"
-
-#include "moto-shelf.h"
 #include "moto-test-window.h"
+#include "moto-shelf.h"
 
 /* Some items */
 
@@ -30,12 +30,10 @@ create_shape(MotoShelf* shelf, MotoSystem* system,
     moto_node_set_scene_node(obj, scene); // TODO: Remove function 'moto_node_set_scene_node' later.
     moto_scene_node_set_object_current(scene, (MotoObjectNode*)obj);
 
-    MotoNode *view = moto_node_create_child_by_name(obj,  "MotoMeshViewNode", "view");
     MotoNode *plane = moto_node_create_child_by_name(obj, type_name, name);
     MotoNode *mat = moto_node_create_child_by_name(obj,  "MotoMaterialNode", "mat");
 
-    moto_node_link(obj, "view", view, "view");
-    moto_node_link(view, "mesh", plane, "out");
+    moto_node_link(obj, "shape", plane, "self");
     moto_node_link(obj, "material", mat, "material");
 }
 
@@ -88,47 +86,25 @@ perform_op(MotoShelf *shelf, MotoSystem *system,
         return;
     }
 
-    MotoMeshViewNode *view;
-    moto_node_get_param_object((MotoNode *)obj, "view", (GObject**)&view);
+    MotoShapeNode* shape = moto_object_node_get_shape(obj);
 
-    if(!view)
+    if(!shape)
     {
-        moto_error("Current object has no view.");
-        return;
-    }
-
-    if(!g_type_is_a(G_TYPE_FROM_INSTANCE(view), MOTO_TYPE_MESH_VIEW_NODE))
-    {
-        moto_error("View of current object is not MotoMeshViewNode.");
-        return;
-    }
-
-    MotoParam *param  = moto_node_get_param((MotoNode*)view, "mesh");
-    MotoParam *source = moto_param_get_source(param);
-    if( ! source)
-    {
-        moto_error("View of current object has not associated shape.");
+        moto_error("Current object has no shape.");
         return;
     }
 
     MotoNode *op = \
-        moto_node_create_child_by_name(obj, op_node_name, name);
-    if( ! op || ! g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_OP_NODE))
+        moto_node_create_child_by_name((MotoNode*)obj, op_node_name, name);
+    if(!op || !g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_OP_NODE))
         return;
 
-    MotoGeomViewState *state = moto_geom_view_node_get_state((MotoGeomViewNode*)view);
-    if(state)
-        moto_geom_view_state_leave(state, (MotoGeomViewNode*)view);
+    moto_node_link(shape, "out", op, "in");
+    moto_node_link(op, "out", obj, "shape");
 
-    MotoMeshSelection *selection = moto_mesh_view_node_get_selection(view);
+    MotoShapeSelection *selection = moto_object_node_get_selection(obj);
     moto_op_node_set_selection((MotoOpNode*)op, selection);
-    moto_mesh_selection_deselect_all(selection);
-
-    MotoParam *in_mesh = moto_node_get_param(op, "in");
-    moto_param_link(in_mesh, source);
-
-    MotoParam *out_mesh = moto_node_get_param(op, "out");
-    moto_param_link(param, out_mesh);
+    moto_shape_selection_deselect_all(selection);
 }
 
 static void perform_extrude(MotoShelf *shelf, MotoSystem *system)
@@ -343,3 +319,4 @@ void moto_shelf_add_item(MotoShelf *self, const gchar *tab_name, const gchar *na
 
     gtk_widget_show_all((GtkWidget *)tab);
 }
+

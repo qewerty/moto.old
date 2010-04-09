@@ -23,7 +23,7 @@
 #define __MOTO_OP_NODE_H__
 
 #include "moto-shape-node.h"
-#include "moto-geom.h"
+#include "moto-shape.h"
 #include "moto-mesh.h"
 
 G_BEGIN_DECLS
@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 typedef struct _MotoOpNode MotoOpNode;
 typedef struct _MotoOpNodeClass MotoOpNodeClass;
 
-typedef MotoGeom* (*MotoOpPerformMethod)(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+typedef MotoShape* (*MotoOpPerformMethod)(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoOpNode */
 
@@ -57,10 +57,10 @@ GType moto_op_node_get_type(void);
 #define MOTO_OP_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_OP_NODE, MotoOpNodeClass))
 
 void moto_op_node_set_selection(MotoOpNode *self,
-    MotoMeshSelection *selection);
-MotoMeshSelection *moto_op_node_get_selection(MotoOpNode *self);
+    MotoShapeSelection *selection);
+MotoShapeSelection *moto_op_node_get_selection(MotoOpNode *self);
 
-MotoGeom *moto_op_node_perform(MotoOpNode *self, MotoGeom *in, gboolean *the_same);
+MotoShape *moto_op_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same);
 
 G_END_DECLS
 

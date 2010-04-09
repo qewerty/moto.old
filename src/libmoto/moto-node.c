@@ -204,6 +204,10 @@ moto_node_init(MotoNode *self)
     g_get_current_time(& priv->last_modified);
 
     priv->tags = NULL;
+
+    moto_node_add_params(self,
+            "self", "Self", MOTO_TYPE_NODE, MOTO_PARAM_MODE_OUT, self, NULL, "Node",
+            NULL);
 }
 
 static void
@@ -2220,9 +2224,9 @@ void moto_param_link(MotoParam *self, MotoParam *src)
     GType src_type = moto_param_get_value_type(src);
     if(g_type_is_a(self_type, G_TYPE_OBJECT) || g_type_is_a(self_type, G_TYPE_INTERFACE))
     {
-        if( ! g_type_is_a(src_type, self_type))
+        if(!g_type_is_a(src_type, G_TYPE_OBJECT))
         {
-            moto_error("Can't link param of not derived type (src: %s; dest: %s)",
+            moto_error("Can't link param of not derived type (src: %s; dst: %s)",
                 g_type_name(src_type), g_type_name(self_type));
             return;
         }
@@ -2444,7 +2448,19 @@ static void moto_param_update(MotoParam *self)
     if(use_source && priv->source)
     {
         MotoParamPriv *src_priv = MOTO_PARAM_GET_PRIVATE(priv->source);
-        g_value_transform(& src_priv->value, & priv->value);
+
+
+        GType dst_type = G_VALUE_TYPE(&priv->value);
+        if(g_type_is_a(dst_type, G_TYPE_OBJECT))
+        {
+            if(!g_type_is_a(dst_type, G_VALUE_TYPE(&src_priv->value)))
+            {
+                moto_error("Can't update parameter '%s'.\n", moto_param_get_name(self));
+                return;
+            }
+        }
+
+        g_value_transform(&src_priv->value, &priv->value);
     }
 
     MotoNode *node = moto_param_get_node(self);

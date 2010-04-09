@@ -24,6 +24,9 @@
 
 #include "moto-node.h"
 #include "moto-bound.h"
+#include "moto-shape.h"
+#include "moto-enums.h"
+#include "moto-transform-info.h"
 
 G_BEGIN_DECLS
 
@@ -31,6 +34,15 @@ typedef struct _MotoShapeNode MotoShapeNode;
 typedef struct _MotoShapeNodeClass MotoShapeNodeClass;
 
 typedef MotoBound *(*MotoShapeNodeGetBoundMethod)(MotoShapeNode *self);
+typedef void (*MotoShapeNodeDrawMethod)(MotoShapeNode *self, MotoDrawMode draw_mode,
+    MotoShapeSelection* selection, MotoSelectionMode selection_mode);
+
+typedef void (*MotoShapeNodeSelectMoreMethod)(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+typedef void (*MotoShapeNodeSelectLessMethod)(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+typedef void (*MotoShapeNodeSelectInverseMethod)(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
 
 /* class MotoShapeNode */
 
@@ -44,6 +56,10 @@ struct _MotoShapeNodeClass
     MotoNodeClass parent;
 
     MotoShapeNodeGetBoundMethod get_bound;
+    MotoShapeNodeDrawMethod draw;
+    MotoShapeNodeSelectMoreMethod select_more;
+    MotoShapeNodeSelectLessMethod select_less;
+    MotoShapeNodeSelectInverseMethod select_inverse;
 };
 
 GType moto_shape_node_get_type(void);
@@ -56,6 +72,24 @@ GType moto_shape_node_get_type(void);
 #define MOTO_SHAPE_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_SHAPE_NODE, MotoShapeNodeClass))
 
 MotoBound *moto_shape_node_get_bound(MotoShapeNode *self);
+
+MotoShape* moto_shape_node_get_shape(MotoShapeNode* self);
+
+void moto_shape_node_draw(MotoShapeNode* self, MotoDrawMode draw_mode,
+    MotoShapeSelection* selection, MotoSelectionMode selection_mode);
+
+void moto_shape_node_select_more(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+void moto_shape_node_select_less(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+void moto_shape_node_select_inverse(MotoShapeNode* self,
+    MotoShapeSelection* selection, MotoSelectionMode mode);
+
+gboolean
+moto_shape_node_select(MotoShapeNode *self,
+        MotoShapeSelection* selection, MotoSelectionMode mode,
+        gint x, gint y, gint width, gint height,
+        MotoRay *ray, MotoTransformInfo *tinfo);
 
 G_END_DECLS
 

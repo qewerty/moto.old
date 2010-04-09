@@ -8,8 +8,8 @@
 
 /* forwards */
 
-static void moto_grid_view_node_draw(MotoGeomViewNode *self);
-static void moto_grid_view_node_prepare_for_draw(MotoGeomViewNode *self);
+static void moto_grid_view_node_draw(MotoShapeNode *self);
+static void moto_grid_view_node_prepare_for_draw(MotoGridViewNode *self);
 
 /* class GridViewNode */
 
@@ -57,7 +57,7 @@ moto_grid_view_node_init(MotoGridViewNode *self)
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "view", "View", MOTO_TYPE_GEOM_VIEW_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
+            "view", "View", MOTO_TYPE_SHAPE_NODE, MOTO_PARAM_MODE_OUT, self, pspec, "Shape",
             NULL);
 
     self->priv->prepared = FALSE;
@@ -68,8 +68,8 @@ static void
 moto_grid_view_node_class_init(MotoGridViewNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
-    MotoGeomViewNodeClass *gvnclass = \
-        MOTO_GEOM_VIEW_NODE_CLASS(klass);
+    MotoShapeNodeClass *gvnclass = \
+        MOTO_SHAPE_NODE_CLASS(klass);
 
     grid_view_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
@@ -77,10 +77,10 @@ moto_grid_view_node_class_init(MotoGridViewNodeClass *klass)
     goclass->finalize   = moto_grid_view_node_finalize;
 
     gvnclass->draw              = moto_grid_view_node_draw;
-    gvnclass->prepare_for_draw  = moto_grid_view_node_prepare_for_draw;
+    // gvnclass->prepare_for_draw  = moto_grid_view_node_prepare_for_draw;
 }
 
-G_DEFINE_TYPE(MotoGridViewNode, moto_grid_view_node, MOTO_TYPE_GEOM_VIEW_NODE);
+G_DEFINE_TYPE(MotoGridViewNode, moto_grid_view_node, MOTO_TYPE_SHAPE_NODE);
 
 /* Methods of class GridViewNode */
 
@@ -139,7 +139,7 @@ static void draw_grid()
     glEnd();
 }
 
-static void moto_grid_view_node_draw(MotoGeomViewNode *self)
+static void moto_grid_view_node_draw(MotoShapeNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 
@@ -158,7 +158,7 @@ static void moto_grid_view_node_draw(MotoGeomViewNode *self)
     glPopAttrib();
 }
 
-static void moto_grid_view_node_prepare_for_draw(MotoGeomViewNode *self)
+static void moto_grid_view_node_prepare_for_draw(MotoGridViewNode *self)
 {
     MotoGridViewNode *view = (MotoGridViewNode *)self;
 

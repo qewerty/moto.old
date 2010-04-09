@@ -2,11 +2,11 @@
 #include "moto-types.h"
 #include "moto-enums.h"
 #include "moto-param-spec.h"
-#include "moto-geom-op-skel-node.h"
+#include "moto-shape-op-skel-node.h"
 
 /* forwards */
 
-static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoGeom *in);
+static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoShape *in);
 
 /* class MotoOpSkelNode */
 
@@ -44,7 +44,7 @@ MotoOpSkelNode *moto_op_skel_node_new(const gchar *name)
     return self;
 }
 
-static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoGeom *in)
+static MotoMesh *moto_op_skel_node_perform(MotoOpNode *self, MotoShape *in)
 {
     // Implement your operator here.
 

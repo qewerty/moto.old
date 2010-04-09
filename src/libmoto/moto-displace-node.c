@@ -17,7 +17,7 @@
 
 /* forwards */
 
-static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboolean *the_same);
+static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboolean *the_same);
 
 /* class MotoDisplaceNode */
 
@@ -59,7 +59,7 @@ MotoDisplaceNode *moto_displace_node_new(const gchar *name)
     return self;
 }
 
-static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboolean *the_same)
+static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboolean *the_same)
 {
     *the_same = TRUE;
 
@@ -70,13 +70,13 @@ static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboole
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
     MotoPointCloud *geom = g_object_get_data((GObject*)self, "_prev_geom");
-    if(!geom || !moto_geom_is_struct_the_same(geom, in))
+    if(!geom || !moto_shape_is_struct_the_same(geom, in))
     {
         *the_same = FALSE;
         geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
-    MotoGeom *out = (MotoGeom*)geom;
+    MotoShape *out = (MotoShape*)geom;
 
     gfloat scale;
     moto_node_get_param_float(node, "scale", &scale);
@@ -153,6 +153,6 @@ static MotoGeom *moto_displace_node_perform(MotoNode *self, MotoGeom *in, gboole
 #endif
     }
 
-    moto_geom_prepare(out);
+    moto_shape_prepare(out);
     return out;
 }
