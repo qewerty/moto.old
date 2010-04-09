@@ -8,14 +8,14 @@
 
 /* forwards */
 
-static void moto_grid_view_node_draw(MotoShapeNode *self);
-static void moto_grid_view_node_prepare_for_draw(MotoGridViewNode *self);
+static void moto_grid_node_draw(MotoShapeNode *self);
+static void moto_grid_node_prepare_for_draw(MotoGridNode *self);
 
-/* class GridViewNode */
+/* class GridNode */
 
-static GObjectClass *grid_view_node_parent_class = NULL;
+static GObjectClass *grid_node_parent_class = NULL;
 
-struct _MotoGridViewNodePriv
+struct _MotoGridNodePriv
 {
     gboolean disposed;
 
@@ -24,33 +24,33 @@ struct _MotoGridViewNodePriv
 };
 
 static void
-moto_grid_view_node_dispose(GObject *obj)
+moto_grid_node_dispose(GObject *obj)
 {
-    MotoGridViewNode *self = (MotoGridViewNode *)obj;
+    MotoGridNode *self = (MotoGridNode *)obj;
 
     if(self->priv->disposed)
         return;
     self->priv->disposed = TRUE;
 
-    grid_view_node_parent_class->dispose(obj);
+    grid_node_parent_class->dispose(obj);
 }
 
 static void
-moto_grid_view_node_finalize(GObject *obj)
+moto_grid_node_finalize(GObject *obj)
 {
-    MotoGridViewNode *self = (MotoGridViewNode *)obj;
+    MotoGridNode *self = (MotoGridNode *)obj;
 
-    g_slice_free(MotoGridViewNodePriv, self->priv);
+    g_slice_free(MotoGridNodePriv, self->priv);
 
-    grid_view_node_parent_class->finalize(obj);
+    grid_node_parent_class->finalize(obj);
 }
 
 static void
-moto_grid_view_node_init(MotoGridViewNode *self)
+moto_grid_node_init(MotoGridNode *self)
 {
     MotoNode *node = (MotoNode *)self;
 
-    self->priv = g_slice_new(MotoGridViewNodePriv);
+    self->priv = g_slice_new(MotoGridNodePriv);
     self->priv->disposed = FALSE;
 
     /* params */
@@ -65,28 +65,28 @@ moto_grid_view_node_init(MotoGridViewNode *self)
 }
 
 static void
-moto_grid_view_node_class_init(MotoGridViewNodeClass *klass)
+moto_grid_node_class_init(MotoGridNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
     MotoShapeNodeClass *gvnclass = \
         MOTO_SHAPE_NODE_CLASS(klass);
 
-    grid_view_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    grid_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_grid_view_node_dispose;
-    goclass->finalize   = moto_grid_view_node_finalize;
+    goclass->dispose    = moto_grid_node_dispose;
+    goclass->finalize   = moto_grid_node_finalize;
 
-    gvnclass->draw              = moto_grid_view_node_draw;
-    // gvnclass->prepare_for_draw  = moto_grid_view_node_prepare_for_draw;
+    gvnclass->draw              = moto_grid_node_draw;
+    // gvnclass->prepare_for_draw  = moto_grid_node_prepare_for_draw;
 }
 
-G_DEFINE_TYPE(MotoGridViewNode, moto_grid_view_node, MOTO_TYPE_SHAPE_NODE);
+G_DEFINE_TYPE(MotoGridNode, moto_grid_node, MOTO_TYPE_SHAPE_NODE);
 
-/* Methods of class GridViewNode */
+/* Methods of class GridNode */
 
-MotoGridViewNode *moto_grid_view_node_new(const gchar *name)
+MotoGridNode *moto_grid_node_new(const gchar *name)
 {
-    MotoGridViewNode *self = (MotoGridViewNode *)g_object_new(MOTO_TYPE_GRID_VIEW_NODE, NULL);
+    MotoGridNode *self = (MotoGridNode *)g_object_new(MOTO_TYPE_GRID_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -139,9 +139,9 @@ static void draw_grid()
     glEnd();
 }
 
-static void moto_grid_view_node_draw(MotoShapeNode *self)
+static void moto_grid_node_draw(MotoShapeNode *self)
 {
-    MotoGridViewNode *view = (MotoGridViewNode *)self;
+    MotoGridNode *view = (MotoGridNode *)self;
 
     glPushAttrib(GL_ENABLE_BIT);
 
@@ -151,16 +151,16 @@ static void moto_grid_view_node_draw(MotoShapeNode *self)
     glDisable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
-        moto_grid_view_node_prepare_for_draw(self);
+        moto_grid_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
 
     glPopAttrib();
 }
 
-static void moto_grid_view_node_prepare_for_draw(MotoGridViewNode *self)
+static void moto_grid_node_prepare_for_draw(MotoGridNode *self)
 {
-    MotoGridViewNode *view = (MotoGridViewNode *)self;
+    MotoGridNode *view = (MotoGridNode *)self;
 
     if( ! glIsList(view->priv->dlist))
         view->priv->dlist = glGenLists(1);

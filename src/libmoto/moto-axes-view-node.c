@@ -5,14 +5,14 @@
 
 /* forwards */
 
-static void moto_axes_view_node_draw(MotoShapeNode *self);
-static void moto_axes_view_node_prepare_for_draw(MotoShapeNode *self);
+static void moto_axes_node_draw(MotoShapeNode *self);
+static void moto_axes_node_prepare_for_draw(MotoShapeNode *self);
 
-/* class AxesViewNode */
+/* class AxesNode */
 
-static GObjectClass *axes_view_node_parent_class = NULL;
+static GObjectClass *axes_node_parent_class = NULL;
 
-struct _MotoAxesViewNodePriv
+struct _MotoAxesNodePriv
 {
     gboolean prepared;
     GLuint dlist;
@@ -21,31 +21,31 @@ struct _MotoAxesViewNodePriv
 };
 
 static void
-moto_axes_view_node_dispose(GObject *obj)
+moto_axes_node_dispose(GObject *obj)
 {
-    MotoAxesViewNode *self = (MotoAxesViewNode *)obj;
+    MotoAxesNode *self = (MotoAxesNode *)obj;
 
     glDeleteLists(self->priv->dlist, 1);
     gluDeleteQuadric(self->priv->quadric);
 
-    G_OBJECT_CLASS(axes_view_node_parent_class)->dispose(obj);
+    G_OBJECT_CLASS(axes_node_parent_class)->dispose(obj);
 }
 
 static void
-moto_axes_view_node_finalize(GObject *obj)
+moto_axes_node_finalize(GObject *obj)
 {
-    MotoAxesViewNode *self = (MotoAxesViewNode *)obj;
-    g_slice_free(MotoAxesViewNodePriv, self->priv);
+    MotoAxesNode *self = (MotoAxesNode *)obj;
+    g_slice_free(MotoAxesNodePriv, self->priv);
 
-    axes_view_node_parent_class->finalize(obj);
+    axes_node_parent_class->finalize(obj);
 }
 
 static void
-moto_axes_view_node_init(MotoAxesViewNode *self)
+moto_axes_node_init(MotoAxesNode *self)
 {
     MotoNode *node = (MotoNode *)self;
 
-    self->priv = g_slice_new(MotoAxesViewNodePriv);
+    self->priv = g_slice_new(MotoAxesNodePriv);
 
     /* params */
 
@@ -61,28 +61,28 @@ moto_axes_view_node_init(MotoAxesViewNode *self)
 }
 
 static void
-moto_axes_view_node_class_init(MotoAxesViewNodeClass *klass)
+moto_axes_node_class_init(MotoAxesNodeClass *klass)
 {
     GObjectClass *goclass = G_OBJECT_CLASS(klass);
     MotoShapeNodeClass *gvnclass = \
         MOTO_SHAPE_NODE_CLASS(klass);
 
-    axes_view_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    axes_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_axes_view_node_dispose;
-    goclass->finalize   = moto_axes_view_node_finalize;
+    goclass->dispose    = moto_axes_node_dispose;
+    goclass->finalize   = moto_axes_node_finalize;
 
-    gvnclass->draw              = moto_axes_view_node_draw;
-    // gvnclass->prepare_for_draw  = moto_axes_view_node_prepare_for_draw;
+    gvnclass->draw              = moto_axes_node_draw;
+    // gvnclass->prepare_for_draw  = moto_axes_node_prepare_for_draw;
 }
 
-G_DEFINE_TYPE(MotoAxesViewNode, moto_axes_view_node, MOTO_TYPE_SHAPE_NODE);
+G_DEFINE_TYPE(MotoAxesNode, moto_axes_node, MOTO_TYPE_SHAPE_NODE);
 
-/* Methods of class AxesViewNode */
+/* Methods of class AxesNode */
 
-MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
+MotoAxesNode *moto_axes_node_new(const gchar *name)
 {
-    MotoAxesViewNode *self = (MotoAxesViewNode *)g_object_new(MOTO_TYPE_AXES_VIEW_NODE, NULL);
+    MotoAxesNode *self = (MotoAxesNode *)g_object_new(MOTO_TYPE_AXES_NODE, NULL);
     MotoNode *node = (MotoNode *)self;
 
     moto_node_set_name(node, name);
@@ -90,7 +90,7 @@ MotoAxesViewNode *moto_axes_view_node_new(const gchar *name)
     return self;
 }
 
-static void draw_axes(MotoAxesViewNode *self)
+static void draw_axes(MotoAxesNode *self)
 {
     GLint slices = 8;
     GLint len = 5;
@@ -142,9 +142,9 @@ static void draw_axes(MotoAxesViewNode *self)
 
 }
 
-static void moto_axes_view_node_draw(MotoShapeNode *self)
+static void moto_axes_node_draw(MotoShapeNode *self)
 {
-    MotoAxesViewNode *view = (MotoAxesViewNode *)self;
+    MotoAxesNode *view = (MotoAxesNode *)self;
 
     glPushAttrib(GL_ENABLE_BIT);
 
@@ -156,16 +156,16 @@ static void moto_axes_view_node_draw(MotoShapeNode *self)
     // glEnable(GL_LINE_SMOOTH);
 
     if( ! view->priv->prepared)
-        moto_axes_view_node_prepare_for_draw(self);
+        moto_axes_node_prepare_for_draw(self);
     else
         glCallList(view->priv->dlist);
 
     glPopAttrib();
 }
 
-static void moto_axes_view_node_prepare_for_draw(MotoShapeNode *self)
+static void moto_axes_node_prepare_for_draw(MotoShapeNode *self)
 {
-    MotoAxesViewNode *view = (MotoAxesViewNode *)self;
+    MotoAxesNode *view = (MotoAxesNode *)self;
 
     if( ! glIsList(view->priv->dlist))
         view->priv->dlist = glGenLists(1);

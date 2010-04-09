@@ -148,8 +148,8 @@ moto_system_class_init(MotoSystemClass *klass)
             MOTO_TYPE_SPHERE_NODE;
             MOTO_TYPE_CYLINDER_NODE;
             MOTO_TYPE_MESH_FILE_NODE;
-            MOTO_TYPE_GRID_VIEW_NODE;
-            MOTO_TYPE_AXES_VIEW_NODE;
+            MOTO_TYPE_GRID_NODE;
+            MOTO_TYPE_AXES_NODE;
             MOTO_TYPE_LIGHT_NODE;
         MOTO_TYPE_MATERIAL_NODE;
         MOTO_TYPE_DISPLACE_NODE;

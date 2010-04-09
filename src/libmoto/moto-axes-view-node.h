@@ -19,42 +19,42 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_AXES_VIEW_NODE_H__
-#define __MOTO_AXES_VIEW_NODE_H__
+#ifndef __MOTO_AXES_NODE_H__
+#define __MOTO_AXES_NODE_H__
 
 #include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoAxesViewNode MotoAxesViewNode;
-typedef struct _MotoAxesViewNodeClass MotoAxesViewNodeClass;
-typedef struct _MotoAxesViewNodePriv MotoAxesViewNodePriv;
+typedef struct _MotoAxesNode MotoAxesNode;
+typedef struct _MotoAxesNodeClass MotoAxesNodeClass;
+typedef struct _MotoAxesNodePriv MotoAxesNodePriv;
 
-/* class MotoAxesViewNode */
+/* class MotoAxesNode */
 
-struct _MotoAxesViewNode
+struct _MotoAxesNode
 {
     MotoShapeNode parent;
 
-    MotoAxesViewNodePriv *priv;
+    MotoAxesNodePriv *priv;
 };
 
-struct _MotoAxesViewNodeClass
+struct _MotoAxesNodeClass
 {
     MotoShapeNodeClass parent;
 };
 
-GType moto_axes_view_node_get_type(void);
+GType moto_axes_node_get_type(void);
 
-#define MOTO_TYPE_AXES_VIEW_NODE (moto_axes_view_node_get_type())
-#define MOTO_AXES_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_AXES_VIEW_NODE, MotoAxesViewNode))
-#define MOTO_AXES_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_AXES_VIEW_NODE, MotoAxesViewNodeClass))
-#define MOTO_IS_AXES_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_AXES_VIEW_NODE))
-#define MOTO_IS_AXES_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_AXES_VIEW_NODE))
-#define MOTO_AXES_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_AXES_VIEW_NODE, MotoAxesViewNodeClass))
+#define MOTO_TYPE_AXES_NODE (moto_axes_node_get_type())
+#define MOTO_AXES_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_AXES_NODE, MotoAxesNode))
+#define MOTO_AXES_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_AXES_NODE, MotoAxesNodeClass))
+#define MOTO_IS_AXES_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_AXES_NODE))
+#define MOTO_IS_AXES_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_AXES_NODE))
+#define MOTO_AXES_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_AXES_NODE, MotoAxesNodeClass))
 
-MotoAxesViewNode *moto_axes_view_node_new(const gchar *name);
+MotoAxesNode *moto_axes_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_AXES_VIEW_NODE_H__ */
+#endif /* __MOTO_AXES_NODE_H__ */

@@ -19,42 +19,42 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_GRID_VIEW_NODE_H__
-#define __MOTO_GRID_VIEW_NODE_H__
+#ifndef __MOTO_GRID_NODE_H__
+#define __MOTO_GRID_NODE_H__
 
 #include "moto-shape-node.h"
 
 G_BEGIN_DECLS
 
-typedef struct _MotoGridViewNode MotoGridViewNode;
-typedef struct _MotoGridViewNodeClass MotoGridViewNodeClass;
-typedef struct _MotoGridViewNodePriv MotoGridViewNodePriv;
+typedef struct _MotoGridNode MotoGridNode;
+typedef struct _MotoGridNodeClass MotoGridNodeClass;
+typedef struct _MotoGridNodePriv MotoGridNodePriv;
 
-/* class MotoGridViewNode */
+/* class MotoGridNode */
 
-struct _MotoGridViewNode
+struct _MotoGridNode
 {
     MotoShapeNode parent;
 
-    MotoGridViewNodePriv *priv;
+    MotoGridNodePriv *priv;
 };
 
-struct _MotoGridViewNodeClass
+struct _MotoGridNodeClass
 {
     MotoShapeNodeClass parent;
 };
 
-GType moto_grid_view_node_get_type(void);
+GType moto_grid_node_get_type(void);
 
-#define MOTO_TYPE_GRID_VIEW_NODE (moto_grid_view_node_get_type())
-#define MOTO_GRID_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GRID_VIEW_NODE, MotoGridViewNode))
-#define MOTO_GRID_VIEW_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GRID_VIEW_NODE, MotoGridViewNodeClass))
-#define MOTO_IS_GRID_VIEW_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GRID_VIEW_NODE))
-#define MOTO_IS_GRID_VIEW_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GRID_VIEW_NODE))
-#define MOTO_GRID_VIEW_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GRID_VIEW_NODE, MotoGridViewNodeClass))
+#define MOTO_TYPE_GRID_NODE (moto_grid_node_get_type())
+#define MOTO_GRID_NODE(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_GRID_NODE, MotoGridNode))
+#define MOTO_GRID_NODE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_GRID_NODE, MotoGridNodeClass))
+#define MOTO_IS_GRID_NODE(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_GRID_NODE))
+#define MOTO_IS_GRID_NODE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_GRID_NODE))
+#define MOTO_GRID_NODE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_GRID_NODE, MotoGridNodeClass))
 
-MotoGridViewNode *moto_grid_view_node_new(const gchar *name);
+MotoGridNode *moto_grid_node_new(const gchar *name);
 
 G_END_DECLS
 
-#endif /* __MOTO_GRID_VIEW_NODE_H__ */
+#endif /* __MOTO_GRID_NODE_H__ */

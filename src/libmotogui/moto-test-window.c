@@ -331,11 +331,11 @@ moto_test_window_init(MotoTestWindow *self)
     moto_scene_node_set_root(self->priv->scene_node, (MotoObjectNode *)root_node);
 
     MotoNode *obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "grid");
-    MotoNode *grid_node = moto_node_create_child_by_name(obj_node, "MotoGridViewNode", "grid");
+    MotoNode *grid_node = moto_node_create_child_by_name(obj_node, "MotoGridNode", "grid");
     moto_node_link(obj_node, "shape", grid_node, "self");
 
     obj_node = moto_node_create_child_by_name(root_node, "MotoObjectNode", "axes");
-    MotoNode *axes_node = moto_node_create_child_by_name(obj_node, "MotoAxesViewNode", "axes");
+    MotoNode *axes_node = moto_node_create_child_by_name(obj_node, "MotoAxesNode", "axes");
     moto_node_link(obj_node, "shape", axes_node, "self");
 
     moto_scene_node_set_axes(self->priv->scene_node, (MotoObjectNode *)obj_node);
@@ -431,7 +431,7 @@ moto_test_window_init(MotoTestWindow *self)
         G_CALLBACK(release_mouse_button), NULL);
 
 
-    // g_object_unref(G_OBJECT(grid_view_node));
+    // g_object_unref(G_OBJECT(grid_node));
 
     gtk_widget_grab_focus(GTK_WIDGET(area));
 
