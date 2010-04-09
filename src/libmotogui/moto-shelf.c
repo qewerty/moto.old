@@ -99,8 +99,8 @@ perform_op(MotoShelf *shelf, MotoSystem *system,
     if(!op || !g_type_is_a(G_TYPE_FROM_INSTANCE(op), MOTO_TYPE_OP_NODE))
         return;
 
-    moto_node_link(shape, "out", op, "in");
-    moto_node_link(op, "out", obj, "shape");
+    moto_node_link(op, "in", shape, "out");
+    moto_node_link(obj, "shape", op, "self");
 
     MotoShapeSelection *selection = moto_object_node_get_selection(obj);
     moto_op_node_set_selection((MotoOpNode*)op, selection);
