@@ -173,7 +173,6 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
 static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 {
-    g_print("set_draw_mode\n");
     moto_scene_node_set_draw_mode(MOTO_SCENE_NODE(user_data),
             *((MotoDrawMode*)g_object_get_data(G_OBJECT(item), "moto-draw-mode-enum-value")));
 }

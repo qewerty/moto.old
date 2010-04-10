@@ -10,7 +10,6 @@
 /* forwards */
 
 static void moto_cylinder_node_update(MotoNode *self);
-static MotoBound *moto_cylinder_node_get_bound(MotoShapeNode *self);
 
 /* class CylinderNode */
 
@@ -19,9 +18,6 @@ static GObjectClass *cylinder_node_parent_class = NULL;
 struct _MotoCylinderNodePriv
 {
     MotoMesh *mesh;
-
-    MotoBound *bound;
-    gboolean bound_calculated;
 };
 
 static void
@@ -29,7 +25,6 @@ moto_cylinder_node_dispose(GObject *obj)
 {
     MotoCylinderNode *self = (MotoCylinderNode *)obj;
 
-    g_object_unref(self->priv->bound);
     g_slice_free(MotoCylinderNodePriv, self->priv);
 
     G_OBJECT_CLASS(cylinder_node_parent_class)->dispose(obj);
@@ -77,9 +72,6 @@ moto_cylinder_node_init(MotoCylinderNode *self)
             "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
             "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
             NULL);
-
-    self->priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
-    self->priv->bound_calculated = FALSE;
 }
 
 static void
@@ -90,8 +82,6 @@ moto_cylinder_node_class_init(MotoCylinderNodeClass *klass)
     MotoShapeNodeClass *gnclass = (MotoShapeNodeClass *)klass;
 
     cylinder_node_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
-
-    gnclass->get_bound = moto_cylinder_node_get_bound;
 
     goclass->dispose    = moto_cylinder_node_dispose;
     goclass->finalize   = moto_cylinder_node_finalize;
@@ -478,7 +468,6 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
         }
     }
 
-    self->priv->bound_calculated = FALSE;
     if(!moto_shape_prepare((MotoShape*)mesh))
     {
         g_print("Error while preparing mesh of MotoCylinderNode\n");
@@ -497,59 +486,3 @@ static void moto_cylinder_node_update(MotoNode *self)
     if(param)
         moto_cylinder_node_update_mesh(cylinder);
 }
-
-static void calc_bound(MotoCylinderNode *self)
-{
-    // FIXME: Rewrite with moto_value_[g|s]et_[boolean|int|float]_[2|3|4] when them will be implemented!
-    gfloat *radius0 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius0"));
-    gfloat *radius1 = (gfloat *)g_value_peek_pointer(moto_node_get_param_value((MotoNode *)self, "radius1"));
-
-    gfloat radius_x      = max(radius0[0], radius1[0]);
-    gfloat radius_y      = max(radius0[1], radius1[1]);
-    gfloat height;
-    moto_node_get_param_float((MotoNode *)self, "height", &height);
-    MotoAxis orientation;
-    moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
-
-    gfloat rsx, rsy, rsz;
-    switch(orientation)
-    {
-        case MOTO_AXIS_X:
-            rsx = radius_x;
-            rsy = radius_y;
-            rsz = height;
-        break;
-        case MOTO_AXIS_Y:
-            rsx = radius_x;
-            rsy = radius_y;
-            rsz = height;
-        break;
-        case MOTO_AXIS_Z:
-            rsx = radius_x;
-            rsy = radius_y;
-            rsz = height;
-        break;
-    }
-
-    self->priv->bound->bound[0] = -rsx;
-    self->priv->bound->bound[1] =  rsx;
-    self->priv->bound->bound[2] = -rsy;
-    self->priv->bound->bound[3] =  rsy;
-    self->priv->bound->bound[4] = -rsz;
-    self->priv->bound->bound[5] =  rsz;
-}
-
-static MotoBound *moto_cylinder_node_get_bound(MotoShapeNode *self)
-{
-    MotoCylinderNode *cylinder = (MotoCylinderNode *)self;
-
-    if( ! cylinder->priv->bound_calculated)
-    {
-        calc_bound(cylinder);
-        cylinder->priv->bound_calculated = TRUE;
-    }
-
-    return cylinder->priv->bound;
-}
-
-

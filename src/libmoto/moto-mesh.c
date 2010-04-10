@@ -1221,6 +1221,8 @@ gboolean moto_mesh_prepare(MotoMesh *self)
     moto_mesh_calc_normals(self);
     moto_mesh_tesselate_faces(self);
 
+    moto_mesh_update_bound(self);
+
     return TRUE;
 }
 
