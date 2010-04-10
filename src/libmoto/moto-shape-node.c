@@ -681,7 +681,7 @@ static void moto_shape_node_draw_WIREFRAME_FACE(MotoShapeNode* self, MotoShapeSe
         else if(MOTO_DRAW_MODE_WIREFRAME == draw_mode)
         {
             glEnable(GL_POLYGON_STIPPLE);
-            glPolygonStipple(stipple_mask);
+            glPolygonStipple((GLubyte*)stipple_mask);
         }
         else
         {
