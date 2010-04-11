@@ -772,12 +772,47 @@ int moto_ray_intersect_bound_dist(MotoRay *self,
 int moto_ray_intersect_cylinder(MotoRay *self,
         MotoIntersection *intersection,
         float a[3], float b[3], float radius)
-{}
+{
+    return 0;
+}
 
 int moto_ray_intersect_cylinder_check(MotoRay *self,
         float a[3], float b[3], float radius)
-{}
+{
+    return 0;
+}
 
 int moto_ray_intersect_cylinder_dist(MotoRay *self,
         float *dist, float a[3], float b[3], float radius)
-{}
+{
+    const float z[3] = {0, 0, 1};
+    float c[3], tmp;
+    vector3_dif(c, a, b);
+
+    float height = vector3_length(c);
+    c[0] /= height;
+    c[1] /= height;
+    c[2] /= height;
+
+    float cross[3];
+    vector3_cross(cross, c, z);
+
+    float cos0 = vector3_dot(c, z);
+    float sin0 = acos(cos0);
+
+    float m[16], im[16], t[16], tmpm[16];
+
+    matrix44_rotate_from_axis_sincos(m, sin0, cos0, cross[0], cross[1], cross[2]);
+    matrix44_translate(t, a[0], b[0], c[0]);
+    matrix44_mult(tmpm, t, m);
+
+    matrix44_inverse(im, tmpm, m, tmp);
+
+    MotoRay r;
+    moto_ray_set_transformed(&r, self, im);
+
+    
+
+    *dist = 1;
+    return 1;
+}
