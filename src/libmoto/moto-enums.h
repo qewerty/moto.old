@@ -61,6 +61,17 @@ typedef enum
 GType moto_selection_mode_get_type(void);
 #define MOTO_TYPE_SELECTION_MODE (moto_selection_mode_get_type())
 
+typedef enum
+{
+    MOTO_CULL_FACE_MODE_NONE,
+    MOTO_CULL_FACE_MODE_BACK,
+    MOTO_CULL_FACE_MODE_FRONT,
+    MOTO_CULL_FACE_MODE_FRONT_AND_BACK,
+} MotoCullFaceMode;
+
+GType moto_cull_face_mode_get_type(void);
+#define MOTO_TYPE_CULL_FACE_MODE (moto_cull_face_mode_get_type())
+
 typedef enum _MotoExtrudeMode
 {
     MOTO_EXTRUDE_MODE_VERTS,

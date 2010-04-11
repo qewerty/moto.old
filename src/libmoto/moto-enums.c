@@ -64,6 +64,25 @@ GType moto_selection_mode_get_type(void)
     return type;
 }
 
+/* MotoSelectionMode */
+
+GType moto_cull_face_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_CULL_FACE_MODE_NONE, "CULL_FACE_MODE_NONE", "None"},
+            {MOTO_CULL_FACE_MODE_BACK, "CULL_FACE_MODE_BACK", "Back"},
+            {MOTO_CULL_FACE_MODE_FRONT, "CULL_FACE_MODE_FRONT", "Front"},
+            {MOTO_CULL_FACE_MODE_FRONT_AND_BACK, "CULL_FACE_MODE_FRONT_AND_BACK", "Front and Back"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoCullFaceMode", values);
+    }
+    return type;
+}
+
 /* MotoExtrudeMode */
 
 GType moto_extrude_mode_get_type(void)
