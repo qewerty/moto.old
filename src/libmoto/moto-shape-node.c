@@ -421,7 +421,7 @@ static void moto_shape_node_draw_WIREFRAME_VERTEX(MotoShapeNode* self, MotoShape
         guint i;
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(moto_shape_selection_is_vertex_selected(selection, i))
+            if(moto_shape_selection_check_vertex(selection, i))
             {
                 glVertex3fv((GLfloat *)(& mesh->v_coords[i]));
             }
@@ -512,7 +512,7 @@ static void moto_shape_node_draw_WIREFRAME_EDGE(MotoShapeNode* self, MotoShapeSe
             if(mesh->b32)
             {
                 guint32 *e_verts = (guint32 *)mesh->e_verts;
-                if(moto_shape_selection_is_edge_selected(selection, i))
+                if(moto_shape_selection_check_edge(selection, i))
                 {
                     glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2]]));
                     glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2 + 1]]));
@@ -521,7 +521,7 @@ static void moto_shape_node_draw_WIREFRAME_EDGE(MotoShapeNode* self, MotoShapeSe
             else
             {
                 guint16 *e_verts = (guint16 *)mesh->e_verts;
-                if(moto_shape_selection_is_edge_selected(selection, i))
+                if(moto_shape_selection_check_edge(selection, i))
                 {
                     glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2]]));
                     glVertex3fv((GLfloat *)(& mesh->v_coords[e_verts[i*2 + 1]]));
@@ -567,7 +567,7 @@ static void on_tess_combine(GLdouble coords[3],
 {
     GLdouble *vertex;
 
-    vertex = (GLdouble*)malloc(6*sizeof(GLdouble));
+    vertex = (GLdouble*)g_try_malloc(6*sizeof(GLdouble));
     vertex[0] = coords[0];
     vertex[1] = coords[1];
     vertex[2] = coords[2];
@@ -655,7 +655,7 @@ static void moto_shape_node_draw_WIREFRAME_FACE(MotoShapeNode* self, MotoShapeSe
 
                 glColor4f(1, 1, 1, 1);
 
-                if(!moto_shape_selection_is_face_selected(selection, i))
+                if(!moto_shape_selection_check_face(selection, i))
                 {
                     GLdouble verts[v_num*3];
 
@@ -693,7 +693,7 @@ static void moto_shape_node_draw_WIREFRAME_FACE(MotoShapeNode* self, MotoShapeSe
 
                 glColor4f(1, 1, 1, 1);
 
-                if(!moto_shape_selection_is_face_selected(selection, i))
+                if(!moto_shape_selection_check_face(selection, i))
                 {
                     GLdouble verts[v_num*6];
 
@@ -730,7 +730,7 @@ static void moto_shape_node_draw_WIREFRAME_FACE(MotoShapeNode* self, MotoShapeSe
 
             glColor4f(0, 1, 0, 1);
 
-            if(moto_shape_selection_is_face_selected(selection, i))
+            if(moto_shape_selection_check_face(selection, i))
             {
                 glBegin(GL_POLYGON);
                 for(j = 0; j < v_num; j++)
@@ -854,7 +854,7 @@ static void moto_shape_node_draw_SOLID_VERTEX(MotoShapeNode* self, MotoShapeSele
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(!moto_shape_selection_is_vertex_selected(selection, i))
+            if(!moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -864,7 +864,7 @@ static void moto_shape_node_draw_SOLID_VERTEX(MotoShapeNode* self, MotoShapeSele
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(moto_shape_selection_is_vertex_selected(selection, i))
+            if(moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -900,7 +900,7 @@ static void moto_shape_node_draw_SOLID_EDGE(MotoShapeNode* self, MotoShapeSelect
         guint i;
         for(i = 0; i < mesh->e_num; i++)
         {
-            if(moto_shape_selection_is_edge_selected(selection, i))
+            if(moto_shape_selection_check_edge(selection, i))
                 glColor3f(0, 1, 0);
             else
                 glColor3f(0.1, 0.1, 0.1);
@@ -967,7 +967,7 @@ static void moto_shape_node_draw_SOLID_FACE(MotoShapeNode* self, MotoShapeSelect
             guint start = (0 == i) ? 0: f_data[i-1].v_offset;
             guint v_num = f_data[i].v_offset - start;
 
-            if(moto_shape_selection_is_face_selected(selection, i))
+            if(moto_shape_selection_check_face(selection, i))
             {
                 glDisable(GL_LIGHTING);
                 glColor3f(0, 1, 0);
@@ -1109,7 +1109,7 @@ static void moto_shape_node_draw_SMOOTH_VERTEX(MotoShapeNode* self, MotoShapeSel
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(!moto_shape_selection_is_vertex_selected(selection, i))
+            if(!moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -1119,7 +1119,7 @@ static void moto_shape_node_draw_SMOOTH_VERTEX(MotoShapeNode* self, MotoShapeSel
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(moto_shape_selection_is_vertex_selected(selection, i))
+            if(moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -1155,7 +1155,7 @@ static void moto_shape_node_draw_SMOOTH_EDGE(MotoShapeNode* self, MotoShapeSelec
         guint i;
         for(i = 0; i < mesh->e_num; i++)
         {
-            if(moto_shape_selection_is_edge_selected(selection, i))
+            if(moto_shape_selection_check_edge(selection, i))
                 glColor3f(0, 1, 0);
             else
                 glColor3f(0.1, 0.1, 0.1);
@@ -1220,7 +1220,7 @@ static void moto_shape_node_draw_SMOOTH_FACE(MotoShapeNode* self, MotoShapeSelec
             guint start = (0 == i) ? 0: f_data[i-1].v_offset;
             guint v_num = f_data[i].v_offset - start;
 
-            if(moto_shape_selection_is_face_selected(selection, i))
+            if(moto_shape_selection_check_face(selection, i))
             {
                 glDisable(GL_LIGHTING);
                 glColor3f(0, 1, 0);
@@ -1366,7 +1366,7 @@ static void moto_shape_node_draw_SHADED_VERTEX(MotoShapeNode* self, MotoShapeSel
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(!moto_shape_selection_is_vertex_selected(selection, i))
+            if(!moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -1376,7 +1376,7 @@ static void moto_shape_node_draw_SHADED_VERTEX(MotoShapeNode* self, MotoShapeSel
         glBegin(GL_POINTS);
         for(i = 0; i < mesh->v_num; i++)
         {
-            if(moto_shape_selection_is_vertex_selected(selection, i))
+            if(moto_shape_selection_check_vertex(selection, i))
                 glVertex3fv((GLfloat *)(mesh->v_coords + i));
         }
         glEnd();
@@ -1412,7 +1412,7 @@ static void moto_shape_node_draw_SHADED_EDGE(MotoShapeNode* self, MotoShapeSelec
         guint i;
         for(i = 0; i < mesh->e_num; i++)
         {
-            if(moto_shape_selection_is_edge_selected(selection, i))
+            if(moto_shape_selection_check_edge(selection, i))
                 glColor3f(0, 1, 0);
             else
                 glColor3f(0.1, 0.1, 0.1);
@@ -1477,7 +1477,7 @@ static void moto_shape_node_draw_SHADED_FACE(MotoShapeNode* self, MotoShapeSelec
             guint start = (0 == i) ? 0: f_data[i-1].v_offset;
             guint v_num = f_data[i].v_offset - start;
 
-            if(moto_shape_selection_is_face_selected(selection, i))
+            if(moto_shape_selection_check_face(selection, i))
             {
                 glDisable(GL_LIGHTING);
                 glColor3f(0, 1, 0);
@@ -1751,7 +1751,7 @@ moto_shape_node_select_VERTEX(MotoShapeNode *self,
             }
         }
 
-        moto_shape_selection_toggle_vertex_selection(selection, index);
+        moto_shape_selection_toggle_vertex(selection, index);
         moto_shape_node_reset(self);
     }
 
@@ -1765,6 +1765,8 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
         gint x, gint y, gint width, gint height,
         MotoRay *ray, MotoTransformInfo *tinfo)
 {
+    y = height - y;
+
     MotoShape* shape = moto_shape_node_get_shape(self);
     if(shape && MOTO_IS_MESH(shape))
     {
@@ -1775,27 +1777,58 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
             g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
 
         guint index = 0;
-        gfloat dist, dist_tmp;
-        dist = MACRO;
-        gfloat square_radius = 0.25*0.25;
-        gfloat fovy = atan((1/tinfo->proj[5]))*2;
+        gfloat dist_tmp;
+        gfloat dist = G_MAXFLOAT;
+        gfloat z = G_MAXFLOAT;
+        gfloat radius = 0.25;
 
         guint i;
-        for(i = 0; i < mesh->v_num; i++)
+        for(i = 0; i < mesh->e_num; i++)
         {
-            gfloat *xyz = (gfloat *)(mesh->v_coords + i);
+            gfloat* v0 = (gfloat*)&mesh->v_coords[mesh->e_verts16[i*2]];
+            gfloat* v1 = (gfloat*)&mesh->v_coords[mesh->e_verts16[i*2 + 1]];
 
-            /* perspective compensatioin for sphere radius */
-            gfloat p2v[3]; /* Vector from ray origin to vertex. */
-            vector3_dif(p2v, xyz, ray->pos);
-            gfloat pc = 1 + vector3_length(p2v)*fovy/PI_HALF;
+            GLdouble v0x, v0y, v0z;
+            GLdouble v1x, v1y, v1z;
+            gluProject(v0[0], v0[1], v0[2],
+                       tinfo->model, tinfo->proj, tinfo->view,
+                       &v0x, &v0y, &v0z);
+            gluProject(v1[0], v1[1], v1[2],
+                       tinfo->model, tinfo->proj, tinfo->view,
+                       &v1x, &v1y, &v1z);
 
-            if( ! moto_ray_intersect_sphere_2_dist(ray, & dist_tmp, xyz, square_radius*pc))
+            double A = v0y - v1y;
+            double B = v1x - v0x;
+            double C = (v0x * v1y) - (v1x * v0y);
+
+            dist_tmp = fabs(A*x + B*y + C)/sqrt(A*A + B*B);
+
+            if(dist_tmp >= 50)
                 continue;
+
+            double dx = fabs(B);
+            double dy = fabs(A);
+
+            double z_tmp = (v0z + v1z)/2;
+
+            if(dx > dy)
+            {
+                if(x < v0x && x < v1x)
+                    continue;
+                if(x > v0x && x > v1x)
+                    continue;
+            }
+            else
+            {
+                if(y < v0y && y < v1y)
+                    continue;
+                if(y > v0y && y > v1y)
+                    continue;
+            }
 
             g_array_append_val(hits, i);
 
-            if(dist_tmp < dist)
+            if(dist_tmp < dist && z_tmp < z)
             {
                 dist = dist_tmp;
                 index = i;
@@ -1804,31 +1837,8 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
 
         if(hits->len > 0)
         {
-            /* Detecting which of intersected verts is nearest to cursor. */
-            GLdouble win_dist,
-                     min_win_dist = MACRO;
-            GLdouble win_x, win_y, win_z, xx, yy;
-            guint i, ii;
-            for(i = 0; i < hits->len; i++)
-            {
-                ii = g_array_index(hits, gint, i);
-                gluProject(mesh->v_coords[ii].x, mesh->v_coords[ii].y, mesh->v_coords[ii].z,
-                        tinfo->model, tinfo->proj, tinfo->view, & win_x, & win_y, & win_z);
-
-                xx = (x - win_x);
-                yy = (height - y - win_y);
-                win_dist = sqrt(xx*xx + yy*yy);
-                if(win_dist < min_win_dist)
-                {
-                    min_win_dist = win_dist;
-                    index = ii;
-                }
-            }
-
-            moto_shape_selection_toggle_vertex_selection(selection, index);
+            moto_shape_selection_toggle_edge(selection, index);
         }
-
-        moto_mesh_update_selection_from_verts(mesh, selection);
 
         g_array_free(hits, TRUE);
         return TRUE;
@@ -1857,7 +1867,7 @@ moto_shape_node_select_FACE(MotoShapeNode *self,
         guint i;
         for(i = 0; i < mesh->f_num; i++)
         {
-            if( ! moto_mesh_intersect_face(mesh, i, ray, & dist_tmp))
+            if(!moto_mesh_intersect_face(mesh, i, ray, & dist_tmp))
                 continue;
             num++;
 
@@ -1870,7 +1880,8 @@ moto_shape_node_select_FACE(MotoShapeNode *self,
 
         if(num > 0)
         {
-            moto_shape_selection_toggle_face_selection(selection, index);
+            // TODO: If num > 1 find nearest.
+            moto_shape_selection_toggle_face(selection, index);
         }
 
         return TRUE;
@@ -1934,5 +1945,5 @@ moto_shape_node_get_bound_DEFAULT(MotoShapeNode* self)
 static void moto_shape_node_update(MotoNode* self)
 {
     g_print("moto_shape_node_update\n");
-    moto_shape_node_reset(self);
+    moto_shape_node_reset((MotoShapeNode*)self);
 }

@@ -111,23 +111,23 @@ void moto_shape_selection_select_verts(MotoShapeSelection *self, ...);
 void moto_shape_selection_deselect_vertex(MotoShapeSelection *self, guint index);
 void moto_shape_selection_deselect_verts(MotoShapeSelection *self, ...);
 void moto_shape_selection_deselect_all_verts(MotoShapeSelection *self);
-void moto_shape_selection_toggle_vertex_selection(MotoShapeSelection *self, guint index);
-gboolean moto_shape_selection_is_vertex_selected(MotoShapeSelection *self, guint index);
+void moto_shape_selection_toggle_vertex(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_check_vertex(MotoShapeSelection *self, guint index);
 
 void moto_shape_selection_select_edge(MotoShapeSelection *self, guint index);
 void moto_shape_selection_select_edges(MotoShapeSelection *self, ...);
 void moto_shape_selection_deselect_edge(MotoShapeSelection *self, guint index);
 void moto_shape_selection_deselect_edges(MotoShapeSelection *self, ...);
 void moto_shape_selection_deselect_all_edges(MotoShapeSelection *self);
-void moto_shape_selection_toggle_edge_selection(MotoShapeSelection *self, guint index);
-gboolean moto_shape_selection_is_edge_selected(MotoShapeSelection *self, guint index);
+void moto_shape_selection_toggle_edge(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_check_edge(MotoShapeSelection *self, guint index);
 
 void moto_shape_selection_select_face(MotoShapeSelection *self, guint index);
 void moto_shape_selection_select_faces(MotoShapeSelection *self, ...);
 void moto_shape_selection_deselect_face(MotoShapeSelection *self, guint index);
 void moto_shape_selection_deselect_all_faces(MotoShapeSelection *self);
-void moto_shape_selection_toggle_face_selection(MotoShapeSelection *self, guint index);
-gboolean moto_shape_selection_is_face_selected(MotoShapeSelection *self, guint index);
+void moto_shape_selection_toggle_face(MotoShapeSelection *self, guint index);
+gboolean moto_shape_selection_check_face(MotoShapeSelection *self, guint index);
 
 void moto_shape_selection_deselect_all(MotoShapeSelection *self);
 

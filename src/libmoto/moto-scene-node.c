@@ -139,6 +139,7 @@ test_manip_button_press(MotoSceneNodeManipulator *manip, MotoSceneNode *scene_no
 static void
 moto_scene_node_init(MotoSceneNode *self)
 {
+    MotoNode* node = (MotoNode*)self;
     MotoSceneNodePriv *priv = self->priv = g_slice_new(MotoSceneNodePriv);
 
     priv->library = NULL;
@@ -190,6 +191,10 @@ moto_scene_node_init(MotoSceneNode *self)
     priv->thread_pool = NULL;
     priv->max_thread_for_update = 4;
     priv->updating_done = TRUE;
+
+    moto_node_add_params(node,
+            "cull_face", "Call Face", MOTO_TYPE_CULL_FACE_MODE, MOTO_PARAM_MODE_INOUT, MOTO_CULL_FACE_MODE_BACK, NULL, "View",
+            NULL);
 }
 
 static void

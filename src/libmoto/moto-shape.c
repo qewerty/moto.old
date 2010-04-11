@@ -234,12 +234,12 @@ void moto_shape_selection_deselect_all_verts(MotoShapeSelection *self)
     moto_bitmask_unset_all(self->verts);
 }
 
-void moto_shape_selection_toggle_vertex_selection(MotoShapeSelection *self, guint index)
+void moto_shape_selection_toggle_vertex(MotoShapeSelection *self, guint index)
 {
     moto_bitmask_toggle(self->verts, index);
 }
 
-gboolean moto_shape_selection_is_vertex_selected(MotoShapeSelection *self, guint index)
+gboolean moto_shape_selection_check_vertex(MotoShapeSelection *self, guint index)
 {
     return moto_bitmask_is_set(self->verts, index);
 }
@@ -295,12 +295,12 @@ void moto_shape_selection_deselect_all_edges(MotoShapeSelection *self)
     moto_bitmask_unset_all(self->edges);
 }
 
-void moto_shape_selection_toggle_edge_selection(MotoShapeSelection *self, guint index)
+void moto_shape_selection_toggle_edge(MotoShapeSelection *self, guint index)
 {
     moto_bitmask_toggle(self->edges, index);
 }
 
-gboolean moto_shape_selection_is_edge_selected(MotoShapeSelection *self, guint index)
+gboolean moto_shape_selection_check_edge(MotoShapeSelection *self, guint index)
 {
     return moto_bitmask_is_set(self->edges, index);
 }
@@ -356,12 +356,12 @@ void moto_shape_selection_deselect_all_faces(MotoShapeSelection *self)
     return moto_bitmask_unset_all(self->faces);
 }
 
-void moto_shape_selection_toggle_face_selection(MotoShapeSelection *self, guint index)
+void moto_shape_selection_toggle_face(MotoShapeSelection *self, guint index)
 {
     moto_bitmask_toggle(self->faces, index);
 }
 
-gboolean moto_shape_selection_is_face_selected(MotoShapeSelection *self, guint index)
+gboolean moto_shape_selection_check_face(MotoShapeSelection *self, guint index)
 {
     return moto_bitmask_is_set(self->faces, index);
 }
