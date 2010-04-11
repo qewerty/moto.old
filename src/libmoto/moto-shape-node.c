@@ -1829,6 +1829,7 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
             if(dist_tmp < dist && z_tmp < z)
             {
                 dist = dist_tmp;
+                z = z_tmp;
                 index = i;
             }
         }
