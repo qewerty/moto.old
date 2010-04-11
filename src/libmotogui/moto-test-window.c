@@ -444,6 +444,8 @@ void moto_test_window_redraw_3dview(MotoTestWindow *self)
     if(!self->priv->area)
         return;
 
+    moto_scene_node_update(self->priv->scene_node);
+
     GdkEvent *event = gdk_event_new(GDK_NOTHING);
     g_signal_emit_by_name(self->priv->area, "expose-event",  self->priv->area, event, NULL);
     gdk_event_free(event);

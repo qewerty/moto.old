@@ -321,6 +321,8 @@ static void moto_plane_node_update_mesh(MotoPlaneNode *self)
 
 static void moto_plane_node_update(MotoNode *self)
 {
+    ((MotoNodeClass*)plane_node_parent_class)->update(self);
+
     MotoParam *param;
 
     param = moto_node_get_param(self, "out");

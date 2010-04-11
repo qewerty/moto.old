@@ -90,12 +90,10 @@ moto_shape_node_init(MotoShapeNode *self)
 static void
 moto_shape_node_class_init(MotoShapeNodeClass *klass)
 {
-    GObjectClass *goclass = (GObjectClass *)klass;
-
     shape_node_parent_class = (GObjectClass *)(g_type_class_peek_parent(klass));
 
-    goclass->dispose = moto_shape_node_dispose;
-    goclass->finalize = moto_shape_node_finalize;
+    ((GObjectClass*)klass)->dispose = moto_shape_node_dispose;
+    ((GObjectClass*)klass)->finalize = moto_shape_node_finalize;
 
     ((MotoNodeClass*)klass)->update = moto_shape_node_update;
 

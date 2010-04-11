@@ -180,6 +180,8 @@ static void moto_mesh_file_node_update_mesh(MotoMeshFileNode *self)
 
 static void moto_mesh_file_node_update(MotoNode *self)
 {
+    ((MotoNodeClass*)mesh_file_node_parent_class)->update(self);
+
     MotoMeshFileNode *mesh_file = (MotoMeshFileNode *)self;
 
     MotoParam *param;

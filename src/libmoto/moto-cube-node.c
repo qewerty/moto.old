@@ -388,6 +388,8 @@ static void moto_cube_node_update_mesh(MotoCubeNode *self)
 
 static void moto_cube_node_update(MotoNode *self)
 {
+    ((MotoNodeClass*)cube_node_parent_class)->update(self);
+
     MotoCubeNode *cube = (MotoCubeNode *)self;
 
     MotoParam *param;

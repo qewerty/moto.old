@@ -302,6 +302,8 @@ static void moto_sphere_node_update_mesh(MotoSphereNode *self)
 
 static void moto_sphere_node_update(MotoNode *self)
 {
+    ((MotoNodeClass*)sphere_node_parent_class)->update(self);
+
     MotoSphereNode *sphere = (MotoSphereNode *)self;
 
     MotoParam *param;

@@ -345,7 +345,8 @@ void on_float_changed(GtkSpinButton *spinbutton,
     moto_param_set_float(data->param, value);
     g_signal_handler_unblock(spinbutton, data->handler_id);
 
-    moto_node_update(moto_param_get_node(data->param));
+    MotoNode* node = moto_param_get_node(data->param);
+    moto_node_update(node);
     moto_test_window_redraw_3dview(data->window);
 }
 

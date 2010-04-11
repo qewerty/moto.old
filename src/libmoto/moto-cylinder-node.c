@@ -478,6 +478,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
 static void moto_cylinder_node_update(MotoNode *self)
 {
+    ((MotoNodeClass*)cylinder_node_parent_class)->update(self);
+
     MotoCylinderNode *cylinder = (MotoCylinderNode *)self;
 
     MotoParam *param;
