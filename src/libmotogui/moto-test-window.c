@@ -19,6 +19,8 @@
 #include "libmoto/moto-node.h"
 #include "libmoto/moto-variation.h"
 #include "libmoto/moto-object-node.h"
+#include "libmoto/moto-shape-node.h"
+#include "libmoto/moto-mesh.h"
 #include "libmotoutil/numdef.h"
 
 #include "moto-shelf.h"
@@ -263,6 +265,35 @@ gboolean on_key_press_event(GtkWidget   *widget,
 
         MotoSelectionMode mode = \
             moto_object_node_get_selection_mode(ob);
+
+        MotoShapeNode* shape_node = \
+            moto_object_node_get_shape(ob);
+        if(shape_node)
+        {
+            MotoShape* shape = moto_shape_node_get_shape(shape_node);
+            if(shape && MOTO_IS_MESH(shape))
+            {
+                MotoMesh* mesh = (MotoMesh*)shape;
+
+                MotoShapeSelection* selection = \
+                    moto_object_node_get_selection(ob);
+
+                switch(mode)
+                {
+                    case MOTO_SELECTION_MODE_VERTEX:
+                        moto_mesh_update_selection_from_verts(mesh, selection);
+                    break;
+                    case MOTO_SELECTION_MODE_EDGE:
+                        moto_mesh_update_selection_from_edges(mesh, selection);
+                    break;
+                    case MOTO_SELECTION_MODE_FACE:
+                        moto_mesh_update_selection_from_faces(mesh, selection);
+                    break;
+                    default:
+                    break;
+                }
+            }
+        }
 
         GEnumClass *ec = \
             (GEnumClass *)g_type_class_ref(MOTO_TYPE_SELECTION_MODE);
