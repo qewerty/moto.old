@@ -16,7 +16,6 @@
 /* forwards */
 
 static void moto_param_update(MotoParam *self);
-static void moto_param_notify_dests(MotoParam *self);
 static void moto_param_mark_for_update(MotoParam *self);
 
 /* enums */
@@ -2492,7 +2491,7 @@ static void moto_param_mark_for_update(MotoParam *self)
         MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
 }
 
-static void moto_param_notify_dests(MotoParam *self)
+void moto_param_notify_dests(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
 

@@ -303,6 +303,8 @@ gpointer moto_param_get_pointer(MotoParam *self);
 gint     moto_param_get_enum(MotoParam *self);
 GObject *moto_param_get_object(MotoParam *self);
 
+void moto_param_notify_dests(MotoParam *self);
+
 // boolean
 void moto_param_get_2b(MotoParam *self,  gboolean *v0, gboolean *v1);
 void moto_param_get_2bv(MotoParam *self, gboolean *v);
