@@ -80,7 +80,6 @@ moto_shape_node_init(MotoShapeNode *self)
     moto_node_add_params(node,
             "active", "Active", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
             "visible", "Visible",   MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
-            "lock", "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
             "out", "Output Shape", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
             NULL);
 
@@ -136,7 +135,13 @@ MotoShape* moto_shape_node_get_shape(MotoShapeNode* self)
 void moto_shape_node_draw(MotoShapeNode* self, MotoDrawMode draw_mode,
     MotoShapeSelection* selection, MotoSelectionMode selection_mode)
 {
-    MOTO_SHAPE_NODE_GET_CLASS(self)->draw(self, draw_mode, selection, selection_mode);
+    gboolean visible = FALSE;
+    moto_node_get_param_boolean((MotoNode*)self, "visible", &visible);
+    if(visible)
+    {
+        MOTO_SHAPE_NODE_GET_CLASS(self)->draw(self,
+            draw_mode, selection, selection_mode);
+    }
 }
 
 static void moto_shape_node_delete_buffers(MotoShapeNode *self)
