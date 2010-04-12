@@ -1770,14 +1770,10 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
     {
         MotoMesh *mesh = (MotoMesh*)shape;
 
-        /* Array of intersected verts. */
-        GArray *hits = \
-            g_array_sized_new(FALSE, FALSE, sizeof(guint), max(64, min(1024, mesh->v_num/10)));
-
+        guint num = 0;
         guint index = 0;
         gfloat dist_tmp;
         gfloat dist = G_MAXFLOAT;
-        gfloat z = G_MAXFLOAT;
         gfloat radius = 0.25;
 
         guint i;
@@ -1807,8 +1803,6 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
             double dx = fabs(B);
             double dy = fabs(A);
 
-            double z_tmp = (v0z + v1z)/2;
-
             if(dx > dy)
             {
                 if(x < v0x && x < v1x)
@@ -1824,22 +1818,20 @@ moto_shape_node_select_EDGE(MotoShapeNode *self,
                     continue;
             }
 
-            g_array_append_val(hits, i);
+            ++num;
 
-            if(dist_tmp < dist && z_tmp < z)
+            if(dist_tmp < dist)
             {
                 dist = dist_tmp;
-                z = z_tmp;
                 index = i;
             }
         }
 
-        if(hits->len > 0)
+        if(num > 0)
         {
             moto_shape_selection_toggle_edge(selection, index);
         }
 
-        g_array_free(hits, TRUE);
         return TRUE;
     }
 
