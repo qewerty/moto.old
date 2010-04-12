@@ -255,16 +255,23 @@ gboolean on_key_press_event(GtkWidget   *widget,
     else if(65289 == event->keyval && (GDK_CONTROL_MASK & event->state))
     {
         MotoSceneNode *w = moto_system_get_current_scene(self->priv->system);
-        if( ! w)
+        if(!w)
             return FALSE;
         MotoObjectNode *ob = moto_scene_node_get_current_object(w);
-        if( ! ob)
+        if(!ob)
             return FALSE;
-        MotoShapeNode *gv;
-        moto_node_get_param_object((MotoNode *)ob, "view", (GObject**)&gv);
-        if( ! gv)
-            return FALSE;
-        // moto_shape_view_node_goto_next_state(gv);
+
+        MotoSelectionMode mode = \
+            moto_object_node_get_selection_mode(ob);
+
+        GEnumClass *ec = \
+            (GEnumClass *)g_type_class_ref(MOTO_TYPE_SELECTION_MODE);
+
+        gint new_mode = (mode + 1) % ec->n_values;
+        moto_object_node_set_selection_mode(ob, (MotoSelectionMode)new_mode);
+
+        g_type_class_unref(ec);
+
         moto_test_window_redraw_3dview(self);
     }
 

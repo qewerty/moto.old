@@ -714,6 +714,10 @@ MotoSelectionMode moto_object_node_get_selection_mode(MotoObjectNode* self)
 void moto_object_node_set_selection_mode(MotoObjectNode* self, MotoSelectionMode mode)
 {
     moto_node_set_param_enum((MotoNode*)self, "mode", (gint)mode);
+
+    MotoShapeNode* shape_node = moto_object_node_get_shape(self);
+    if(shape_node)
+        moto_shape_node_reset(shape_node);
 }
 
 void moto_object_node_select_more(MotoObjectNode* self)
