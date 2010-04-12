@@ -141,6 +141,8 @@ static void moto_op_node_update(MotoNode *self)
     }
 
     moto_node_set_param_object(self, "out", (GObject *)geom);
+
+    ((MotoNodeClass*)op_node_parent_class)->update(self);
 }
 
 MotoShape *moto_op_node_perform(MotoOpNode *self, MotoShape *in, gboolean *the_same)
