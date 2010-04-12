@@ -1935,6 +1935,5 @@ moto_shape_node_get_bound_DEFAULT(MotoShapeNode* self)
 
 static void moto_shape_node_update(MotoNode* self)
 {
-    g_print("moto_shape_node_update\n");
     moto_shape_node_reset((MotoShapeNode*)self);
 }
