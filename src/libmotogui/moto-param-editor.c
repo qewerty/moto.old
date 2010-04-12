@@ -1698,6 +1698,7 @@ typedef struct _AddWidgetData
 {
     MotoParamEditor *pe;
     GtkTable *table;
+    guint num;
 } AddWidgetData;
 
 typedef struct _OnLabelButtonPressData
@@ -1844,6 +1845,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
 
     if(!(mode & MOTO_PARAM_MODE_IN) || !(mode && MOTO_PARAM_MODE_INOUT))
         return;
+    ++data->num;
 
     const gchar *title = moto_param_get_title(param);
     GtkWidget *label = gtk_label_new(title);
@@ -1896,16 +1898,28 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
 
 static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
 {
+    if(moto_node_get_n_params_in_group(node, group) < 1)
+        return;
+
     MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
     GtkExpander *exp = (GtkExpander *)gtk_expander_new(group);
     gtk_expander_set_expanded(exp, TRUE);
 
     GtkTable *table = (GtkTable *)gtk_table_new(5, 3, FALSE);
     gtk_container_add((GtkContainer *)exp, (GtkWidget *)table);
-    gtk_box_pack_start(pe_priv->gbox, (GtkWidget *)exp, FALSE, FALSE, 2);
 
-    AddWidgetData data = {pe, table};
+    AddWidgetData data = {pe, table, 0};
     moto_node_foreach_param_in_group(node, group, (MotoNodeForeachParamInGroupFunc)add_param_widget, & data);
+
+    if(data.num > 0)
+    {
+        gtk_box_pack_start(pe_priv->gbox, (GtkWidget *)exp, FALSE, FALSE, 2);
+    }
+    else
+    {
+        g_object_ref_sink(exp);
+        g_object_unref(exp);
+    }
 
     pe_priv->gnum++;
 }

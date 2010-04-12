@@ -1427,6 +1427,16 @@ static void call_group_func(Group *group, NodeGroupData *data)
     data->func(data->node, group->name->str, data->user_data);
 }
 
+guint moto_node_get_n_params_in_group(MotoNode* self, const char* name)
+{
+    MotoNodePriv *priv = MOTO_NODE_GET_PRIVATE(self);
+
+    Group* g = (Group*)moto_mapped_list_get(&priv->pgroups, name);
+    if(!g)
+        return 0;
+    return g_slist_length(g->params);
+}
+
 void moto_node_foreach_group(MotoNode *self,
         MotoNodeForeachGroupFunc func, gpointer user_data)
 {

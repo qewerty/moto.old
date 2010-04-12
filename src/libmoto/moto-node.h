@@ -200,6 +200,8 @@ gboolean moto_node_set_params(MotoNode *self, ...) G_GNUC_NULL_TERMINATED;
 void moto_node_foreach_param(MotoNode *self,
         MotoNodeForeachParamFunc func, gpointer user_data);
 
+guint moto_node_get_n_params_in_group(MotoNode* self, const char* name);
+
 void moto_node_foreach_group(MotoNode *self,
         MotoNodeForeachGroupFunc func, gpointer user_data);
 void moto_node_foreach_param_in_group(MotoNode *self, const gchar *group_name,
