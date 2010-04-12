@@ -96,7 +96,7 @@ struct _MotoNodePriv
     MotoNode *parent;
     GList *children;
 
-    gboolean updated;
+    gboolean ready;
 
     guint id;
 
@@ -128,7 +128,7 @@ struct _MotoParamPriv
     MotoParam *source;
     GSList *dests;
 
-    gboolean updated;
+    gboolean ready;
 
     /* Used for determing which IN params this OUT depends on.
      * Only for params with MOTO_PARAM_MODE_OUT flag. */
@@ -189,7 +189,7 @@ moto_node_init(MotoNode *self)
     priv->parent   = NULL;
     priv->children = NULL;
 
-    priv->updated = FALSE;
+    priv->ready = FALSE;
 
     static guint id = 0;
 
@@ -446,7 +446,7 @@ static void check_param_source_ready(MotoParam *param, gboolean *ready)
         MotoNode *src_node = moto_param_get_node(source);
         if(src_node)
         {
-            *ready = MOTO_NODE_GET_PRIVATE(src_node)->updated;
+            *ready = MOTO_NODE_GET_PRIVATE(src_node)->ready;
         }
     }
 }
@@ -461,7 +461,7 @@ gboolean moto_node_is_ready_to_update(MotoNode *self)
 
 gboolean moto_node_needs_update(MotoNode *self)
 {
-    return ! MOTO_NODE_GET_PRIVATE(self)->updated;
+    return ! MOTO_NODE_GET_PRIVATE(self)->ready;
 }
 
 guint moto_node_get_id(MotoNode *self)
@@ -1501,7 +1501,7 @@ void moto_node_restore_from_variation(MotoNode *self, MotoVariation *variation)
 
 static void update_param(MotoParam *param, gpointer user_data)
 {
-    if( ! MOTO_PARAM_GET_PRIVATE(param)->updated)
+    if( ! MOTO_PARAM_GET_PRIVATE(param)->ready)
         moto_param_update(param);
 }
 
@@ -1516,7 +1516,7 @@ void moto_node_update(MotoNode *self)
         klass->update(self);
 
     moto_node_update_last_modified(self);
-    priv->updated = TRUE;
+    priv->ready = TRUE;
 }
 
 const GTimeVal *moto_node_get_last_modified(MotoNode *self)
@@ -1682,7 +1682,7 @@ moto_param_init(MotoParam *self)
     priv->source = NULL;
     priv->dests = NULL;
 
-    priv->updated = FALSE;
+    priv->ready = FALSE;
 
     priv->depends_on_params = NULL;
 
@@ -2478,17 +2478,17 @@ static void moto_param_update(MotoParam *self)
 
     MotoNode *node = moto_param_get_node(self);
     if(node)
-        MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
+        MOTO_NODE_GET_PRIVATE(node)->ready = FALSE;
 }
 
 static void moto_param_mark_for_update(MotoParam *self)
 {
     MotoParamPriv *priv = MOTO_PARAM_GET_PRIVATE(self);
-    priv->updated = FALSE;
+    priv->ready = FALSE;
 
     MotoNode *node = moto_param_get_node(self);
     if(node)
-        MOTO_NODE_GET_PRIVATE(node)->updated = FALSE;
+        MOTO_NODE_GET_PRIVATE(node)->ready = FALSE;
 }
 
 void moto_param_notify_dests(MotoParam *self)
