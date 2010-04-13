@@ -114,8 +114,6 @@ static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboole
 
             gfloat a, s, c;
             gfloat to_p[3], tmp[3];
-            #pragma omp parallel for if(size_i > 100) private(i, pi, po, a, s, c, tmp, to_p) \
-                shared(size_i, angle, points_i, points_o, orig, axis)
             for(i = 0; i < size_i; i++)
             {
                 gint offset = i*3;
