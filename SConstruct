@@ -2,8 +2,7 @@ import sys, os
 from tools.mototools import create_options
 from tools import msg
 
-SourceSignatures('MD5')
-TargetSignatures('content')
+Decider('MD5-timestamp')
 
 platform = sys.platform
 

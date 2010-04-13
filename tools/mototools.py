@@ -1,6 +1,6 @@
 import os
 
-from SCons.Options import Options, ListOption
+from SCons.Variables import Variables, ListVariable
 
 PLUGIN_PREFIX = 'moto-'
 
@@ -21,10 +21,10 @@ def find_plugins():
         return []
 
 def create_options(filename, args):
-    opts = Options(filename, args)
-    opts.AddOptions(
+    opts = Variables(filename, args)
+    opts.AddVariables(
         ('MOTO_GUI',    'Name of the target file of moto gui application', 'moto-gui'),
-        ListOption('PLUGINS', 'List of plugins to build (from %s%ssrc%splugins)' % (os.pardir, os.sep, os.sep), [],
+        ListVariable('PLUGINS', 'List of plugins to build (from %s%ssrc%splugins)' % (os.pardir, os.sep, os.sep), [],
             find_plugins()),
         ('CC',          'The C compiler', ''),
         ('CXX',         'The C++ compiler', ''),
