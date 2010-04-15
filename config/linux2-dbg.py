@@ -14,6 +14,6 @@ CPPFLAGS = ['-DMOTO_WITH_WOBJ_MESH_LOADER',
 
 
 PKG_CONFIG = ['pkg-config gtk+-2.0 libglade-2.0 gtkglext-1.0 gio-2.0 gthread-2.0 --cflags --libs',
-              'python2.5-config --includes', 'python2.5-config --libs']
+              'python2.6-config --includes', 'python2.6-config --libs']
 
 PLUGINS = []
