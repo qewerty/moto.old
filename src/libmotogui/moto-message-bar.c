@@ -90,7 +90,7 @@ GtkWidget *moto_message_bar_new(MotoMessager *messager)
         g_signal_connect(G_OBJECT(messager), "warning-message", G_CALLBACK(on_warning_message), self);
         g_signal_connect(G_OBJECT(messager), "error-message", G_CALLBACK(on_error_message), self);
 
-        // moto_messager_set_print_messages(FALSE);
+        // moto_messager_set_printmessages(FALSE);
     }
 
     moto_info("OK");

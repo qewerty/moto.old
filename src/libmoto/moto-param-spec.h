@@ -32,8 +32,8 @@ G_BEGIN_DECLS
 typedef struct _MotoParamSpec      MotoParamSpec;
 typedef struct _MotoParamSpecClass MotoParamSpecClass;
 
-typedef struct _MotoParamSpecBoolean      MotoParamSpecBoolean;
-typedef struct _MotoParamSpecBooleanClass MotoParamSpecBooleanClass;
+typedef struct _MotoParamSpecBool      MotoParamSpecBool;
+typedef struct _MotoParamSpecBoolClass MotoParamSpecBoolClass;
 
 typedef struct _MotoParamSpecInt MotoParamSpecInt;
 typedef struct _MotoParamSpecIntClass MotoParamSpecIntClass;
@@ -41,32 +41,32 @@ typedef struct _MotoParamSpecIntClass MotoParamSpecIntClass;
 typedef struct _MotoParamSpecFloat      MotoParamSpecFloat;
 typedef struct _MotoParamSpecFloatClass MotoParamSpecFloatClass;
 
-typedef struct _MotoParamSpecBoolean_2      MotoParamSpecBoolean_2;
-typedef struct _MotoParamSpecBoolean_2Class MotoParamSpecBoolean_2Class;
+typedef struct _MotoParamSpecBool2      MotoParamSpecBool2;
+typedef struct _MotoParamSpecBool2Class MotoParamSpecBool2Class;
 
-typedef struct _MotoParamSpecInt_2      MotoParamSpecInt_2;
-typedef struct _MotoParamSpecInt_2Class MotoParamSpecInt_2Class;
+typedef struct _MotoParamSpecInt2      MotoParamSpecInt2;
+typedef struct _MotoParamSpecInt2Class MotoParamSpecInt2Class;
 
-typedef struct _MotoParamSpecFloat_2      MotoParamSpecFloat_2;
-typedef struct _MotoParamSpecFloat_2Class MotoParamSpecFloat_2Class;
+typedef struct _MotoParamSpecFloat2      MotoParamSpecFloat2;
+typedef struct _MotoParamSpecFloat2Class MotoParamSpecFloat2Class;
 
-typedef struct _MotoParamSpecBoolean_3      MotoParamSpecBoolean_3;
-typedef struct _MotoParamSpecBoolean_3Class MotoParamSpecBoolean_3Class;
+typedef struct _MotoParamSpecBool3      MotoParamSpecBool3;
+typedef struct _MotoParamSpecBool3Class MotoParamSpecBool3Class;
 
-typedef struct _MotoParamSpecInt_3      MotoParamSpecInt_3;
-typedef struct _MotoParamSpecInt_3Class MotoParamSpecInt_3Class;
+typedef struct _MotoParamSpecInt3      MotoParamSpecInt3;
+typedef struct _MotoParamSpecInt3Class MotoParamSpecInt3Class;
 
-typedef struct _MotoParamSpecFloat_3      MotoParamSpecFloat_3;
-typedef struct _MotoParamSpecFloat_3Class MotoParamSpecFloat_3Class;
+typedef struct _MotoParamSpecFloat3      MotoParamSpecFloat3;
+typedef struct _MotoParamSpecFloat3Class MotoParamSpecFloat3Class;
 
-typedef struct _MotoParamSpecBoolean_4      MotoParamSpecBoolean_4;
-typedef struct _MotoParamSpecBoolean_4Class MotoParamSpecBoolean_4Class;
+typedef struct _MotoParamSpecBool4      MotoParamSpecBool4;
+typedef struct _MotoParamSpecBool4Class MotoParamSpecBool4Class;
 
-typedef struct _MotoParamSpecInt_4      MotoParamSpecInt_4;
-typedef struct _MotoParamSpecInt_4Class MotoParamSpecInt_4Class;
+typedef struct _MotoParamSpecInt4      MotoParamSpecInt4;
+typedef struct _MotoParamSpecInt4Class MotoParamSpecInt4Class;
 
-typedef struct _MotoParamSpecFloat_4      MotoParamSpecFloat_4;
-typedef struct _MotoParamSpecFloat_4Class MotoParamSpecFloat_4Class;
+typedef struct _MotoParamSpecFloat4      MotoParamSpecFloat4;
+typedef struct _MotoParamSpecFloat4Class MotoParamSpecFloat4Class;
 
 typedef MotoParamSpec *(*MotoParamSpecCopyMethod)(MotoParamSpec *self);
 
@@ -99,30 +99,30 @@ GType moto_param_spec_get_value_type(MotoParamSpec *self);
 
 MotoParamSpec *moto_param_spec_copy(MotoParamSpec *self);
 
-// MotoParamSpecBoolean
+// MotoParamSpecBool
 
-struct _MotoParamSpecBoolean
+struct _MotoParamSpecBool
 {
     MotoParamSpec parent;
 
     gboolean default_value;
 };
 
-struct _MotoParamSpecBooleanClass
+struct _MotoParamSpecBoolClass
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_boolean_get_type(void);
+GType moto_param_spec_bool_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_BOOLEAN (moto_param_spec_boolean_get_type())
-#define MOTO_PARAM_SPEC_BOOLEAN(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOLEAN, MotoParamSpecBoolean))
-#define MOTO_PARAM_SPEC_BOOLEAN_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOLEAN, MotoParamSpecBooleanClass))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOLEAN))
-#define MOTO_PARAM_SPEC_BOOLEAN_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN, MotoParamSpecBooleanClass))
+#define MOTO_TYPE_PARAM_SPEC_BOOL (moto_param_spec_bool_get_type())
+#define MOTO_PARAM_SPEC_BOOL(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOL, MotoParamSpecBool))
+#define MOTO_PARAM_SPEC_bool_class(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOL, MotoParamSpecBoolClass))
+#define MOTO_IS_PARAM_SPEC_BOOLEAN(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOL))
+#define MOTO_IS_PARAM_SPEC_bool_class(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOL))
+#define MOTO_PARAM_SPEC_BOOLGET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOL, MotoParamSpecBoolClass))
 
-MotoParamSpec *moto_param_spec_boolean_new(gboolean default_value);
+MotoParamSpec *moto_param_spec_bool_new(gboolean default_value);
 
 // MotoParamSpecInt
 
@@ -146,12 +146,12 @@ GType moto_param_spec_int_get_type(void);
 
 #define MOTO_TYPE_PARAM_SPEC_INT (moto_param_spec_int_get_type())
 #define MOTO_PARAM_SPEC_INT(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT, MotoParamSpecInt))
-#define MOTO_PARAM_SPEC_INT_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT, MotoParamSpecIntClass))
+#define MOTO_PARAM_SPEC_int_class(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT, MotoParamSpecIntClass))
 #define MOTO_IS_PARAM_SPEC_INT(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT))
-#define MOTO_IS_PARAM_SPEC_INT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT))
-#define MOTO_PARAM_SPEC_INT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT, MotoParamSpecIntClass))
+#define MOTO_IS_PARAM_SPEC_int_class(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT))
+#define MOTO_PARAM_SPEC_INTGET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT, MotoParamSpecIntClass))
 
-MotoParamSpec *moto_param_spec_int_new(gint default_value, gint min, gint max, gint step, gint page_step);
+MotoParamSpec *moto_param_spec_intnew(gint default_value, gint min, gint max, gint step, gint page_step);
 
 // MotoParamSpecFloat
 
@@ -175,42 +175,42 @@ GType moto_param_spec_float_get_type(void);
 
 #define MOTO_TYPE_PARAM_SPEC_FLOAT (moto_param_spec_float_get_type())
 #define MOTO_PARAM_SPEC_FLOAT(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT, MotoParamSpecFloat))
-#define MOTO_PARAM_SPEC_FLOAT_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT, MotoParamSpecFloatClass))
+#define MOTO_PARAM_SPEC_float_class(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT, MotoParamSpecFloatClass))
 #define MOTO_IS_PARAM_SPEC_FLOAT(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT))
-#define MOTO_IS_PARAM_SPEC_FLOAT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT))
-#define MOTO_PARAM_SPEC_FLOAT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT, MotoParamSpecFloatClass))
+#define MOTO_IS_PARAM_SPEC_float_class(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT))
+#define MOTO_PARAM_SPEC_FLOATGET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT, MotoParamSpecFloatClass))
 
-MotoParamSpec *moto_param_spec_float_new(gfloat default_value, gfloat min, gfloat max, gfloat step, gfloat page_step);
+MotoParamSpec *moto_param_spec_floatnew(gfloat default_value, gfloat min, gfloat max, gfloat step, gfloat page_step);
 
-// MotoParamSpecBoolean_2
+// MotoParamSpecBool2
 
-struct _MotoParamSpecBoolean_2
+struct _MotoParamSpecBool2
 {
     MotoParamSpec parent;
 
     gboolean default_value[2];
 };
 
-struct _MotoParamSpecBoolean_2Class
+struct _MotoParamSpecBool2Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_boolean_2_get_type(void);
+GType moto_param_spec_bool2_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_BOOLEAN_2 (moto_param_spec_boolean_2_get_type())
-#define MOTO_PARAM_SPEC_BOOLEAN_2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOLEAN_2, MotoParamSpecBoolean_2))
-#define MOTO_PARAM_SPEC_BOOLEAN_2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOLEAN_2, MotoParamSpecBoolean_2Class))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_2))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOLEAN_2))
-#define MOTO_PARAM_SPEC_BOOLEAN_2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_2, MotoParamSpecBoolean_2Class))
+#define MOTO_TYPE_PARAM_SPEC_BOOL2 (moto_param_spec_bool2_get_type())
+#define MOTO_PARAM_SPEC_BOOL2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOL2, MotoParamSpecBool2))
+#define MOTO_PARAM_SPEC_BOOL2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOL2, MotoParamSpecBool2Class))
+#define MOTO_IS_PARAM_SPEC_BOOL2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOL2))
+#define MOTO_IS_PARAM_SPEC_BOOL2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOL2))
+#define MOTO_PARAM_SPEC_BOOL2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOL2, MotoParamSpecBool2Class))
 
 MotoParamSpec *
-moto_param_spec_boolean_2_new(gboolean default_value0, gboolean default_value1);
+moto_param_spec_bool2_new(gboolean default_value0, gboolean default_value1);
 
-// MotoParamSpecInt_2
+// MotoParamSpecInt2
 
-struct _MotoParamSpecInt_2
+struct _MotoParamSpecInt2
 {
     MotoParamSpec parent;
 
@@ -221,27 +221,27 @@ struct _MotoParamSpecInt_2
     gint page_step[2];
 };
 
-struct _MotoParamSpecInt_2Class
+struct _MotoParamSpecInt2Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_int_2_get_type(void);
+GType moto_param_spec_int2_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_INT_2 (moto_param_spec_int_2_get_type())
-#define MOTO_PARAM_SPEC_INT_2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT_2, MotoParamSpecInt_2))
-#define MOTO_PARAM_SPEC_INT_2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT_2, MotoParamSpecInt_2Class))
-#define MOTO_IS_PARAM_SPEC_INT_2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT_2))
-#define MOTO_IS_PARAM_SPEC_INT_2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT_2))
-#define MOTO_PARAM_SPEC_INT_2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT_2, MotoParamSpecInt_2Class))
+#define MOTO_TYPE_PARAM_SPEC_INT2 (moto_param_spec_int2_get_type())
+#define MOTO_PARAM_SPEC_INT2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT2, MotoParamSpecInt2))
+#define MOTO_PARAM_SPEC_INT2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT2, MotoParamSpecInt2Class))
+#define MOTO_IS_PARAM_SPEC_INT2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT2))
+#define MOTO_IS_PARAM_SPEC_INT2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT2))
+#define MOTO_PARAM_SPEC_INT2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT2, MotoParamSpecInt2Class))
 
 MotoParamSpec *
-moto_param_spec_int_2_new(gint default_value0, gint min1, gint max0, gint step0, gint page_step0,
+moto_param_spec_int2_new(gint default_value0, gint min1, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min0, gint max1, gint step1, gint page_step1);
 
-// MotoParamSpecFloat_2
+// MotoParamSpecFloat2
 
-struct _MotoParamSpecFloat_2
+struct _MotoParamSpecFloat2
 {
     MotoParamSpec parent;
 
@@ -252,53 +252,53 @@ struct _MotoParamSpecFloat_2
     gfloat page_step[2];
 };
 
-struct _MotoParamSpecFloat_2Class
+struct _MotoParamSpecFloat2Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_float_2_get_type(void);
+GType moto_param_spec_float2_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_FLOAT_2 (moto_param_spec_float_2_get_type())
-#define MOTO_PARAM_SPEC_FLOAT_2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT_2, MotoParamSpecFloat_2))
-#define MOTO_PARAM_SPEC_FLOAT_2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT_2, MotoParamSpecFloat_2Class))
-#define MOTO_IS_PARAM_SPEC_FLOAT_2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_2))
-#define MOTO_IS_PARAM_SPEC_FLOAT_2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT_2))
-#define MOTO_PARAM_SPEC_FLOAT_2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_2, MotoParamSpecFloat_2Class))
+#define MOTO_TYPE_PARAM_SPEC_FLOAT2 (moto_param_spec_float2_get_type())
+#define MOTO_PARAM_SPEC_FLOAT2(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT2, MotoParamSpecFloat2))
+#define MOTO_PARAM_SPEC_FLOAT2_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT2, MotoParamSpecFloat2Class))
+#define MOTO_IS_PARAM_SPEC_FLOAT2(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT2))
+#define MOTO_IS_PARAM_SPEC_FLOAT2_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT2))
+#define MOTO_PARAM_SPEC_FLOAT2_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT2, MotoParamSpecFloat2Class))
 
 MotoParamSpec *
-moto_param_spec_float_2_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float2_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1);
 
-// MotoParamSpecBoolean_3
+// MotoParamSpecBool3
 
-struct _MotoParamSpecBoolean_3
+struct _MotoParamSpecBool3
 {
     MotoParamSpec parent;
 
     gboolean default_value[3];
 };
 
-struct _MotoParamSpecBoolean_3Class
+struct _MotoParamSpecBool3Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_boolean_3_get_type(void);
+GType moto_param_spec_bool3_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_BOOLEAN_3 (moto_param_spec_boolean_3_get_type())
-#define MOTO_PARAM_SPEC_BOOLEAN_3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOLEAN_3, MotoParamSpecBoolean_3))
-#define MOTO_PARAM_SPEC_BOOLEAN_3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOLEAN_3, MotoParamSpecBoolean_3Class))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_3))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOLEAN_3))
-#define MOTO_PARAM_SPEC_BOOLEAN_3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_3, MotoParamSpecBoolean_3Class))
+#define MOTO_TYPE_PARAM_SPEC_BOOL3 (moto_param_spec_bool3_get_type())
+#define MOTO_PARAM_SPEC_BOOL3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOL3, MotoParamSpecBool3))
+#define MOTO_PARAM_SPEC_BOOL3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOL3, MotoParamSpecBool3Class))
+#define MOTO_IS_PARAM_SPEC_BOOL3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOL3))
+#define MOTO_IS_PARAM_SPEC_BOOL3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOL3))
+#define MOTO_PARAM_SPEC_BOOL3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOL3, MotoParamSpecBool3Class))
 
 MotoParamSpec *
-moto_param_spec_boolean_3_new(gboolean default_value0, gboolean default_value1, gboolean default_value2);
+moto_param_spec_bool3_new(gboolean default_value0, gboolean default_value1, gboolean default_value2);
 
-// MotoParamSpecInt_3
+// MotoParamSpecInt3
 
-struct _MotoParamSpecInt_3
+struct _MotoParamSpecInt3
 {
     MotoParamSpec parent;
 
@@ -309,28 +309,28 @@ struct _MotoParamSpecInt_3
     gint page_step[3];
 };
 
-struct _MotoParamSpecInt_3Class
+struct _MotoParamSpecInt3Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_int_3_get_type(void);
+GType moto_param_spec_int3_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_INT_3 (moto_param_spec_int_3_get_type())
-#define MOTO_PARAM_SPEC_INT_3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT_3, MotoParamSpecInt_3))
-#define MOTO_PARAM_SPEC_INT_3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT_3, MotoParamSpecInt_3Class))
-#define MOTO_IS_PARAM_SPEC_INT_3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT_3))
-#define MOTO_IS_PARAM_SPEC_INT_3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT_3))
-#define MOTO_PARAM_SPEC_INT_3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT_3, MotoParamSpecInt_3Class))
+#define MOTO_TYPE_PARAM_SPEC_INT3 (moto_param_spec_int3_get_type())
+#define MOTO_PARAM_SPEC_INT3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT3, MotoParamSpecInt3))
+#define MOTO_PARAM_SPEC_INT3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT3, MotoParamSpecInt3Class))
+#define MOTO_IS_PARAM_SPEC_INT3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT3))
+#define MOTO_IS_PARAM_SPEC_INT3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT3))
+#define MOTO_PARAM_SPEC_INT3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT3, MotoParamSpecInt3Class))
 
 MotoParamSpec *
-moto_param_spec_int_3_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
+moto_param_spec_int3_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min1, gint max1, gint step1, gint page_step1,
                           gint default_value2, gint min2, gint max2, gint step2, gint page_step2);
 
-// MotoParamSpecFloat_3
+// MotoParamSpecFloat3
 
-struct _MotoParamSpecFloat_3
+struct _MotoParamSpecFloat3
 {
     MotoParamSpec parent;
 
@@ -341,54 +341,54 @@ struct _MotoParamSpecFloat_3
     gfloat page_step[3];
 };
 
-struct _MotoParamSpecFloat_3Class
+struct _MotoParamSpecFloat3Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_float_3_get_type(void);
+GType moto_param_spec_float3_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_FLOAT_3 (moto_param_spec_float_3_get_type())
-#define MOTO_PARAM_SPEC_FLOAT_3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT_3, MotoParamSpecFloat_3))
-#define MOTO_PARAM_SPEC_FLOAT_3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT_3, MotoParamSpecFloat_3Class))
-#define MOTO_IS_PARAM_SPEC_FLOAT_3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_3))
-#define MOTO_IS_PARAM_SPEC_FLOAT_3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT_3))
-#define MOTO_PARAM_SPEC_FLOAT_3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_3, MotoParamSpecFloat_3Class))
+#define MOTO_TYPE_PARAM_SPEC_FLOAT3 (moto_param_spec_float3_get_type())
+#define MOTO_PARAM_SPEC_FLOAT3(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT3, MotoParamSpecFloat3))
+#define MOTO_PARAM_SPEC_FLOAT3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT3, MotoParamSpecFloat3Class))
+#define MOTO_IS_PARAM_SPEC_FLOAT3(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT3))
+#define MOTO_IS_PARAM_SPEC_FLOAT3_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT3))
+#define MOTO_PARAM_SPEC_FLOAT3_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT3, MotoParamSpecFloat3Class))
 
 MotoParamSpec *
-moto_param_spec_float_3_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float3_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1,
                             gfloat default_value2, gfloat min2, gfloat max2, gfloat step2, gfloat page_step2);
 
-// MotoParamSpecBoolean_4
+// MotoParamSpecBool4
 
-struct _MotoParamSpecBoolean_4
+struct _MotoParamSpecBool4
 {
     MotoParamSpec parent;
 
     gboolean default_value[4];
 };
 
-struct _MotoParamSpecBoolean_4Class
+struct _MotoParamSpecBool4Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_boolean_4_get_type(void);
+GType moto_param_spec_bool4_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_BOOLEAN_4 (moto_param_spec_boolean_4_get_type())
-#define MOTO_PARAM_SPEC_BOOLEAN_4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOLEAN_4, MotoParamSpecBoolean_4))
-#define MOTO_PARAM_SPEC_BOOLEAN_4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOLEAN_4, MotoParamSpecBoolean_4Class))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_4))
-#define MOTO_IS_PARAM_SPEC_BOOLEAN_4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOLEAN_4))
-#define MOTO_PARAM_SPEC_BOOLEAN_4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOLEAN_4, MotoParamSpecBoolean_4Class))
+#define MOTO_TYPE_PARAM_SPEC_BOOL4 (moto_param_spec_bool4_get_type())
+#define MOTO_PARAM_SPEC_BOOL4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_BOOL4, MotoParamSpecBool4))
+#define MOTO_PARAM_SPEC_BOOL4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_BOOL4, MotoParamSpecBool4Class))
+#define MOTO_IS_PARAM_SPEC_BOOL4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_BOOL4))
+#define MOTO_IS_PARAM_SPEC_BOOL4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_BOOL4))
+#define MOTO_PARAM_SPEC_BOOL4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_BOOL4, MotoParamSpecBool4Class))
 
 MotoParamSpec *
-moto_param_spec_boolean_4_new(gboolean default_value0, gboolean default_value1, gboolean default_value2, gboolean default_value3);
+moto_param_spec_bool4_new(gboolean default_value0, gboolean default_value1, gboolean default_value2, gboolean default_value3);
 
-// MotoParamSpecInt_4
+// MotoParamSpecInt4
 
-struct _MotoParamSpecInt_4
+struct _MotoParamSpecInt4
 {
     MotoParamSpec parent;
 
@@ -399,29 +399,29 @@ struct _MotoParamSpecInt_4
     gint page_step[4];
 };
 
-struct _MotoParamSpecInt_4Class
+struct _MotoParamSpecInt4Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_int_4_get_type(void);
+GType moto_param_spec_int4_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_INT_4 (moto_param_spec_int_4_get_type())
-#define MOTO_PARAM_SPEC_INT_4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT_4, MotoParamSpecInt_4))
-#define MOTO_PARAM_SPEC_INT_4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT_4, MotoParamSpecInt_4Class))
-#define MOTO_IS_PARAM_SPEC_INT_4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT_4))
-#define MOTO_IS_PARAM_SPEC_INT_4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT_4))
-#define MOTO_PARAM_SPEC_INT_4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT_4, MotoParamSpecInt_4Class))
+#define MOTO_TYPE_PARAM_SPEC_INT4 (moto_param_spec_int4_get_type())
+#define MOTO_PARAM_SPEC_INT4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_INT4, MotoParamSpecInt4))
+#define MOTO_PARAM_SPEC_INT4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_INT4, MotoParamSpecInt4Class))
+#define MOTO_IS_PARAM_SPEC_INT4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_INT4))
+#define MOTO_IS_PARAM_SPEC_INT4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_INT4))
+#define MOTO_PARAM_SPEC_INT4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_INT4, MotoParamSpecInt4Class))
 
 MotoParamSpec *
-moto_param_spec_int_4_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
+moto_param_spec_int4_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min1, gint max1, gint step1, gint page_step1,
                           gint default_value2, gint min2, gint max2, gint step2, gint page_step2,
                           gint default_value3, gint min3, gint max3, gint step3, gint page_step3);
 
-// MotoParamSpecFloat_4
+// MotoParamSpecFloat4
 
-struct _MotoParamSpecFloat_4
+struct _MotoParamSpecFloat4
 {
     MotoParamSpec parent;
 
@@ -432,22 +432,22 @@ struct _MotoParamSpecFloat_4
     gfloat page_step[4];
 };
 
-struct _MotoParamSpecFloat_4Class
+struct _MotoParamSpecFloat4Class
 {
     MotoParamSpecClass parent;
 };
 
-GType moto_param_spec_float_4_get_type(void);
+GType moto_param_spec_float4_get_type(void);
 
-#define MOTO_TYPE_PARAM_SPEC_FLOAT_4 (moto_param_spec_float_4_get_type())
-#define MOTO_PARAM_SPEC_FLOAT_4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT_4, MotoParamSpecFloat_4))
-#define MOTO_PARAM_SPEC_FLOAT_4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT_4, MotoParamSpecFloat_4Class))
-#define MOTO_IS_PARAM_SPEC_FLOAT_4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_4))
-#define MOTO_IS_PARAM_SPEC_FLOAT_4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT_4))
-#define MOTO_PARAM_SPEC_FLOAT_4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT_4, MotoParamSpecFloat_4Class))
+#define MOTO_TYPE_PARAM_SPEC_FLOAT4 (moto_param_spec_float4_get_type())
+#define MOTO_PARAM_SPEC_FLOAT4(obj)  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_PARAM_SPEC_FLOAT4, MotoParamSpecFloat4))
+#define MOTO_PARAM_SPEC_FLOAT4_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), MOTO_TYPE_PARAM_SPEC_FLOAT4, MotoParamSpecFloat4Class))
+#define MOTO_IS_PARAM_SPEC_FLOAT4(obj)  (G_TYPE_CHECK_INSTANCE_TYPE ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT4))
+#define MOTO_IS_PARAM_SPEC_FLOAT4_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),MOTO_TYPE_PARAM_SPEC_FLOAT4))
+#define MOTO_PARAM_SPEC_FLOAT4_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),MOTO_TYPE_PARAM_SPEC_FLOAT4, MotoParamSpecFloat4Class))
 
 MotoParamSpec *
-moto_param_spec_float_4_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float4_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1,
                             gfloat default_value2, gfloat min2, gfloat max2, gfloat step2, gfloat page_step2,
                             gfloat default_value3, gfloat min3, gfloat max3, gfloat step3, gfloat page_step3);

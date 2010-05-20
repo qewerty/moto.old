@@ -78,7 +78,7 @@ moto_shape_node_init(MotoShapeNode *self)
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);
 
     moto_node_add_params(node,
-            "active", "Active", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
+            "active", "Active", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, TRUE, NULL, "Status",
             "out", "Output Shape", MOTO_TYPE_SHAPE, MOTO_PARAM_MODE_OUT,   NULL, NULL, "Shape",
             NULL);
 
@@ -281,11 +281,10 @@ static void moto_shape_node_draw_WIREFRAME_OBJECT(MotoShapeNode* self, MotoShape
         glDisable(GL_LIGHTING);
         glEnableClientState(GL_VERTEX_ARRAY);
 
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-
         glLineWidth(1.0);
         glColor3f(0.9, 0.9, 0.9);
 
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
         glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
     }
@@ -768,6 +767,7 @@ static void moto_shape_node_draw_SOLID_OBJECT(MotoShapeNode* self, MotoShapeSele
         glColor4f(1, 1, 1, 1);
 
         glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
 
         if(moto_scene_node_get_cull_faces(scene_node))
             glEnable(GL_CULL_FACE);
@@ -900,7 +900,7 @@ static void moto_shape_node_draw_SOLID_EDGE(MotoShapeNode* self, MotoShapeSelect
             if(selection && moto_shape_selection_check_edge(selection, i))
                 glColor3f(0, 1, 0);
             else
-                glColor3f(0.1, 0.1, 0.1);
+                glColor3f(0.9, 0.1, 0.1);
 
             glVertex3fv((GLfloat*)(&mesh->v_coords[mesh->e_verts16[i*2]]));
             glVertex3fv((GLfloat*)(&mesh->v_coords[mesh->e_verts16[i*2 + 1]]));
@@ -1349,11 +1349,10 @@ static void moto_shape_node_draw_SHADED_VERTEX(MotoShapeNode* self, MotoShapeSel
         glDisable(GL_LIGHTING);
         glEnableClientState(GL_VERTEX_ARRAY);
 
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-
         glLineWidth(1.0);
         glColor3f(0.1, 0.1, 0.1);
 
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
         glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
         guint i;
@@ -1445,11 +1444,10 @@ static void moto_shape_node_draw_SHADED_FACE(MotoShapeNode* self, MotoShapeSelec
         glDisable(GL_LIGHTING);
         glEnableClientState(GL_VERTEX_ARRAY);
 
-        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
-
         glLineWidth(1.0);
         glColor3f(0.1, 0.1, 0.1);
 
+        glVertexPointer(3, GL_FLOAT, sizeof(MotoVector), mesh->v_coords);
         glDrawElements(GL_LINES, 2*mesh->e_num, mesh->index_gl_type, mesh->e_verts);
 
         if(moto_scene_node_get_cull_faces(scene_node))

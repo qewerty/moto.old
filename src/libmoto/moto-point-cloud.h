@@ -19,8 +19,8 @@
 #
 ################################################################################## */
 
-#ifndef __MOTO_POINT_CLOUD_H__
-#define __MOTO_POINT_CLOUD_H__
+#ifndef __MOTO_POINTCLOUD_H__
+#define __MOTO_POINTCLOUD_H__
 
 #include <glib-object.h>
 
@@ -47,20 +47,20 @@ struct _MotoPointCloudIface
     MotoPointCloudGetPlainDataMethod get_plain_data;
 };
 
-GType moto_point_cloud_get_type(void);
+GType moto_pointcloud_get_type(void);
 
-#define MOTO_TYPE_POINT_CLOUD           (moto_point_cloud_get_type())
-#define MOTO_POINT_CLOUD(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_POINT_CLOUD, MotoPointCloud))
-#define MOTO_IS_POINT_CLOUD(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MOTO_TYPE_POINT_CLOUD))
-#define MOTO_POINT_CLOUD_GET_INTERFACE(inst)   (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MOTO_TYPE_POINT_CLOUD, MotoPointCloudIface))
+#define MOTO_TYPE_POINTCLOUD           (moto_pointcloud_get_type())
+#define MOTO_POINTCLOUD(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), MOTO_TYPE_POINTCLOUD, MotoPointCloud))
+#define MOTO_IS_POINTCLOUD(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MOTO_TYPE_POINTCLOUD))
+#define MOTO_POINTCLOUD_GET_INTERFACE(inst)   (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MOTO_TYPE_POINTCLOUD, MotoPointCloudIface))
 
-void moto_point_cloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachPointFunc func, gpointer user_data);
+void moto_pointcloud_foreach_point(MotoPointCloud *self, MotoPointCloudForeachPointFunc func, gpointer user_data);
 
 /* Following functions may be used for SSE optimization of point cloud data processing. */
-gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self);
-void moto_point_cloud_get_plain_data(MotoPointCloud *self,
+gboolean moto_pointcloud_can_provide_plain_data(MotoPointCloud *self);
+void moto_pointcloud_get_plain_data(MotoPointCloud *self,
     gfloat **points, gfloat **normals, gsize *size);
 
 G_END_DECLS
 
-#endif /* __MOTO_POINT_CLOUD_H__ */
+#endif /* __MOTO_POINTCLOUD_H__ */

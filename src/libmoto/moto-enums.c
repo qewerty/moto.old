@@ -102,3 +102,21 @@ GType moto_extrude_mode_get_type(void)
     return type;
 }
 
+/* MotoExtrudeMode */
+
+GType moto_array_mode_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GEnumValue values[] = {
+            {MOTO_ARRAY_MODE_LOCAL,   "EXTRUDE_MODE_LOCAL",  "Local"},
+            {MOTO_ARRAY_MODE_GLOBAL,  "EXTRUDE_MODE_GLOBAL",  "Global"},
+            {MOTO_ARRAY_MODE_WEIGHT,  "EXTRUDE_MODE_WEIGHT",  "Weight"},
+            {MOTO_ARRAY_MODE_RELATIVE,  "EXTRUDE_MODE_WEIGHT",  "Relative"},
+            {0, NULL, NULL},
+        };
+        type = g_enum_register_static("MotoArrayMode", values);
+    }
+    return type;
+}

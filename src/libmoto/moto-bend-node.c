@@ -24,11 +24,11 @@ moto_bend_node_init(MotoBendNode *self)
 
     gfloat orig[3] = {0, 0, 0};
     gfloat dir[3]  = {1, 0, 0};
-    MotoParamSpec *angle_spec = moto_param_spec_float_new(0, -1000000, 1000000, 0.1, 1);
+    MotoParamSpec *angle_spec = moto_param_spec_floatnew(0, -1000000, 1000000, 0.1, 1);
     moto_node_add_params(node,
             "angle",  "Angle",              G_TYPE_FLOAT,          MOTO_PARAM_MODE_INOUT, 0.0f, angle_spec, "Arguments",
-            "orig",   "Origin",             MOTO_TYPE_FLOAT_3,     MOTO_PARAM_MODE_INOUT, orig, NULL,       "Arguments",
-            "dir",    "Direction",          MOTO_TYPE_FLOAT_3,     MOTO_PARAM_MODE_INOUT, dir,  NULL,       "Arguments",
+            "orig",   "Origin",             MOTO_TYPE_FLOAT3,     MOTO_PARAM_MODE_INOUT, orig, NULL,       "Arguments",
+            "dir",    "Direction",          MOTO_TYPE_FLOAT3,     MOTO_PARAM_MODE_INOUT, dir,  NULL,       "Arguments",
             NULL);
     g_object_unref(angle_spec);
 }
@@ -62,7 +62,7 @@ static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboole
 
     MotoNode *node = (MotoNode*)self;
 
-    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINTCLOUD))
         return in;
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
@@ -70,7 +70,7 @@ static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboole
     if(!geom || !moto_shape_is_struct_the_same(geom, in))
     {
         *the_same = FALSE;
-        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        geom = MOTO_POINTCLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
     MotoShape *out = (MotoShape*)geom;
@@ -84,7 +84,7 @@ static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboole
     gfloat angle;
     moto_node_get_param_float(node, "angle", &angle);
 
-    if(moto_point_cloud_can_provide_plain_data(in_pc))
+    if(moto_pointcloud_can_provide_plain_data(in_pc))
     {
         gfloat *points_i  = NULL;
         gfloat *normals_i = NULL;
@@ -93,8 +93,8 @@ static MotoShape *moto_bend_node_perform(MotoOpNode *self, MotoShape *in, gboole
         gfloat *normals_o = NULL;
         gsize size_o      = 0;
 
-        moto_point_cloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
-        moto_point_cloud_get_plain_data(geom,  & points_o, & normals_o, & size_o);
+        moto_pointcloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
+        moto_pointcloud_get_plain_data(geom,  & points_o, & normals_o, & size_o);
 
         gint i;
         gfloat *pi, *po, *ni, *no;

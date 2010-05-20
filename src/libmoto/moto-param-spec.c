@@ -34,38 +34,38 @@ MotoParamSpec *moto_param_spec_copy(MotoParamSpec *self)
     return NULL;
 }
 
-// MotoParamSpecBoolean
+// MotoParamSpecBool
 
 static void
-moto_param_spec_boolean_init(MotoParamSpecBoolean *self)
+moto_param_spec_bool_init(MotoParamSpecBool *self)
 {
     self->default_value = FALSE;
 }
 
-MotoParamSpec *moto_param_spec_boolean_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_boolcopy(MotoParamSpec *self)
 {
-    MotoParamSpecBoolean *bs = MOTO_PARAM_SPEC_BOOLEAN(self);
+    MotoParamSpecBool *bs = MOTO_PARAM_SPEC_BOOL(self);
 
-    return moto_param_spec_boolean_new(bs->default_value);
+    return moto_param_spec_bool_new(bs->default_value);
 }
 
 static void
-moto_param_spec_boolean_class_init(MotoParamSpecBooleanClass *klass)
+moto_param_spec_bool_class_init(MotoParamSpecBoolClass *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
     ps_class->value_type = G_TYPE_BOOLEAN;
-    ps_class->copy = moto_param_spec_boolean_copy;
+    ps_class->copy = moto_param_spec_boolcopy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecBoolean, moto_param_spec_boolean, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecBool, moto_param_spec_bool, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecBoolean
+// Methods of MotoParamSpecBool
 
-MotoParamSpec *moto_param_spec_boolean_new(gboolean default_value)
+MotoParamSpec *moto_param_spec_bool_new(gboolean default_value)
 {
-    MotoParamSpec *self = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOLEAN, NULL);
-    MotoParamSpecBoolean *bs = (MotoParamSpecBoolean *)self;
+    MotoParamSpec *self = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOL, NULL);
+    MotoParamSpecBool *bs = (MotoParamSpecBool *)self;
 
     bs->default_value = default_value;
 
@@ -84,11 +84,11 @@ moto_param_spec_int_init(MotoParamSpecInt *self)
     self->page_step =  10;
 }
 
-MotoParamSpec *moto_param_spec_int_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_intcopy(MotoParamSpec *self)
 {
     MotoParamSpecInt *is = MOTO_PARAM_SPEC_INT(self);
 
-    return moto_param_spec_int_new(is->default_value,
+    return moto_param_spec_intnew(is->default_value,
         is->min, is->max, is->step, is->page_step);
 }
 
@@ -98,7 +98,7 @@ moto_param_spec_int_class_init(MotoParamSpecIntClass *klass)
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
     ps_class->value_type = G_TYPE_INT;
-    ps_class->copy = moto_param_spec_int_copy;
+    ps_class->copy = moto_param_spec_intcopy;
 }
 
 G_DEFINE_TYPE(MotoParamSpecInt, moto_param_spec_int, MOTO_TYPE_PARAM_SPEC);
@@ -106,7 +106,7 @@ G_DEFINE_TYPE(MotoParamSpecInt, moto_param_spec_int, MOTO_TYPE_PARAM_SPEC);
 // Methods of MotoParamSpecInt
 
 MotoParamSpec *
-moto_param_spec_int_new(gint default_value,
+moto_param_spec_intnew(gint default_value,
     gint min, gint max, gint step, gint page_step)
 {
     MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT, NULL);
@@ -133,11 +133,11 @@ moto_param_spec_float_init(MotoParamSpecFloat *self)
     self->page_step =  1;
 }
 
-MotoParamSpec *moto_param_spec_float_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_floatcopy(MotoParamSpec *self)
 {
     MotoParamSpecFloat *fs = MOTO_PARAM_SPEC_FLOAT(self);
 
-    return moto_param_spec_float_new(fs->default_value,
+    return moto_param_spec_floatnew(fs->default_value,
         fs->min, fs->max, fs->step, fs->page_step);
 }
 
@@ -147,7 +147,7 @@ moto_param_spec_float_class_init(MotoParamSpecFloatClass *klass)
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
     ps_class->value_type = G_TYPE_FLOAT;
-    ps_class->copy = moto_param_spec_float_copy;
+    ps_class->copy = moto_param_spec_floatcopy;
 }
 
 G_DEFINE_TYPE(MotoParamSpecFloat, moto_param_spec_float, MOTO_TYPE_PARAM_SPEC);
@@ -155,7 +155,7 @@ G_DEFINE_TYPE(MotoParamSpecFloat, moto_param_spec_float, MOTO_TYPE_PARAM_SPEC);
 // Methods of MotoParamSpecFloat
 
 MotoParamSpec *
-moto_param_spec_float_new(gfloat default_value,
+moto_param_spec_floatnew(gfloat default_value,
     gfloat min, gfloat max, gfloat step, gfloat page_step)
 {
     MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT, NULL);
@@ -170,40 +170,40 @@ moto_param_spec_float_new(gfloat default_value,
     return self;
 }
 
-// MotoParamSpecBoolean_2
+// MotoParamSpecBool2
 
 static void
-moto_param_spec_boolean_2_init(MotoParamSpecBoolean_2 *self)
+moto_param_spec_bool2_init(MotoParamSpecBool2 *self)
 {
     self->default_value[0] = FALSE;
     self->default_value[1] = FALSE;
 }
 
-MotoParamSpec *moto_param_spec_boolean_2_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_bool2_copy(MotoParamSpec *self)
 {
-    MotoParamSpecBoolean_2 *bs2 = MOTO_PARAM_SPEC_BOOLEAN_2(self);
+    MotoParamSpecBool2 *bs2 = MOTO_PARAM_SPEC_BOOL2(self);
 
-    return moto_param_spec_boolean_2_new(bs2->default_value[0], bs2->default_value[1]);
+    return moto_param_spec_bool2_new(bs2->default_value[0], bs2->default_value[1]);
 }
 
 static void
-moto_param_spec_boolean_2_class_init(MotoParamSpecBoolean_2Class *klass)
+moto_param_spec_bool2_class_init(MotoParamSpecBool2Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_BOOLEAN_2;
-    ps_class->copy = moto_param_spec_boolean_2_copy;
+    ps_class->value_type = MOTO_TYPE_BOOL2;
+    ps_class->copy = moto_param_spec_bool2_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecBoolean_2, moto_param_spec_boolean_2, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecBool2, moto_param_spec_bool2, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecBoolean_2
+// Methods of MotoParamSpecBool2
 
 MotoParamSpec *
-moto_param_spec_boolean_2_new(gboolean default_value0, gboolean default_value1)
+moto_param_spec_bool2_new(gboolean default_value0, gboolean default_value1)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOLEAN_2, NULL);
-    MotoParamSpecBoolean_2 *bs2 = (MotoParamSpecBoolean_2 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOL2, NULL);
+    MotoParamSpecBool2 *bs2 = (MotoParamSpecBool2 *)self;
 
     bs2->default_value[0] = default_value0;
     bs2->default_value[1] = default_value1;
@@ -211,10 +211,10 @@ moto_param_spec_boolean_2_new(gboolean default_value0, gboolean default_value1)
     return self;
 }
 
-// MotoParamSpecInt_2
+// MotoParamSpecInt2
 
 static void
-moto_param_spec_int_2_init(MotoParamSpecInt_2 *self)
+moto_param_spec_int2_init(MotoParamSpecInt2 *self)
 {
     gint i;
     for(i = 0; i < 2; i++)
@@ -227,33 +227,33 @@ moto_param_spec_int_2_init(MotoParamSpecInt_2 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_int_2_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_int2_copy(MotoParamSpec *self)
 {
-    MotoParamSpecInt_2 *is2 = MOTO_PARAM_SPEC_INT_2(self);
+    MotoParamSpecInt2 *is2 = MOTO_PARAM_SPEC_INT2(self);
 
-    return moto_param_spec_int_2_new(is2->default_value[0], is2->min[0], is2->max[0], is2->step[0], is2->page_step[0],
+    return moto_param_spec_int2_new(is2->default_value[0], is2->min[0], is2->max[0], is2->step[0], is2->page_step[0],
                                      is2->default_value[1], is2->min[1], is2->max[1], is2->step[1], is2->page_step[1]);
 }
 
 static void
-moto_param_spec_int_2_class_init(MotoParamSpecInt_2Class *klass)
+moto_param_spec_int2_class_init(MotoParamSpecInt2Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_INT_2;
-    ps_class->copy = moto_param_spec_int_2_copy;
+    ps_class->value_type = MOTO_TYPE_INT2;
+    ps_class->copy = moto_param_spec_int2_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecInt_2, moto_param_spec_int_2, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecInt2, moto_param_spec_int2, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecInt_2
+// Methods of MotoParamSpecInt2
 
 MotoParamSpec *
-moto_param_spec_int_2_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
+moto_param_spec_int2_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min1, gint max1, gint step1, gint page_step1)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT_2, NULL);
-    MotoParamSpecInt_2 *is2 = (MotoParamSpecInt_2 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT2, NULL);
+    MotoParamSpecInt2 *is2 = (MotoParamSpecInt2 *)self;
 
     is2->default_value[0] = default_value0;
     is2->min[0]       = min0;
@@ -270,10 +270,10 @@ moto_param_spec_int_2_new(gint default_value0, gint min0, gint max0, gint step0,
     return self;
 }
 
-// MotoParamSpecFloat_2
+// MotoParamSpecFloat2
 
 static void
-moto_param_spec_float_2_init(MotoParamSpecFloat_2 *self)
+moto_param_spec_float2_init(MotoParamSpecFloat2 *self)
 {
     gint i;
     for(i = 0; i < 2; i++)
@@ -286,33 +286,33 @@ moto_param_spec_float_2_init(MotoParamSpecFloat_2 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_float_2_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_float2_copy(MotoParamSpec *self)
 {
-    MotoParamSpecFloat_2 *fs2 = MOTO_PARAM_SPEC_FLOAT_2(self);
+    MotoParamSpecFloat2 *fs2 = MOTO_PARAM_SPEC_FLOAT2(self);
 
-    return moto_param_spec_float_2_new(fs2->default_value[0], fs2->min[0], fs2->max[0], fs2->step[0], fs2->page_step[0],
+    return moto_param_spec_float2_new(fs2->default_value[0], fs2->min[0], fs2->max[0], fs2->step[0], fs2->page_step[0],
                                        fs2->default_value[1], fs2->min[1], fs2->max[1], fs2->step[1], fs2->page_step[1]);
 }
 
 static void
-moto_param_spec_float_2_class_init(MotoParamSpecFloat_2Class *klass)
+moto_param_spec_float2_class_init(MotoParamSpecFloat2Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_FLOAT_2;
-    ps_class->copy = moto_param_spec_float_2_copy;
+    ps_class->value_type = MOTO_TYPE_FLOAT2;
+    ps_class->copy = moto_param_spec_float2_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecFloat_2, moto_param_spec_float_2, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecFloat2, moto_param_spec_float2, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecFloat_2
+// Methods of MotoParamSpecFloat2
 
 MotoParamSpec *
-moto_param_spec_float_2_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float2_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT_2, NULL);
-    MotoParamSpecFloat_2 *fs2 = (MotoParamSpecFloat_2 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT2, NULL);
+    MotoParamSpecFloat2 *fs2 = (MotoParamSpecFloat2 *)self;
 
     fs2->default_value[0] = default_value0;
     fs2->min[0]       = min0;
@@ -329,41 +329,41 @@ moto_param_spec_float_2_new(gfloat default_value0, gfloat min0, gfloat max0, gfl
     return self;
 }
 
-// MotoParamSpecBoolean_3
+// MotoParamSpecBool3
 
 static void
-moto_param_spec_boolean_3_init(MotoParamSpecBoolean_3 *self)
+moto_param_spec_bool3_init(MotoParamSpecBool3 *self)
 {
     self->default_value[0] = FALSE;
     self->default_value[1] = FALSE;
     self->default_value[2] = FALSE;
 }
 
-MotoParamSpec *moto_param_spec_boolean_3_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_bool3_copy(MotoParamSpec *self)
 {
-    MotoParamSpecBoolean_3 *bs3 = MOTO_PARAM_SPEC_BOOLEAN_3(self);
+    MotoParamSpecBool3 *bs3 = MOTO_PARAM_SPEC_BOOL3(self);
 
-    return moto_param_spec_boolean_3_new(bs3->default_value[0], bs3->default_value[1], bs3->default_value[2]);
+    return moto_param_spec_bool3_new(bs3->default_value[0], bs3->default_value[1], bs3->default_value[2]);
 }
 
 static void
-moto_param_spec_boolean_3_class_init(MotoParamSpecBoolean_3Class *klass)
+moto_param_spec_bool3_class_init(MotoParamSpecBool3Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_BOOLEAN_3;
-    ps_class->copy = moto_param_spec_boolean_3_copy;
+    ps_class->value_type = MOTO_TYPE_BOOL3;
+    ps_class->copy = moto_param_spec_bool3_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecBoolean_3, moto_param_spec_boolean_3, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecBool3, moto_param_spec_bool3, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecBoolean_3
+// Methods of MotoParamSpecBool3
 
 MotoParamSpec *
-moto_param_spec_boolean_3_new(gboolean default_value0, gboolean default_value1, gboolean default_value2)
+moto_param_spec_bool3_new(gboolean default_value0, gboolean default_value1, gboolean default_value2)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOLEAN_3, NULL);
-    MotoParamSpecBoolean_3 *bs3 = (MotoParamSpecBoolean_3 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOL3, NULL);
+    MotoParamSpecBool3 *bs3 = (MotoParamSpecBool3 *)self;
 
     bs3->default_value[0] = default_value0;
     bs3->default_value[1] = default_value1;
@@ -372,10 +372,10 @@ moto_param_spec_boolean_3_new(gboolean default_value0, gboolean default_value1, 
     return self;
 }
 
-// MotoParamSpecInt_3
+// MotoParamSpecInt3
 
 static void
-moto_param_spec_int_3_init(MotoParamSpecInt_3 *self)
+moto_param_spec_int3_init(MotoParamSpecInt3 *self)
 {
     gint i;
     for(i = 0; i < 3; i++)
@@ -388,35 +388,35 @@ moto_param_spec_int_3_init(MotoParamSpecInt_3 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_int_3_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_int3_copy(MotoParamSpec *self)
 {
-    MotoParamSpecInt_3 *is3 = MOTO_PARAM_SPEC_INT_3(self);
+    MotoParamSpecInt3 *is3 = MOTO_PARAM_SPEC_INT3(self);
 
-    return moto_param_spec_int_3_new(is3->default_value[0], is3->min[0], is3->max[0], is3->step[0], is3->page_step[0],
+    return moto_param_spec_int3_new(is3->default_value[0], is3->min[0], is3->max[0], is3->step[0], is3->page_step[0],
                                      is3->default_value[1], is3->min[1], is3->max[1], is3->step[1], is3->page_step[1],
                                      is3->default_value[2], is3->min[2], is3->max[2], is3->step[2], is3->page_step[2]);
 }
 
 static void
-moto_param_spec_int_3_class_init(MotoParamSpecInt_3Class *klass)
+moto_param_spec_int3_class_init(MotoParamSpecInt3Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_INT_3;
-    ps_class->copy = moto_param_spec_int_3_copy;
+    ps_class->value_type = MOTO_TYPE_INT3;
+    ps_class->copy = moto_param_spec_int3_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecInt_3, moto_param_spec_int_3, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecInt3, moto_param_spec_int3, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecInt_3
+// Methods of MotoParamSpecInt3
 
 MotoParamSpec *
-moto_param_spec_int_3_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
+moto_param_spec_int3_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min1, gint max1, gint step1, gint page_step1,
                           gint default_value2, gint min2, gint max2, gint step2, gint page_step2)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT_3, NULL);
-    MotoParamSpecInt_3 *is3 = (MotoParamSpecInt_3 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT3, NULL);
+    MotoParamSpecInt3 *is3 = (MotoParamSpecInt3 *)self;
 
     is3->default_value[0] = default_value0;
     is3->min[0]       = min0;
@@ -439,10 +439,10 @@ moto_param_spec_int_3_new(gint default_value0, gint min0, gint max0, gint step0,
     return self;
 }
 
-// MotoParamSpecFloat_3
+// MotoParamSpecFloat3
 
 static void
-moto_param_spec_float_3_init(MotoParamSpecFloat_3 *self)
+moto_param_spec_float3_init(MotoParamSpecFloat3 *self)
 {
     gint i;
     for(i = 0; i < 3; i++)
@@ -455,35 +455,35 @@ moto_param_spec_float_3_init(MotoParamSpecFloat_3 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_float_3_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_float3_copy(MotoParamSpec *self)
 {
-    MotoParamSpecFloat_3 *fs3 = MOTO_PARAM_SPEC_FLOAT_3(self);
+    MotoParamSpecFloat3 *fs3 = MOTO_PARAM_SPEC_FLOAT3(self);
 
-    return moto_param_spec_float_3_new(fs3->default_value[0], fs3->min[0], fs3->max[0], fs3->step[0], fs3->page_step[0],
+    return moto_param_spec_float3_new(fs3->default_value[0], fs3->min[0], fs3->max[0], fs3->step[0], fs3->page_step[0],
                                        fs3->default_value[1], fs3->min[1], fs3->max[1], fs3->step[1], fs3->page_step[1],
                                        fs3->default_value[2], fs3->min[2], fs3->max[2], fs3->step[2], fs3->page_step[2]);
 }
 
 static void
-moto_param_spec_float_3_class_init(MotoParamSpecFloat_3Class *klass)
+moto_param_spec_float3_class_init(MotoParamSpecFloat3Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_FLOAT_3;
-    ps_class->copy = moto_param_spec_float_3_copy;
+    ps_class->value_type = MOTO_TYPE_FLOAT3;
+    ps_class->copy = moto_param_spec_float3_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecFloat_3, moto_param_spec_float_3, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecFloat3, moto_param_spec_float3, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecFloat_3
+// Methods of MotoParamSpecFloat3
 
 MotoParamSpec *
-moto_param_spec_float_3_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float3_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1,
                             gfloat default_value2, gfloat min2, gfloat max2, gfloat step2, gfloat page_step2)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT_3, NULL);
-    MotoParamSpecFloat_3 *fs3 = (MotoParamSpecFloat_3 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT3, NULL);
+    MotoParamSpecFloat3 *fs3 = (MotoParamSpecFloat3 *)self;
 
     fs3->default_value[0] = default_value0;
     fs3->min[0]       = min0;
@@ -506,10 +506,10 @@ moto_param_spec_float_3_new(gfloat default_value0, gfloat min0, gfloat max0, gfl
     return self;
 }
 
-// MotoParamSpecBoolean_4
+// MotoParamSpecBool4
 
 static void
-moto_param_spec_boolean_4_init(MotoParamSpecBoolean_4 *self)
+moto_param_spec_bool4_init(MotoParamSpecBool4 *self)
 {
     self->default_value[0] = FALSE;
     self->default_value[1] = FALSE;
@@ -517,32 +517,32 @@ moto_param_spec_boolean_4_init(MotoParamSpecBoolean_4 *self)
     self->default_value[3] = FALSE;
 }
 
-MotoParamSpec *moto_param_spec_boolean_4_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_bool4_copy(MotoParamSpec *self)
 {
-    MotoParamSpecBoolean_4 *bs4 = MOTO_PARAM_SPEC_BOOLEAN_4(self);
+    MotoParamSpecBool4 *bs4 = MOTO_PARAM_SPEC_BOOL4(self);
 
-    return moto_param_spec_boolean_4_new(bs4->default_value[0], bs4->default_value[1],
+    return moto_param_spec_bool4_new(bs4->default_value[0], bs4->default_value[1],
                                          bs4->default_value[2], bs4->default_value[3]);
 }
 
 static void
-moto_param_spec_boolean_4_class_init(MotoParamSpecBoolean_4Class *klass)
+moto_param_spec_bool4_class_init(MotoParamSpecBool4Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_BOOLEAN_4;
-    ps_class->copy = moto_param_spec_boolean_4_copy;
+    ps_class->value_type = MOTO_TYPE_BOOL4;
+    ps_class->copy = moto_param_spec_bool4_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecBoolean_4, moto_param_spec_boolean_4, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecBool4, moto_param_spec_bool4, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecBoolean_4
+// Methods of MotoParamSpecBool4
 
 MotoParamSpec *
-moto_param_spec_boolean_4_new(gboolean default_value0, gboolean default_value1, gboolean default_value2, gboolean default_value3)
+moto_param_spec_bool4_new(gboolean default_value0, gboolean default_value1, gboolean default_value2, gboolean default_value3)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOLEAN_4, NULL);
-    MotoParamSpecBoolean_4 *bs4 = (MotoParamSpecBoolean_4 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_BOOL4, NULL);
+    MotoParamSpecBool4 *bs4 = (MotoParamSpecBool4 *)self;
 
     bs4->default_value[0] = default_value0;
     bs4->default_value[1] = default_value1;
@@ -552,10 +552,10 @@ moto_param_spec_boolean_4_new(gboolean default_value0, gboolean default_value1, 
     return self;
 }
 
-// MotoParamSpecInt_4
+// MotoParamSpecInt4
 
 static void
-moto_param_spec_int_4_init(MotoParamSpecInt_4 *self)
+moto_param_spec_int4_init(MotoParamSpecInt4 *self)
 {
     gint i;
     for(i = 0; i < 4; i++)
@@ -568,37 +568,37 @@ moto_param_spec_int_4_init(MotoParamSpecInt_4 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_int_4_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_int4_copy(MotoParamSpec *self)
 {
-    MotoParamSpecInt_4 *is4 = MOTO_PARAM_SPEC_INT_4(self);
+    MotoParamSpecInt4 *is4 = MOTO_PARAM_SPEC_INT4(self);
 
-    return moto_param_spec_int_4_new(is4->default_value[0], is4->min[0], is4->max[0], is4->step[0], is4->page_step[0],
+    return moto_param_spec_int4_new(is4->default_value[0], is4->min[0], is4->max[0], is4->step[0], is4->page_step[0],
                                      is4->default_value[1], is4->min[1], is4->max[1], is4->step[1], is4->page_step[1],
                                      is4->default_value[2], is4->min[2], is4->max[2], is4->step[2], is4->page_step[2],
                                      is4->default_value[3], is4->min[3], is4->max[3], is4->step[3], is4->page_step[3]);
 }
 
 static void
-moto_param_spec_int_4_class_init(MotoParamSpecInt_4Class *klass)
+moto_param_spec_int4_class_init(MotoParamSpecInt4Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_INT_4;
-    ps_class->copy = moto_param_spec_int_4_copy;
+    ps_class->value_type = MOTO_TYPE_INT4;
+    ps_class->copy = moto_param_spec_int4_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecInt_4, moto_param_spec_int_4, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecInt4, moto_param_spec_int4, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecInt_4
+// Methods of MotoParamSpecInt4
 
 MotoParamSpec *
-moto_param_spec_int_4_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
+moto_param_spec_int4_new(gint default_value0, gint min0, gint max0, gint step0, gint page_step0,
                           gint default_value1, gint min1, gint max1, gint step1, gint page_step1,
                           gint default_value2, gint min2, gint max2, gint step2, gint page_step2,
                           gint default_value3, gint min3, gint max3, gint step3, gint page_step3)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT_4, NULL);
-    MotoParamSpecInt_4 *is4 = (MotoParamSpecInt_4 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_INT4, NULL);
+    MotoParamSpecInt4 *is4 = (MotoParamSpecInt4 *)self;
 
     is4->default_value[0] = default_value0;
     is4->min[0]       = min0;
@@ -627,10 +627,10 @@ moto_param_spec_int_4_new(gint default_value0, gint min0, gint max0, gint step0,
     return self;
 }
 
-// MotoParamSpecFloat_4
+// MotoParamSpecFloat4
 
 static void
-moto_param_spec_float_4_init(MotoParamSpecFloat_4 *self)
+moto_param_spec_float4_init(MotoParamSpecFloat4 *self)
 {
     gint i;
     for(i = 0; i < 4; i++)
@@ -643,37 +643,37 @@ moto_param_spec_float_4_init(MotoParamSpecFloat_4 *self)
     }
 }
 
-MotoParamSpec *moto_param_spec_float_4_copy(MotoParamSpec *self)
+MotoParamSpec *moto_param_spec_float4_copy(MotoParamSpec *self)
 {
-    MotoParamSpecFloat_4 *fs4 = MOTO_PARAM_SPEC_FLOAT_4(self);
+    MotoParamSpecFloat4 *fs4 = MOTO_PARAM_SPEC_FLOAT4(self);
 
-    return moto_param_spec_float_4_new(fs4->default_value[0], fs4->min[0], fs4->max[0], fs4->step[0], fs4->page_step[0],
+    return moto_param_spec_float4_new(fs4->default_value[0], fs4->min[0], fs4->max[0], fs4->step[0], fs4->page_step[0],
                                        fs4->default_value[1], fs4->min[1], fs4->max[1], fs4->step[1], fs4->page_step[1],
                                        fs4->default_value[2], fs4->min[2], fs4->max[2], fs4->step[2], fs4->page_step[2],
                                        fs4->default_value[3], fs4->min[3], fs4->max[3], fs4->step[3], fs4->page_step[3]);
 }
 
 static void
-moto_param_spec_float_4_class_init(MotoParamSpecFloat_4Class *klass)
+moto_param_spec_float4_class_init(MotoParamSpecFloat4Class *klass)
 {
     MotoParamSpecClass *ps_class = MOTO_PARAM_SPEC_CLASS(klass);
 
-    ps_class->value_type = MOTO_TYPE_FLOAT_4;
-    ps_class->copy = moto_param_spec_float_4_copy;
+    ps_class->value_type = MOTO_TYPE_FLOAT4;
+    ps_class->copy = moto_param_spec_float4_copy;
 }
 
-G_DEFINE_TYPE(MotoParamSpecFloat_4, moto_param_spec_float_4, MOTO_TYPE_PARAM_SPEC);
+G_DEFINE_TYPE(MotoParamSpecFloat4, moto_param_spec_float4, MOTO_TYPE_PARAM_SPEC);
 
-// Methods of MotoParamSpecFloat_4
+// Methods of MotoParamSpecFloat4
 
 MotoParamSpec *
-moto_param_spec_float_4_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
+moto_param_spec_float4_new(gfloat default_value0, gfloat min0, gfloat max0, gfloat step0, gfloat page_step0,
                             gfloat default_value1, gfloat min1, gfloat max1, gfloat step1, gfloat page_step1,
                             gfloat default_value2, gfloat min2, gfloat max2, gfloat step2, gfloat page_step2,
                             gfloat default_value3, gfloat min3, gfloat max3, gfloat step3, gfloat page_step3)
 {
-    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT_4, NULL);
-    MotoParamSpecFloat_4 *fs4 = (MotoParamSpecFloat_4 *)self;
+    MotoParamSpec *self  = (MotoParamSpec *)g_object_new(MOTO_TYPE_PARAM_SPEC_FLOAT4, NULL);
+    MotoParamSpecFloat4 *fs4 = (MotoParamSpecFloat4 *)self;
 
     fs4->default_value[0] = default_value0;
     fs4->min[0]       = min0;

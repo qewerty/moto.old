@@ -31,20 +31,20 @@ G_BEGIN_DECLS
 
 typedef gboolean (*MotoGValueFromPyObjectFunc)(GValue *v, PyObject *obj);
 
-gboolean moto_boolean_from_PyObject(gboolean *v, PyObject *obj);
-gboolean moto_boolean_2_from_PyObject(gboolean *v, PyObject *obj);
-gboolean moto_boolean_3_from_PyObject(gboolean *v, PyObject *obj);
-gboolean moto_boolean_4_from_PyObject(gboolean *v, PyObject *obj);
+gboolean moto_boolfrom_PyObject(gboolean *v, PyObject *obj);
+gboolean moto_bool2_from_PyObject(gboolean *v, PyObject *obj);
+gboolean moto_bool3_from_PyObject(gboolean *v, PyObject *obj);
+gboolean moto_bool4_from_PyObject(gboolean *v, PyObject *obj);
 
-gboolean moto_int_from_PyObject(gint *v, PyObject *obj);
-gboolean moto_int_2_from_PyObject(gint *v, PyObject *obj);
-gboolean moto_int_3_from_PyObject(gint *v, PyObject *obj);
-gboolean moto_int_4_from_PyObject(gint *v, PyObject *obj);
+gboolean moto_intfrom_PyObject(gint *v, PyObject *obj);
+gboolean moto_int2_from_PyObject(gint *v, PyObject *obj);
+gboolean moto_int3_from_PyObject(gint *v, PyObject *obj);
+gboolean moto_int4_from_PyObject(gint *v, PyObject *obj);
 
-gboolean moto_float_from_PyObject(gfloat *v, PyObject *obj);
-gboolean moto_float_2_from_PyObject(gfloat *v, PyObject *obj);
-gboolean moto_float_3_from_PyObject(gfloat *v, PyObject *obj);
-gboolean moto_float_4_from_PyObject(gfloat *v, PyObject *obj);
+gboolean moto_floatfrom_PyObject(gfloat *v, PyObject *obj);
+gboolean moto_float2_from_PyObject(gfloat *v, PyObject *obj);
+gboolean moto_float3_from_PyObject(gfloat *v, PyObject *obj);
+gboolean moto_float4_from_PyObject(gfloat *v, PyObject *obj);
 
 gboolean moto_string_from_PyObject(gchar **v, PyObject *obj);
 

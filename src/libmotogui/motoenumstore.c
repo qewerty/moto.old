@@ -20,7 +20,7 @@ static void   moto_enum_store_add_value   (GtkListStore *store,
                                            GEnumValue   *value);
 
 
-G_DEFINE_TYPE(MotoEnumStore, moto_enum_store, MOTO_TYPE_INT_STORE)
+G_DEFINE_TYPE(MotoEnumStore, moto_enum_store, MOTO_TYPE_INTSTORE)
 
 #define parent_class moto_enum_store_parent_class
 
@@ -113,8 +113,8 @@ moto_enum_store_add_value(GtkListStore *store,
 
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, &iter,
-                       MOTO_INT_STORE_VALUE, value->value,
-                       MOTO_INT_STORE_LABEL, value->value_nick,
+                       MOTO_INTSTORE_VALUE, value->value,
+                       MOTO_INTSTORE_LABEL, value->value_nick,
                        -1);
 }
 
@@ -298,7 +298,7 @@ moto_enum_store_set_stock_prefix(MotoEnumStore *store,
             gint        value;
 
             gtk_tree_model_get(model, &iter,
-                               MOTO_INT_STORE_VALUE, &value,
+                               MOTO_INTSTORE_VALUE, &value,
                                -1);
 
             enum_value = g_enum_get_value(store->enum_class, value);
@@ -309,7 +309,7 @@ moto_enum_store_set_stock_prefix(MotoEnumStore *store,
         }
 
         gtk_list_store_set(GTK_LIST_STORE (store), &iter,
-                           MOTO_INT_STORE_STOCK_ID, stock_id,
+                           MOTO_INTSTORE_STOCK_ID, stock_id,
                            -1);
 
         if(stock_id)

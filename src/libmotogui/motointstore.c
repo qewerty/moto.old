@@ -12,56 +12,56 @@ typedef struct
   GType  user_data_type;
 } MotoIntStorePrivate;
 
-static GObject * moto_int_store_constructor(GType                  type,
+static GObject * moto_intstore_constructor(GType                  type,
                                             guint                  n_params,
                                             GObjectConstructParam *params);
 
-static void  moto_int_store_tree_model_init(GtkTreeModelIface *iface);
+static void  moto_intstore_tree_model_init(GtkTreeModelIface *iface);
 
-static void  moto_int_store_finalize       (GObject           *object);
-static void  moto_int_store_set_property   (GObject           *object,
+static void  moto_intstore_finalize       (GObject           *object);
+static void  moto_intstore_set_property   (GObject           *object,
                                             guint              property_id,
                                             const GValue      *value,
                                             GParamSpec        *pspec);
-static void  moto_int_store_get_property   (GObject           *object,
+static void  moto_intstore_get_property   (GObject           *object,
                                             guint              property_id,
                                             GValue            *value,
                                             GParamSpec        *pspec);
 
-static void  moto_int_store_row_inserted   (GtkTreeModel      *model,
+static void  moto_intstore_row_inserted   (GtkTreeModel      *model,
                                             GtkTreePath       *path,
                                             GtkTreeIter       *iter);
-static void  moto_int_store_add_empty      (MotoIntStore      *store);
+static void  moto_intstore_add_empty      (MotoIntStore      *store);
 
 
-G_DEFINE_TYPE_WITH_CODE(MotoIntStore, moto_int_store, GTK_TYPE_LIST_STORE,
+G_DEFINE_TYPE_WITH_CODE(MotoIntStore, moto_intstore, GTK_TYPE_LIST_STORE,
                         G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_MODEL,
-                                              moto_int_store_tree_model_init))
+                                              moto_intstore_tree_model_init))
 
-#define MOTO_INT_STORE_GET_PRIVATE(obj) \
-    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_INT_STORE, MotoIntStorePrivate)
+#define MOTO_INTSTORE_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_INTSTORE, MotoIntStorePrivate)
 
-#define parent_class moto_int_store_parent_class
+#define parent_class moto_intstore_parent_class
 
 static GtkTreeModelIface *parent_iface = NULL;
 
 static void
-moto_int_store_class_init(MotoIntStoreClass *klass)
+moto_intstore_class_init(MotoIntStoreClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->constructor  = moto_int_store_constructor;
-  object_class->finalize     = moto_int_store_finalize;
-  object_class->set_property = moto_int_store_set_property;
-  object_class->get_property = moto_int_store_get_property;
+  object_class->constructor  = moto_intstore_constructor;
+  object_class->finalize     = moto_intstore_finalize;
+  object_class->set_property = moto_intstore_set_property;
+  object_class->get_property = moto_intstore_get_property;
 
   /**
    * MotoIntStore:user-data-type:
    *
-   * Allows to set the #GType for the MOTO_INT_STORE_USER_DATA column.
+   * Allows to set the #GType for the MOTO_INTSTORE_USER_DATA column.
    *
    * You need to set this property when constructing the store if you want
-   * to use the MOTO_INT_STORE_USER_DATA column and want to have the store
+   * to use the MOTO_INTSTORE_USER_DATA column and want to have the store
    * handle ref-counting of your user data.
    *
    * Since: MOTO 2.4
@@ -78,53 +78,53 @@ moto_int_store_class_init(MotoIntStoreClass *klass)
 }
 
 static void
-moto_int_store_init(MotoIntStore *store)
+moto_intstore_init(MotoIntStore *store)
 {
     store->empty_iter = NULL;
 }
 
 static GObject *
-moto_int_store_constructor(GType                  type,
+moto_intstore_constructor(GType                  type,
                            guint                  n_params,
                            GObjectConstructParam *params)
 {
     GObject             *object;
     MotoIntStore        *store;
     MotoIntStorePrivate *priv;
-    GType                types[MOTO_INT_STORE_NUM_COLUMNS];
+    GType                types[MOTO_INTSTORE_NUM_COLUMNS];
 
     object = G_OBJECT_CLASS(parent_class)->constructor(type, n_params, params);
 
-    store = MOTO_INT_STORE(object);
-    priv  = MOTO_INT_STORE_GET_PRIVATE(store);
+    store = MOTO_INTSTORE(object);
+    priv  = MOTO_INTSTORE_GET_PRIVATE(store);
 
-    types[MOTO_INT_STORE_VALUE]     = G_TYPE_INT;
-    types[MOTO_INT_STORE_LABEL]     = G_TYPE_STRING;
-    types[MOTO_INT_STORE_STOCK_ID]  = G_TYPE_STRING;
-    types[MOTO_INT_STORE_PIXBUF]    = GDK_TYPE_PIXBUF;
-    types[MOTO_INT_STORE_USER_DATA] = (priv->user_data_type != G_TYPE_NONE ?
+    types[MOTO_INTSTORE_VALUE]     = G_TYPE_INT;
+    types[MOTO_INTSTORE_LABEL]     = G_TYPE_STRING;
+    types[MOTO_INTSTORE_STOCK_ID]  = G_TYPE_STRING;
+    types[MOTO_INTSTORE_PIXBUF]    = GDK_TYPE_PIXBUF;
+    types[MOTO_INTSTORE_USER_DATA] = (priv->user_data_type != G_TYPE_NONE ?
                                        priv->user_data_type : G_TYPE_POINTER);
 
     gtk_list_store_set_column_types(GTK_LIST_STORE(store),
-                                    MOTO_INT_STORE_NUM_COLUMNS, types);
+                                    MOTO_INTSTORE_NUM_COLUMNS, types);
 
-    moto_int_store_add_empty(store);
+    moto_intstore_add_empty(store);
 
     return object;
 }
 
 static void
-moto_int_store_tree_model_init(GtkTreeModelIface *iface)
+moto_intstore_tree_model_init(GtkTreeModelIface *iface)
 {
   parent_iface = g_type_interface_peek_parent(iface);
 
-  iface->row_inserted = moto_int_store_row_inserted;
+  iface->row_inserted = moto_intstore_row_inserted;
 }
 
 static void
-moto_int_store_finalize(GObject *object)
+moto_intstore_finalize(GObject *object)
 {
-    MotoIntStore *store = MOTO_INT_STORE (object);
+    MotoIntStore *store = MOTO_INTSTORE (object);
 
     if (store->empty_iter)
     {
@@ -136,12 +136,12 @@ moto_int_store_finalize(GObject *object)
 }
 
 static void
-moto_int_store_set_property(GObject      *object,
+moto_intstore_set_property(GObject      *object,
                             guint         property_id,
                             const GValue *value,
                             GParamSpec   *pspec)
 {
-    MotoIntStorePrivate *priv = MOTO_INT_STORE_GET_PRIVATE(object);
+    MotoIntStorePrivate *priv = MOTO_INTSTORE_GET_PRIVATE(object);
 
     switch(property_id)
     {
@@ -155,12 +155,12 @@ moto_int_store_set_property(GObject      *object,
 }
 
 static void
-moto_int_store_get_property(GObject    *object,
+moto_intstore_get_property(GObject    *object,
                             guint       property_id,
                             GValue     *value,
                             GParamSpec *pspec)
 {
-    MotoIntStorePrivate *priv = MOTO_INT_STORE_GET_PRIVATE(object);
+    MotoIntStorePrivate *priv = MOTO_INTSTORE_GET_PRIVATE(object);
 
     switch(property_id)
     {
@@ -174,11 +174,11 @@ moto_int_store_get_property(GObject    *object,
 }
 
 static void
-moto_int_store_row_inserted(GtkTreeModel *model,
+moto_intstore_row_inserted(GtkTreeModel *model,
                             GtkTreePath  *path,
                             GtkTreeIter  *iter)
 {
-    MotoIntStore *store = MOTO_INT_STORE(model);
+    MotoIntStore *store = MOTO_INTSTORE(model);
 
     if(parent_iface->row_inserted)
         parent_iface->row_inserted(model, path, iter);
@@ -193,7 +193,7 @@ moto_int_store_row_inserted(GtkTreeModel *model,
 }
 
 static void
-moto_int_store_add_empty(MotoIntStore *store)
+moto_intstore_add_empty(MotoIntStore *store)
 {
   GtkTreeIter iter = {0,};
 
@@ -201,15 +201,15 @@ moto_int_store_add_empty(MotoIntStore *store)
 
   gtk_list_store_prepend(GTK_LIST_STORE(store), &iter);
   gtk_list_store_set(GTK_LIST_STORE(store), &iter,
-                     MOTO_INT_STORE_VALUE, -1,
-                     MOTO_INT_STORE_LABEL, ("(Empty)"),
+                     MOTO_INTSTORE_VALUE, -1,
+                     MOTO_INTSTORE_LABEL, ("(Empty)"),
                      -1);
 
   store->empty_iter = gtk_tree_iter_copy(&iter);
 }
 
 /**
- * moto_int_store_new:
+ * moto_intstore_new:
  *
  * Creates a #GtkListStore with a number of useful columns.
  * #MotoIntStore is especially useful if the items you want to store
@@ -220,13 +220,13 @@ moto_int_store_add_empty(MotoIntStore *store)
  * Since: MOTO 2.2
  **/
 GtkListStore *
-moto_int_store_new(void)
+moto_intstore_new(void)
 {
-  return g_object_new(MOTO_TYPE_INT_STORE, NULL);
+  return g_object_new(MOTO_TYPE_INTSTORE, NULL);
 }
 
 /**
- * moto_int_store_lookup_by_value:
+ * moto_intstore_lookup_by_value:
  * @model: a #MotoIntStore
  * @value: an integer value to lookup in the @model
  * @iter:  return location for the iter of the given @value
@@ -239,7 +239,7 @@ moto_int_store_new(void)
  * Since: MOTO 2.2
  **/
 gboolean
-moto_int_store_lookup_by_value(GtkTreeModel *model,
+moto_intstore_lookup_by_value(GtkTreeModel *model,
                                gint          value,
                                GtkTreeIter  *iter)
 {
@@ -255,7 +255,7 @@ moto_int_store_lookup_by_value(GtkTreeModel *model,
         gint this;
 
         gtk_tree_model_get(model, iter,
-                           MOTO_INT_STORE_VALUE, & this,
+                           MOTO_INTSTORE_VALUE, & this,
                            -1);
         if(this == value)
             break;

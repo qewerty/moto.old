@@ -19,8 +19,8 @@
 *
 */
 
-#ifndef __MOTO_PRINT_ARRAY_H__
-#define __MOTO_PRINT_ARRAY_H__
+#ifndef __MOTO_PRINTARRAY_H__
+#define __MOTO_PRINTARRAY_H__
 
 #include <stdio.h>
 
@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-void print_matrix44(float m[16])
+void printmatrix44(float m[16])
 {
     int i, j;
     for(i = 0; i < 4; i++)
@@ -41,7 +41,7 @@ void print_matrix44(float m[16])
     }
 }
 
-void print_vector3(float v[3])
+void printvector3(float v[3])
 {
     printf("(%f %f %f)\n", v[0], v[1], v[2]);
 }
@@ -50,4 +50,4 @@ void print_vector3(float v[3])
 }
 #endif
 
-#endif /* __MOTO_PRINT_ARRAY_H__ */
+#endif /* __MOTO_PRINTARRAY_H__ */

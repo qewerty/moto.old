@@ -7,7 +7,7 @@
 G_BEGIN_DECLS
 
 /* VOID:OBJECT,INT,INT,INT,INT (marshal.txt:1) */
-extern void moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT (GClosure     *closure,
+extern void moto_cclosure_marshal_VOID__OBJECT_INTINTINTINT (GClosure     *closure,
                                                                 GValue       *return_value,
                                                                 guint         n_param_values,
                                                                 const GValue *param_values,
@@ -15,7 +15,7 @@ extern void moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT (GClosure     *cl
                                                                 gpointer      marshal_data);
 
 /* BOOLEAN:OBJECT,INT,INT,INT,INT (marshal.txt:2) */
-extern void moto_cclosure_marshal_BOOLEAN__OBJECT_INT_INT_INT_INT (GClosure     *closure,
+extern void moto_cclosure_marshal_BOOL_OBJECT_INTINTINTINT (GClosure     *closure,
                                                                    GValue       *return_value,
                                                                    guint         n_param_values,
                                                                    const GValue *param_values,

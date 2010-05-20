@@ -61,13 +61,13 @@ moto_cube_node_init(MotoCubeNode *self)
     gfloat size[3] = {1, 1, 1};
     gint   divs[3] = {3, 3, 3};
 
-    MotoParamSpec *divs_spec = moto_param_spec_int_3_new(3, 1, 1000000, 1, 10,
+    MotoParamSpec *divs_spec = moto_param_spec_int3_new(3, 1, 1000000, 1, 10,
                                                          3, 1, 1000000, 1, 10,
                                                          3, 1, 1000000, 1, 10);
 
     moto_node_add_params(node,
-            "size", "Size",               MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, size,       NULL,      "Form",
-            "divs", "Divisions",          MOTO_TYPE_INT_3,   MOTO_PARAM_MODE_INOUT, divs,       divs_spec, "Form",
+            "size", "Size",               MOTO_TYPE_FLOAT3, MOTO_PARAM_MODE_INOUT, size,       NULL,      "Form",
+            "divs", "Divisions",          MOTO_TYPE_INT3,   MOTO_PARAM_MODE_INOUT, divs,       divs_spec, "Form",
           // TODO: Implement.
           // "side_px", "Side +X",         G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Sides",
           // "side_mx", "Side -X",         G_TYPE_BOOLEAN,    MOTO_PARAM_MODE_INOUT, TRUE,       NULL,      "Sides",

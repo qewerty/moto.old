@@ -29,7 +29,7 @@ moto_displace_node_init(MotoDisplaceNode *self)
     MotoNode *node = (MotoNode *)self;
 
     /* params */
-    MotoParamSpec *scale_spec = moto_param_spec_float_new(0.1, -1000000, 1000000, 0.01, 0.1);
+    MotoParamSpec *scale_spec = moto_param_spec_floatnew(0.1, -1000000, 1000000, 0.01, 0.1);
     moto_node_add_params(node,
             "scale",  "Scaling Value", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.1f, scale_spec, "Shape",
             NULL);
@@ -65,7 +65,7 @@ static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboo
 
     MotoNode *node = (MotoNode*)self;
 
-    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINT_CLOUD))
+    if( ! g_type_is_a(G_TYPE_FROM_INSTANCE(in), MOTO_TYPE_POINTCLOUD))
         return in;
 
     MotoPointCloud *in_pc = (MotoPointCloud*)in;
@@ -73,7 +73,7 @@ static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboo
     if(!geom || !moto_shape_is_struct_the_same(geom, in))
     {
         *the_same = FALSE;
-        geom = MOTO_POINT_CLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
+        geom = MOTO_POINTCLOUD(moto_copyable_copy(MOTO_COPYABLE(in_pc)));
         g_object_set_data((GObject*)self, "_prev_geom", geom);
     }
     MotoShape *out = (MotoShape*)geom;
@@ -81,7 +81,7 @@ static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboo
     gfloat scale;
     moto_node_get_param_float(node, "scale", &scale);
 
-    if(moto_point_cloud_can_provide_plain_data(in_pc))
+    if(moto_pointcloud_can_provide_plain_data(in_pc))
     {
         gfloat *points_i  = NULL;
         gfloat *normals_i = NULL;
@@ -90,8 +90,8 @@ static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboo
         gfloat *normals_o = NULL;
         gsize size_o      = 0;
 
-        moto_point_cloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
-        moto_point_cloud_get_plain_data(geom,  & points_o, & normals_o, & size_o);
+        moto_pointcloud_get_plain_data(in_pc, & points_i, & normals_i, & size_i);
+        moto_pointcloud_get_plain_data(geom,  & points_o, & normals_o, & size_o);
 
         gint i;
         gfloat *pi, *ni, *po;
@@ -116,8 +116,8 @@ static MotoShape *moto_displace_node_perform(MotoNode *self, MotoShape *in, gboo
 
         asm("movaps (%0), %%xmm0\n\t" : : "r" (scale_sse) : "xmm0");
 
-        _mm_prefetch(points_i, _MM_HINT_T0);
-        _mm_prefetch(normals_i, _MM_HINT_T0);
+        _mm_prefetch(points_i, _MM_HINTT0);
+        _mm_prefetch(normals_i, _MM_HINTT0);
         for(i = 0; i < size_sse; ++i)
         {
             asm("movaps   (%0), %%xmm1\n\t"

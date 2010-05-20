@@ -28,15 +28,15 @@ moto_extrude_node_init(MotoExtrudeNode *self)
     gfloat ls[] = {1, 1, 1};
 
     /* params */
-    MotoParamSpec *sections_spec = moto_param_spec_int_new(1, 1, 100000, 1, 2);
+    MotoParamSpec *sections_spec = moto_param_spec_intnew(1, 1, 100000, 1, 2);
     moto_node_add_params(node,
             "mode",     "Mode",        MOTO_TYPE_EXTRUDE_MODE, MOTO_PARAM_MODE_INOUT, MOTO_EXTRUDE_MODE_FACES, NULL, "Arguments",
             "sections", "Sections",    MOTO_TYPE_INT,          MOTO_PARAM_MODE_INOUT, 1, sections_spec, "Arguments",
-            "lt",   "Local Translate", MOTO_TYPE_FLOAT_3,      MOTO_PARAM_MODE_INOUT, lt, NULL,       "Arguments",
-            "lr",   "Local Rotate",    MOTO_TYPE_FLOAT_3,      MOTO_PARAM_MODE_INOUT, lr, NULL,       "Arguments",
-            "ls",   "Local Scale",     MOTO_TYPE_FLOAT_3,      MOTO_PARAM_MODE_INOUT, ls, NULL,       "Arguments",
+            "lt",   "Local Translate", MOTO_TYPE_FLOAT3,      MOTO_PARAM_MODE_INOUT, lt, NULL,       "Arguments",
+            "lr",   "Local Rotate",    MOTO_TYPE_FLOAT3,      MOTO_PARAM_MODE_INOUT, lr, NULL,       "Arguments",
+            "ls",   "Local Scale",     MOTO_TYPE_FLOAT3,      MOTO_PARAM_MODE_INOUT, ls, NULL,       "Arguments",
             "path",     "Path",        MOTO_TYPE_OBJECT_NODE,  MOTO_PARAM_MODE_INOUT, NULL, NULL,       "Path",
-            "global",   "Global",      MOTO_TYPE_BOOLEAN,      MOTO_PARAM_MODE_INOUT, TRUE, NULL,       "Path",
+            "global",   "Global",      MOTO_TYPE_BOOL,      MOTO_PARAM_MODE_INOUT, TRUE, NULL,       "Path",
             NULL);
     g_object_unref(sections_spec);
 }

@@ -34,12 +34,12 @@ moto_material_node_init(MotoMaterialNode *self)
     gfloat shin = 0;
 
     moto_node_add_params(node,
-        "ambi", "Ambient", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, ambi, NULL, "Color",
-        "diff", "Diffuse", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, diff, NULL, "Color",
-        "spec", "Specular", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, spec, NULL, "Color",
-        "emis", "Emission", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, emis, NULL, "Color",
+        "ambi", "Ambient", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, ambi, NULL, "Color",
+        "diff", "Diffuse", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, diff, NULL, "Color",
+        "spec", "Specular", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, spec, NULL, "Color",
+        "emis", "Emission", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, emis, NULL, "Color",
         "shin", "Shininess", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, shin, NULL, "Color",
-        "blend", "Blend", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Color",
+        "blend", "Blend", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Color",
         "material", "Material", MOTO_TYPE_MATERIAL_NODE, MOTO_PARAM_MODE_INOUT, self, NULL, "Output",
         NULL);
 }

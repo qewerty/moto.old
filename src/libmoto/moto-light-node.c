@@ -76,10 +76,10 @@ moto_light_node_init(MotoLightNode *self)
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "model", "Model", MOTO_TYPE_LIGHT_MODEL, MOTO_PARAM_MODE_INOUT, MOTO_LIGHT_MODEL_POINT, NULL, "Light",
-            "diffspec", "Diffuse/Specular", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, diffspec, NULL, "Light",
+            "diffspec", "Diffuse/Specular", MOTO_TYPE_BOOL2, MOTO_PARAM_MODE_INOUT, diffspec, NULL, "Light",
             "category", "Category", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Light",
             "intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Light",
-            "color", "Color", MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, color, NULL, "Light",
+            "color", "Color", MOTO_TYPE_FLOAT3, MOTO_PARAM_MODE_INOUT, color, NULL, "Light",
             "decay", "Decay", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0, NULL, "Light",
             "spot_blur", "Spot Blur", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0, NULL, "Spot",
             "cone_angle", "Cone Angle", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 30.0, NULL, "Spot",

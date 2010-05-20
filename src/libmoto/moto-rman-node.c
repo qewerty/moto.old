@@ -65,15 +65,15 @@ moto_rman_node_init(MotoRManNode *self)
 
     moto_node_add_params(node,
             "target", "Target", MOTO_TYPE_RMAN_TARGET, MOTO_PARAM_MODE_INOUT, MOTO_RMAN_TARGET_3DELIGHT, NULL, "Arguments",
-            "samples", "Pixel Samples", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, samples, NULL, "Arguments",
-            "filter_size", "Filter Size", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, filter_size, NULL, "Arguments",
+            "samples", "Pixel Samples", MOTO_TYPE_FLOAT2, MOTO_PARAM_MODE_INOUT, samples, NULL, "Arguments",
+            "filter_size", "Filter Size", MOTO_TYPE_FLOAT2, MOTO_PARAM_MODE_INOUT, filter_size, NULL, "Arguments",
             "grid_size", "Grid Size", MOTO_TYPE_INT, MOTO_PARAM_MODE_INOUT, 32, NULL, "Limits",
-            "bucket_size", "Bucket Size", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, bucket_size, NULL, "Limits",
-            "ao", "Ambient Occlusion", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Global Illumination",
+            "bucket_size", "Bucket Size", MOTO_TYPE_INT2, MOTO_PARAM_MODE_INOUT, bucket_size, NULL, "Limits",
+            "ao", "Ambient Occlusion", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Global Illumination",
             "gi_intensity", "Intensity", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1.0, NULL, "Global Illumination",
             "gi_samples", "Samples", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 64.0, NULL, "Global Illumination",
             "gi_max_dist", "Max Distance", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 1e36, NULL, "Global Illumination",
-            "use_custom_command", "Use Custom Command", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Customization",
+            "use_custom_command", "Use Custom Command", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, FALSE, NULL, "Customization",
             "custom_command", "Custom Command", MOTO_TYPE_STRING, MOTO_PARAM_MODE_INOUT, "", NULL, "Customization",
             NULL);
 }

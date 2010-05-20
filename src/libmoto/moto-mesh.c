@@ -20,7 +20,7 @@
 static MotoBound* moto_mesh_update_bound(MotoShape* self);
 
 static void moto_mesh_copyable_init(MotoCopyableIface *iface);
-static void moto_mesh_point_cloud_init(MotoPointCloudIface *iface);
+static void moto_mesh_pointcloud_init(MotoPointCloudIface *iface);
 
 gboolean moto_mesh_prepare(MotoMesh *self);
 gboolean moto_mesh_is_struct_the_same(MotoMesh *self, MotoMesh *other);
@@ -139,8 +139,8 @@ moto_mesh_class_init(MotoMeshClass *klass)
 G_DEFINE_TYPE_WITH_CODE(MotoMesh, moto_mesh, MOTO_TYPE_SHAPE,
                         G_IMPLEMENT_INTERFACE(MOTO_TYPE_COPYABLE,
                                               moto_mesh_copyable_init);
-                        G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINT_CLOUD,
-                                              moto_mesh_point_cloud_init));
+                        G_IMPLEMENT_INTERFACE(MOTO_TYPE_POINTCLOUD,
+                                              moto_mesh_pointcloud_init));
 
 /* Methods of class Mesh */
 
@@ -3128,7 +3128,7 @@ __moto_mesh_get_plain_data(MotoPointCloud *self,
 }
 
 static void
-moto_mesh_point_cloud_init(MotoPointCloudIface *iface)
+moto_mesh_pointcloud_init(MotoPointCloudIface *iface)
 {
     iface->foreach_point = __moto_mesh_foreach_point;
 

@@ -84,6 +84,18 @@ GType moto_extrude_mode_get_type(void);
 
 #define MOTO_TYPE_EXTRUDE_MODE (moto_extrude_mode_get_type())
 
+typedef enum _MotoArrayMode
+{
+    MOTO_ARRAY_MODE_LOCAL,
+    MOTO_ARRAY_MODE_GLOBAL,
+    MOTO_ARRAY_MODE_WEIGHT,
+    MOTO_ARRAY_MODE_RELATIVE,
+} MotoArrayMode;
+
+GType moto_array_mode_get_type(void);
+
+#define MOTO_TYPE_ARRAY_MODE (moto_array_mode_get_type())
+
 G_END_DECLS
 
 #endif /* __MOTO_ENUMS__ */

@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "moto-types.h"
@@ -46,31 +48,35 @@ moto_cylinder_node_init(MotoCylinderNode *self)
     self->priv->mesh = NULL;
 
     gfloat radius[4] = {1, 1, 1, 1};
-    gint divs[2] = {10, 10};
+    gint divs[2] = {3, 10};
     gint caps[2] = {TRUE, TRUE};
     gint round_caps[2] = {FALSE, FALSE};
     gint cap_divs[2] = {0, 0};
     gfloat cap_offsets[2] = {0, 0};
 
-    MotoParamSpec *divs_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
-                                                       10, 3, 1000000, 1, 10);
+    MotoParamSpec *divs_spec = moto_param_spec_int2_new(3, 1, 1000000, 1, 10,
+                                                         10, 3, 1000000, 1, 10);
 
-    MotoParamSpec *cap_divs_spec = moto_param_spec_int_2_new(0, 0, 1000000, 1, 2,
-                                                                  0, 0, 1000000, 1, 2);
+    MotoParamSpec *cap_divs_spec = moto_param_spec_int2_new(0, 0, 1000000, 1, 2,
+                                                             0, 0, 1000000, 1, 2);
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "height", "Height", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Body",
-            "radius", "Radius", MOTO_TYPE_FLOAT_4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Body",
-            "divs", "Divisions",     MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Body",
+            "radius", "Radius", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Body",
+            "divs", "Divisions",     MOTO_TYPE_INT2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Body",
+            "div0_mode", "Division 0 Mode",     MOTO_TYPE_ARRAY_MODE, MOTO_PARAM_MODE_INOUT, MOTO_ARRAY_MODE_WEIGHT, NULL, "Body",
+            "div0_ratio", "Division 0 Ratio", MOTO_TYPE_FLOAT_ARRAY, MOTO_PARAM_MODE_INOUT, NULL, NULL, "Body",
+            "div1_mode", "Division 1 Mode",     MOTO_TYPE_ARRAY_MODE, MOTO_PARAM_MODE_INOUT, MOTO_ARRAY_MODE_WEIGHT, NULL, "Body",
+            "div1_ratio", "Division 1 Ratio", MOTO_TYPE_FLOAT_ARRAY, MOTO_PARAM_MODE_INOUT, NULL, NULL, "Body",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Z, pspec, "Body",
-            "caps", "Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Caps",
-            "cap_divs", "Cap Divisions", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, cap_divs, cap_divs_spec, "Caps",
-            "cap_offsets", "Cap Offsets", MOTO_TYPE_FLOAT_2, MOTO_PARAM_MODE_INOUT, cap_offsets, pspec, "Caps",
-            "round_caps", "Round Caps", MOTO_TYPE_BOOLEAN_2, MOTO_PARAM_MODE_INOUT, round_caps, pspec, "Caps",
+            "caps", "Caps", MOTO_TYPE_BOOL2, MOTO_PARAM_MODE_INOUT, caps, pspec, "Caps",
+            "cap_divs", "Cap Divisions", MOTO_TYPE_INT2, MOTO_PARAM_MODE_INOUT, cap_divs, cap_divs_spec, "Caps",
+            "cap_offsets", "Cap Offsets", MOTO_TYPE_FLOAT2, MOTO_PARAM_MODE_INOUT, cap_offsets, pspec, "Caps",
+            "round_caps", "Round Caps", MOTO_TYPE_BOOL2, MOTO_PARAM_MODE_INOUT, round_caps, pspec, "Caps",
             "screw", "Screw", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 0.0f, pspec, "Screw",
-            "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
-            "uv", "Generate UV", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
+            "screw_symmetry", "Screw Symmetry", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "Screw",
+            "uv", "Generate UV", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, FALSE, pspec, "Texture Mapping",
             NULL);
 }
 
@@ -133,9 +139,100 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     gint rows, cols;
     moto_node_get_param_2i(node, "divs", &rows, &cols);
+    ++rows;
+
+    MotoArrayMode div0_mode = MOTO_ARRAY_MODE_WEIGHT;
+    moto_node_get_param_enum(node, "div0_mode", &div0_mode);
+
+    g_print("div0_mode: %d\n", div0_mode);
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
+
+    GValue*  div0_ratio_value = moto_node_get_param_value(node, "div0_ratio");
+    gsize div0_ratio_size = 0;
+    const gfloat* div0_ratio = \
+        moto_value_get_float_array(div0_ratio_value, &div0_ratio_size);
+    gfloat div0_ratios[rows];
+    gfloat div0_ratio_sum = 0;
+    // Parsing div0_ratio
+    {
+        g_print("---\n");
+        size_t i;
+
+        switch(div0_mode)
+        {
+            case MOTO_ARRAY_MODE_LOCAL:
+            {
+                for(i = 0; i < rows; ++i)
+                    div0_ratios[i] = height / (rows - 1);
+            }
+            break;
+            case MOTO_ARRAY_MODE_GLOBAL:
+            {
+                for(i = 0; i < rows; ++i)
+                    div0_ratios[i] = height / (rows - 1); // TODO: Implement global mode.
+            }
+            break;
+            case MOTO_ARRAY_MODE_WEIGHT:
+            {
+                for(i = 0; i < rows; ++i)
+                    div0_ratios[i] = 1;
+            }
+        }
+
+        g_print("div0_ratio_size: %u\n", div0_ratio_size);
+        g_print("div0_ratio: %p\n", div0_ratio);
+        if(div0_ratio_size > 0)
+            g_print("div0_ratio[0]: %f\n", div0_ratio[0]);
+
+
+        memcpy(div0_ratios, div0_ratio,
+            sizeof(gfloat)*(min(div0_ratio_size, rows)));
+
+        for(i = 0; i < (rows-1); ++i)
+            div0_ratio_sum += div0_ratios[i];
+    }
+
+    MotoArrayMode div1_mode = MOTO_ARRAY_MODE_WEIGHT;
+    moto_node_get_param_enum(node, "div1_mode", &div1_mode);
+
+    GValue*  div1_ratio_value = moto_node_get_param_value(node, "div1_ratio");
+    gsize div1_ratio_size = 0;
+    const gfloat* div1_ratio = \
+        moto_value_get_float_array(div1_ratio_value, &div1_ratio_size);
+    gfloat div1_ratios[cols];
+    gfloat div1_ratio_sum = 0;
+    {
+        size_t i;
+
+        switch(div1_mode)
+        {
+            case MOTO_ARRAY_MODE_LOCAL:
+            {
+                for(i = 0; i < cols; ++i)
+                    div1_ratios[i] = PI2/cols;
+            }
+            break;
+            case MOTO_ARRAY_MODE_GLOBAL:
+            {
+                for(i = 0; i < cols; ++i)
+                    div1_ratios[i] = PI2/cols;
+            }
+            break;
+            case MOTO_ARRAY_MODE_WEIGHT:
+            {
+                for(i = 0; i < cols; ++i)
+                    div1_ratios[i] = 1;
+            }
+        }
+
+        memcpy(div1_ratios, div1_ratio,
+            sizeof(gfloat)*(min(div1_ratio_size, cols)));
+
+        for(i = 0; i < cols; ++i)
+            div1_ratio_sum += div1_ratios[i];
+    }
 
     MotoAxis orientation;
     moto_node_get_param_enum((MotoNode *)self, "orientation", &orientation);
@@ -251,21 +348,41 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
     }
     else if(MOTO_AXIS_Z == orientation)
     {
+        gfloat len = 0;
         for(i = 0; i < rows; i++)
         {
+            gfloat ratio0 = div0_ratios[i]/div0_ratio_sum;
+            g_print("ratio0: %f\n", ratio0);
+
+            gfloat a = 0;
             for(j = 0; j < cols; j++)
             {
+                gfloat ratio1 = div1_ratios[j]/div1_ratio_sum;
+
                 gfloat sa = (screw_s) ? screw*RAD_PER_DEG*((gfloat)i-rows/2)/(rows-1) : screw*RAD_PER_DEG*((gfloat)i)/(rows-1);
-                gfloat a = (PI2*j)/cols + sa;
+                // gfloat a = (PI2*j)/cols + sa;
+                a += PI2*ratio1 + sa;
                 gfloat s = sin(a);
                 gfloat c = cos(a);
 
-                gfloat len = (height*i)/(rows-1);
                 mesh->v_coords[vi].y = c*(radius_x_f*(len/height) + radius_x_s*(1-len/height));
                 mesh->v_coords[vi].x = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
                 mesh->v_coords[vi].z = len - height/2;
 
                 ++vi;
+            }
+
+            switch(div0_mode)
+            {
+                case MOTO_ARRAY_MODE_LOCAL:
+                    len += div0_ratios[i];
+                break;
+                case MOTO_ARRAY_MODE_GLOBAL:
+                    len += height*ratio0;
+                break;
+                case MOTO_ARRAY_MODE_WEIGHT:
+                    len += height*ratio0;
+                break;
             }
         }
     }

@@ -49,21 +49,21 @@
 
 /* VOID:OBJECT,INT,INT,INT,INT (marshal.txt:1) */
 void
-moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT (GClosure     *closure,
+moto_cclosure_marshal_VOID__OBJECT_INTINTINTINT (GClosure     *closure,
                                                     GValue       *return_value G_GNUC_UNUSED,
                                                     guint         n_param_values,
                                                     const GValue *param_values,
                                                     gpointer      invocation_hint G_GNUC_UNUSED,
                                                     gpointer      marshal_data)
 {
-  typedef void (*GMarshalFunc_VOID__OBJECT_INT_INT_INT_INT) (gpointer     data1,
+  typedef void (*GMarshalFunc_VOID__OBJECT_INTINTINTINT) (gpointer     data1,
                                                              gpointer     arg_1,
                                                              gint         arg_2,
                                                              gint         arg_3,
                                                              gint         arg_4,
                                                              gint         arg_5,
                                                              gpointer     data2);
-  register GMarshalFunc_VOID__OBJECT_INT_INT_INT_INT callback;
+  register GMarshalFunc_VOID__OBJECT_INTINTINTINT callback;
   register GCClosure *cc = (GCClosure*) closure;
   register gpointer data1, data2;
 
@@ -79,7 +79,7 @@ moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT (GClosure     *closure,
       data1 = g_value_peek_pointer (param_values + 0);
       data2 = closure->data;
     }
-  callback = (GMarshalFunc_VOID__OBJECT_INT_INT_INT_INT) (marshal_data ? marshal_data : cc->callback);
+  callback = (GMarshalFunc_VOID__OBJECT_INTINTINTINT) (marshal_data ? marshal_data : cc->callback);
 
   callback (data1,
             g_marshal_value_peek_object (param_values + 1),
@@ -92,21 +92,21 @@ moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT (GClosure     *closure,
 
 /* BOOLEAN:OBJECT,INT,INT,INT,INT (marshal.txt:2) */
 void
-moto_cclosure_marshal_BOOLEAN__OBJECT_INT_INT_INT_INT (GClosure     *closure,
+moto_cclosure_marshal_BOOL_OBJECT_INTINTINTINT (GClosure     *closure,
                                                        GValue       *return_value G_GNUC_UNUSED,
                                                        guint         n_param_values,
                                                        const GValue *param_values,
                                                        gpointer      invocation_hint G_GNUC_UNUSED,
                                                        gpointer      marshal_data)
 {
-  typedef gboolean (*GMarshalFunc_BOOLEAN__OBJECT_INT_INT_INT_INT) (gpointer     data1,
+  typedef gboolean (*GMarshalFunc_BOOL_OBJECT_INTINTINTINT) (gpointer     data1,
                                                                     gpointer     arg_1,
                                                                     gint         arg_2,
                                                                     gint         arg_3,
                                                                     gint         arg_4,
                                                                     gint         arg_5,
                                                                     gpointer     data2);
-  register GMarshalFunc_BOOLEAN__OBJECT_INT_INT_INT_INT callback;
+  register GMarshalFunc_BOOL_OBJECT_INTINTINTINT callback;
   register GCClosure *cc = (GCClosure*) closure;
   register gpointer data1, data2;
   gboolean v_return;
@@ -124,7 +124,7 @@ moto_cclosure_marshal_BOOLEAN__OBJECT_INT_INT_INT_INT (GClosure     *closure,
       data1 = g_value_peek_pointer (param_values + 0);
       data2 = closure->data;
     }
-  callback = (GMarshalFunc_BOOLEAN__OBJECT_INT_INT_INT_INT) (marshal_data ? marshal_data : cc->callback);
+  callback = (GMarshalFunc_BOOL_OBJECT_INTINTINTINT) (marshal_data ? marshal_data : cc->callback);
 
   v_return = callback (data1,
                        g_marshal_value_peek_object (param_values + 1),

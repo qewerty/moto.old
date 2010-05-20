@@ -16,8 +16,8 @@
 G_BEGIN_DECLS
 
 void moto_gl_init(void);
-void moto_gl_print_list(void);
-void moto_gl_print_info(void);
+void moto_gl_printlist(void);
+void moto_gl_printinfo(void);
 gboolean moto_gl_is_supported(const gchar *name);
 
 gboolean moto_gl_is_glsl_supported(void);

@@ -550,59 +550,74 @@ static void moto_node_add_params_va(MotoNode *self, gboolean is_static, va_list 
                 g_value_set_pointer(&v, va_arg(ap, gpointer));
             break;
             default:
-                if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_2))
+                if(g_type_is_a(ptype, MOTO_TYPE_BOOL2))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_bool[2|3|4] when them will be implemented!
                     gboolean *ptr = (gboolean *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*2);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_3))
+                else if(g_type_is_a(ptype, MOTO_TYPE_BOOL3))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_bool[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*3);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_BOOLEAN_4))
+                else if(g_type_is_a(ptype, MOTO_TYPE_BOOL4))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_boolean_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_bool[2|3|4] when them will be implemented!
                     gboolean *ptr = (gboolean *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gboolean)*4);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_INT_2))
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT2))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_int[2|3|4] when them will be implemented!
                     gint *ptr = (gint *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*2);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_INT_3))
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT3))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_int[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*3);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_INT_4))
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT4))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_int_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_int[2|3|4] when them will be implemented!
                     gint *ptr = (gint *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gint)*4);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_2))
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT2))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_float[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*2);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_3))
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT3))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_float[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*3);
                 }
-                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_4))
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT4))
                 {
-                    // FIXME: Rewrite with moto_value_[g|s]et_float_[2|3|4] when them will be implemented!
+                    // FIXME: Rewrite with moto_value_[g|s]et_float[2|3|4] when them will be implemented!
                     gfloat *ptr = (gfloat *)g_value_peek_pointer(&v);
                     memcpy(ptr, va_arg(ap, gpointer), sizeof(gfloat)*4);
+                }
+                /*
+                else if(g_type_is_a(ptype, MOTO_TYPE_BOOL_ARRAY))
+                {
+                    moto_value_set_bool_array(&v, NULL, 0);
+                }
+                else if(g_type_is_a(ptype, MOTO_TYPE_INT_ARRAY))
+                {
+                    moto_value_set_int_array(&v, NULL, 0);
+                }
+                */
+                else if(g_type_is_a(ptype, MOTO_TYPE_FLOAT_ARRAY))
+                {
+                    va_arg(ap, gpointer);
+                    moto_value_set_float_array(&v, NULL, 0);
                 }
                 else if(g_type_is_a(ptype, G_TYPE_ENUM))
                 {
@@ -1927,96 +1942,96 @@ GObject *moto_param_get_object(MotoParam *self)
 
 void moto_param_get_2b(MotoParam *self,  gboolean *v0, gboolean *v1)
 {
-    moto_value_get_boolean_2(moto_param_get_value(self), v0, v1);
+    moto_value_get_bool2(moto_param_get_value(self), v0, v1);
 }
 
 void moto_param_get_2bv(MotoParam *self, gboolean *v)
 {
-    moto_value_get_boolean_2_v(moto_param_get_value(self), v);
+    moto_value_get_bool2_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_3b(MotoParam *self,  gboolean *v0, gboolean *v1, gboolean *v2)
 {
-    moto_value_get_boolean_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_get_bool3(moto_param_get_value(self), v0, v1, v2);
 }
 
 void moto_param_get_3bv(MotoParam *self, gboolean *v)
 {
-    moto_value_get_boolean_3_v(moto_param_get_value(self), v);
+    moto_value_get_bool3_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_4b(MotoParam *self,  gboolean *v0, gboolean *v1, gboolean *v2, gboolean *v3)
 {
-    moto_value_get_boolean_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_get_bool4(moto_param_get_value(self), v0, v1, v2, v3);
 }
 
 void moto_param_get_4bv(MotoParam *self, gboolean *v)
 {
-    moto_value_get_boolean_4_v(moto_param_get_value(self), v);
+    moto_value_get_bool4_v(moto_param_get_value(self), v);
 }
 
 // int
 
 void moto_param_get_2i(MotoParam *self, gint *v0, gint *v1)
 {
-    moto_value_get_int_2(moto_param_get_value(self), v0, v1);
+    moto_value_get_int2(moto_param_get_value(self), v0, v1);
 }
 
 void moto_param_get_2iv(MotoParam *self, gint *v)
 {
-    moto_value_get_int_2_v(moto_param_get_value(self), v);
+    moto_value_get_int2_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_3i(MotoParam *self, gint *v0, gint *v1, gint *v2)
 {
-    moto_value_get_int_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_get_int3(moto_param_get_value(self), v0, v1, v2);
 }
 
 void moto_param_get_3iv(MotoParam *self, gint *v)
 {
-    moto_value_get_int_3_v(moto_param_get_value(self), v);
+    moto_value_get_int3_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_4i(MotoParam *self, gint *v0, gint *v1, gint *v2, gint *v3)
 {
-    moto_value_get_int_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_get_int4(moto_param_get_value(self), v0, v1, v2, v3);
 }
 
 void moto_param_get_4iv(MotoParam *self, gint *v)
 {
-    moto_value_get_int_4_v(moto_param_get_value(self), v);
+    moto_value_get_int4_v(moto_param_get_value(self), v);
 }
 
 // float
 
 void moto_param_get_2f(MotoParam *self,  gfloat *v0, gfloat *v1)
 {
-    moto_value_get_float_2(moto_param_get_value(self), v0, v1);
+    moto_value_get_float2(moto_param_get_value(self), v0, v1);
 }
 
 void moto_param_get_2fv(MotoParam *self, gfloat *v)
 {
-    moto_value_get_float_2_v(moto_param_get_value(self), v);
+    moto_value_get_float2_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_3f(MotoParam *self,  gfloat *v0, gfloat *v1, gfloat *v2)
 {
-    moto_value_get_float_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_get_float3(moto_param_get_value(self), v0, v1, v2);
 }
 
 void moto_param_get_3fv(MotoParam *self, gfloat *v)
 {
-    moto_value_get_float_3_v(moto_param_get_value(self), v);
+    moto_value_get_float3_v(moto_param_get_value(self), v);
 }
 
 void moto_param_get_4f(MotoParam *self,  gfloat *v0, gfloat *v1, gfloat *v2, gfloat *v3)
 {
-    moto_value_get_float_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_get_float4(moto_param_get_value(self), v0, v1, v2, v3);
 }
 
 void moto_param_get_4fv(MotoParam *self, gfloat *v)
 {
-    moto_value_get_float_4_v(moto_param_get_value(self), v);
+    moto_value_get_float4_v(moto_param_get_value(self), v);
 }
 
 void moto_param_set_boolean(MotoParam *self, gboolean value)
@@ -2072,37 +2087,37 @@ void moto_param_set_object(MotoParam *self, GObject *value)
 
 void moto_param_set_2b(MotoParam *self, gboolean v0, gboolean v1)
 {
-    moto_value_set_boolean_2(moto_param_get_value(self), v0, v1);
+    moto_value_set_bool2(moto_param_get_value(self), v0, v1);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_2bv(MotoParam *self, const gboolean *v)
 {
-    moto_value_set_boolean_2_v(moto_param_get_value(self), v);
+    moto_value_set_bool2_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3b(MotoParam *self, gboolean v0, gboolean v1, gboolean v2)
 {
-    moto_value_set_boolean_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_set_bool3(moto_param_get_value(self), v0, v1, v2);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3bv(MotoParam *self, const gboolean *v)
 {
-    moto_value_set_boolean_3_v(moto_param_get_value(self), v);
+    moto_value_set_bool3_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4b(MotoParam *self, gboolean v0, gboolean v1, gboolean v2, gboolean v3)
 {
-    moto_value_set_boolean_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_set_bool4(moto_param_get_value(self), v0, v1, v2, v3);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4bv(MotoParam *self, const gboolean *v)
 {
-    moto_value_set_boolean_4_v(moto_param_get_value(self), v);
+    moto_value_set_bool4_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
@@ -2110,37 +2125,37 @@ void moto_param_set_4bv(MotoParam *self, const gboolean *v)
 
 void moto_param_set_2i(MotoParam *self, gint v0, gint v1)
 {
-    moto_value_set_int_2(moto_param_get_value(self), v0, v1);
+    moto_value_set_int2(moto_param_get_value(self), v0, v1);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_2iv(MotoParam *self, const gint *v)
 {
-    moto_value_set_int_2_v(moto_param_get_value(self), v);
+    moto_value_set_int2_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3i(MotoParam *self, gint v0, gint v1, gint v2)
 {
-    moto_value_set_int_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_set_int3(moto_param_get_value(self), v0, v1, v2);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3iv(MotoParam *self, const gint *v)
 {
-    moto_value_set_int_3_v(moto_param_get_value(self), v);
+    moto_value_set_int3_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4i(MotoParam *self, gint v0, gint v1, gint v2, gint v3)
 {
-    moto_value_set_int_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_set_int4(moto_param_get_value(self), v0, v1, v2, v3);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4iv(MotoParam *self, const gint *v)
 {
-    moto_value_set_int_4_v(moto_param_get_value(self), v);
+    moto_value_set_int4_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
@@ -2148,37 +2163,37 @@ void moto_param_set_4iv(MotoParam *self, const gint *v)
 
 void moto_param_set_2f(MotoParam *self, gfloat v0, gfloat v1)
 {
-    moto_value_set_float_2(moto_param_get_value(self), v0, v1);
+    moto_value_set_float2(moto_param_get_value(self), v0, v1);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_2fv(MotoParam *self, const gfloat *v)
 {
-    moto_value_set_float_2_v(moto_param_get_value(self), v);
+    moto_value_set_float2_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2)
 {
-    moto_value_set_float_3(moto_param_get_value(self), v0, v1, v2);
+    moto_value_set_float3(moto_param_get_value(self), v0, v1, v2);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_3fv(MotoParam *self, const gfloat *v)
 {
-    moto_value_set_float_3_v(moto_param_get_value(self), v);
+    moto_value_set_float3_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4f(MotoParam *self, gfloat v0, gfloat v1, gfloat v2, gfloat v3)
 {
-    moto_value_set_float_4(moto_param_get_value(self), v0, v1, v2, v3);
+    moto_value_set_float4(moto_param_get_value(self), v0, v1, v2, v3);
     moto_param_notify_dests(self);
 }
 
 void moto_param_set_4fv(MotoParam *self, const gfloat *v)
 {
-    moto_value_set_float_4_v(moto_param_get_value(self), v);
+    moto_value_set_float4_v(moto_param_get_value(self), v);
     moto_param_notify_dests(self);
 }
 

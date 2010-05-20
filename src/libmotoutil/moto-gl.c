@@ -21,7 +21,7 @@ void moto_gl_init(void)
     }
 }
 
-void moto_gl_print_list(void)
+void moto_gl_printlist(void)
 {
     const gchar *extensions = (const gchar *)glGetString(GL_EXTENSIONS);
 

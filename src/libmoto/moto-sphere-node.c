@@ -64,13 +64,13 @@ moto_sphere_node_init(MotoSphereNode *self)
     gfloat radius[3] = {1, 1, 1};
     gint   rc[2]     = {10, 10};
 
-    MotoParamSpec *rc_spec = moto_param_spec_int_2_new(10, 3, 1000000, 1, 10,
+    MotoParamSpec *rc_spec = moto_param_spec_int2_new(10, 3, 1000000, 1, 10,
                                                        10, 3, 1000000, 1, 10);
 
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
-            "radius", "Radius",   MOTO_TYPE_FLOAT_3, MOTO_PARAM_MODE_INOUT, radius, pspec, "Form",
-            "rc", "Rows/Columns", MOTO_TYPE_INT_2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Form",
+            "radius", "Radius",   MOTO_TYPE_FLOAT3, MOTO_PARAM_MODE_INOUT, radius, pspec, "Form",
+            "rc", "Rows/Columns", MOTO_TYPE_INT2, MOTO_PARAM_MODE_INOUT, rc, rc_spec, "Form",
             "orientation", "Orientation",  MOTO_TYPE_AXIS, MOTO_PARAM_MODE_INOUT, MOTO_AXIS_Y, pspec, "Orientation",
             NULL);
 

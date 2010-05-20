@@ -67,8 +67,8 @@ moto_mesh_file_node_init(MotoMeshFileNode *self)
     GParamSpec *pspec = NULL; // FIXME: Implement.
     moto_node_add_params(node,
             "filename", "Filename", MOTO_TYPE_FILENAME, MOTO_PARAM_MODE_INOUT, "", pspec, "General",
-            "lock",     "Lock", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
-            "watch",    "Watch", MOTO_TYPE_BOOLEAN, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
+            "lock",     "Lock", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
+            "watch",    "Watch", MOTO_TYPE_BOOL, MOTO_PARAM_MODE_INOUT, TRUE, pspec, "General",
             NULL);
 
     priv->bound = moto_bound_new(0, 0, 0, 0, 0, 0);

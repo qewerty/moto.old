@@ -78,12 +78,12 @@ moto_plane_node_init(MotoPlaneNode *self)
     gfloat size[2] = {10, 10};
     gint divs[2] = {10, 10};
 
-    MotoParamSpec *divs_spec = moto_param_spec_int_2_new(10, 1, 1000000, 1, 10,
+    MotoParamSpec *divs_spec = moto_param_spec_int2_new(10, 1, 1000000, 1, 10,
                                                          10, 1, 1000000, 1, 10);
 
     moto_node_add_params(node,
-            "size", "Size",               MOTO_TYPE_FLOAT_2,     MOTO_PARAM_MODE_INOUT, size,                NULL,      "Form",
-            "divs", "Divisions",          MOTO_TYPE_INT_2,       MOTO_PARAM_MODE_INOUT, divs,                divs_spec, "Form",
+            "size", "Size",               MOTO_TYPE_FLOAT2,     MOTO_PARAM_MODE_INOUT, size,                NULL,      "Form",
+            "divs", "Divisions",          MOTO_TYPE_INT2,       MOTO_PARAM_MODE_INOUT, divs,                divs_spec, "Form",
             "orientation", "Orientation", MOTO_TYPE_ORIENTATION, MOTO_PARAM_MODE_INOUT, MOTO_ORIENTATION_ZX, NULL,      "Orientation",
             NULL);
 

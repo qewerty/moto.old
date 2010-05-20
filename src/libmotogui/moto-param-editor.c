@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <gdk/gdkkeysyms.h>
 
 #include "libmoto/moto-types.h"
@@ -186,13 +187,13 @@ static void widget_delete_notify(OnChangedData *data, GObject *where_the_object_
 
 // int2
 
-void on_int_2_changed_0(GtkSpinButton *spinbutton,
+void on_int2_changed_0(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_2 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int2 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -202,13 +203,13 @@ void on_int_2_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_2_changed_1(GtkSpinButton *spinbutton,
+void on_int2_changed_1(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_2 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int2 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -220,13 +221,13 @@ void on_int_2_changed_1(GtkSpinButton *spinbutton,
 
 // int3
 
-void on_int_3_changed_0(GtkSpinButton *spinbutton,
+void on_int3_changed_0(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[0] = (gint)value;
@@ -236,13 +237,13 @@ void on_int_3_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_3_changed_1(GtkSpinButton *spinbutton,
+void on_int3_changed_1(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[1] = (gint)value;
@@ -252,13 +253,13 @@ void on_int_3_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_3_changed_2(GtkSpinButton *spinbutton,
+void on_int3_changed_2(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[2] = (gint)value;
@@ -270,13 +271,13 @@ void on_int_3_changed_2(GtkSpinButton *spinbutton,
 
 // int4
 
-void on_int_4_changed_0(GtkSpinButton *spinbutton,
+void on_int4_changed_0(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_4 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int4 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -286,13 +287,13 @@ void on_int_4_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_4_changed_1(GtkSpinButton *spinbutton,
+void on_int4_changed_1(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_4 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int4 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -302,13 +303,13 @@ void on_int_4_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_4_changed_2(GtkSpinButton *spinbutton,
+void on_int4_changed_2(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_4 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int4 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[2] = value;
@@ -318,13 +319,13 @@ void on_int_4_changed_2(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_4_changed_3(GtkSpinButton *spinbutton,
+void on_int4_changed_3(GtkSpinButton *spinbutton,
                         OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_int_4 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_int4 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gint *vec = g_value_peek_pointer(v);
     vec[3] = value;
@@ -336,7 +337,7 @@ void on_int_4_changed_3(GtkSpinButton *spinbutton,
 
 // float
 
-void on_float_changed(GtkSpinButton *spinbutton,
+void on_floatchanged(GtkSpinButton *spinbutton,
                       OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
@@ -350,7 +351,7 @@ void on_float_changed(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_param_changed(MotoParam *param, OnChangedData *data)
+void on_floatparam_changed(MotoParam *param, OnChangedData *data)
 {
     g_signal_handler_block(data->widget, data->handler_id);
     gtk_spin_button_set_value((GtkSpinButton *)data->widget, moto_param_get_float(param));
@@ -359,13 +360,13 @@ void on_float_param_changed(MotoParam *param, OnChangedData *data)
 
 // float2
 
-void on_float_2_changed_0(GtkSpinButton *spinbutton,
+void on_float2_changed_0(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -375,13 +376,13 @@ void on_float_2_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_2_changed_1(GtkSpinButton *spinbutton,
+void on_float2_changed_1(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -393,13 +394,13 @@ void on_float_2_changed_1(GtkSpinButton *spinbutton,
 
 // float3
 
-void on_float_3_changed_0(GtkSpinButton *spinbutton,
+void on_float3_changed_0(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -409,13 +410,13 @@ void on_float_3_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_3_changed_1(GtkSpinButton *spinbutton,
+void on_float3_changed_1(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -425,13 +426,13 @@ void on_float_3_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_3_changed_2(GtkSpinButton *spinbutton,
+void on_float3_changed_2(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[2] = value;
@@ -443,13 +444,13 @@ void on_float_3_changed_2(GtkSpinButton *spinbutton,
 
 // float4
 
-void on_float_4_changed_0(GtkSpinButton *spinbutton,
+void on_float4_changed_0(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -459,13 +460,13 @@ void on_float_4_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_4_changed_1(GtkSpinButton *spinbutton,
+void on_float4_changed_1(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -475,13 +476,13 @@ void on_float_4_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_4_changed_2(GtkSpinButton *spinbutton,
+void on_float4_changed_2(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[2] = value;
@@ -491,13 +492,13 @@ void on_float_4_changed_2(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_float_4_changed_3(GtkSpinButton *spinbutton,
+void on_float4_changed_3(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gfloat value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_float_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_float3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gfloat *vec = g_value_peek_pointer(v);
     vec[3] = value;
@@ -509,7 +510,7 @@ void on_float_4_changed_3(GtkSpinButton *spinbutton,
 
 // int
 
-void on_int_changed(GtkSpinButton *spinbutton,
+void on_intchanged(GtkSpinButton *spinbutton,
                     OnChangedData *data)
 {
     gint value = gtk_spin_button_get_value_as_int(spinbutton);
@@ -522,7 +523,7 @@ void on_int_changed(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_int_param_changed(MotoParam *param, OnChangedData *data)
+void on_intparam_changed(MotoParam *param, OnChangedData *data)
 {
     g_signal_handler_block(data->widget, data->handler_id);
     gtk_spin_button_set_value((GtkSpinButton *)data->widget, moto_param_get_int(param));
@@ -531,7 +532,7 @@ void on_int_param_changed(MotoParam *param, OnChangedData *data)
 
 // boolean
 
-void on_boolean_changed(GtkToggleButton *togglebutton,
+void on_boolchanged(GtkToggleButton *togglebutton,
                         OnChangedData *data)
 {
     gboolean value = gtk_toggle_button_get_active(togglebutton);
@@ -544,7 +545,7 @@ void on_boolean_changed(GtkToggleButton *togglebutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_param_changed(MotoParam *param, OnChangedData *data)
+void on_boolparam_changed(MotoParam *param, OnChangedData *data)
 {
     g_signal_handler_block(data->widget, data->handler_id);
     gtk_toggle_button_set_active((GtkToggleButton *)data->widget, moto_param_get_boolean(param));
@@ -553,13 +554,13 @@ void on_boolean_param_changed(MotoParam *param, OnChangedData *data)
 
 // boolean2
 
-void on_boolean_2_changed_0(GtkToggleButton *spinbutton,
+void on_bool2_changed_0(GtkToggleButton *spinbutton,
                             OnChangedData *data)
 {
     gboolean value = gtk_toggle_button_get_active(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -569,13 +570,13 @@ void on_boolean_2_changed_0(GtkToggleButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_2_changed_1(GtkToggleButton *togglebutton,
+void on_bool2_changed_1(GtkToggleButton *togglebutton,
                             OnChangedData *data)
 {
     gboolean value = gtk_toggle_button_get_active(togglebutton);
 
     g_signal_handler_block(togglebutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -587,13 +588,13 @@ void on_boolean_2_changed_1(GtkToggleButton *togglebutton,
 
 // boolean3
 
-void on_boolean_3_changed_0(GtkSpinButton *spinbutton,
+void on_bool3_changed_0(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -603,13 +604,13 @@ void on_boolean_3_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_3_changed_1(GtkSpinButton *spinbutton,
+void on_bool3_changed_1(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -619,13 +620,13 @@ void on_boolean_3_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_3_changed_2(GtkSpinButton *spinbutton,
+void on_bool3_changed_2(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[2] = value;
@@ -637,13 +638,13 @@ void on_boolean_3_changed_2(GtkSpinButton *spinbutton,
 
 // boolean4
 
-void on_boolean_4_changed_0(GtkSpinButton *spinbutton,
+void on_bool4_changed_0(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[0] = value;
@@ -653,13 +654,13 @@ void on_boolean_4_changed_0(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_4_changed_1(GtkSpinButton *spinbutton,
+void on_bool4_changed_1(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[1] = value;
@@ -669,13 +670,13 @@ void on_boolean_4_changed_1(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_4_changed_2(GtkSpinButton *spinbutton,
+void on_bool4_changed_2(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[2] = value;
@@ -685,13 +686,13 @@ void on_boolean_4_changed_2(GtkSpinButton *spinbutton,
     moto_test_window_redraw_3dview(data->window);
 }
 
-void on_boolean_4_changed_3(GtkSpinButton *spinbutton,
+void on_bool4_changed_3(GtkSpinButton *spinbutton,
                           OnChangedData *data)
 {
     gboolean value = gtk_spin_button_get_value(spinbutton);
 
     g_signal_handler_block(spinbutton, data->handler_id);
-    // FIXME: Rewrite with moto_value_*et_boolean_3 when it will be implemented!
+    // FIXME: Rewrite with moto_value_*et_bool3 when it will be implemented!
     GValue *v = moto_param_get_value(data->param);
     gboolean *vec = g_value_peek_pointer(v);
     vec[3] = value;
@@ -700,6 +701,201 @@ void on_boolean_4_changed_3(GtkSpinButton *spinbutton,
     moto_node_update(moto_param_get_node(data->param));
     moto_test_window_redraw_3dview(data->window);
 }
+
+static void
+on_float_array_changed(GtkEditable *editable,
+                       OnChangedData *data)
+{
+    const gchar* text = gtk_entry_get_text((GtkEntry *)editable);
+
+    GValue* value = moto_param_get_value(data->param);
+    gsize size = 0;
+    const float* array = moto_value_get_float_array(value, &size);
+
+    size_t len = strlen(text);
+    float* tmp = (float*)g_try_malloc(sizeof(float)*len/2);
+    size_t i = 0;
+    size_t ii = 0;
+    for(i = 0; i < len; ++i)
+    {
+        int ch = text[i];
+        if(isdigit(ch) || ch == '.')
+        {
+            char* endptr = NULL;
+            errno = 0;
+            tmp[ii] = g_ascii_strtod(text + i, &endptr);
+            ++ii;
+            i += (endptr - (text + i));
+        }
+    }
+    moto_value_set_float_array(value, tmp, ii);
+    g_free(tmp);
+
+    g_signal_handler_block(editable, data->handler_id);
+    moto_param_notify_dests(data->param);
+    g_signal_handler_unblock(editable, data->handler_id);
+
+    moto_node_update(moto_param_get_node(data->param));
+    moto_test_window_redraw_3dview(data->window);
+}
+
+static gboolean check_float_array_string(const char* str, gsize size)
+{
+    gboolean has_dot = FALSE;
+    gboolean has_e = FALSE;
+    gunichar ch = ' ';
+    gunichar ch_prev = ' ';
+    const gchar* ptr = str;
+    gsize i;
+    for(i = 0; i < size; ++i)
+    {
+        ch_prev = ch;
+        ch = g_utf8_get_char(ptr);
+        ptr = g_utf8_next_char(ptr);
+        if(g_unichar_isdigit(ch))
+            continue;
+
+        if('.' == ch)
+        {
+            if(has_dot)
+                return FALSE;
+            has_dot = TRUE;
+            continue;
+        }
+
+        if('+' == ch || '-' == ch)
+        {
+            if(ch_prev != ' ' && ch_prev != 'e')
+                return FALSE;
+            continue;
+        }
+
+        if('e' == ch)
+        {
+            if(has_e || (!g_unichar_isdigit(ch_prev) && ch_prev != '.'))
+                return FALSE;
+            has_e = TRUE;
+            has_dot = FALSE;
+            continue;
+        }
+
+        if(' ' == ch)
+        {
+            if(g_unichar_isdigit(ch_prev) || (ch_prev == '.') || ('e' == ch_prev) || (0 == i))
+            {
+                has_dot = FALSE;
+                has_e = FALSE;
+                continue;
+            }
+            else
+            {
+                return FALSE;
+            }
+        }
+
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static void
+on_float_array_insert_text(GtkEditable *editable,
+                           gchar *new_text,
+                           gint new_text_length,
+                           gint *position,
+                           OnChangedData *data)
+{
+    const gchar* text = gtk_entry_get_text((GtkEntry *)editable);
+
+    GString* result = g_string_new("");
+
+    g_string_append_len(result, text, *position);
+    g_string_append_len(result, new_text, new_text_length);
+    g_string_append(result, text + *position);
+
+    g_print("result: '%s'\n", result->str);
+    if(!check_float_array_string(result->str, result->len))
+    {
+        g_signal_stop_emission_by_name(editable, "insert-text");
+        g_string_free(result, TRUE);
+        return;
+    }
+
+    g_string_free(result, TRUE);
+}
+
+static void
+on_float_array_delete_text(GtkEditable *editable,
+                           gint start_pos,
+                           gint end_pos,
+                           OnChangedData *data)
+{
+    // g_signal_stop_emission_by_name(editable, "delete-text");
+}
+
+static gboolean
+on_float_array_scroll(GtkWidget* widget,
+                      GdkEventScroll *event,
+                      OnChangedData* data)
+{
+    GtkEntry* entry = (GtkEntry*)widget;
+
+    GValue* value = moto_param_get_value(data->param);
+    gsize size = 0;
+    const gfloat* array = moto_value_get_float_array(value, &size);
+    if(size < 1)
+        return FALSE;
+
+    gfloat* tmp = (gfloat*)g_try_malloc(sizeof(float)*size);
+
+    const char* text = gtk_entry_get_text(entry);
+
+    gint pos = gtk_editable_get_position((GtkEditable*)widget);
+
+    const char* begin = \
+        g_utf8_offset_to_pointer(text, pos);
+
+    gint index = 0;
+    gint i = 0;
+    gchar* ptr = text;
+    gunichar ch_prev = ' ';
+    for(i = 0; i < pos; ++i)
+    {
+        gunichar ch = g_utf8_get_char(ptr);
+        ptr = g_utf8_next_char(ptr);
+
+        if(' ' == ch && ch_prev != ' ')
+        {
+            ++index;
+        }
+    }
+
+    gunichar ch = g_utf8_get_char(begin);
+    while(' ' != ch)
+    {
+        begin = g_utf8_prev_char(begin);
+        ch = g_utf8_get_char(begin);
+    }
+
+    gdouble v = g_ascii_strtod(begin, NULL);
+
+    if(GDK_SCROLL_UP == event->direction)
+    {
+        tmp[index] = v + 0.1;
+        moto_param_notify_dests(data->param);
+        return TRUE;
+    }
+    else if(GDK_SCROLL_DOWN == event->direction)
+    {
+        tmp[index] = v - 0.1;
+        moto_param_notify_dests(data->param);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+// MOTO_TYPE_STRING
 
 static
 void on_string_changed(GtkEditable *editable,
@@ -923,9 +1119,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = \
-            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_int_changed), data);
+            g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_intchanged), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_int_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_intparam_changed), data);
     }
     else if(G_TYPE_BOOLEAN == ptype)
     {
@@ -937,9 +1133,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolean_changed), data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(on_boolchanged), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
     }
     else if(G_TYPE_FLOAT == ptype)
     {
@@ -962,13 +1158,13 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = widget;
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_float_changed), data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(on_floatchanged), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_BOOLEAN_2 == ptype)
+    else if(MOTO_TYPE_BOOL2 == ptype)
     {
-        MotoParamSpecBoolean_2 *pspec = MOTO_PARAM_SPEC_BOOLEAN_2(moto_param_get_spec(param));
+        MotoParamSpecBool2 *pspec = MOTO_PARAM_SPEC_BOOL2(moto_param_get_spec(param));
 
         gboolean cap0 = pspec ? pspec->default_value[0] : FALSE;
         gboolean cap1 = pspec ? pspec->default_value[1] : FALSE;
@@ -978,7 +1174,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
         widget = gtk_hbox_new(FALSE, 0);
 
-        // FIXME: Rewrite with moto_value_get_boolean_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_bool3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gboolean *vec = (gboolean *)g_value_peek_pointer(value);
 
@@ -995,9 +1191,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_boolean_2_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_bool2_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 2
         entry = gtk_check_button_new();
@@ -1010,17 +1206,17 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_boolean_2_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "toggled", G_CALLBACK(on_bool2_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
     }
-    else if(MOTO_TYPE_BOOLEAN_3 == ptype)
+    else if(MOTO_TYPE_BOOL3 == ptype)
     {
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_boolean_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_bool3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gboolean *vec = (gboolean *)g_value_peek_pointer(value);
 
@@ -1040,9 +1236,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool3_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 2
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
@@ -1058,9 +1254,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool3_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 3
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
@@ -1076,17 +1272,17 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_3_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool3_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
     }
-    else if(MOTO_TYPE_BOOLEAN_4 == ptype)
+    else if(MOTO_TYPE_BOOL4 == ptype)
     {
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_boolean_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_bool3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gboolean *vec = (gboolean *)g_value_peek_pointer(value);
 
@@ -1106,9 +1302,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool4_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 2
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
@@ -1124,9 +1320,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool4_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 3
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
@@ -1142,9 +1338,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool4_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
 
         // 4
         entry = gtk_spin_button_new_with_range(-1000000, 1000000, 0.1);
@@ -1160,20 +1356,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_boolean_4_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_bool4_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolean_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_boolparam_changed), data);
     }
-    else if(MOTO_TYPE_INT_2 == ptype)
+    else if(MOTO_TYPE_INT2 == ptype)
     {
-        MotoParamSpecInt_2 *pspec = \
-            MOTO_PARAM_SPEC_INT_2(moto_param_get_spec(param));
+        MotoParamSpecInt2 *pspec = \
+            MOTO_PARAM_SPEC_INT2(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gint *vec = (gint *)g_value_peek_pointer(value);
 
@@ -1195,9 +1391,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_2_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int2_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1215,20 +1411,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_2_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int2_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_INT_3 == ptype)
+    else if(MOTO_TYPE_INT3 == ptype)
     {
-        MotoParamSpecInt_3 *pspec = \
-            MOTO_PARAM_SPEC_INT_3(moto_param_get_spec(param));
+        MotoParamSpecInt3 *pspec = \
+            MOTO_PARAM_SPEC_INT3(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gint *vec = (gint *)g_value_peek_pointer(value);
 
@@ -1250,9 +1446,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int3_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1270,9 +1466,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int3_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 3
         if(pspec)
@@ -1290,20 +1486,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_3_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int3_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_INT_4 == ptype)
+    else if(MOTO_TYPE_INT4 == ptype)
     {
-        MotoParamSpecInt_4 *pspec = \
-            MOTO_PARAM_SPEC_INT_4(moto_param_get_spec(param));
+        MotoParamSpecInt4 *pspec = \
+            MOTO_PARAM_SPEC_INT4(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gint *vec = (gint *)g_value_peek_pointer(value);
 
@@ -1325,9 +1521,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int4_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1345,9 +1541,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int4_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 3
         if(pspec)
@@ -1366,9 +1562,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int4_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 4
         if(pspec)
@@ -1386,20 +1582,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int_4_changed_3), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_int4_changed_3), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_FLOAT_2 == ptype)
+    else if(MOTO_TYPE_FLOAT2 == ptype)
     {
-        MotoParamSpecFloat_2 *pspec = \
-            MOTO_PARAM_SPEC_FLOAT_2(moto_param_get_spec(param));
+        MotoParamSpecFloat2 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT2(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gfloat *vec = (gfloat *)g_value_peek_pointer(value);
 
@@ -1422,9 +1618,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_2_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float2_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1443,20 +1639,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_2_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float2_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_FLOAT_3 == ptype)
+    else if(MOTO_TYPE_FLOAT3 == ptype)
     {
-        MotoParamSpecFloat_3 *pspec = \
-            MOTO_PARAM_SPEC_FLOAT_3(moto_param_get_spec(param));
+        MotoParamSpecFloat3 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT3(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gfloat *vec = (gfloat *)g_value_peek_pointer(value);
 
@@ -1479,9 +1675,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float3_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1500,9 +1696,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float3_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 3
         if(pspec)
@@ -1521,20 +1717,20 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_3_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float3_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
-    else if(MOTO_TYPE_FLOAT_4 == ptype)
+    else if(MOTO_TYPE_FLOAT4 == ptype)
     {
-        MotoParamSpecFloat_4 *pspec = \
-            MOTO_PARAM_SPEC_FLOAT_4(moto_param_get_spec(param));
+        MotoParamSpecFloat4 *pspec = \
+            MOTO_PARAM_SPEC_FLOAT4(moto_param_get_spec(param));
 
         GtkWidget *entry;
 
         widget = gtk_hbox_new(TRUE, 0);
 
-        // FIXME: Rewrite with moto_value_get_float_3 when it will be implemented!
+        // FIXME: Rewrite with moto_value_get_float3 when it will be implemented!
         GValue *value = moto_param_get_value(param);
         gfloat *vec = (gfloat *)g_value_peek_pointer(value);
 
@@ -1557,9 +1753,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_0), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float4_changed_0), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 2
         if(pspec)
@@ -1578,9 +1774,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_1), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float4_changed_1), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 3
         if(pspec)
@@ -1599,9 +1795,9 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_2), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float4_changed_2), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
 
         // 4
         if(pspec)
@@ -1620,9 +1816,47 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->window = pe_priv->window;
         data->widget = entry;
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
-        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float_4_changed_3), data);
+        data->handler_id = g_signal_connect(G_OBJECT(entry), "value-changed", G_CALLBACK(on_float4_changed_3), data);
         data->param_handler_id = \
-            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+            g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
+    }
+    else if(MOTO_TYPE_FLOAT_ARRAY == ptype)
+    {
+        GValue* value = moto_param_get_value(param);
+        gsize size = 0;
+        const gfloat* array = moto_value_get_float_array(value, &size);
+
+        GString* str = g_string_new("");
+        GString* str_tmp = g_string_new("");
+        gsize i = 0;
+        for(i = 0; i < size; ++i)
+        {
+            if(fmod(array[i], 1) < 0.01)
+                g_string_printf(str_tmp, "%d ", (gint)array[i]);
+            else if(fmod(array[i], 0.1) < 0.01)
+                g_string_printf(str_tmp, "%.1f", array[i]);
+            else
+                g_string_printf(str_tmp, "%.2f ", array[i]);
+            g_string_append(str, str_tmp->str);
+        }
+
+        widget = gtk_entry_new();
+        gtk_entry_set_text((GtkEntry *)widget, str->str);
+        gtk_editable_set_editable((GtkEditable *)widget, TRUE);
+
+        data = g_slice_new(OnChangedData);
+        data->param = param;
+        data->window = pe_priv->window;
+        data->widget = widget;
+        g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
+        data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_float_array_changed), data);
+        g_signal_connect(G_OBJECT(widget), "insert-text", G_CALLBACK(on_float_array_insert_text), data);
+        g_signal_connect(G_OBJECT(widget), "delete-text", G_CALLBACK(on_float_array_delete_text), data);
+        g_signal_connect(G_OBJECT(widget), "scroll-event", G_CALLBACK(on_float_array_scroll), data);
+        data->param_handler_id = 0;
+
+        g_string_free(str, TRUE);
+        g_string_free(str_tmp, TRUE);
     }
     else if(G_TYPE_STRING == ptype)
     {
@@ -1637,7 +1871,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_string_changed), data);
         data->param_handler_id = 0;
-        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
     else if(MOTO_TYPE_FILENAME == ptype)
     {
@@ -1666,7 +1900,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         g_object_weak_ref(G_OBJECT(entry), (GWeakNotify)widget_delete_notify, data);
         data->handler_id = g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(on_string_changed), data);
         data->param_handler_id = 0;
-        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_float_param_changed), data);
+        //     g_signal_connect(G_OBJECT(param), "value-changed", G_CALLBACK(on_floatparam_changed), data);
     }
     else if(G_TYPE_IS_ENUM(ptype))
     {

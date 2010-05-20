@@ -961,7 +961,7 @@ moto_scene_node_manipulator_class_init(MotoSceneNodeManipulatorClass *klass)
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 moto_cclosure_marshal_BOOLEAN__OBJECT_INT_INT_INT_INT,
+                 moto_cclosure_marshal_BOOL_OBJECT_INTINTINTINT,
                  G_TYPE_BOOLEAN /* return_type */,
                  5     /* n_params */,
                  button_press_signal_types  /* param_types */);
@@ -973,7 +973,7 @@ moto_scene_node_manipulator_class_init(MotoSceneNodeManipulatorClass *klass)
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT,
+                 moto_cclosure_marshal_VOID__OBJECT_INTINTINTINT,
                  G_TYPE_NONE /* return_type */,
                  5     /* n_params */,
                  button_release_signal_types /* param_types */);
@@ -985,7 +985,7 @@ moto_scene_node_manipulator_class_init(MotoSceneNodeManipulatorClass *klass)
                  NULL /* class closure */,
                  NULL /* accumulator */,
                  NULL /* accu_data */,
-                 moto_cclosure_marshal_VOID__OBJECT_INT_INT_INT_INT,
+                 moto_cclosure_marshal_VOID__OBJECT_INTINTINTINT,
                  G_TYPE_NONE /* return_type */,
                  5     /* n_params */,
                  motion_notify_signal_types  /* param_types */);

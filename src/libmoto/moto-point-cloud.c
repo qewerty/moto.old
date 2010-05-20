@@ -2,7 +2,7 @@
 #include "moto-copyable.h"
 
 static void
-moto_point_cloud_base_init(gpointer g_class)
+moto_pointcloud_base_init(gpointer g_class)
 {
   static gboolean initialized = FALSE;
 
@@ -13,13 +13,13 @@ moto_point_cloud_base_init(gpointer g_class)
 }
 
 GType
-moto_point_cloud_get_type (void)
+moto_pointcloud_get_type (void)
 {
   static GType type = 0;
   if (type == 0) {
     static const GTypeInfo info = {
       sizeof (MotoPointCloudIface),
-      moto_point_cloud_base_init,   /* base_init */
+      moto_pointcloud_base_init,   /* base_init */
       NULL,   /* base_finalize */
       NULL,   /* class_init */
       NULL,   /* class_finalize */
@@ -34,18 +34,18 @@ moto_point_cloud_get_type (void)
   return type;
 }
 
-void moto_point_cloud_foreach_point(MotoPointCloud *self,
+void moto_pointcloud_foreach_point(MotoPointCloud *self,
         MotoPointCloudForeachPointFunc func, gpointer user_data)
 {
-    MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);
+    MotoPointCloudIface *iface = MOTO_POINTCLOUD_GET_INTERFACE(self);
 
     if(iface->foreach_point)
         iface->foreach_point(self, func, user_data);
 }
 
-gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self)
+gboolean moto_pointcloud_can_provide_plain_data(MotoPointCloud *self)
 {
-    MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);
+    MotoPointCloudIface *iface = MOTO_POINTCLOUD_GET_INTERFACE(self);
 
     if(iface->can_provide_plain_data)
         return iface->can_provide_plain_data(self);
@@ -53,10 +53,10 @@ gboolean moto_point_cloud_can_provide_plain_data(MotoPointCloud *self)
     return FALSE;
 }
 
-void moto_point_cloud_get_plain_data(MotoPointCloud *self,
+void moto_pointcloud_get_plain_data(MotoPointCloud *self,
         gfloat **points, gfloat **normals, gsize *size)
 {
-    MotoPointCloudIface *iface = MOTO_POINT_CLOUD_GET_INTERFACE(self);
+    MotoPointCloudIface *iface = MOTO_POINTCLOUD_GET_INTERFACE(self);
 
     if(iface->get_plain_data)
     {
