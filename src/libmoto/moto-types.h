@@ -155,20 +155,20 @@ gfloat *moto_value_get_float2x2(GValue *value);
 gfloat *moto_value_get_float3x3(GValue *value);
 gfloat *moto_value_get_float4x4(GValue *value);
 
-// Following functions fill mem with vector or matrix data of needed type if types
+// Following functions fill mem with vector data of needed type if types
 // are transformable and return TRUE else return FALSE.
 
-gboolean moto_value_get_as_bool1(GValue *value, gboolean *mem);
+gboolean moto_value_get_as_bool(GValue *value, gboolean *mem);
 gboolean moto_value_get_as_bool2(GValue *value, gboolean *mem);
 gboolean moto_value_get_as_bool3(GValue *value, gboolean *mem);
 gboolean moto_value_get_as_bool4(GValue *value, gboolean *mem);
 
-gboolean moto_value_get_as_int1(GValue *value, gint *mem);
+gboolean moto_value_get_as_int(GValue *value, gint *mem);
 gboolean moto_value_get_as_int2(GValue *value, gint *mem);
 gboolean moto_value_get_as_int3(GValue *value, gint *mem);
 gboolean moto_value_get_as_int4(GValue *value, gint *mem);
 
-gboolean moto_value_get_as_float1(GValue *value, gfloat *mem);
+gboolean moto_value_get_as_float(GValue *value, gfloat *mem);
 gboolean moto_value_get_as_float2(GValue *value, gfloat *mem);
 gboolean moto_value_get_as_float3(GValue *value, gfloat *mem);
 gboolean moto_value_get_as_float4(GValue *value, gfloat *mem);
