@@ -56,18 +56,18 @@ static gpointer moto_bool2_value_peek_pointer(const GValue *value)
 }
 
 static gchar *moto_bool2_collect_value(GValue       *value,
-                                           guint         n_collect_values,
-                                           GTypeCValue  *collect_values,
-                                           guint         collect_flags)
+                                       guint         n_collect_values,
+                                       GTypeCValue  *collect_values,
+                                       guint         collect_flags)
 {
     // TODO: Implement
     return NULL;
 }
 
 static gchar *moto_bool2_lcopy_value(const GValue       *value,
-                                         guint         n_collect_values,
-                                         GTypeCValue  *collect_values,
-                                         guint         collect_flags)
+                                     guint         n_collect_values,
+                                     GTypeCValue  *collect_values,
+                                     guint         collect_flags)
 {
     // TODO: Implement
     return NULL;
@@ -84,9 +84,9 @@ GType moto_bool2_get_type(void)
             moto_bool2_value_free,          /* value_free */
             moto_bool2_value_copy,          /* value_copy */
             moto_bool2_value_peek_pointer,  /* value_peek_pointer */
-            "p",                                /* collect_format */
+            "p",                            /* collect_format */
             moto_bool2_collect_value,       /* collect_value */
-            "p",                                /* lcopy_format */
+            "p",                            /* lcopy_format */
             moto_bool2_lcopy_value,         /* lcopy_value */
         };
 
@@ -146,695 +146,695 @@ static gpointer moto_bool3_value_peek_pointer(const GValue *value)
 }
 
 static gchar *moto_bool3_collect_value(GValue       *value,
-                                           guint         n_collect_values,
-                                           GTypeCValue  *collect_values,
-                                           guint         collect_flags)
+                                       guint         n_collect_values,
+                                       GTypeCValue  *collect_values,
+                                       guint         collect_flags)
 {
     // TODO: Implement
     return NULL;
-    }
+}
 
-    static gchar *moto_bool3_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
+static gchar *moto_bool3_lcopy_value(const GValue       *value,
+                                     guint         n_collect_values,
+                                     GTypeCValue  *collect_values,
+                                     guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
 
-    GType moto_bool3_get_type(void)
+GType moto_bool3_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_bool3_value_init,          /* value_init */
-                moto_bool3_value_free,          /* value_free */
-                moto_bool3_value_copy,          /* value_copy */
-                moto_bool3_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_bool3_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_bool3_lcopy_value,         /* lcopy_value */
-            };
+            moto_bool3_value_init,          /* value_init */
+            moto_bool3_value_free,          /* value_free */
+            moto_bool3_value_copy,          /* value_copy */
+            moto_bool3_value_peek_pointer,  /* value_peek_pointer */
+            "p",                            /* collect_format */
+            moto_bool3_collect_value,       /* collect_value */
+            "p",                            /* lcopy_format */
+            moto_bool3_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
-
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoBool3", & info, & f_info, 0);
-        }
-        return type;
-    }
-
-    // MOTO_TYPE_BOOL4
-
-    struct _MotoBool4
-    {
-        gboolean data[4];
-    };
-
-    static void moto_bool4_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoBool4);
-        memcpy(value->data[0].v_pointer, boolzero_array, sizeof(MotoBool4));
-    }
-
-    static void moto_bool4_value_free(GValue *value)
-    {
-        g_slice_free(MotoBool4, value->data[0].v_pointer);
-    }
-
-    static void moto_bool4_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoBool4);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoBool4));
-    }
-
-    static gpointer moto_bool4_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_bool4_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_bool4_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_bool4_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        GTypeInfo info = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_bool4_value_init,          /* value_init */
-                moto_bool4_value_free,          /* value_free */
-                moto_bool4_value_copy,          /* value_copy */
-                moto_bool4_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_bool4_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_bool4_lcopy_value,         /* lcopy_value */
-            };
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeFundamentalInfo f_info = {0,};
 
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoBool4", & info, & f_info, 0);
-        }
-        return type;
-    }
-
-    // MOTO_TYPE_INT2
-
-    struct _MotoInt2
-    {
-        gint data[2];
-    };
-
-    static void moto_int2_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoInt2);
-        memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt2));
-    }
-
-    static void moto_int2_value_free(GValue *value)
-    {
-        g_slice_free(MotoInt2, value->data[0].v_pointer);
-    }
-
-    static void moto_int2_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoInt2);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt2));
-    }
-
-    static gpointer moto_int2_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_int2_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_int2_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_int2_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_int2_value_init,          /* value_init */
-                moto_int2_value_free,          /* value_free */
-                moto_int2_value_copy,          /* value_copy */
-                moto_int2_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_int2_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_int2_lcopy_value,         /* lcopy_value */
-            };
-
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
-
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoInt2", & info, & f_info, 0);
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoBool3", & info, & f_info, 0);
     }
+    return type;
+}
 
-    // MOTO_TYPE_INT3
+// MOTO_TYPE_BOOL4
 
-    struct _MotoInt3
+struct _MotoBool4
+{
+    gboolean data[4];
+};
+
+static void moto_bool4_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoBool4);
+    memcpy(value->data[0].v_pointer, boolzero_array, sizeof(MotoBool4));
+}
+
+static void moto_bool4_value_free(GValue *value)
+{
+    g_slice_free(MotoBool4, value->data[0].v_pointer);
+}
+
+static void moto_bool4_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoBool4);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoBool4));
+}
+
+static gpointer moto_bool4_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_bool4_collect_value(GValue       *value,
+                                       guint         n_collect_values,
+                                       GTypeCValue  *collect_values,
+                                       guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_bool4_lcopy_value(const GValue       *value,
+                                     guint         n_collect_values,
+                                     GTypeCValue  *collect_values,
+                                     guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_bool4_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        gint data[3];
-    };
-
-    static void moto_int3_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoInt3);
-        memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt3));
-    }
-
-    static void moto_int3_value_free(GValue *value)
-    {
-        g_slice_free(MotoInt3, value->data[0].v_pointer);
-    }
-
-    static void moto_int3_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoInt3);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt3));
-    }
-
-    static gpointer moto_int3_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_int3_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_int3_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_int3_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_int3_value_init,          /* value_init */
-                moto_int3_value_free,          /* value_free */
-                moto_int3_value_copy,          /* value_copy */
-                moto_int3_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_int3_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_int3_lcopy_value,         /* lcopy_value */
-            };
+            moto_bool4_value_init,          /* value_init */
+            moto_bool4_value_free,          /* value_free */
+            moto_bool4_value_copy,          /* value_copy */
+            moto_bool4_value_peek_pointer,  /* value_peek_pointer */
+            "p",                            /* collect_format */
+            moto_bool4_collect_value,       /* collect_value */
+            "p",                            /* lcopy_format */
+            moto_bool4_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
-
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoInt3", & info, & f_info, 0);
-        }
-        return type;
-    }
-
-    // MOTO_TYPE_INT4
-
-    struct _MotoInt4
-    {
-        gint data[4];
-    };
-
-    static void moto_int4_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoInt4);
-        memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt4));
-    }
-
-    static void moto_int4_value_free(GValue *value)
-    {
-        g_slice_free(MotoInt4, value->data[0].v_pointer);
-    }
-
-    static void moto_int4_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoInt4);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt4));
-    }
-
-    static gpointer moto_int4_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_int4_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_int4_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_int4_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        GTypeInfo info = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_int4_value_init,          /* value_init */
-                moto_int4_value_free,          /* value_free */
-                moto_int4_value_copy,          /* value_copy */
-                moto_int4_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_int4_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_int4_lcopy_value,         /* lcopy_value */
-            };
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeFundamentalInfo f_info = {0,};
 
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoInt4", & info, & f_info, 0);
-        }
-        return type;
-    }
-
-    // MOTO_TYPE_FLOAT2
-
-    struct _MotoFloat2
-    {
-        gfloat data[2];
-    };
-
-    static void moto_float2_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoFloat2);
-        memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat2));
-    }
-
-    static void moto_float2_value_free(GValue *value)
-    {
-        g_slice_free(MotoFloat2, value->data[0].v_pointer);
-    }
-
-    static void moto_float2_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoFloat2);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat2));
-    }
-
-    static gpointer moto_float2_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_float2_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_float2_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_float2_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_float2_value_init,          /* value_init */
-                moto_float2_value_free,          /* value_free */
-                moto_float2_value_copy,          /* value_copy */
-                moto_float2_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_float2_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_float2_lcopy_value,         /* lcopy_value */
-            };
-
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
-
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoFloat2", & info, & f_info, 0);
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoBool4", & info, & f_info, 0);
     }
+    return type;
+}
 
-    // MOTO_TYPE_FLOAT3
+// MOTO_TYPE_INT2
 
-    struct _MotoFloat3
+struct _MotoInt2
+{
+    gint data[2];
+};
+
+static void moto_int2_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoInt2);
+    memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt2));
+}
+
+static void moto_int2_value_free(GValue *value)
+{
+    g_slice_free(MotoInt2, value->data[0].v_pointer);
+}
+
+static void moto_int2_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoInt2);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt2));
+}
+
+static gpointer moto_int2_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_int2_collect_value(GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_int2_lcopy_value(const GValue       *value,
+                                    guint         n_collect_values,
+                                    GTypeCValue  *collect_values,
+                                    guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_int2_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        gfloat data[3];
-    };
-
-    static void moto_float3_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoFloat3);
-        memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat3));
-    }
-
-    static void moto_float3_value_free(GValue *value)
-    {
-        g_slice_free(MotoFloat3, value->data[0].v_pointer);
-    }
-
-    static void moto_float3_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoFloat3);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat3));
-    }
-
-    static gpointer moto_float3_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_float3_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_float3_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_float3_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_float3_value_init,          /* value_init */
-                moto_float3_value_free,          /* value_free */
-                moto_float3_value_copy,          /* value_copy */
-                moto_float3_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_float3_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_float3_lcopy_value,         /* lcopy_value */
-            };
+            moto_int2_value_init,          /* value_init */
+            moto_int2_value_free,          /* value_free */
+            moto_int2_value_copy,          /* value_copy */
+            moto_int2_value_peek_pointer,  /* value_peek_pointer */
+            "p",                                /* collect_format */
+            moto_int2_collect_value,       /* collect_value */
+            "p",                                /* lcopy_format */
+            moto_int2_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
-
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoFloat3", & info, & f_info, 0);
-        }
-        return type;
-    }
-
-    // MOTO_TYPE_FLOAT4
-
-    struct _MotoFloat4
-    {
-        gfloat data[4];
-    };
-
-    static void moto_float4_value_init(GValue *value)
-    {
-        value->data[0].v_pointer = g_slice_new(MotoFloat4);
-        memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat4));
-    }
-
-    static void moto_float4_value_free(GValue *value)
-    {
-        g_slice_free(MotoFloat4, value->data[0].v_pointer);
-    }
-
-    static void moto_float4_value_copy(const GValue *src_value, GValue *dest_value)
-    {
-        dest_value->data[0].v_pointer = g_slice_new(MotoFloat4);
-        memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat4));
-    }
-
-    static gpointer moto_float4_value_peek_pointer(const GValue *value)
-    {
-        return value->data[0].v_pointer;
-    }
-
-    static gchar *moto_float4_collect_value(GValue       *value,
-                                               guint         n_collect_values,
-                                               GTypeCValue  *collect_values,
-                                               guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    static gchar *moto_float4_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_float4_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        GTypeInfo info = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_float4_value_init,          /* value_init */
-                moto_float4_value_free,          /* value_free */
-                moto_float4_value_copy,          /* value_copy */
-                moto_float4_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                /* collect_format */
-                moto_float4_collect_value,       /* collect_value */
-                "p",                                /* lcopy_format */
-                moto_float4_lcopy_value,         /* lcopy_value */
-            };
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeFundamentalInfo f_info = {0,};
 
-            GTypeFundamentalInfo f_info = {0,};
-
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoFloat4", & info, & f_info, 0);
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoInt2", & info, & f_info, 0);
     }
+    return type;
+}
+
+// MOTO_TYPE_INT3
+
+struct _MotoInt3
+{
+    gint data[3];
+};
+
+static void moto_int3_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoInt3);
+    memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt3));
+}
+
+static void moto_int3_value_free(GValue *value)
+{
+    g_slice_free(MotoInt3, value->data[0].v_pointer);
+}
+
+static void moto_int3_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoInt3);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt3));
+}
+
+static gpointer moto_int3_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_int3_collect_value(GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_int3_lcopy_value(const GValue       *value,
+                                    guint         n_collect_values,
+                                    GTypeCValue  *collect_values,
+                                    guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_int3_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GTypeValueTable value_table = \
+        {
+            moto_int3_value_init,          /* value_init */
+            moto_int3_value_free,          /* value_free */
+            moto_int3_value_copy,          /* value_copy */
+            moto_int3_value_peek_pointer,  /* value_peek_pointer */
+            "p",                           /* collect_format */
+            moto_int3_collect_value,       /* collect_value */
+            "p",                           /* lcopy_format */
+            moto_int3_lcopy_value,         /* lcopy_value */
+        };
+
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
+
+        GTypeFundamentalInfo f_info = {0,};
+
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
+        }
+        type = g_type_register_fundamental(type_id, "MotoInt3", & info, & f_info, 0);
+    }
+    return type;
+}
+
+// MOTO_TYPE_INT4
+
+struct _MotoInt4
+{
+    gint data[4];
+};
+
+static void moto_int4_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoInt4);
+    memcpy(value->data[0].v_pointer, intzero_array, sizeof(MotoInt4));
+}
+
+static void moto_int4_value_free(GValue *value)
+{
+    g_slice_free(MotoInt4, value->data[0].v_pointer);
+}
+
+static void moto_int4_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoInt4);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoInt4));
+}
+
+static gpointer moto_int4_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_int4_collect_value(GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_int4_lcopy_value(const GValue       *value,
+                                    guint         n_collect_values,
+                                    GTypeCValue  *collect_values,
+                                    guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_int4_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GTypeValueTable value_table = \
+        {
+            moto_int4_value_init,          /* value_init */
+            moto_int4_value_free,          /* value_free */
+            moto_int4_value_copy,          /* value_copy */
+            moto_int4_value_peek_pointer,  /* value_peek_pointer */
+            "p",                           /* collect_format */
+            moto_int4_collect_value,       /* collect_value */
+            "p",                           /* lcopy_format */
+            moto_int4_lcopy_value,         /* lcopy_value */
+        };
+
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
+
+        GTypeFundamentalInfo f_info = {0,};
+
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
+        }
+        type = g_type_register_fundamental(type_id, "MotoInt4", & info, & f_info, 0);
+    }
+    return type;
+}
+
+// MOTO_TYPE_FLOAT2
+
+struct _MotoFloat2
+{
+    gfloat data[2];
+};
+
+static void moto_float2_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoFloat2);
+    memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat2));
+}
+
+static void moto_float2_value_free(GValue *value)
+{
+    g_slice_free(MotoFloat2, value->data[0].v_pointer);
+}
+
+static void moto_float2_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoFloat2);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat2));
+}
+
+static gpointer moto_float2_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_float2_collect_value(GValue       *value,
+                                        guint         n_collect_values,
+                                        GTypeCValue  *collect_values,
+                                        guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_float2_lcopy_value(const GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_float2_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GTypeValueTable value_table = \
+        {
+            moto_float2_value_init,          /* value_init */
+            moto_float2_value_free,          /* value_free */
+            moto_float2_value_copy,          /* value_copy */
+            moto_float2_value_peek_pointer,  /* value_peek_pointer */
+            "p",                             /* collect_format */
+            moto_float2_collect_value,       /* collect_value */
+            "p",                             /* lcopy_format */
+            moto_float2_lcopy_value,         /* lcopy_value */
+        };
+
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
+
+        GTypeFundamentalInfo f_info = {0,};
+
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
+        }
+        type = g_type_register_fundamental(type_id, "MotoFloat2", & info, & f_info, 0);
+    }
+    return type;
+}
+
+// MOTO_TYPE_FLOAT3
+
+struct _MotoFloat3
+{
+    gfloat data[3];
+};
+
+static void moto_float3_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoFloat3);
+    memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat3));
+}
+
+static void moto_float3_value_free(GValue *value)
+{
+    g_slice_free(MotoFloat3, value->data[0].v_pointer);
+}
+
+static void moto_float3_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoFloat3);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat3));
+}
+
+static gpointer moto_float3_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_float3_collect_value(GValue       *value,
+                                        guint         n_collect_values,
+                                        GTypeCValue  *collect_values,
+                                        guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_float3_lcopy_value(const GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_float3_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GTypeValueTable value_table = \
+        {
+            moto_float3_value_init,          /* value_init */
+            moto_float3_value_free,          /* value_free */
+            moto_float3_value_copy,          /* value_copy */
+            moto_float3_value_peek_pointer,  /* value_peek_pointer */
+            "p",                             /* collect_format */
+            moto_float3_collect_value,       /* collect_value */
+            "p",                             /* lcopy_format */
+            moto_float3_lcopy_value,         /* lcopy_value */
+        };
+
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
+
+        GTypeFundamentalInfo f_info = {0,};
+
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
+        }
+        type = g_type_register_fundamental(type_id, "MotoFloat3", & info, & f_info, 0);
+    }
+    return type;
+}
+
+// MOTO_TYPE_FLOAT4
+
+struct _MotoFloat4
+{
+    gfloat data[4];
+};
+
+static void moto_float4_value_init(GValue *value)
+{
+    value->data[0].v_pointer = g_slice_new(MotoFloat4);
+    memcpy(value->data[0].v_pointer, floatzero_array, sizeof(MotoFloat4));
+}
+
+static void moto_float4_value_free(GValue *value)
+{
+    g_slice_free(MotoFloat4, value->data[0].v_pointer);
+}
+
+static void moto_float4_value_copy(const GValue *src_value, GValue *dest_value)
+{
+    dest_value->data[0].v_pointer = g_slice_new(MotoFloat4);
+    memcpy(dest_value->data[0].v_pointer, src_value->data[0].v_pointer, sizeof(MotoFloat4));
+}
+
+static gpointer moto_float4_value_peek_pointer(const GValue *value)
+{
+    return value->data[0].v_pointer;
+}
+
+static gchar *moto_float4_collect_value(GValue       *value,
+                                        guint         n_collect_values,
+                                        GTypeCValue  *collect_values,
+                                        guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_float4_lcopy_value(const GValue       *value,
+                                      guint         n_collect_values,
+                                      GTypeCValue  *collect_values,
+                                      guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+GType moto_float4_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
+    {
+        static GTypeValueTable value_table = \
+        {
+            moto_float4_value_init,          /* value_init */
+            moto_float4_value_free,          /* value_free */
+            moto_float4_value_copy,          /* value_copy */
+            moto_float4_value_peek_pointer,  /* value_peek_pointer */
+            "p",                             /* collect_format */
+            moto_float4_collect_value,       /* collect_value */
+            "p",                             /* lcopy_format */
+            moto_float4_lcopy_value,         /* lcopy_value */
+        };
+
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
+
+        GTypeFundamentalInfo f_info = {0,};
+
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
+        }
+        type = g_type_register_fundamental(type_id, "MotoFloat4", & info, & f_info, 0);
+    }
+    return type;
+}
 
 // MOTO_TYPE_BOOL_ARRAY
 
@@ -867,65 +867,65 @@ static gpointer moto_bool_array_value_peek_pointer(const GValue *value)
 }
 
 static gchar *moto_bool_array_collect_value(GValue       *value,
-                                           guint         n_collect_values,
-                                           GTypeCValue  *collect_values,
-                                           guint         collect_flags)
+                                            guint         n_collect_values,
+                                            GTypeCValue  *collect_values,
+                                            guint         collect_flags)
 {
     // TODO: Implement
     return NULL;
-    }
+}
 
-    static gchar *moto_bool_array_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
+static gchar *moto_bool_array_lcopy_value(const GValue       *value,
+                                          guint         n_collect_values,
+                                          GTypeCValue  *collect_values,
+                                          guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
 
-    GType moto_bool_array_get_type(void)
+GType moto_bool_array_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_bool_array_value_init,          /* value_init */
-                moto_bool_array_value_free,          /* value_free */
-                moto_bool_array_value_copy,          /* value_copy */
-                moto_bool_array_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                      /* collect_format */
-                moto_bool_array_collect_value,       /* collect_value */
-                "p",                                      /* lcopy_format */
-                moto_bool_array_lcopy_value,         /* lcopy_value */
-            };
+            moto_bool_array_value_init,          /* value_init */
+            moto_bool_array_value_free,          /* value_free */
+            moto_bool_array_value_copy,          /* value_copy */
+            moto_bool_array_value_peek_pointer,  /* value_peek_pointer */
+            "p",                                 /* collect_format */
+            moto_bool_array_collect_value,       /* collect_value */
+            "p",                                 /* lcopy_format */
+            moto_bool_array_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeFundamentalInfo f_info = {0,};
+        GTypeFundamentalInfo f_info = {0,};
 
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoBoolArray", & info, & f_info, 0);
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoBoolArray", & info, & f_info, 0);
     }
+    return type;
+}
 
 // MOTO_TYPE_INT_ARRAY
 
@@ -964,59 +964,59 @@ static gchar *moto_int_array_collect_value(GValue       *value,
 {
     // TODO: Implement
     return NULL;
-    }
+}
 
-    static gchar *moto_int_array_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
-    {
-        // TODO: Implement
-        return NULL;
-    }
+static gchar *moto_int_array_lcopy_value(const GValue       *value,
+                                         guint         n_collect_values,
+                                         GTypeCValue  *collect_values,
+                                         guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
 
-    GType moto_int_array_get_type(void)
+GType moto_int_array_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_int_array_value_init,          /* value_init */
-                moto_int_array_value_free,          /* value_free */
-                moto_int_array_value_copy,          /* value_copy */
-                moto_int_array_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                      /* collect_format */
-                moto_int_array_collect_value,       /* collect_value */
-                "p",                                      /* lcopy_format */
-                moto_int_array_lcopy_value,         /* lcopy_value */
-            };
+            moto_int_array_value_init,          /* value_init */
+            moto_int_array_value_free,          /* value_free */
+            moto_int_array_value_copy,          /* value_copy */
+            moto_int_array_value_peek_pointer,  /* value_peek_pointer */
+            "p",                                /* collect_format */
+            moto_int_array_collect_value,       /* collect_value */
+            "p",                                /* lcopy_format */
+            moto_int_array_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeFundamentalInfo f_info = {0,};
+        GTypeFundamentalInfo f_info = {0,};
 
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoIntArray", & info, & f_info, 0);
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoIntArray", & info, & f_info, 0);
     }
+    return type;
+}
 
 // MOTO_TYPE_FLOAT_ARRAY
 
@@ -1067,340 +1067,340 @@ static gpointer moto_float_array_value_peek_pointer(const GValue *value)
 }
 
 static gchar *moto_float_array_collect_value(GValue       *value,
+                                             guint         n_collect_values,
+                                             GTypeCValue  *collect_values,
+                                             guint         collect_flags)
+{
+    // TODO: Implement
+    return NULL;
+}
+
+static gchar *moto_float_array_lcopy_value(const GValue *value,
                                            guint         n_collect_values,
                                            GTypeCValue  *collect_values,
                                            guint         collect_flags)
 {
     // TODO: Implement
     return NULL;
-    }
+}
 
-    static gchar *moto_float_array_lcopy_value(const GValue       *value,
-                                             guint         n_collect_values,
-                                             GTypeCValue  *collect_values,
-                                             guint         collect_flags)
+GType moto_float_array_get_type(void)
+{
+    static GType type = 0;
+    if(0 == type)
     {
-        // TODO: Implement
-        return NULL;
-    }
-
-    GType moto_float_array_get_type(void)
-    {
-        static GType type = 0;
-        if(0 == type)
+        static GTypeValueTable value_table = \
         {
-            static GTypeValueTable value_table = \
-            {
-                moto_float_array_value_init,          /* value_init */
-                moto_float_array_value_free,          /* value_free */
-                moto_float_array_value_copy,          /* value_copy */
-                moto_float_array_value_peek_pointer,  /* value_peek_pointer */
-                "p",                                      /* collect_format */
-                moto_float_array_collect_value,       /* collect_value */
-                "p",                                      /* lcopy_format */
-                moto_float_array_lcopy_value,         /* lcopy_value */
-            };
+            moto_float_array_value_init,          /* value_init */
+            moto_float_array_value_free,          /* value_free */
+            moto_float_array_value_copy,          /* value_copy */
+            moto_float_array_value_peek_pointer,  /* value_peek_pointer */
+            "p",                                  /* collect_format */
+            moto_float_array_collect_value,       /* collect_value */
+            "p",                                  /* lcopy_format */
+            moto_float_array_lcopy_value,         /* lcopy_value */
+        };
 
-            GTypeInfo info = \
-            {
-                0,              /* class_size */
-                NULL,           /* base_init */
-                NULL,           /* base_destroy */
-                NULL,           /* class_init */
-                NULL,           /* class_destroy */
-                NULL,           /* class_data */
-                0,              /* instance_size */
-                0,              /* n_preallocs */
-                NULL,           /* instance_init */
-                & value_table,  /* value_table */
-            };
+        GTypeInfo info = \
+        {
+            0,              /* class_size */
+            NULL,           /* base_init */
+            NULL,           /* base_destroy */
+            NULL,           /* class_init */
+            NULL,           /* class_destroy */
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            & value_table,  /* value_table */
+        };
 
-            GTypeFundamentalInfo f_info = {0,};
+        GTypeFundamentalInfo f_info = {0,};
 
-            GType type_id = g_type_fundamental_next();
-            if( ! type_id)
-            {
-                // TODO
-            }
-            type = g_type_register_fundamental(type_id, "MotoFloatArray", & info, & f_info, 0);
+        GType type_id = g_type_fundamental_next();
+        if( ! type_id)
+        {
+            // TODO
         }
-        return type;
+        type = g_type_register_fundamental(type_id, "MotoFloatArray", & info, & f_info, 0);
     }
+    return type;
+}
 
-    // Transformation functions
+// Transformation functions
 
-    // 1 -> *
-    //
-    // boolean -> *
-    static void moto_transform_bool1_to_bool2(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+// 1 -> *
+//
+// boolean -> *
+static void moto_transform_bool_to_bool2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_bool1_to_bool3(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_bool_to_bool3(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_bool1_to_bool4(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_bool_to_bool4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_bool1_to_int2(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (src_value->data[0].v_int) ? 1 : 0;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_bool_to_int2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_bool1_to_int3(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (src_value->data[0].v_int) ? 1 : 0;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_bool_to_int3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_bool1_to_int4(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (src_value->data[0].v_int) ? 1 : 0;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_bool_to_int4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (src_value->data[0].v_int) ? 1 : 0;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_bool1_to_float2(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_bool_to_float2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_bool1_to_float3(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_bool_to_float3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_bool1_to_float4(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_bool_to_float4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = (src_value->data[0].v_int) ? 1.0f : 0.0f;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    // int -> *
-    static void moto_transform_int1_to_bool2(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+// int -> *
+static void moto_transform_int_to_bool2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_int1_to_bool3(const GValue *src_value, GValue *dest_value)
-    {
-        gint src = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gint *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_int_to_bool3(const GValue *src_value, GValue *dest_value)
+{
+    gint src = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gint *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_int1_to_bool4(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_int_to_bool4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (src_value->data[0].v_int) ? TRUE : FALSE;
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_int1_to_int2(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = src_value->data[0].v_int;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_int_to_int2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_int1_to_int3(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = src_value->data[0].v_int;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_int_to_int3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_int1_to_int4(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = src_value->data[0].v_int;
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_int_to_int4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = src_value->data[0].v_int;
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_int1_to_float2(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src = (gfloat)(src_value->data[0].v_int);
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_int_to_float2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_int1_to_float3(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src = (gfloat)(src_value->data[0].v_int);
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_int_to_float3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_int1_to_float4(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src = (gfloat)(src_value->data[0].v_int);
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_int_to_float4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src = (gfloat)(src_value->data[0].v_int);
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    // float -> *
+// float -> *
 
-    static void moto_transform_float1_to_bool2(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (gboolean)(src_value->data[0].v_float);
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_float_to_bool2(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (gboolean)(src_value->data[0].v_float);
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_float1_to_bool3(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src = (gboolean)( src_value->data[0].v_float);
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_float_to_bool3(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src = (gboolean)( src_value->data[0].v_float);
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_float1_to_bool4(const GValue *src_value, GValue *dest_value)
-    {
-        gboolean src  = (gboolean)(src_value->data[0].v_float);
-        gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_float_to_bool4(const GValue *src_value, GValue *dest_value)
+{
+    gboolean src  = (gboolean)(src_value->data[0].v_float);
+    gboolean *dest = dest_value->data[0].v_pointer = (gboolean *)g_slice_new(MotoBool4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_float1_to_int2(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (gint)(src_value->data[0].v_float);
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_float_to_int2(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (gint)(src_value->data[0].v_float);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_float1_to_int3(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (gint)(src_value->data[0].v_float);
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_float_to_int3(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (gint)(src_value->data[0].v_float);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_float1_to_int4(const GValue *src_value, GValue *dest_value)
-    {
-        gint src  = (gint)(src_value->data[0].v_float);
-        gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_float_to_int4(const GValue *src_value, GValue *dest_value)
+{
+    gint src  = (gint)(src_value->data[0].v_float);
+    gint *dest = dest_value->data[0].v_pointer = (gint *)g_slice_new(MotoInt4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    static void moto_transform_float1_to_float2(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = src_value->data[0].v_float;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
-        dest[0] = src;
-        dest[1] = src;
-    }
+static void moto_transform_float_to_float2(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = src_value->data[0].v_float;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat2);
+    dest[0] = src;
+    dest[1] = src;
+}
 
-    static void moto_transform_float1_to_float3(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = src_value->data[0].v_float;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-    }
+static void moto_transform_float_to_float3(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = src_value->data[0].v_float;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat3);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+}
 
-    static void moto_transform_float1_to_float4(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat src  = src_value->data[0].v_float;
-        gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
-        dest[0] = src;
-        dest[1] = src;
-        dest[2] = src;
-        dest[3] = src;
-    }
+static void moto_transform_float_to_float4(const GValue *src_value, GValue *dest_value)
+{
+    gfloat src  = src_value->data[0].v_float;
+    gfloat *dest = dest_value->data[0].v_pointer = (gfloat *)g_slice_new(MotoFloat4);
+    dest[0] = src;
+    dest[1] = src;
+    dest[2] = src;
+    dest[3] = src;
+}
 
-    // 2 -> *
+// 2 -> *
 
-    static void moto_transform_float2_to_float1(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat *src = (gfloat *)src_value->data[0].v_pointer;
-        g_value_set_float(dest_value, (src[0] + src[1]) / 2);
-    }
+static void moto_transform_float2_to_float(const GValue *src_value, GValue *dest_value)
+{
+    gfloat *src = (gfloat *)src_value->data[0].v_pointer;
+    g_value_set_float(dest_value, (src[0] + src[1]) / 2);
+}
 
-    // 3 -> *
+// 3 -> *
 
-    static void moto_transform_float3_to_float1(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat *src = (gfloat *)src_value->data[0].v_pointer;
-        g_value_set_float(dest_value, (src[0] + src[1] + src[2]) / 3);
-    }
+static void moto_transform_float3_to_float(const GValue *src_value, GValue *dest_value)
+{
+    gfloat *src = (gfloat *)src_value->data[0].v_pointer;
+    g_value_set_float(dest_value, (src[0] + src[1] + src[2]) / 3);
+}
 
-    // 4 -> *
+// 4 -> *
 
-    static void moto_transform_float4_to_float1(const GValue *src_value, GValue *dest_value)
-    {
-        gfloat *src = (gfloat *)src_value->data[0].v_pointer;
-        g_value_set_float(dest_value, (src[0] + src[1] + src[2] + src[3]) / 4);
-    }
+static void moto_transform_float4_to_float(const GValue *src_value, GValue *dest_value)
+{
+    gfloat *src = (gfloat *)src_value->data[0].v_pointer;
+    g_value_set_float(dest_value, (src[0] + src[1] + src[2] + src[3]) / 4);
+}
 
 // Public functions
 
@@ -1409,57 +1409,57 @@ void moto_types_init(void)
     // 1 -> *
 
     // boolean -> *
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL2, moto_transform_bool1_to_bool2);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL3, moto_transform_bool1_to_bool3);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL4, moto_transform_bool1_to_bool4);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL2, moto_transform_bool_to_bool2);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL3, moto_transform_bool_to_bool3);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_BOOL4, moto_transform_bool_to_bool4);
 
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT2, moto_transform_bool1_to_int2);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT3, moto_transform_bool1_to_int3);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT4, moto_transform_bool1_to_int4);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT2, moto_transform_bool_to_int2);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT3, moto_transform_bool_to_int3);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_INT4, moto_transform_bool_to_int4);
 
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT2, moto_transform_bool1_to_float2);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT3, moto_transform_bool1_to_float3);
-    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT4, moto_transform_bool1_to_float4);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT2, moto_transform_bool_to_float2);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT3, moto_transform_bool_to_float3);
+    g_value_register_transform_func(MOTO_TYPE_BOOL, MOTO_TYPE_FLOAT4, moto_transform_bool_to_float4);
 
     // int -> *
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL2, moto_transform_int1_to_bool2);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL3, moto_transform_int1_to_bool3);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL4, moto_transform_int1_to_bool4);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL2, moto_transform_int_to_bool2);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL3, moto_transform_int_to_bool3);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_BOOL4, moto_transform_int_to_bool4);
 
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT2, moto_transform_int1_to_int2);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT3, moto_transform_int1_to_int3);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT4, moto_transform_int1_to_int4);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT2, moto_transform_int_to_int2);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT3, moto_transform_int_to_int3);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_INT4, moto_transform_int_to_int4);
 
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT2, moto_transform_int1_to_float2);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT3, moto_transform_int1_to_float3);
-    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT4, moto_transform_int1_to_float4);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT2, moto_transform_int_to_float2);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT3, moto_transform_int_to_float3);
+    g_value_register_transform_func(MOTO_TYPE_INT, MOTO_TYPE_FLOAT4, moto_transform_int_to_float4);
 
     // float -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL2, moto_transform_float1_to_bool2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL3, moto_transform_float1_to_bool3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL4, moto_transform_float1_to_bool4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL2, moto_transform_float_to_bool2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL3, moto_transform_float_to_bool3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_BOOL4, moto_transform_float_to_bool4);
 
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT2, moto_transform_float1_to_int2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT3, moto_transform_float1_to_int3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT4, moto_transform_float1_to_int4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT2, moto_transform_float_to_int2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT3, moto_transform_float_to_int3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_INT4, moto_transform_float_to_int4);
 
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT2, moto_transform_float1_to_float2);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT3, moto_transform_float1_to_float3);
-    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT4, moto_transform_float1_to_float4);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT2, moto_transform_float_to_float2);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT3, moto_transform_float_to_float3);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT, MOTO_TYPE_FLOAT4, moto_transform_float_to_float4);
 
     /*
     // 2 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT2, MOTO_TYPE_FLOAT, moto_transform_float2_to_float1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT2, MOTO_TYPE_FLOAT, moto_transform_float2_to_float);
     g_value_register_transform_func(MOTO_TYPE_FLOAT2, MOTO_TYPE_FLOAT3, moto_transform_float2_to_float3);
     g_value_register_transform_func(MOTO_TYPE_FLOAT2, MOTO_TYPE_FLOAT4, moto_transform_float2_to_float4);
 
     // 3 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT3, MOTO_TYPE_FLOAT, moto_transform_float3_to_float1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT3, MOTO_TYPE_FLOAT, moto_transform_float3_to_float);
     g_value_register_transform_func(MOTO_TYPE_FLOAT3, MOTO_TYPE_FLOAT2, moto_transform_float3_to_float2);
     g_value_register_transform_func(MOTO_TYPE_FLOAT3, MOTO_TYPE_FLOAT4, moto_transform_float3_to_float4);
 
     // 4 -> *
-    g_value_register_transform_func(MOTO_TYPE_FLOAT4, MOTO_TYPE_FLOAT, moto_transform_float4_to_float1);
+    g_value_register_transform_func(MOTO_TYPE_FLOAT4, MOTO_TYPE_FLOAT, moto_transform_float4_to_float);
     g_value_register_transform_func(MOTO_TYPE_FLOAT4, MOTO_TYPE_FLOAT2, moto_transform_float4_to_float2);
     g_value_register_transform_func(MOTO_TYPE_FLOAT4, MOTO_TYPE_FLOAT3, moto_transform_float4_to_float3);
     */
