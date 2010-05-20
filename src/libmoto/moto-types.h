@@ -196,20 +196,6 @@ void moto_value_set_float3_v(GValue *value, const gfloat *v);
 void moto_value_set_float4(GValue *value, gfloat v0, gfloat v1, gfloat v2, gfloat v3);
 void moto_value_set_float4_v(GValue *value, const gfloat *v);
 
-// Setting individual element of vector or matrix
-
-void moto_value_set_bool2_element(GValue *value, gsize i, gboolean v);
-void moto_value_set_bool3_element(GValue *value, gsize i, gboolean v);
-void moto_value_set_bool4_element(GValue *value, gsize i, gboolean v);
-
-void moto_value_set_int2_element(GValue *value, gsize i, gint v);
-void moto_value_set_int3_element(GValue *value, gsize i, gint v);
-void moto_value_set_int4_element(GValue *value, gsize i, gint v);
-
-void moto_value_set_float2_element(GValue *value, gsize i, gfloat v);
-void moto_value_set_float3_element(GValue *value, gsize i, gfloat v);
-void moto_value_set_float4_element(GValue *value, gsize i, gfloat v);
-
 G_END_DECLS
 
 #endif /* __MOTO_TYPES_H__ */
