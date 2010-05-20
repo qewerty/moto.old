@@ -65,6 +65,7 @@ moto_cylinder_node_init(MotoCylinderNode *self)
             "height", "Height", MOTO_TYPE_FLOAT, MOTO_PARAM_MODE_INOUT, 2.0f, pspec, "Body",
             "radius", "Radius", MOTO_TYPE_FLOAT4, MOTO_PARAM_MODE_INOUT, radius, pspec, "Body",
             "divs", "Divisions",     MOTO_TYPE_INT2, MOTO_PARAM_MODE_INOUT, divs, divs_spec, "Body",
+            "radius_mul", "Radius Multiplier", MOTO_TYPE_FLOAT_ARRAY, MOTO_PARAM_MODE_INOUT, NULL, pspec, "Body",
             "div0_mode", "Division 0 Mode",     MOTO_TYPE_ARRAY_MODE, MOTO_PARAM_MODE_INOUT, MOTO_ARRAY_MODE_WEIGHT, NULL, "Body",
             "div0_ratio", "Division 0 Ratio", MOTO_TYPE_FLOAT_ARRAY, MOTO_PARAM_MODE_INOUT, NULL, NULL, "Body",
             "div1_mode", "Division 1 Mode",     MOTO_TYPE_ARRAY_MODE, MOTO_PARAM_MODE_INOUT, MOTO_ARRAY_MODE_WEIGHT, NULL, "Body",
@@ -148,6 +149,23 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
 
     rows = (rows < 2) ? 2 : rows;
     cols = (cols < 3) ? 3 : cols;
+
+    GValue* radius_mul_value = moto_node_get_param_value(node, "radius_mul");
+    gfloat radius_mul[rows + 1];
+    {
+        gint i;
+        for(i = 0; i < rows + 1; ++i)
+        {
+            radius_mul[i] = 1;
+        }
+
+        gsize size;
+        const gfloat* radius_mul_array = \
+            moto_value_get_float_array(radius_mul_value, &size);
+
+        memcpy(radius_mul, radius_mul_array,
+            sizeof(gfloat)*min(size, rows + 1));
+    }
 
     GValue*  div0_ratio_value = moto_node_get_param_value(node, "div0_ratio");
     gsize div0_ratio_size = 0;
@@ -318,8 +336,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 gfloat c = cos(a);
 
                 gfloat len = (height*i)/(rows-1);
-                mesh->v_coords[vi].z = c*(radius_x_f*(len/height) + radius_x_s*(1-len/height));
-                mesh->v_coords[vi].y = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
+                mesh->v_coords[vi].z = radius_mul[i] * (c*(radius_x_f*(len/height) + radius_x_s*(1-len/height)));
+                mesh->v_coords[vi].y = radius_mul[i] * (s*(radius_y_f*(len/height) + radius_y_s*(1-len/height)));
                 mesh->v_coords[vi].x = len - height/2;
 
                 ++vi;
@@ -338,8 +356,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 gfloat c = cos(a);
 
                 gfloat len = (height*i)/(rows-1);
-                mesh->v_coords[vi].z = c*(radius_x_f*(len/height) + radius_x_s*(1-len/height));
-                mesh->v_coords[vi].x = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
+                mesh->v_coords[vi].z = radius_mul[i] * (c*(radius_x_f*(len/height) + radius_x_s*(1-len/height)));
+                mesh->v_coords[vi].x = radius_mul[i] * (s*(radius_y_f*(len/height) + radius_y_s*(1-len/height)));
                 mesh->v_coords[vi].y = len - height/2;
 
                 ++vi;
@@ -365,8 +383,8 @@ static void moto_cylinder_node_update_mesh(MotoCylinderNode *self)
                 gfloat s = sin(a);
                 gfloat c = cos(a);
 
-                mesh->v_coords[vi].y = c*(radius_x_f*(len/height) + radius_x_s*(1-len/height));
-                mesh->v_coords[vi].x = s*(radius_y_f*(len/height) + radius_y_s*(1-len/height));
+                mesh->v_coords[vi].y = radius_mul[i] * (c*(radius_x_f*(len/height) + radius_mul[i]*radius_x_s*(1-len/height)));
+                mesh->v_coords[vi].x = radius_mul[i] * (s*(radius_y_f*(len/height) + radius_mul[i]*radius_y_s*(1-len/height)));
                 mesh->v_coords[vi].z = len - height/2;
 
                 ++vi;
