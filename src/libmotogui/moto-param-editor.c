@@ -1,4 +1,5 @@
-#include <errno.h>
+#include <string.h>
+#include <ctype.h>
 #include <gdk/gdkkeysyms.h>
 
 #include "libmoto/moto-types.h"
@@ -722,7 +723,6 @@ on_float_array_changed(GtkEditable *editable,
         if(isdigit(ch) || '.' == ch || '-' == ch || '+' == ch)
         {
             char* endptr = NULL;
-            errno = 0;
             tmp[ii] = g_ascii_strtod(text + i, &endptr);
             ++ii;
             i += (endptr - (text + i));
@@ -830,88 +830,6 @@ on_float_array_delete_text(GtkEditable *editable,
                            OnChangedData *data)
 {
     // g_signal_stop_emission_by_name(editable, "delete-text");
-}
-
-static gboolean
-on_float_array_scroll(GtkWidget* widget,
-                      GdkEventScroll *event,
-                      OnChangedData* data)
-{
-    g_print("on_float_array_scroll\n");
-
-    GtkEntry* entry = (GtkEntry*)widget;
-
-    GValue* value = moto_param_get_value(data->param);
-    gsize size = 0;
-    const gfloat* array = moto_value_get_float_array(value, &size);
-    g_print("on_float_array_scroll: size = %u\n", size);
-    if(size < 1)
-        return FALSE;
-
-    gfloat* tmp = (gfloat*)g_try_malloc(sizeof(float)*size);
-    memcpy(tmp, array, sizeof(float)*size);
-
-    const char* text = gtk_entry_get_text(entry);
-
-    gint pos = gtk_editable_get_position((GtkEditable*)widget);
-
-    const char* begin = \
-        g_utf8_offset_to_pointer(text, pos);
-
-    gint index = 0;
-    gint i = 0;
-    gchar* ptr = text;
-    gunichar ch_prev = ' ';
-    for(i = 0; i < pos; ++i)
-    {
-        gunichar ch = g_utf8_get_char(ptr);
-        ptr = g_utf8_next_char(ptr);
-
-        if(' ' == ch && ch_prev != ' ')
-        {
-            ++index;
-        }
-    }
-
-    gunichar ch = g_utf8_get_char(begin);
-    while(' ' != ch || begin == text)
-    {
-        begin = g_utf8_prev_char(begin);
-        ch = g_utf8_get_char(begin);
-    }
-
-    gdouble v = g_ascii_strtod(begin, NULL);
-    g_print("v: %f\n", v);
-
-    g_print("GDK_SCROLL_UP: %d\n", GDK_SCROLL_UP);
-    g_print("GDK_SCROLL_DOWN: %d\n", GDK_SCROLL_DOWN);
-    g_print("event->direction: %d\n", event->direction);
-    if(GDK_SCROLL_UP == event->direction)
-    {
-        tmp[index] = v + 0.1;
-    }
-    else if(GDK_SCROLL_DOWN == event->direction)
-    {
-        tmp[index] = v - 0.1;
-    }
-
-    GString* str = g_string_new("");
-    GString* str_tmp = g_string_new("");
-    for(i = 0; i < size; ++i)
-    {
-        g_string_printf(str_tmp, "%.2f ", tmp[i]);
-        g_string_append(str, str_tmp->str);
-    }
-
-    g_print("result: %s\n", str->str);
-
-    gtk_entry_set_text(entry, str->str);
-
-    g_string_free(str, TRUE);
-    g_string_free(str_tmp, TRUE);
-    g_free(tmp);
-
-    return TRUE;
 }
 
 // MOTO_TYPE_STRING
@@ -1115,7 +1033,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->param_handler_id = 0;
 
         g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)widget_delete_notify, data);
-        g_signal_connect(widget, "clicked", on_source_button_clicked, data);
+        g_signal_connect(widget, "clicked", G_CALLBACK(on_source_button_clicked), data);
         return widget;
     }
 
@@ -1866,7 +1784,6 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         data->handler_id = g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(on_float_array_changed), data);
         g_signal_connect(G_OBJECT(widget), "insert-text", G_CALLBACK(on_float_array_insert_text), data);
         g_signal_connect(G_OBJECT(widget), "delete-text", G_CALLBACK(on_float_array_delete_text), data);
-        g_signal_connect(G_OBJECT(widget), "scroll-event", G_CALLBACK(on_float_array_scroll), data);
         data->param_handler_id = 0;
 
         g_string_free(str, TRUE);
@@ -2016,7 +1933,7 @@ static void check_param(MotoNode *node, MotoParam *param, MotoCheckParamData *da
     if(data->has)
         return;
 
-    if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT)
+    if(!(moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT))
         return;
 
     GType ptype = moto_param_get_value_type(param);
@@ -2025,7 +1942,7 @@ static void check_param(MotoNode *node, MotoParam *param, MotoCheckParamData *da
 
 static void add_param_to_menu(MotoNode *node, MotoParam *param, MotoMakeNodeMenuData *data)
 {
-    if( ! moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT)
+    if(!(moto_param_get_mode(param) & MOTO_PARAM_MODE_OUT))
         return;
 
     GType ptype = moto_param_get_value_type(param);
@@ -2033,7 +1950,7 @@ static void add_param_to_menu(MotoNode *node, MotoParam *param, MotoMakeNodeMenu
 
     if(compatible)
     {
-        GtkMenuItem *item = gtk_menu_item_new_with_label(moto_param_get_name(param));
+        GtkWidget *item = gtk_menu_item_new_with_label(moto_param_get_name(param));
         gtk_menu_shell_append((GtkMenuShell*)data->menu, item);
     }
 }
@@ -2053,13 +1970,13 @@ static gboolean make_submenu_for_node(MotoSceneNode *scene_node, MotoNode *node,
 
     GtkMenu *menu = data->menu;
 
-    GtkMenuItem *item = gtk_menu_item_new_with_label(moto_node_get_name(node));
+    GtkWidget *item = gtk_menu_item_new_with_label(moto_node_get_name(node));
     gtk_menu_shell_append((GtkMenuShell*)menu, item);
 
-    GtkMenu *submenu = gtk_menu_new();
-    gtk_menu_item_set_submenu(item, (GtkWidget*)submenu);
+    GtkWidget *submenu = gtk_menu_new();
+    gtk_menu_item_set_submenu((GtkMenuItem*)item, submenu);
 
-    MotoMakeNodeMenuData data1 = {submenu, data->type, NULL};
+    MotoMakeNodeMenuData data1 = {(GtkMenu*)submenu, data->type, NULL};
     moto_node_foreach_param(node, (MotoNodeForeachParamFunc)add_param_to_menu, &data1);
 
     return TRUE;
@@ -2074,15 +1991,15 @@ static void on_connect_button_clicked(GtkButton *button, MotoParam *param)
     if( ! scene_node)
         return;
 
-    GtkMenu *menu = gtk_menu_new();
+    GtkWidget *menu = gtk_menu_new();
     g_object_weak_ref(G_OBJECT(menu), (GWeakNotify)on_menu_destroy, NULL);
 
-    MotoMakeNodeMenuData data = {menu, moto_param_get_value_type(param), node};
+    MotoMakeNodeMenuData data = {(GtkMenu*)menu, moto_param_get_value_type(param), node};
     moto_scene_node_foreach_node(scene_node, MOTO_TYPE_NODE,
         (MotoSceneNodeForeachNodeFunc)make_submenu_for_node, & data);
 
-    gtk_widget_show_all((GtkWidget*)menu);
-    gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 2, 0);
+    gtk_widget_show_all(menu);
+    gtk_menu_popup((GtkMenu*)menu, NULL, NULL, NULL, NULL, 2, 0);
 }
 
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
@@ -2138,7 +2055,7 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
                 2, 3, pe_priv->num, pe_priv->num + 1,
                 GTK_SHRINK, GTK_SHRINK, 0, 0);
 
-        g_signal_connect(button, "clicked", on_connect_button_clicked, param);
+        g_signal_connect(button, "clicked", G_CALLBACK(on_connect_button_clicked), param);
     }
 
     pe_priv->num++;
