@@ -719,7 +719,7 @@ on_float_array_changed(GtkEditable *editable,
     for(i = 0; i < len; ++i)
     {
         int ch = text[i];
-        if(isdigit(ch) || ch == '.')
+        if(isdigit(ch) || '.' == ch || '-' == ch || '+' == ch)
         {
             char* endptr = NULL;
             errno = 0;
@@ -813,7 +813,6 @@ on_float_array_insert_text(GtkEditable *editable,
     g_string_append_len(result, new_text, new_text_length);
     g_string_append(result, text + *position);
 
-    g_print("result: '%s'\n", result->str);
     if(!check_float_array_string(result->str, result->len))
     {
         g_signal_stop_emission_by_name(editable, "insert-text");
@@ -838,15 +837,19 @@ on_float_array_scroll(GtkWidget* widget,
                       GdkEventScroll *event,
                       OnChangedData* data)
 {
+    g_print("on_float_array_scroll\n");
+
     GtkEntry* entry = (GtkEntry*)widget;
 
     GValue* value = moto_param_get_value(data->param);
     gsize size = 0;
     const gfloat* array = moto_value_get_float_array(value, &size);
+    g_print("on_float_array_scroll: size = %u\n", size);
     if(size < 1)
         return FALSE;
 
     gfloat* tmp = (gfloat*)g_try_malloc(sizeof(float)*size);
+    memcpy(tmp, array, sizeof(float)*size);
 
     const char* text = gtk_entry_get_text(entry);
 
@@ -871,28 +874,44 @@ on_float_array_scroll(GtkWidget* widget,
     }
 
     gunichar ch = g_utf8_get_char(begin);
-    while(' ' != ch)
+    while(' ' != ch || begin == text)
     {
         begin = g_utf8_prev_char(begin);
         ch = g_utf8_get_char(begin);
     }
 
     gdouble v = g_ascii_strtod(begin, NULL);
+    g_print("v: %f\n", v);
 
+    g_print("GDK_SCROLL_UP: %d\n", GDK_SCROLL_UP);
+    g_print("GDK_SCROLL_DOWN: %d\n", GDK_SCROLL_DOWN);
+    g_print("event->direction: %d\n", event->direction);
     if(GDK_SCROLL_UP == event->direction)
     {
         tmp[index] = v + 0.1;
-        moto_param_notify_dests(data->param);
-        return TRUE;
     }
     else if(GDK_SCROLL_DOWN == event->direction)
     {
         tmp[index] = v - 0.1;
-        moto_param_notify_dests(data->param);
-        return TRUE;
     }
 
-    return FALSE;
+    GString* str = g_string_new("");
+    GString* str_tmp = g_string_new("");
+    for(i = 0; i < size; ++i)
+    {
+        g_string_printf(str_tmp, "%.2f ", tmp[i]);
+        g_string_append(str, str_tmp->str);
+    }
+
+    g_print("result: %s\n", str->str);
+
+    gtk_entry_set_text(entry, str->str);
+
+    g_string_free(str, TRUE);
+    g_string_free(str_tmp, TRUE);
+    g_free(tmp);
+
+    return TRUE;
 }
 
 // MOTO_TYPE_STRING
@@ -1831,12 +1850,7 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
         gsize i = 0;
         for(i = 0; i < size; ++i)
         {
-            if(fmod(array[i], 1) < 0.01)
-                g_string_printf(str_tmp, "%d ", (gint)array[i]);
-            else if(fmod(array[i], 0.1) < 0.01)
-                g_string_printf(str_tmp, "%.1f", array[i]);
-            else
-                g_string_printf(str_tmp, "%.2f ", array[i]);
+            g_string_printf(str_tmp, "%.2f ", array[i]);
             g_string_append(str, str_tmp->str);
         }
 
