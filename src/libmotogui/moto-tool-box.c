@@ -179,6 +179,9 @@ static void set_draw_mode(GtkMenuItem *item, gpointer user_data)
 
 static void set_state(GtkMenuItem *item, gpointer user_data)
 {
+    MotoObjectNode* ob = (MotoObjectNode*)user_data;
+    gint new_mode = (gint)g_object_get_data(item, "moto-geom-view-state");
+    moto_object_node_set_selection_mode(ob, (MotoSelectionMode)new_mode);
 }
 
 void show_draw_mode_menu(GtkButton *button, gpointer user_data)
@@ -247,7 +250,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
         return;
     }
 
-    MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view");
+    MotoParam *in_view = moto_node_get_param((MotoNode *)object, "shape");
     if(( ! in_view) || (moto_param_get_mode(in_view) == MOTO_PARAM_MODE_OUT))
     {
         moto_warning("Current object has no view. I can do nothing.");
@@ -266,6 +269,26 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     /* menu */
     GtkMenu *menu = (GtkMenu *)gtk_menu_new();
     GtkWidget *item;
+
+    GEnumClass *ec = \
+        (GEnumClass *)g_type_class_ref(MOTO_TYPE_SELECTION_MODE);
+    guint i;
+    for(i = 0; i < ec->n_values; ++i)
+    {
+        gint v = ec->minimum + i;
+        GEnumValue *ev = g_enum_get_value(ec, v);
+        if(!ev)
+            continue;
+
+        item = \
+            gtk_menu_item_new_with_label(ev->value_nick);
+
+        g_object_set_data((GObject *)item, "moto-geom-view-state", (gpointer)v);
+        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(set_state), object);
+
+        gtk_menu_shell_append((GtkMenuShell *)menu, (GtkWidget *)item);
+    }
+    g_type_class_unref(ec);
 
     /*
     GSList *state = moto_shape_view_node_get_state_list(geom);
