@@ -153,7 +153,7 @@ void moto_tool_box_set_system(MotoToolBox *self, MotoSystem *system)
 
     if( ! MOTO_IS_SYSTEM(system))
     {
-        GString *msg = g_string_new("You are trying to set not MotoSystem instance as system for ToolBox");
+        GString *msg = g_string_new("You are trying to set not a MotoSystem instance as a system for ToolBox");
         moto_error(msg->str);
         g_string_free(msg, TRUE);
 
@@ -250,7 +250,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoParam *in_view = moto_node_get_param((MotoNode *)object, "view");
     if(( ! in_view) || (moto_param_get_mode(in_view) == MOTO_PARAM_MODE_OUT))
     {
-        moto_warning("Current object has no a view. I can do nothing.");
+        moto_warning("Current object has no view. I can do nothing.");
 
         return;
     }
@@ -258,7 +258,7 @@ void show_component_selection_mode_menu(GtkButton *button, gpointer user_data)
     MotoParam *out_view = moto_param_get_source(in_view);
     if( ! out_view)
     {
-        moto_warning("Current object has no a view. I can do nothing.");
+        moto_warning("Current object has no view. I can do nothing.");
 
         return;
     }
