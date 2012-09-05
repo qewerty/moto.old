@@ -58,8 +58,8 @@ GType moto_test_window_get_type(void);
 GtkWindow *moto_test_window_new();
 
 void moto_test_window_redraw_3dview(MotoTestWindow *self);
-void moto_test_window_update_param_editor(MotoTestWindow *self);
-void moto_test_window_update_param_editor_full(MotoTestWindow *self, MotoNode *node);
+void moto_test_window_update_inspector(MotoTestWindow *self);
+void moto_test_window_update_inspector_full(MotoTestWindow *self, MotoNode *node);
 void moto_test_window_update_outliner(MotoTestWindow *self);
 
 G_END_DECLS

@@ -297,7 +297,7 @@ static void on_item(GtkButton *button, ShelfItemData *data)
 
     data->func(data->shelf, data->system);
     moto_test_window_redraw_3dview(data->shelf->priv->window);
-    moto_test_window_update_param_editor(data->shelf->priv->window);
+    moto_test_window_update_inspector(data->shelf->priv->window);
     moto_test_window_update_outliner(data->shelf->priv->window);
 }
 

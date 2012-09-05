@@ -193,7 +193,7 @@ on_cursor_changed(GtkTreeView *tree_view,
 
     MotoNode *node = NULL;
     gtk_tree_model_get(model, &iter, 2, & node, -1);
-    moto_test_window_update_param_editor_full(priv->window, node);
+    moto_test_window_update_inspector_full(priv->window, node);
 
     gtk_tree_path_free(path);
 }

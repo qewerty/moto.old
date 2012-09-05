@@ -6,35 +6,35 @@
 #include "libmoto/moto-param-spec.h"
 #include "libmoto/moto-filename.h"
 #include "libmoto/moto-messager.h"
-#include "moto-param-editor.h"
+#include "moto-inspector.h"
 
 /*  */
 
-static GtkMenuBar *create_menu_bar(MotoParamEditor *pe);
+static GtkMenuBar *create_menu_bar(MotoInspector *pe);
 
-static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *node, gboolean force);
-#define __moto_param_editor_update(self, node) __moto_param_editor_update_full(self, node, FALSE);
+static void __moto_inspector_update_full(MotoInspector *self, MotoNode *node, gboolean force);
+#define __moto_inspector_update(self, node) __moto_inspector_update_full(self, node, FALSE);
 
-static void __moto_param_editor_set_node_buttons(MotoParamEditor *self, gboolean sensitive);
-static void __moto_param_editor_set_param_mode(MotoParamEditor *self, MotoParamMode mode);
+static void __moto_inspector_set_node_buttons(MotoInspector *self, gboolean sensitive);
+static void __moto_inspector_set_param_mode(MotoInspector *self, MotoParamMode mode);
 
-static void __on_button_prev(GtkButton* button, MotoParamEditor *pe);
-static void __on_button_next(GtkButton* button, MotoParamEditor *pe);
-static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was);
+static void __on_button_prev(GtkButton* button, MotoInspector *pe);
+static void __on_button_next(GtkButton* button, MotoInspector *pe);
+static void __on_node_destroy(MotoInspector *pe, MotoNode *where_the_object_was);
 
-static void __on_button_in(GtkButton* button, MotoParamEditor *pe);
-static void __on_button_out(GtkButton* button, MotoParamEditor *pe);
-static void __on_button_inout(GtkButton* button, MotoParamEditor *pe);
-static void __on_button_all(GtkButton* button, MotoParamEditor *pe);
+static void __on_button_in(GtkButton* button, MotoInspector *pe);
+static void __on_button_out(GtkButton* button, MotoInspector *pe);
+static void __on_button_inout(GtkButton* button, MotoInspector *pe);
+static void __on_button_all(GtkButton* button, MotoInspector *pe);
 
-/* class MotoParamEditor */
+/* class MotoInspector */
 
-#define MOTO_PARAM_EDITOR_GET_PRIVATE(obj) \
-    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_PARAM_EDITOR, MotoParamEditorPriv)
+#define MOTO_INSPECTOR_GET_PRIVATE(obj) \
+    G_TYPE_INSTANCE_GET_PRIVATE(obj, MOTO_TYPE_INSPECTOR, MotoInspectorPriv)
 
-static GObjectClass *param_editor_parent_class = NULL;
+static GObjectClass *inspector_parent_class = NULL;
 
-struct _MotoParamEditorPriv
+struct _MotoInspectorPriv
 {
     gboolean disposed;
 
@@ -63,27 +63,27 @@ struct _MotoParamEditorPriv
 };
 
 static void
-moto_param_editor_dispose(GObject *obj)
+moto_inspector_dispose(GObject *obj)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(obj);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(obj);
 
     if(priv->disposed)
         return;
     priv->disposed = TRUE;
 
-    param_editor_parent_class->dispose(obj);
+    inspector_parent_class->dispose(obj);
 }
 
 static void
-moto_param_editor_finalize(GObject *obj)
+moto_inspector_finalize(GObject *obj)
 {
-    param_editor_parent_class->finalize(obj);
+    inspector_parent_class->finalize(obj);
 }
 
 static void
-moto_param_editor_init(MotoParamEditor *self)
+moto_inspector_init(MotoInspector *self)
 {
-    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv *priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     priv->disposed = FALSE;
 
@@ -140,25 +140,25 @@ moto_param_editor_init(MotoParamEditor *self)
 }
 
 static void
-moto_param_editor_class_init(MotoParamEditorClass *klass)
+moto_inspector_class_init(MotoInspectorClass *klass)
 {
     GObjectClass *goclass = (GObjectClass *)klass;
 
-    param_editor_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
+    inspector_parent_class = (GObjectClass *)g_type_class_peek_parent(klass);
 
-    goclass->dispose    = moto_param_editor_dispose;
-    goclass->finalize   = moto_param_editor_finalize;
+    goclass->dispose    = moto_inspector_dispose;
+    goclass->finalize   = moto_inspector_finalize;
 
-    g_type_class_add_private(goclass, sizeof(MotoParamEditorPriv));
+    g_type_class_add_private(goclass, sizeof(MotoInspectorPriv));
 }
 
-G_DEFINE_TYPE(MotoParamEditor, moto_param_editor, GTK_TYPE_VBOX);
+G_DEFINE_TYPE(MotoInspector, moto_inspector, GTK_TYPE_VBOX);
 
-GtkWidget *moto_param_editor_new(MotoTestWindow *window)
+GtkWidget *moto_inspector_new(MotoTestWindow *window)
 {
-    MotoParamEditor *self = (MotoParamEditor *)g_object_new(MOTO_TYPE_PARAM_EDITOR, NULL);
+    MotoInspector *self = (MotoInspector *)g_object_new(MOTO_TYPE_INSPECTOR, NULL);
 
-    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv *priv = MOTO_INSPECTOR_GET_PRIVATE(self);
     priv->window = window;
 
     return (GtkWidget *)self;
@@ -167,16 +167,16 @@ GtkWidget *moto_param_editor_new(MotoTestWindow *window)
 typedef struct _OnChangedData
 {
     MotoParam *param;
-    MotoParamEditor *pe;
+    MotoInspector *pe;
     MotoTestWindow *window;
     GtkWidget *widget;
     gulong handler_id;
     gulong param_handler_id;
 } OnChangedData;
 
-static void node_delete_notify(MotoParamEditor *pe, GObject *where_the_object_was)
+static void node_delete_notify(MotoInspector *pe, GObject *where_the_object_was)
 {
-    moto_param_editor_set_node(pe, NULL);
+    moto_inspector_set_node(pe, NULL);
 }
 
 static void widget_delete_notify(OnChangedData *data, GObject *where_the_object_was)
@@ -983,12 +983,12 @@ static void on_source_button_clicked(GtkButton *button, OnChangedData *data)
     if( ! source)
         return;
 
-    moto_param_editor_set_node(data->pe, moto_param_get_node(source));
+    moto_inspector_set_node(data->pe, moto_param_get_node(source));
 }
 
-static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
+static GtkWidget *create_widget_for_param(MotoInspector *pe, MotoParam *param)
 {
-    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv *pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
 
     GtkWidget *widget = NULL;
     OnChangedData *data;
@@ -1861,14 +1861,14 @@ static GtkWidget *create_widget_for_param(MotoParamEditor *pe, MotoParam *param)
 
 typedef struct _AddWidgetData
 {
-    MotoParamEditor *pe;
+    MotoInspector *pe;
     GtkTable *table;
     guint num;
 } AddWidgetData;
 
 typedef struct _OnLabelButtonPressData
 {
-    MotoParamEditor *pe;
+    MotoInspector *pe;
     MotoParam *param;
 } OnLabelButtonPressData;
 
@@ -1880,8 +1880,8 @@ gboolean on_label_button_press_event(GtkLabel       *label,
     {
         moto_param_set_use_expression(data->param, ! moto_param_get_use_expression(data->param));
 
-        MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(data->pe);
-        __moto_param_editor_update_full(data->pe, pe_priv->node, TRUE);
+        MotoInspectorPriv* pe_priv = MOTO_INSPECTOR_GET_PRIVATE(data->pe);
+        __moto_inspector_update_full(data->pe, pe_priv->node, TRUE);
     }
 
     return TRUE;
@@ -2004,7 +2004,7 @@ static void on_connect_button_clicked(GtkButton *button, MotoParam *param)
 
 static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *param, AddWidgetData *data)
 {
-    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(data->pe);
+    MotoInspectorPriv* pe_priv = MOTO_INSPECTOR_GET_PRIVATE(data->pe);
 
     MotoParamMode mode = moto_param_get_mode(param);
 
@@ -2061,12 +2061,12 @@ static void add_param_widget(MotoNode *node, const gchar *group, MotoParam *para
     pe_priv->num++;
 }
 
-static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
+static void make_group(MotoNode *node, const gchar *group, MotoInspector *pe)
 {
     if(moto_node_get_n_params_in_group(node, group) < 1)
         return;
 
-    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv* pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
     GtkExpander *exp = (GtkExpander *)gtk_expander_new(group);
     gtk_expander_set_expanded(exp, TRUE);
 
@@ -2089,9 +2089,9 @@ static void make_group(MotoNode *node, const gchar *group, MotoParamEditor *pe)
     pe_priv->gnum++;
 }
 
-void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
+void moto_inspector_set_node(MotoInspector *self, MotoNode *node)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     if(priv->node)
     {
@@ -2108,12 +2108,12 @@ void moto_param_editor_set_node(MotoParamEditor *self, MotoNode *node)
     priv->next_nodes = NULL;
     gtk_widget_set_sensitive(priv->button_next, FALSE);
 
-    __moto_param_editor_update(self, node);
+    __moto_inspector_update(self, node);
 }
 
-static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *node, gboolean force)
+static void __moto_inspector_update_full(MotoInspector *self, MotoNode *node, gboolean force)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     if(node == priv->node && ! force)
         return;
@@ -2131,10 +2131,10 @@ static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *nod
     }
     if( ! node)
     {
-        __moto_param_editor_set_node_buttons(self, FALSE);
+        __moto_inspector_set_node_buttons(self, FALSE);
         return;
     }
-    __moto_param_editor_set_node_buttons(self, TRUE);
+    __moto_inspector_set_node_buttons(self, TRUE);
 
     g_object_weak_ref(G_OBJECT(node), (GWeakNotify)node_delete_notify, self);
     priv->node = node;
@@ -2144,7 +2144,7 @@ static void __moto_param_editor_update_full(MotoParamEditor *self, MotoNode *nod
     gtk_widget_show_all((GtkWidget *)self);
 }
 
-static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
+static GtkMenuBar *create_menu_bar(MotoInspector *pe)
 {
     GtkMenuBar *mb = (GtkMenuBar *)gtk_menu_bar_new();
     GtkMenu *menu;
@@ -2191,21 +2191,21 @@ static GtkMenuBar *create_menu_bar(MotoParamEditor *pe)
     return mb;
 }
 
-gboolean moto_param_editor_has_prev_node(MotoParamEditor *self)
+gboolean moto_inspector_has_prev_node(MotoInspector *self)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
     return NULL != priv->prev_nodes;
 }
 
-gboolean moto_param_editor_has_next_node(MotoParamEditor *self)
+gboolean moto_inspector_has_next_node(MotoInspector *self)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
     return NULL != priv->next_nodes;
 }
 
-void moto_param_editor_goto_prev_node(MotoParamEditor *self)
+void moto_inspector_goto_prev_node(MotoInspector *self)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     GList *first = g_list_first(priv->prev_nodes);
     if( ! first)
@@ -2217,16 +2217,16 @@ void moto_param_editor_goto_prev_node(MotoParamEditor *self)
     if(priv->node)
         priv->next_nodes = g_list_prepend(priv->next_nodes, priv->node);
 
-    if( ! moto_param_editor_has_prev_node(self))
+    if( ! moto_inspector_has_prev_node(self))
         gtk_widget_set_sensitive(priv->button_prev, FALSE);
     gtk_widget_set_sensitive(priv->button_next, TRUE);
 
-    __moto_param_editor_update(self, node);
+    __moto_inspector_update(self, node);
 }
 
-void moto_param_editor_goto_next_node(MotoParamEditor *self)
+void moto_inspector_goto_next_node(MotoInspector *self)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     GList *first = g_list_first(priv->next_nodes);
     if( ! first)
@@ -2238,93 +2238,93 @@ void moto_param_editor_goto_next_node(MotoParamEditor *self)
     if(priv->node)
         priv->prev_nodes = g_list_prepend(priv->prev_nodes, priv->node);
 
-    if( ! moto_param_editor_has_next_node(self))
+    if( ! moto_inspector_has_next_node(self))
         gtk_widget_set_sensitive(priv->button_next, FALSE);
     gtk_widget_set_sensitive(priv->button_prev, TRUE);
 
-    __moto_param_editor_update(self, node);
+    __moto_inspector_update(self, node);
 }
 
-void moto_param_editor_goto_first_node(MotoParamEditor *self)
+void moto_inspector_goto_first_node(MotoInspector *self)
 {
-    if( ! moto_param_editor_has_prev_node(self))
+    if( ! moto_inspector_has_prev_node(self))
         return;
 }
 
-void moto_param_editor_goto_last_node(MotoParamEditor *self)
+void moto_inspector_goto_last_node(MotoInspector *self)
 {
-    if( ! moto_param_editor_has_next_node(self))
+    if( ! moto_inspector_has_next_node(self))
         return;
 }
 
-static void __on_button_prev(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_prev(GtkButton* button, MotoInspector *pe)
 {
-    moto_param_editor_goto_prev_node(pe);
+    moto_inspector_goto_prev_node(pe);
 }
 
-static void __on_button_next(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_next(GtkButton* button, MotoInspector *pe)
 {
-    moto_param_editor_goto_next_node(pe);
+    moto_inspector_goto_next_node(pe);
 }
 
-static void __on_node_destroy(MotoParamEditor *pe, MotoNode *where_the_object_was)
+static void __on_node_destroy(MotoInspector *pe, MotoNode *where_the_object_was)
 {
-    MotoParamEditorPriv* pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv* pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
 
     pe_priv->prev_nodes = g_list_remove_all(pe_priv->prev_nodes, where_the_object_was);
     pe_priv->next_nodes = g_list_remove_all(pe_priv->next_nodes, where_the_object_was);
 
     if(pe_priv->node == where_the_object_was)
     {
-        if(moto_param_editor_has_prev_node(pe))
+        if(moto_inspector_has_prev_node(pe))
         {
-            moto_param_editor_goto_prev_node(pe);
+            moto_inspector_goto_prev_node(pe);
         }
         else
         {
-            moto_param_editor_goto_next_node(pe);
+            moto_inspector_goto_next_node(pe);
         }
     }
 }
 
-static void __moto_param_editor_set_param_mode(MotoParamEditor *self, MotoParamMode mode)
+static void __moto_inspector_set_param_mode(MotoInspector *self, MotoParamMode mode)
 {
-    MotoParamEditorPriv *priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv *priv = MOTO_INSPECTOR_GET_PRIVATE(self);
     priv->param_mode = mode;
-    __moto_param_editor_update_full(self, priv->node, TRUE);
+    __moto_inspector_update_full(self, priv->node, TRUE);
 }
 
-static void __on_button_in(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_in(GtkButton* button, MotoInspector *pe)
 {
-    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv *pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
     pe_priv->show_all = FALSE;
-    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_IN);
+    __moto_inspector_set_param_mode(pe, MOTO_PARAM_MODE_IN);
 }
 
-static void __on_button_out(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_out(GtkButton* button, MotoInspector *pe)
 {
-    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv *pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
     pe_priv->show_all = FALSE;
-    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_OUT);
+    __moto_inspector_set_param_mode(pe, MOTO_PARAM_MODE_OUT);
 }
 
-static void __on_button_inout(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_inout(GtkButton* button, MotoInspector *pe)
 {
-    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv *pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
     pe_priv->show_all = FALSE;
-    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
+    __moto_inspector_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
 }
 
-static void __on_button_all(GtkButton* button, MotoParamEditor *pe)
+static void __on_button_all(GtkButton* button, MotoInspector *pe)
 {
-    MotoParamEditorPriv *pe_priv = MOTO_PARAM_EDITOR_GET_PRIVATE(pe);
+    MotoInspectorPriv *pe_priv = MOTO_INSPECTOR_GET_PRIVATE(pe);
     pe_priv->show_all = TRUE;
-    __moto_param_editor_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
+    __moto_inspector_set_param_mode(pe, MOTO_PARAM_MODE_INOUT);
 }
 
-static void __moto_param_editor_set_node_buttons(MotoParamEditor *self, gboolean sensitive)
+static void __moto_inspector_set_node_buttons(MotoInspector *self, gboolean sensitive)
 {
-    MotoParamEditorPriv* priv = MOTO_PARAM_EDITOR_GET_PRIVATE(self);
+    MotoInspectorPriv* priv = MOTO_INSPECTOR_GET_PRIVATE(self);
 
     gtk_widget_set_sensitive(priv->button_in,    sensitive);
     gtk_widget_set_sensitive(priv->button_out,   sensitive);
