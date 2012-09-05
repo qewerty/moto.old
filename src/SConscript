@@ -4,6 +4,6 @@ env.SConscript(['libmotoutil/SConscript',
                 'libmotogui/SConscript',
                 'libmototest/SConscript'])
 
-env.Program('$MOTO_GUI', 'moto-gui.c',
-            LIBS=['moto', 'motoutil', 'motogui', 'mototest'],
-            LIBPATH='./lib')
+env = env.Clone()
+env.Append(LIBS=['moto', 'motoutil', 'motogui', 'mototest'], LIBPATH='./lib')
+env.Program('$MOTO_GUI', 'moto-gui.c')
