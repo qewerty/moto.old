@@ -50,6 +50,9 @@ typedef struct _MotoParamClass MotoParamClass;
 typedef struct _MotoManipulator MotoManipulator;
 typedef struct _MotoManipulatorClass MotoManipulatorClass;
 
+typedef struct _MotoHandle MotoHandle;
+typedef struct _MotoHandleClass MotoHandleClass;
+
 typedef struct _MotoLibrary MotoLibrary;
 typedef struct _MotoLibraryClass MotoLibraryClass;
 
